@@ -3,6 +3,7 @@ import ColorClass from '../../utility/color.js';
 import MapClass from '../../map/map.js';
 import MeshClass from '../../mesh/mesh.js';
 import LightClass from '../../light/light.js';
+import MapPathNodeClass from '../../map/map_path_node.js';
 import GeneratePieceClass from './generate_piece.js';
 import GenerateRoomClass from './generate_room.js';
 import GenerateMeshClass from './generate_mesh.js';
@@ -11,6 +12,7 @@ import GeneratePillarClass from './generate_pillar.js';
 import GenerateStorageClass from './generate_storage.js';
 import GenerateComputerClass from './generate_computer.js';
 import GeneratePipeClass from './generate_pipe.js';
+import GenerateAltarClass from './generate_altar.js';
 import GenerateLightClass from './generate_light.js';
 import GenerateUtilityClass from '../utility/generate_utility.js';
 import GenerateBitmapBaseClass from '../bitmap/generate_bitmap_base.js';
@@ -106,7 +108,7 @@ export default class GenerateMapClass
     {
             // build the decoration
             
-        switch (GenerateUtilityClass.randomIndex(5)) {
+        switch (GenerateUtilityClass.randomIndex(6)) {
             case 0:
                 GenerateStoryClass.buildRoomStories(this.core,room,('story_'+roomIdx),stepBitmap,platformBitmap,segmentSize);
                 break;
@@ -121,6 +123,9 @@ export default class GenerateMapClass
                 break;
             case 4:
                 GeneratePipeClass.buildRoomPipes(this.core,room,('pipe_'+roomIdx),pipeBitmap,segmentSize);
+                break;
+            case 5:
+                GenerateAltarClass.buildRoomAltar(this.core,room,('alter_'+roomIdx),platformBitmap,segmentSize);
                 break;
         }
     }
@@ -207,6 +212,39 @@ export default class GenerateMapClass
             // add the room
                             
         rooms.push(room);
+    }
+    
+        //
+        // random nodes
+        //
+        
+    generateRandomNodes(rooms,segmentSize)
+    {
+        let x,z,nodeCount;
+        let room,failCount,pathNode,offset;
+        let roomCount=rooms.length;
+        let path=this.core.map.path;
+        
+        failCount=0;
+        nodeCount=roomCount*3;
+        
+        offset=Math.trunc(segmentSize*0.5);
+        
+        while (path.nodes.length<nodeCount) {
+            room=rooms[GenerateUtilityClass.randomIndex(roomCount)];
+            x=GenerateUtilityClass.randomInBetween(1,(room.piece.size.x-1));
+            z=GenerateUtilityClass.randomInBetween(1,(room.piece.size.z-1));
+            
+            if (room.getGrid(0,x,z)!==0) {
+                failCount++;
+                if (failCount>100) break;
+            }
+            
+            x=room.offset.x+((x*segmentSize)+offset);
+            z=room.offset.z+((z*segmentSize)+offset);
+            pathNode=new MapPathNodeClass(path.nodes.length,new PointClass(x,room.offset.y,z),null,[],null,null);
+            path.nodes.push(pathNode);
+        }
     }
 
         //
@@ -379,6 +417,10 @@ export default class GenerateMapClass
                 this.buildSteps(this.core,room,('room_'+n+'_step_'+k),room.requiredStairs[k],stepBitmap,segmentSize);
             }
         }
+        
+            // generate nodes
+            
+        this.generateRandomNodes(rooms,segmentSize);
 
             // the sky
             

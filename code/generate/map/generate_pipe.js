@@ -308,6 +308,8 @@ export default class GeneratePipeClass
         pnt=new PointClass((xOff+(x*segmentSize)),(room.offset.y+(room.storyCount*segmentSize)),(zOff+(z*segmentSize)));
         pipeAng=new PointClass(0,0,180.0);
         this.addPipeStraightChunk(core,room,name,pipeBitmap,pnt,(room.storyCount*segmentSize),pipeRadius,pipeAng);
+        
+        room.setGrid(0,x,z,1);
     }
     
     static buildSingleSplitPipe(core,room,name,lx,rx,tz,bz,x,z,xOff,zOff,pipeRadius,pipeBitmap,segmentSize)
@@ -319,7 +321,7 @@ export default class GeneratePipeClass
             // split pipe
 
         high=room.storyCount*segmentSize;
-        my=(high*GenerateUtilityClass.randomFloat(0.2,0.6))+pipeRadius;
+        my=(high*GenerateUtilityClass.randomFloat(0.6,0.2))+pipeRadius;
 
             // the top part
 
@@ -400,6 +402,8 @@ export default class GeneratePipeClass
         pnt=new PointClass((xOff+(x2*segmentSize)),((room.offset.y+my)-pipeRadius),(zOff+(z2*segmentSize)));
         pipeAng=new PointClass(0,0,180.0);     // force len to point down
         this.addPipeStraightChunk(core,room,name,pipeBitmap,pnt,my,pipeRadius,pipeAng);
+        
+        room.setGrid(0,x2,z2,1);
     }
     
         //
@@ -446,6 +450,8 @@ export default class GeneratePipeClass
                 
             x=GenerateUtilityClass.randomInBetween((lx+1),(rx-1));
             z=GenerateUtilityClass.randomInBetween((tz+1),(bz-1));
+            
+            if (room.getGrid(0,x,z)!==0) continue;      // always used
             
                 // pipes
                 

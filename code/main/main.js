@@ -170,6 +170,12 @@ class MainClass
     
     initLoadEntities()
     {
+            // call the map ready as it can load entities
+        
+        this.core.projectMap.ready();
+
+            // load the entities
+            
         try {
             this.core.map.entityList.loadMapEntities();
         }

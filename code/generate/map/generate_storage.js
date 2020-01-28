@@ -93,6 +93,8 @@ export default class GenerateStorageClass
                 if (GenerateUtilityClass.randomPercentage(0.5)) {
                     this.addBoxes(core,room,(name+'_'+storageCount),boxBitmap,x,z,segmentSize);
                     storageCount++;
+                    
+                    room.setGrid(0,x,z,1);
                 }
             }
         }

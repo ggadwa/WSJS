@@ -47,6 +47,32 @@ export default class CameraClass
     }
     
         //
+        // mode changes
+        //
+        
+    gotoFirstPerson()
+    {
+        this.mode=CameraClass.CAMERA_MODE_FIRST_PERSON;
+    }
+    
+    isFirstPerson()
+    {
+        return(this.mode===CameraClass.CAMERA_MODE_FIRST_PERSON);
+    }
+    
+    gotoThirdPersonBehind(thirdPersonDistance,thirdPersonLookDegree)
+    {
+        this.mode=CameraClass.CAMERA_MODE_THIRD_PERSON_BEHIND;
+        this.thirdPersonDistance=thirdPersonDistance;
+        this.thirdPersonLookDegree=thirdPersonLookDegree;
+    }
+    
+    isThirdPersonBehind()
+    {
+        return(this.mode===CameraClass.CAMERA_MODE_THIRD_PERSON_BEHIND);
+    }
+    
+        //
         // setup the camera for this frame
         //
         

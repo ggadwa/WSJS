@@ -35,16 +35,6 @@ export default class ProjectMapClass
     }
     
         //
-        // override this give the import settings
-        // for this map
-        //
-        
-    getImportSettings()
-    {
-        return(null);
-    }
-    
-        //
         // main map loader
         //
     
@@ -64,5 +54,47 @@ export default class ProjectMapClass
             
         generateMap=new GenerateMapClass(this.core);
         return(generateMap.build(importSettings));
+    }
+    
+    /**
+     * Adds an entity to this map, should only be called when
+     * the system calls the ready() method.
+     * 
+     * @entityClass {Class} Class of entity to spawn
+     * @name {string} Name of entity
+     * @position {PointClass} Position of entity
+     * @angle {PointClass} Angle of entity
+     * @data {Object} Additional user data for entity
+     * @show {boolean} TRUE if entity is not hidden
+     */
+    addEntity(entityClass,name,position,angle,data,show)
+    {
+        let entity;
+        
+        entity=new entityClass(this.core,name,position,angle,data);
+        entity.show=show;
+        
+        this.core.map.entityList.add(entity);
+        
+        return(entity);
+    }
+    
+    /*
+     * Override this to pass in the map JSON import
+     * settings.
+     * 
+     * @returns {Object} Map setup object
+     */
+    getImportSettings()
+    {
+        return(null);
+    }
+    
+    /**
+     * Override this to finish anything that needs to be setup
+     * in the map after it has been completely loaded.
+     */
+    ready()
+    {
     }
 }

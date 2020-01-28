@@ -85,8 +85,9 @@ export default class GenerateComputerClass
                 xBound.setFromValues(k,(k+wid));
                 
                 GenerateMeshClass.createCube(core,room,(name+'_computer_'+computerCount),computerBitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,GenerateMeshClass.UV_BOX,segmentSize);
-                
                 computerCount++;
+                
+                room.setGrid(0,x,z,1);
             }
         }
     }

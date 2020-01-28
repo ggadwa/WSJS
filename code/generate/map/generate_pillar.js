@@ -68,6 +68,8 @@ export default class GeneratePillarClass
                     GenerateMeshClass.createMeshCylinderSimple(core,room,(name+'_base_bot_'+n),pillarBitmap,centerPnt,yBottomBaseBound,baseRadius,true,false);
                     GenerateMeshClass.createCylinder(core,room,(name+'_'+n),pillarBitmap,centerPnt,yBound,cylinderSegments,radius,false,false);
                     GenerateMeshClass.createMeshCylinderSimple(core,room,(name+'_base_top_'+n),pillarBitmap,centerPnt,yTopBaseBound,baseRadius,false,true);
+                    
+                    room.setGrid(0,x,z,1);
                 }
             }
         }

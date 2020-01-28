@@ -1,11 +1,12 @@
 - networking
-   - odd null error on logon at times
-   - leave doesn't remove remote
-   - player needs local animations
-   - predictions
+    - odd null error on logon at times (fix -- check)
+    - leave doesn't remove remote (fix -- check)
+    - player needs local animations (fix -- check)
+    - predictions
+    - need open system for passing message (like firing weapons, etc)
 
 - generator
-   - create random nodes for rooms, use shield pickup to test
+    - better specs (generated with color?)
 
     - lights
        - regular
@@ -16,9 +17,21 @@
        - pipe, needs random line & random screw line
 
     - decorations
+       - don't repeat decorations
+       - pools
        - better uv for pillars
        - panels for computers areas
        - connectors for pipes
+
+- demo
+    - implement bot skill
+    - mouse wheel broken chrome/windows
+    - fix swimming
+
+- reaper
+
+- kart
+    - use this.getCamera().gotoThirdPersonBehind(20000,-20); in game.js
 
 - js docs (especially in the project_ classes)
 - slowly transition to public/private fields (especially in the project_ classes)
@@ -26,8 +39,3 @@
 - FIREFOX - wait for static class fields
 - finish touch interface when iOS updated
 
-- better specs (generated with color?)
-- implement bot skill
-- swimming is broken
-- sort effects, will need a sort z call into the effect
-- liquids need to draw away from z

@@ -118,11 +118,6 @@ export default class ProjectEntityClass
         return(this.core.camera);
     }
     
-    isMultiplayer()
-    {
-        return(this.core.isMultiplayer);
-    }
-    
         //
         // meshes and liquids
         //
@@ -1003,7 +998,22 @@ export default class ProjectEntityClass
         //
         // networking utilities
         //
+    
+    isMultiplayer()
+    {
+        return(this.core.isMultiplayer);
+    }
         
+    isNetworkMultiplayer()
+    {
+        return((this.core.isMultiplayer)&&(!this.core.setup.localGame));
+    }
+    
+    sendCustomNetworkMessage(intParam0,intParam1,intParam2,floatParam0,floatParam1,floatParam2,stringParam0,stringParam1,stringParam2)
+    {
+        this.core.network.sendCustomMessage(this,intParam0,intParam1,intParam2,floatParam0,floatParam1,floatParam2,stringParam0,stringParam1,stringParam2);
+    }
+    
     getUpdateNetworkData(remoteId)
     {
         let buffer=new ArrayBuffer(55);

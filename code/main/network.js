@@ -15,6 +15,7 @@ export default class NetworkClass
     static MESSAGE_TYPE_ENTITY_LOGON_REQUEST=2;
     static MESSAGE_TYPE_ENTITY_LOGON_REPLY=3;
     static MESSAGE_TYPE_ENTITY_UPDATE=4;
+    static MESSAGE_TYPE_ENTITY_CUSTOM=5;
     
     core=null;
     socket=null;
@@ -136,19 +137,23 @@ export default class NetworkClass
         if (this.inConnectWait) {
             this.inConnectWait=false;
             
+                // ignore any spurious no logon replies
+                
             dataView=new DataView(buffer);
+            if (dataView.getInt16(0)!==NetworkClass.MESSAGE_TYPE_ENTITY_LOGON_REPLY) return;
             
-            if (dataView.getInt16(0)!==NetworkClass.MESSAGE_TYPE_ENTITY_LOGON_REPLY) {
-                this.connectErrorCallback();
-                return;
-            }
-            
+                // negative ids are errors
+                // todo: probably some specific errors here based on negative id
+                
             this.id=dataView.getInt16(2);
             if (this.id<0) {
+                this.lastErrorMessage='Network error: logon not allowed';
                 this.connectErrorCallback();
                 return;
             }
 
+                // we connected OK
+                
             this.connectOKCallback();
             return;
         }
@@ -199,8 +204,8 @@ export default class NetworkClass
         
         console.info('LEAVE>'+remoteId);
         
-        //entity=this.core.map.entityList.findRemoteById(remoteId);
-        //if (entity!==null) 
+        entity=this.core.map.entityList.findRemoteById(remoteId);
+        if (entity!==null) entity.markDelete=true;
     }
     
     handleEntityUpdate(remoteId,dataView)
@@ -250,12 +255,36 @@ export default class NetworkClass
     }
     
         //
-        // user message API
+        // send entity's update message
         //
         
     sendEntityUpdate(entity)
     {
         this.socket.send(entity.getUpdateNetworkData(this.id));
+    }
+    
+        //
+        // custom messages
+        //
+        
+    sendCustomMessage(entity,intParam0,intParam1,intParam2,floatParam0,floatParam1,floatParam2,stringParam0,stringParam1,stringParam2)
+    {
+        let buffer=new ArrayBuffer(92);
+        let dataView=new DataView(buffer);
+        
+        dataView.setInt16(0,NetworkClass.MESSAGE_TYPE_ENTITY_CUSTOM);
+        dataView.setInt16(2,this.id);
+        dataView.setInt32(4,((intParam0===null)?0:intParam0));
+        dataView.setInt32(8,((intParam1===null)?0:intParam1));
+        dataView.setInt32(12,((intParam2===null)?0:intParam2));
+        dataView.setFloat32(16,((floatParam0===null)?0:floatParam0));
+        dataView.setFloat32(20,((floatParam1===null)?0:floatParam1));
+        dataView.setFloat32(24,((floatParam2===null)?0:floatParam2));
+        this.setStringInDataView(dataView,28,((stringParam0===null)?'':stringParam0),32);
+        this.setStringInDataView(dataView,60,((stringParam1===null)?'':stringParam1),32);
+        this.setStringInDataView(dataView,92,((stringParam2===null)?'':stringParam2),32);
+        
+        this.socket.send(buffer);
     }
     
         //
