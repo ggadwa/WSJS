@@ -23,10 +23,10 @@ export default class ProjectGameClass
     }
     
     /**
-     * Override this and return a entity class that will
-     * run any game bots
+     * Override this and return an entity class that will
+     * run any game bots.
      * 
-     * @returns {Class} ProjectEntityClass for bots 
+     * @returns {Class} Class built off ProjectEntityClass for bots 
      */
     getBotClass()
     {
@@ -42,6 +42,17 @@ export default class ProjectGameClass
     getBotName(idx)
     {
         return('bot '+idx);
+    }
+    
+    /**
+     * Override this to return an entity class that will
+     * be the class for remote players.
+     * 
+     * @returns {Class} Class built off ProjectRemoteClass for remotes
+     */
+    getRemoteClass()
+    {
+        return(null);
     }
     
         //

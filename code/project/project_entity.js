@@ -39,7 +39,7 @@ export default class ProjectEntityClass
         this.eyeOffset=0;
         this.bumpHeight=0;
 
-        this.id=-1;
+        this.remoteId=-1;       // the network ID
         
         this.gravityMinValue=10;
         this.gravityMaxValue=300;
@@ -1004,13 +1004,13 @@ export default class ProjectEntityClass
         // networking utilities
         //
         
-    getUpdateNetworkData()
+    getUpdateNetworkData(remoteId)
     {
         let buffer=new ArrayBuffer(55);
         let dataView=new DataView(buffer);
         
         dataView.setInt16(0,NetworkClass.MESSAGE_TYPE_ENTITY_UPDATE);
-        dataView.setInt16(2,this.id);
+        dataView.setInt16(2,remoteId);
         dataView.setInt32(4,this.position.x);
         dataView.setInt32(8,this.position.y);
         dataView.setInt32(12,this.position.z);
@@ -1061,6 +1061,8 @@ export default class ProjectEntityClass
         this.modelEntityAlter.queuedAnimationStop=(dataView.getInt8(54)!==0);
        
             // mark as having a remote update
+            // this is so we only do one remote update
+            // (the latest) and ignore any we missed
         
         this.hadRemoteUpdate=true;
         

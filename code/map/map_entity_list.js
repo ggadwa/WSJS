@@ -45,7 +45,7 @@ export default class MapEntityListClass
         let entity;
         
         for (entity of this.entities) {
-            entity.hadUpdateFlag=false;
+            entity.hadRemoteUpdate=false;
         }
     }
 

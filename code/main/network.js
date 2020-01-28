@@ -1,4 +1,4 @@
-import ProjectEntityClass from '../project/project_entity_remote.js';
+import ProjectEntityRemoteClass from '../project/project_entity_remote.js';
 
 //
 // network class
@@ -183,12 +183,13 @@ export default class NetworkClass
     handleEntityEnter(remoteId,dataView)
     {
         let userName,entity;
+        let remoteClass=this.core.projectGame.getRemoteClass();
         
         userName=this.getStringFromDataView(dataView,4,NetworkClass.USER_NAME_LENGTH);
         
         console.info('ENTER>'+remoteId+'>'+userName);
         
-        entity=new ProjectEntityRemoteClass(this.core,remoteId,userName);
+        entity=new remoteClass(this.core,remoteId,userName);
         this.core.map.entityList.add(entity);
     }
     
@@ -205,8 +206,6 @@ export default class NetworkClass
     handleEntityUpdate(remoteId,dataView)
     {
         let entity;
-        
-        console.info('UPDATE>'+remoteId);
         
         entity=this.core.map.entityList.findRemoteById(remoteId);
         if (entity!==null) {
@@ -256,7 +255,7 @@ export default class NetworkClass
         
     sendEntityUpdate(entity)
     {
-        this.socket.send(entity.getUpdateNetworkData());
+        this.socket.send(entity.getUpdateNetworkData(this.id));
     }
     
         //

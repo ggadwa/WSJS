@@ -1,5 +1,8 @@
-- need ambient flag for lights, ambients always included in light list (add last)
-    - test on race track
+- networking
+   - odd null error on logon at times
+   - leave doesn't remove remote
+   - player needs local animations
+   - predictions
 
 - generator
    - create random nodes for rooms, use shield pickup to test
@@ -16,12 +19,6 @@
        - better uv for pillars
        - panels for computers areas
        - connectors for pipes
-
-- networking
-   - enter
-   - leave
-   - remotes and updates
-   - predictions
 
 - js docs (especially in the project_ classes)
 - slowly transition to public/private fields (especially in the project_ classes)
