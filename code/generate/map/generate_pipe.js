@@ -2,7 +2,6 @@ import PointClass from '../../utility/point.js';
 import BoundClass from '../../utility/bound.js';
 import MeshClass from '../../mesh/mesh.js';
 import GenerateMeshClass from './generate_mesh.js';
-import GenerateUtilityClass from '../utility/generate_utility.js';
 
 //
 // generate pipe decorations
@@ -13,8 +12,14 @@ export default class GeneratePipeClass
     static PIPE_SIDE_COUNT=12;
     static PIPE_CURVE_SEGMENT_COUNT=5;
     
-    constructor()
+    constructor(core,room,name,pipeBitmap,segmentSize)
     {
+        this.core=core;
+        this.room=room;
+        this.name=name;
+        this.pipeBitmap=pipeBitmap;
+        this.segmentSize=segmentSize;
+
         Object.seal(this);
     }
     
@@ -22,7 +27,7 @@ export default class GeneratePipeClass
         // pieces of pipes
         //
 
-    static addPipeStraightChunk(core,room,name,bitmap,pnt,len,radius,pipeAng)
+    addPipeStraightChunk(pnt,len,radius,pipeAng)
     {
         let n,rd,tx,tz,tx2,tz2,bx,bz,bx2,bz2;
         let u1,u2,vfact;
@@ -144,14 +149,14 @@ export default class GeneratePipeClass
         
             // finally create the mesh
 
-        tangentArray=GenerateUtilityClass.buildTangents(vertexArray,uvArray,indexArray);
+        tangentArray=GenerateMeshClass.buildTangents(vertexArray,uvArray,indexArray);
         
-        mesh=new MeshClass(core,name,bitmap,-1,-1,new Float32Array(vertexArray),new Float32Array(normalArray),tangentArray,new Float32Array(uvArray),null,null,new Uint16Array(indexArray));
+        mesh=new MeshClass(this.core,this.name,this.pipeBitmap,-1,-1,new Float32Array(vertexArray),new Float32Array(normalArray),tangentArray,new Float32Array(uvArray),null,null,new Uint16Array(indexArray));
         mesh.simpleCollisions=true;
-        core.map.meshList.add(mesh);
+        this.core.map.meshList.add(mesh);
     }
 
-    static addPipeCornerChunk(core,room,name,bitmap,pnt,radius,xStart,zStart,xTurn,zTurn,yFlip)
+    addPipeCornerChunk(pnt,radius,xStart,zStart,xTurn,zTurn,yFlip)
     {
         let n,k,rd,tx,tz,tx2,tz2,bx,bz,bx2,bz2;
         let yAdd,xTurnAdd,zTurnAdd;
@@ -290,29 +295,29 @@ export default class GeneratePipeClass
         
             // finally create the mesh
 
-        tangentArray=GenerateUtilityClass.buildTangents(vertexArray,uvArray,indexArray);
+        tangentArray=GenerateMeshClass.buildTangents(vertexArray,uvArray,indexArray);
         
-        mesh=new MeshClass(core,name,bitmap,-1,-1,new Float32Array(vertexArray),new Float32Array(normalArray),tangentArray,new Float32Array(uvArray),null,null,new Uint16Array(indexArray));
+        mesh=new MeshClass(this.core,this.name,this.pipeBitmap,-1,-1,new Float32Array(vertexArray),new Float32Array(normalArray),tangentArray,new Float32Array(uvArray),null,null,new Uint16Array(indexArray));
         mesh.simpleCollisions=true;
-        core.map.meshList.add(mesh);
+        this.core.map.meshList.add(mesh);
     }
     
         //
         // pipe types
         //
         
-    static buildSingleVerticalPipe(core,room,name,x,z,xOff,zOff,pipeRadius,pipeBitmap,segmentSize)
+    buildSingleVerticalPipe(x,z,xOff,zOff,pipeRadius)
     {
         let pnt,pipeAng;
         
-        pnt=new PointClass((xOff+(x*segmentSize)),(room.offset.y+(room.storyCount*segmentSize)),(zOff+(z*segmentSize)));
+        pnt=new PointClass((xOff+(x*this.segmentSize)),(this.room.offset.y+(this.room.storyCount*this.segmentSize)),(zOff+(z*this.segmentSize)));
         pipeAng=new PointClass(0,0,180.0);
-        this.addPipeStraightChunk(core,room,name,pipeBitmap,pnt,(room.storyCount*segmentSize),pipeRadius,pipeAng);
+        this.addPipeStraightChunk(pnt,(this.room.storyCount*this.segmentSize),pipeRadius,pipeAng);
         
-        room.setGrid(0,x,z,1);
+        this.room.setGrid(0,x,z,1);
     }
     
-    static buildSingleSplitPipe(core,room,name,lx,rx,tz,bz,x,z,xOff,zOff,pipeRadius,pipeBitmap,segmentSize)
+    buildSingleSplitPipe(lx,rx,tz,bz,x,z,xOff,zOff,pipeRadius)
     {
         let x2,z2;
         let my,high;
@@ -320,147 +325,147 @@ export default class GeneratePipeClass
         
             // split pipe
 
-        high=room.storyCount*segmentSize;
-        my=(high*GenerateUtilityClass.randomFloat(0.6,0.2))+pipeRadius;
+        high=this.room.storyCount*this.segmentSize;
+        my=(high*this.core.randomFloat(0.6,0.2))+pipeRadius;
 
             // the top part
 
-        pnt=new PointClass((xOff+(x*segmentSize)),(room.offset.y+(room.storyCount*segmentSize)),(zOff+(z*segmentSize)));
+        pnt=new PointClass((xOff+(x*this.segmentSize)),(this.room.offset.y+(this.room.storyCount*this.segmentSize)),(zOff+(z*this.segmentSize)));
         pipeAng=new PointClass(0,0,180.0);     // force len to point down
-        this.addPipeStraightChunk(core,room,name,pipeBitmap,pnt,((high-my)-pipeRadius),pipeRadius,pipeAng);
+        this.addPipeStraightChunk(pnt,((high-my)-pipeRadius),pipeRadius,pipeAng);
 
             // the cross over
 
         x2=x;
         z2=z;
 
-        switch (GenerateUtilityClass.randomIndex(2)) {
+        switch (this.core.randomIndex(2)) {
             case 0:
-                pnt=new PointClass((xOff+(x*segmentSize)),((room.offset.y+my)+Math.trunc(pipeRadius*1.5)),(zOff+(z*segmentSize)));
-                this.addPipeCornerChunk(core,room,name,pipeBitmap,pnt,pipeRadius,0.0,0.0,0.0,90.0,false);
+                pnt=new PointClass((xOff+(x*this.segmentSize)),((this.room.offset.y+my)+Math.trunc(pipeRadius*1.5)),(zOff+(z*this.segmentSize)));
+                this.addPipeCornerChunk(pnt,pipeRadius,0.0,0.0,0.0,90.0,false);
 
-                x2=x+GenerateUtilityClass.randomInt(1,3);
+                x2=x+this.core.randomInt(1,3);
                 if (x2>=rx) x2=(rx-1);
 
-                pnt=new PointClass((xOff+(x*segmentSize)+pipeRadius),(room.offset.y+my),(zOff+(z*segmentSize)));
+                pnt=new PointClass((xOff+(x*this.segmentSize)+pipeRadius),(this.room.offset.y+my),(zOff+(z*this.segmentSize)));
                 pipeAng=new PointClass(0,0,270.0);
-                this.addPipeStraightChunk(core,room,name,pipeBitmap,pnt,((segmentSize*Math.abs(x2-x))-(pipeRadius*2)),pipeRadius,pipeAng);
+                this.addPipeStraightChunk(pnt,((this.segmentSize*Math.abs(x2-x))-(pipeRadius*2)),pipeRadius,pipeAng);
 
-                pnt=new PointClass((xOff+(x2*segmentSize)),((room.offset.y+my)-Math.trunc(pipeRadius*1.5)),(zOff+(z*segmentSize)));
-                this.addPipeCornerChunk(core,room,name,pipeBitmap,pnt,pipeRadius,0.0,0.0,0.0,90.0,true);
+                pnt=new PointClass((xOff+(x2*this.segmentSize)),((this.room.offset.y+my)-Math.trunc(pipeRadius*1.5)),(zOff+(z*this.segmentSize)));
+                this.addPipeCornerChunk(pnt,pipeRadius,0.0,0.0,0.0,90.0,true);
                 break;
 
             case 1:
-                pnt=new PointClass(((xOff+(x*segmentSize))-Math.trunc(pipeRadius*1.5)),(room.offset.y+my),(zOff+(z*segmentSize)));
-                this.addPipeCornerChunk(core,room,name,pipeBitmap,pnt,pipeRadius,0.0,90.0,0.0,90.0,false);
+                pnt=new PointClass(((xOff+(x*this.segmentSize))-Math.trunc(pipeRadius*1.5)),(this.room.offset.y+my),(zOff+(z*this.segmentSize)));
+                this.addPipeCornerChunk(pnt,pipeRadius,0.0,90.0,0.0,90.0,false);
 
-                x2=x-GenerateUtilityClass.randomInt(1,3);
+                x2=x-this.core.randomInt(1,3);
                 if (x2<lx) x2=lx;
 
-                pnt=new PointClass((xOff+(x*segmentSize)-pipeRadius),(room.offset.y+my),(zOff+(z*segmentSize)));
+                pnt=new PointClass((xOff+(x*this.segmentSize)-pipeRadius),(this.room.offset.y+my),(zOff+(z*this.segmentSize)));
                 pipeAng=new PointClass(0,0,90.0);
-                this.addPipeStraightChunk(core,room,name,pipeBitmap,pnt,((segmentSize*Math.abs(x2-x))-(pipeRadius*2)),pipeRadius,pipeAng);
+                this.addPipeStraightChunk(pnt,((this.segmentSize*Math.abs(x2-x))-(pipeRadius*2)),pipeRadius,pipeAng);
 
-                pnt=new PointClass(((xOff+(x2*segmentSize))+Math.trunc(pipeRadius*1.5)),((room.offset.y+my)+Math.trunc(pipeRadius*0)),(zOff+(z*segmentSize)));
-                this.addPipeCornerChunk(core,room,name,pipeBitmap,pnt,pipeRadius,0.0,90.0,0.0,90.0,true);
+                pnt=new PointClass(((xOff+(x2*this.segmentSize))+Math.trunc(pipeRadius*1.5)),((this.room.offset.y+my)+Math.trunc(pipeRadius*0)),(zOff+(z*this.segmentSize)));
+                this.addPipeCornerChunk(pnt,pipeRadius,0.0,90.0,0.0,90.0,true);
                 break;
 
             case 2:
-                pnt=new PointClass((xOff+(x*segmentSize)),(room.offset.y+my),((zOff+(z*segmentSize))+Math.trunc(pipeRadius*1.5)));
-                this.addPipeCornerChunk(core,room,name,pipeBitmap,pnt,pipeRadius,90.0,0.0,90.0,0.0,false);
+                pnt=new PointClass((xOff+(x*this.segmentSize)),(this.room.offset.y+my),((zOff+(z*this.segmentSize))+Math.trunc(pipeRadius*1.5)));
+                this.addPipeCornerChunk(pnt,pipeRadius,90.0,0.0,90.0,0.0,false);
 
-                z2=z+GenerateUtilityClass.randomInt(1,3);
+                z2=z+this.core.randomInt(1,3);
                 if (z2>=bz) z2=(bz-1);
 
-                pnt=new PointClass((xOff+(x*segmentSize)),(room.offset.y+my),(zOff+(z*segmentSize)+pipeRadius));
+                pnt=new PointClass((xOff+(x*this.segmentSize)),(this.room.offset.y+my),(zOff+(z*this.segmentSize)+pipeRadius));
                 pipeAng=new PointClass(90.0,0,0.0);
-                this.addPipeStraightChunk(core,room,name,pipeBitmap,pnt,((segmentSize*Math.abs(z2-z))-(pipeRadius*2)),pipeRadius,pipeAng);
+                this.addPipeStraightChunk(pnt,((this.segmentSize*Math.abs(z2-z))-(pipeRadius*2)),pipeRadius,pipeAng);
 
-                pnt=new PointClass((xOff+(x*segmentSize)),(room.offset.y+my),((zOff+(z2*segmentSize))-Math.trunc(pipeRadius*1.5)));
-                this.addPipeCornerChunk(core,room,name,pipeBitmap,pnt,pipeRadius,90.0,0.0,90.0,0.0,true);
+                pnt=new PointClass((xOff+(x*this.segmentSize)),(this.room.offset.y+my),((zOff+(z2*this.segmentSize))-Math.trunc(pipeRadius*1.5)));
+                this.addPipeCornerChunk(pnt,pipeRadius,90.0,0.0,90.0,0.0,true);
                 break;
 
             case 3:
-                pnt=new PointClass((xOff+(x*segmentSize)),((room.offset.y+my)+Math.trunc(pipeRadius*1.5)),(zOff+(z*segmentSize)));
-                this.addPipeCornerChunk(core,room,name,pipeBitmap,pnt,pipeRadius,0.0,0.0,90.0,0.0,false);
+                pnt=new PointClass((xOff+(x*this.segmentSize)),((this.room.offset.y+my)+Math.trunc(pipeRadius*1.5)),(zOff+(z*this.segmentSize)));
+                this.addPipeCornerChunk(pnt,pipeRadius,0.0,0.0,90.0,0.0,false);
 
-                z2=x-GenerateUtilityClass.randomInt(1,3);
+                z2=x-this.core.randomInt(1,3);
                 if (z2<tz) z2=tz;
 
-                pnt=new PointClass((xOff+(x*segmentSize)),(room.offset.y+my),(zOff+(z*segmentSize)-pipeRadius));
+                pnt=new PointClass((xOff+(x*this.segmentSize)),(this.room.offset.y+my),(zOff+(z*this.segmentSize)-pipeRadius));
                 pipeAng=new PointClass(270.0,0,0.0);
-                this.addPipeStraightChunk(core,room,name,pipeBitmap,pnt,((segmentSize*Math.abs(z2-z))-(pipeRadius*2)),pipeRadius,pipeAng);
+                this.addPipeStraightChunk(pnt,((this.segmentSize*Math.abs(z2-z))-(pipeRadius*2)),pipeRadius,pipeAng);
 
-                pnt=new PointClass((xOff+(x*segmentSize)),((room.offset.y+my)-Math.trunc(pipeRadius*1.5)),(zOff+(z2*segmentSize)));
-                this.addPipeCornerChunk(core,room,name,pipeBitmap,pnt,pipeRadius,0.0,0.0,90.0,0.0,true);
+                pnt=new PointClass((xOff+(x*this.segmentSize)),((this.room.offset.y+my)-Math.trunc(pipeRadius*1.5)),(zOff+(z2*this.segmentSize)));
+                this.addPipeCornerChunk(pnt,pipeRadius,0.0,0.0,90.0,0.0,true);
                 break;
         }
 
 
             // the bottom part
 
-        pnt=new PointClass((xOff+(x2*segmentSize)),((room.offset.y+my)-pipeRadius),(zOff+(z2*segmentSize)));
+        pnt=new PointClass((xOff+(x2*this.segmentSize)),((this.room.offset.y+my)-pipeRadius),(zOff+(z2*this.segmentSize)));
         pipeAng=new PointClass(0,0,180.0);     // force len to point down
-        this.addPipeStraightChunk(core,room,name,pipeBitmap,pnt,my,pipeRadius,pipeAng);
+        this.addPipeStraightChunk(pnt,my,pipeRadius,pipeAng);
         
-        room.setGrid(0,x2,z2,1);
+        this.room.setGrid(0,x2,z2,1);
     }
     
         //
         // build room pipe
         //
 
-    static buildRoomPipes(core,room,name,pipeBitmap,segmentSize)
+    build()
     {
         let n,sz,pipeCount,pipeRadius;
         let x,z,xOff,zOff,lx,rx,tz,bz;
         
             // bounds with margins
             
-        lx=room.piece.margins[0];
-        rx=room.piece.size.x-(room.piece.margins[2]);
-        if (room.requiredStairs.length!==0) {
+        lx=this.room.piece.margins[0];
+        rx=this.room.piece.size.x-(this.room.piece.margins[2]);
+        if (this.room.requiredStairs.length!==0) {
             if (lx<2) lx=2;
-            if (rx>(room.piece.size.x-2)) rx=room.piece.size.x-2;
+            if (rx>(this.room.piece.size.x-2)) rx=this.room.piece.size.x-2;
         }
         if (rx<=lx) return;
         
-        tz=room.piece.margins[1];
-        bz=room.piece.size.z-(room.piece.margins[3]);
-        if (room.requiredStairs.length!==0) {
+        tz=this.room.piece.margins[1];
+        bz=this.room.piece.size.z-(this.room.piece.margins[3]);
+        if (this.room.requiredStairs.length!==0) {
             if (tz<2) tz=2;
-            if (bz>(room.piece.size.z-2)) bz=room.piece.size.z-2;
+            if (bz>(this.room.piece.size.z-2)) bz=this.room.piece.size.z-2;
         }
         if (bz<=tz) return;
         
             // pipe sizes
             
-        pipeRadius=GenerateUtilityClass.randomInt(Math.trunc(segmentSize*0.15),Math.trunc(segmentSize*0.15));
-        xOff=room.offset.x+Math.trunc((segmentSize-(pipeRadius*2))*0.5);
-        zOff=room.offset.z+Math.trunc((segmentSize-(pipeRadius*2))*0.5);
+        pipeRadius=this.core.randomInt(Math.trunc(this.segmentSize*0.15),Math.trunc(this.segmentSize*0.15));
+        xOff=this.room.offset.x+Math.trunc((this.segmentSize-(pipeRadius*2))*0.5);
+        zOff=this.room.offset.z+Math.trunc((this.segmentSize-(pipeRadius*2))*0.5);
         
             // pipe count
         
-        sz=Math.trunc(Math.min(room.piece.size.x,room.piece.size.z)*0.5);    
-        pipeCount=GenerateUtilityClass.randomInt(sz,sz);
+        sz=Math.trunc(Math.min(this.room.piece.size.x,this.room.piece.size.z)*0.5);    
+        pipeCount=this.core.randomInt(sz,sz);
         
         for (n=0;n!==pipeCount;n++) {
             
                 // start point
                 
-            x=GenerateUtilityClass.randomInBetween((lx+1),(rx-1));
-            z=GenerateUtilityClass.randomInBetween((tz+1),(bz-1));
+            x=this.core.randomInBetween((lx+1),(rx-1));
+            z=this.core.randomInBetween((tz+1),(bz-1));
             
-            if (room.getGrid(0,x,z)!==0) continue;      // always used
+            if (this.room.getGrid(0,x,z)!==0) continue;      // already used
             
                 // pipes
                 
-            switch (GenerateUtilityClass.randomIndex(2)) {
+            switch (this.core.randomIndex(2)) {
                 case 0:
-                    this.buildSingleSplitPipe(core,room,name,lx,rx,tz,bz,x,z,xOff,zOff,pipeRadius,pipeBitmap,segmentSize);
+                    this.buildSingleSplitPipe(lx,rx,tz,bz,x,z,xOff,zOff,pipeRadius);
                     break;
                 case 1:
-                    this.buildSingleVerticalPipe(core,room,name,x,z,xOff,zOff,pipeRadius,pipeBitmap,segmentSize);
+                    this.buildSingleVerticalPipe(x,z,xOff,zOff,pipeRadius);
                     break;
                     
             }

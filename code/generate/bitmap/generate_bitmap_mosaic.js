@@ -1,7 +1,6 @@
 import ColorClass from '../../utility/color.js';
 import BitmapClass from '../../bitmap/bitmap.js';
 import GenerateBitmapBaseClass from './generate_bitmap_base.js';
-import GenerateUtilityClass from '../utility/generate_utility.js';
 
 //
 // generate mosaic bitmap class
@@ -35,7 +34,7 @@ export default class GenerateBitmapMosaicClass extends GenerateBitmapBaseClass
         
             // some random values
 
-        splitCount=GenerateUtilityClass.randomInt(15,10);
+        splitCount=this.core.randomInt(15,10);
         
         groutColor=this.getRandomGray(0.4,0.6);
         mosaicColor=this.getRandomColor();
@@ -71,10 +70,10 @@ export default class GenerateBitmapMosaicClass extends GenerateBitmapBaseClass
                 
                     // slightly random position
                     
-                lft=Math.trunc(x*tileWid)+GenerateUtilityClass.randomInt(0,3);
-                rgt=Math.trunc((x*tileWid)+tileWid)-GenerateUtilityClass.randomInt(0,3);
-                top=Math.trunc(y*tileHigh)+GenerateUtilityClass.randomInt(0,3);
-                bot=Math.trunc((y*tileHigh)+tileHigh)-GenerateUtilityClass.randomInt(0,3);
+                lft=Math.trunc(x*tileWid)+this.core.randomInt(0,3);
+                rgt=Math.trunc((x*tileWid)+tileWid)-this.core.randomInt(0,3);
+                top=Math.trunc(y*tileHigh)+this.core.randomInt(0,3);
+                bot=Math.trunc((y*tileHigh)+tileHigh)-this.core.randomInt(0,3);
                 
                     // the color
 

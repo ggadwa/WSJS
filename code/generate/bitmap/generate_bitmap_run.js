@@ -8,174 +8,225 @@ import GenerateBitmapTileClass from './generate_bitmap_tile.js';
 import GenerateBitmapMosaicClass from './generate_bitmap_mosaic.js';
 import GenerateBitmapHexagonClass from './generate_bitmap_hexagon.js';
 import GenerateBitmapComputerClass from './generate_bitmap_computer.js';
-import GenerateUtilityClass from '../utility/generate_utility.js';
 
 export default class GenerateBitmapRunClass
 {
-    constructor()
+    constructor(core,colorScheme)
     {
+        this.core=core;
+        this.colorScheme=colorScheme;
+        
+        this.wallBitmap=null;
+        this.floorBitmap=null;
+        this.ceilingBitmap=null;
+        this.platformBitmap=null;
+        this.stepBitmap=null;
+        this.pillarBitmap=null;
+        this.boxBitmap=null;
+        this.computerBitmap=null;
+        this.pipeBitmap=null;
     }
     
-    static generateWall(core,colorScheme)
+    generateWall()
     {
         let variationMode=0;
         let genBitmap;
         
-        switch (GenerateUtilityClass.randomIndex(4)) {
+        if (this.wallBitmap!==null) return(this.wallBitmap);
+        
+        switch (this.core.randomIndex(4)) {
             case 0:
-                genBitmap=new GenerateBitmapBrickClass(core,colorScheme);
+                genBitmap=new GenerateBitmapBrickClass(this.core,this.colorScheme);
                 break;
             case 1:
-                genBitmap=new GenerateBitmapStoneClass(core,colorScheme);
+                genBitmap=new GenerateBitmapStoneClass(this.core,this.colorScheme);
                 break;
             case 2:
-                genBitmap=new GenerateBitmapWoodClass(core,colorScheme);
+                genBitmap=new GenerateBitmapWoodClass(this.core,this.colorScheme);
                 break;
             case 3:
-                genBitmap=new GenerateBitmapMetalClass(core,colorScheme);
+                genBitmap=new GenerateBitmapMetalClass(this.core,this.colorScheme);
                 break;
         }
 
-        return(genBitmap.generate(variationMode));
+        this.wallBitmap=genBitmap.generate(variationMode);
+        
+        return(this.wallBitmap);
     }
     
-    static generateFloor(core,colorScheme)
+    generateFloor()
     {
         let variationMode=0;
         let genBitmap;
         
-        switch(GenerateUtilityClass.randomIndex(5)) {
+        if (this.floorBitmap!==null) return(this.floorBitmap);
+        
+        switch(this.core.randomIndex(5)) {
             case 0:
-                genBitmap=new GenerateBitmapWoodClass(core,colorScheme);
+                genBitmap=new GenerateBitmapWoodClass(this.core,this.colorScheme);
                 break;
             case 1:
-                genBitmap=new GenerateBitmapConcreteClass(core,colorScheme);
+                genBitmap=new GenerateBitmapConcreteClass(this.core,this.colorScheme);
                 break;
             case 2:
-                genBitmap=new GenerateBitmapTileClass(core,colorScheme);
+                genBitmap=new GenerateBitmapTileClass(this.core,this.colorScheme);
                 break;
             case 3:
-                genBitmap=new GenerateBitmapMosaicClass(core,colorScheme);
+                genBitmap=new GenerateBitmapMosaicClass(this.core,this.colorScheme);
                 break;
             case 4:
-                genBitmap=new GenerateBitmapHexagonClass(core,colorScheme);
+                genBitmap=new GenerateBitmapHexagonClass(this.core,this.colorScheme);
                 break;
         }
         
-        return(genBitmap.generate(variationMode));
+        this.floorBitmap=genBitmap.generate(variationMode);
+        
+        return(this.floorBitmap);
     }
     
-    static generateCeiling(core,colorScheme)
+    generateCeiling()
     {
         let variationMode=0;
         let genBitmap;
         
-        switch(GenerateUtilityClass.randomIndex(3)) {
+        if (this.ceilingBitmap!==null) return(this.ceilingBitmap);
+        
+        switch(this.core.randomIndex(3)) {
             case 0:
-                genBitmap=new GenerateBitmapWoodClass(core,colorScheme);
+                genBitmap=new GenerateBitmapWoodClass(this.core,this.colorScheme);
                 break;
             case 1:
-                genBitmap=new GenerateBitmapConcreteClass(core,colorScheme);
+                genBitmap=new GenerateBitmapConcreteClass(this.core,this.colorScheme);
                 break;
             case 2:
-                genBitmap=new GenerateBitmapMetalClass(core,colorScheme);
+                genBitmap=new GenerateBitmapMetalClass(this.core,this.colorScheme);
                 break;
         }
         
-        return(genBitmap.generate(variationMode));
+        this.ceilingBitmap=genBitmap.generate(variationMode);
+        
+        return(this.ceilingBitmap);
     }
     
-    static generatePlatform(core,colorScheme)
+    generatePlatform()
     {
         let variationMode=0;
         let genBitmap;
         
-        switch (GenerateUtilityClass.randomIndex(3)) {
+        if (this.platformBitmap!==null) return(this.platformBitmap);
+        
+        switch (this.core.randomIndex(3)) {
             case 0:
-                genBitmap=new GenerateBitmapBrickClass(core,colorScheme);
+                genBitmap=new GenerateBitmapBrickClass(this.core,this.colorScheme);
                 break;
             case 1:
-                genBitmap=new GenerateBitmapWoodClass(core,colorScheme);
+                genBitmap=new GenerateBitmapWoodClass(this.core,this.colorScheme);
                 break;
             case 2:
-                genBitmap=new GenerateBitmapMetalClass(core,colorScheme);
+                genBitmap=new GenerateBitmapMetalClass(this.core,this.colorScheme);
                 break;
         }
+        
+        this.platformBitmap=genBitmap.generate(variationMode);
 
-        return(genBitmap.generate(variationMode));
+        return(this.platformBitmap);
     }
     
-    static generateStep(core,colorScheme)
+    generateStep()
     {
         let variationMode=0;
         let genBitmap;
         
-        switch (GenerateUtilityClass.randomIndex(3)) {
+        if (this.stepBitmap!==null) return(this.stepBitmap);
+        
+        switch (this.core.randomIndex(3)) {
             case 0:
-                genBitmap=new GenerateBitmapBrickClass(core,colorScheme);
+                genBitmap=new GenerateBitmapBrickClass(this.core,this.colorScheme);
                 break;
             case 1:
-                genBitmap=new GenerateBitmapConcreteClass(core,colorScheme);
+                genBitmap=new GenerateBitmapConcreteClass(this.core,this.colorScheme);
                 break;
             case 2:
-                genBitmap=new GenerateBitmapTileClass(core,colorScheme);
+                genBitmap=new GenerateBitmapTileClass(this.core,this.colorScheme);
                 break;
         }
+        
+        this.stepBitmap=genBitmap.generate(variationMode);
 
-        return(genBitmap.generate(variationMode));
+        return(this.stepBitmap);
     }
     
-    static generateDecoration(core,colorScheme)
+    generatePillar()
     {
         let variationMode=0;
         let genBitmap;
         
-        switch (GenerateUtilityClass.randomIndex(4)) {
+        if (this.pillarBitmap!==null) return(this.pillarBitmap);
+        
+        switch (this.core.randomIndex(4)) {
             case 0:
-                genBitmap=new GenerateBitmapBrickClass(core,colorScheme);
+                genBitmap=new GenerateBitmapBrickClass(this.core,this.colorScheme);
                 break;
             case 1:
-                genBitmap=new GenerateBitmapStoneClass(core,colorScheme);
+                genBitmap=new GenerateBitmapStoneClass(this.core,this.colorScheme);
                 break;
             case 2:
-                genBitmap=new GenerateBitmapConcreteClass(core,colorScheme);
+                genBitmap=new GenerateBitmapConcreteClass(this.core,this.colorScheme);
                 break;
             case 3:
-                genBitmap=new GenerateBitmapMetalClass(core,colorScheme);
+                genBitmap=new GenerateBitmapMetalClass(this.core,this.colorScheme);
                 break;
         }
+        
+        this.pillarBitmap=genBitmap.generate(variationMode);
 
-        return(genBitmap.generate(variationMode));
+        return(this.pillarBitmap);
     }
     
-    static generateBox(core,colorScheme)
+    generateBox()
     {
         let variationMode=0;
         let genBitmap;
         
-        switch (GenerateUtilityClass.randomIndex(2)) {
+        if (this.boxBitmap!==null) return(this.boxBitmap);
+        
+        switch (this.core.randomIndex(2)) {
             case 0:
                 variationMode=GenerateBitmapWoodClass.VARIATION_BOX;
-                genBitmap=new GenerateBitmapWoodClass(core,colorScheme);
+                genBitmap=new GenerateBitmapWoodClass(this.core,this.colorScheme);
                 break;
             case 1:
                 variationMode=GenerateBitmapMetalClass.VARIATION_BOX;
-                genBitmap=new GenerateBitmapMetalClass(core,colorScheme);
+                genBitmap=new GenerateBitmapMetalClass(this.core,this.colorScheme);
                 break;
         }
+        
+        this.boxBitmap=genBitmap.generate(variationMode);
 
-        return(genBitmap.generate(variationMode));
+        return(this.boxBitmap);
     }
     
-    static generateComputer(core,colorScheme)
+    generateComputer()
     {
-        let genBitmap=new GenerateBitmapComputerClass(core,colorScheme);
-        return(genBitmap.generate(0));
+        let genBitmap;
+        
+        if (this.computerBitmap!==null) return(this.computerBitmap);
+        
+        genBitmap=new GenerateBitmapComputerClass(this.core,this.colorScheme);
+        this.computerBitmap=genBitmap.generate(GenerateBitmapComputerClass.VARIATION_NONE);
+        
+        return(this.computerBitmap);
     }
     
-    static generatePipe(core,colorScheme)
+    generatePipe()
     {
-        let genBitmap=new GenerateBitmapMetalClass(core,colorScheme);
-        return(genBitmap.generate(GenerateBitmapMetalClass.VARIATION_PIPE));
+        let genBitmap;
+        
+        if (this.pipeBitmap!==null) return(this.pipeBitmap);
+        
+        genBitmap=new GenerateBitmapMetalClass(this.core,this.colorScheme);
+        this.pipeBitmap=genBitmap.generate(GenerateBitmapMetalClass.VARIATION_PIPE);
+        
+        return(this.pipeBitmap);
     }
 }

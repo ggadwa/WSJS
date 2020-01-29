@@ -1,7 +1,6 @@
 import ColorClass from '../../utility/color.js';
 import BitmapClass from '../../bitmap/bitmap.js';
 import GenerateBitmapBaseClass from './generate_bitmap_base.js';
-import GenerateUtilityClass from '../utility/generate_utility.js';
 
 //
 // generate hexagon bitmap class
@@ -38,9 +37,9 @@ export default class GenerateBitmapHexagonClass extends GenerateBitmapBaseClass
         
             // sizing
         
-        edgeSize=GenerateUtilityClass.randomInt(3,5);
-        xCount=2+(2*GenerateUtilityClass.randomInt(0,2));
-        yCount=2+(2*GenerateUtilityClass.randomInt(0,5));
+        edgeSize=this.core.randomInt(3,5);
+        xCount=2+(2*this.core.randomInt(0,2));
+        yCount=2+(2*this.core.randomInt(0,5));
         
         xSize=Math.trunc(this.colorImgData.width/xCount);
         ySize=Math.trunc(this.colorImgData.height/yCount);

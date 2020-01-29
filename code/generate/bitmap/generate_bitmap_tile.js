@@ -1,7 +1,6 @@
 import ColorClass from '../../utility/color.js';
 import BitmapClass from '../../bitmap/bitmap.js';
 import GenerateBitmapBaseClass from './generate_bitmap_base.js';
-import GenerateUtilityClass from '../utility/generate_utility.js';
 
 //
 // generate tile bitmap class
@@ -34,8 +33,8 @@ export default class GenerateBitmapTileClass extends GenerateBitmapBaseClass
 
             // tile style
 
-        tileStyle=GenerateUtilityClass.randomIndex(3);
-        edgeSize=GenerateUtilityClass.randomInt(Math.trunc(this.colorImgData.width*0.005),Math.trunc(this.colorImgData.width*0.01));
+        tileStyle=this.core.randomIndex(3);
+        edgeSize=this.core.randomInt(Math.trunc(this.colorImgData.width*0.005),Math.trunc(this.colorImgData.width*0.01));
 
             // splits
 
@@ -59,8 +58,8 @@ export default class GenerateBitmapTileClass extends GenerateBitmapBaseClass
                     // sometimes a tile piece is a recursion to
                     // another tile set
 
-                if ((complex) && (GenerateUtilityClass.randomPercentage(0.25))) {
-                    tileStyle=GenerateUtilityClass.randomIndex(3);
+                if ((complex) && (this.core.randomPercentage(0.25))) {
+                    tileStyle=this.core.randomIndex(3);
                     this.generateTilePiece(dLft,dTop,dRgt,dBot,tileColor,designColor,2,false);
                     continue;
                 }
@@ -95,9 +94,9 @@ export default class GenerateBitmapTileClass extends GenerateBitmapBaseClass
 
                 if (complex) {
                     col=this.adjustColorRandom(col,0.75,0.85);
-                    padding=edgeSize+GenerateUtilityClass.randomInt(edgeSize,(edgeSize*10));
+                    padding=edgeSize+this.core.randomInt(edgeSize,(edgeSize*10));
                     
-                    switch (GenerateUtilityClass.randomIndex(3)) {
+                    switch (this.core.randomIndex(3)) {
                         case 0:
                             this.drawOval((dLft+padding),(dTop+padding),(dRgt-padding),(dBot-padding),0,1,0,0,edgeSize,0.8,designColor,null,0.5,false,false,1,0);
                             break;
@@ -111,50 +110,50 @@ export default class GenerateBitmapTileClass extends GenerateBitmapBaseClass
 
                     // possible dirt
                     
-                if (GenerateUtilityClass.randomPercentage(0.2)) {
+                if (this.core.randomPercentage(0.2)) {
                     this.drawStaticNoiseRect((dLft+edgeSize),(dTop+edgeSize),(dRgt-edgeSize),(dBot-edgeSize),0.8,1.2);
                     this.blur(this.colorImgData.data,(dLft+edgeSize),(dTop+edgeSize),(dRgt-edgeSize),(dBot-edgeSize),5,false);
                 }
                 
                     // possible crack
                     
-                if ((GenerateUtilityClass.randomPercentage(0.2)) && (!complex)) {
-                    switch (GenerateUtilityClass.randomIndex(4)) {
+                if ((this.core.randomPercentage(0.2)) && (!complex)) {
+                    switch (this.core.randomIndex(4)) {
                         case 0:
                             sy=dTop+edgeSize;
-                            ey=GenerateUtilityClass.randomInBetween((dTop+edgeSize),Math.trunc((dTop+dBot)*0.5));
-                            sx=GenerateUtilityClass.randomInBetween((dLft+edgeSize),Math.trunc((dLft+dRgt)*0.5));
+                            ey=this.core.randomInBetween((dTop+edgeSize),Math.trunc((dTop+dBot)*0.5));
+                            sx=this.core.randomInBetween((dLft+edgeSize),Math.trunc((dLft+dRgt)*0.5));
                             ex=dLft+edgeSize;
                             crackXVarient=5;
                             crackYVarient=5;
                             break;
                         case 1:
                             sy=dTop+edgeSize;
-                            ey=GenerateUtilityClass.randomInBetween((dTop+edgeSize),Math.trunc((dTop+dBot)*0.5));
-                            sx=GenerateUtilityClass.randomInBetween(Math.trunc((dLft+dRgt)*0.5),(dRgt-edgeSize));
+                            ey=this.core.randomInBetween((dTop+edgeSize),Math.trunc((dTop+dBot)*0.5));
+                            sx=this.core.randomInBetween(Math.trunc((dLft+dRgt)*0.5),(dRgt-edgeSize));
                             ex=dRgt-edgeSize;
                             crackXVarient=-5;
                             crackYVarient=5;
                             break;
                         case 2:
                             sy=dBot-edgeSize;
-                            ey=GenerateUtilityClass.randomInBetween(Math.trunc((dTop+dBot)*0.5),(dBot-edgeSize));
-                            sx=GenerateUtilityClass.randomInBetween((dLft+edgeSize),Math.trunc((dLft+dRgt)*0.5));
+                            ey=this.core.randomInBetween(Math.trunc((dTop+dBot)*0.5),(dBot-edgeSize));
+                            sx=this.core.randomInBetween((dLft+edgeSize),Math.trunc((dLft+dRgt)*0.5));
                             ex=dLft+edgeSize;
                             crackXVarient=-5;
                             crackYVarient=5;
                             break;
                         default:
                             sy=dBot-edgeSize;
-                            ey=GenerateUtilityClass.randomInBetween(Math.trunc((dTop+dBot)*0.5),(dBot-edgeSize));
-                            sx=GenerateUtilityClass.randomInBetween(Math.trunc((dLft+dRgt)*0.5),(dRgt-edgeSize));
+                            ey=this.core.randomInBetween(Math.trunc((dTop+dBot)*0.5),(dBot-edgeSize));
+                            sx=this.core.randomInBetween(Math.trunc((dLft+dRgt)*0.5),(dRgt-edgeSize));
                             ex=dRgt-edgeSize;
                             crackXVarient=-5;
                             crackYVarient=-5;
                             break;
                     }
 
-                    crackSegCount=GenerateUtilityClass.randomInt(2,2);
+                    crackSegCount=this.core.randomInt(2,2);
                     this.drawSimpleCrack(sx,sy,ex,ey,crackSegCount,crackXVarient,crackYVarient,frameCol);
                 }
             }
@@ -169,16 +168,16 @@ export default class GenerateBitmapTileClass extends GenerateBitmapBaseClass
         
             // get splits
             
-        complex=GenerateUtilityClass.randomPercentage(0.5);
+        complex=this.core.randomPercentage(0.5);
         
         small=false;
-        if (!complex) small=GenerateUtilityClass.randomPercentage(0.5);
+        if (!complex) small=this.core.randomPercentage(0.5);
 
         if (!small) {
-            splitCount=GenerateUtilityClass.randomInt(2,2);
+            splitCount=this.core.randomInt(2,2);
         }
         else {
-            splitCount=GenerateUtilityClass.randomInt(6,4);
+            splitCount=this.core.randomInt(6,4);
         }
         
             // colors

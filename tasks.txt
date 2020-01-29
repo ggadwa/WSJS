@@ -1,3 +1,12 @@
+- big
+    - generate mesh class is next
+    - createFromVectorAndAngle (static)
+    - createStaticFontTexture/deleteStaticFontTexture
+    - main_config and generator_config
+    - remove all static
+    - remove all class fields (ugh)
+    - webGL instead of webGL2
+
 - networking
     - odd null error on logon at times (fix -- check)
     - leave doesn't remove remote (fix -- check)
@@ -7,6 +16,7 @@
 
 - generator
     - better specs (generated with color?)
+    - nodes don't seem right in certain rooms (like boxes)
 
     - lights
        - regular
@@ -30,10 +40,15 @@
     - fix swimming
 
 - reaper
+    - random node start
 
 - kart
 
 - js docs (especially in the project_ classes)
+    - doc main classes
+    - doc project class
+    - [got to wsjs directory] jsdoc -c "docs_config.json"
+
 - slowly transition to public/private fields (especially in the project_ classes)
 - SAFARI - wait for public/private class fields
 - FIREFOX - wait for static class fields

@@ -1,7 +1,6 @@
 import ColorClass from '../../utility/color.js';
 import BitmapClass from '../../bitmap/bitmap.js';
 import GenerateBitmapBaseClass from './generate_bitmap_base.js';
-import GenerateUtilityClass from '../utility/generate_utility.js';
 
 //
 // generate stone bitmap class
@@ -54,7 +53,7 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
         
             // draw the stones
             
-        yCount=GenerateUtilityClass.randomInt(4,4);
+        yCount=this.core.randomInt(4,4);
         yAdd=Math.trunc(this.colorImgData.height/yCount);
         
         top=0;
@@ -65,7 +64,7 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
             lft=0;
             
             while (true) {
-                rgt=lft+GenerateUtilityClass.randomInt(yAdd,Math.trunc(yAdd*0.8));
+                rgt=lft+this.core.randomInt(yAdd,Math.trunc(yAdd*0.8));
                 if (rgt>this.colorImgData.width) rgt=this.colorImgData.width;
 
                     // special check if next stone would be too small,
@@ -77,15 +76,15 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
                 
                     // the stone itself
                     
-                drawStoneColor=this.adjustColorRandom((GenerateUtilityClass.randomPercentage(0.7)?stoneColor:altStoneColor),0.7,1.2);
+                drawStoneColor=this.adjustColorRandom((this.core.randomPercentage(0.7)?stoneColor:altStoneColor),0.7,1.2);
 
-                xOff=GenerateUtilityClass.randomInt(0,Math.trunc(this.colorImgData.width*0.01));
-                yOff=GenerateUtilityClass.randomInt(0,Math.trunc(this.colorImgData.width*0.01));
+                xOff=this.core.randomInt(0,Math.trunc(this.colorImgData.width*0.01));
+                yOff=this.core.randomInt(0,Math.trunc(this.colorImgData.width*0.01));
 
-                edgeSize=GenerateUtilityClass.randomInt(Math.trunc(this.colorImgData.width*0.1),Math.trunc(this.colorImgData.width*0.2));     // new edge size as stones aren't the same
-                xRoundFactor=GenerateUtilityClass.randomFloat(0.02,0.05);
-                yRoundFactor=GenerateUtilityClass.randomFloat(0.02,0.05);
-                normalZFactor=GenerateUtilityClass.randomFloat(0,0.2);        // different z depths
+                edgeSize=this.core.randomInt(Math.trunc(this.colorImgData.width*0.1),Math.trunc(this.colorImgData.width*0.2));     // new edge size as stones aren't the same
+                xRoundFactor=this.core.randomFloat(0.02,0.05);
+                yRoundFactor=this.core.randomFloat(0.02,0.05);
+                normalZFactor=this.core.randomFloat(0,0.2);        // different z depths
 
                 this.drawOval((lft+xOff),(top+yOff),(rgt+xOff),(bot+yOff),0,1,xRoundFactor,yRoundFactor,edgeSize,0.5,drawStoneColor,outlineColor,normalZFactor,false,true,0.4,1.2);
 

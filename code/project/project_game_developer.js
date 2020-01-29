@@ -1,8 +1,21 @@
+/**
+ * @module ProjectGameDeveloperClass
+ * @ignore
+*/
+
 import ColorClass from '../utility/color.js';
 import ProjectGameClass from '../project/project_game.js';
 import InterfaceTextClass from '../interface/interface_text.js';
 
-export default class ProjectGameDeveloprClass extends ProjectGameClass
+/**
+ * A specialized version of ProjectGameClass that has additional
+ * options for developing games, mostly notable fps/count outputs.
+ * A shipping game should extend it's main game class from ProjectGameClass.
+ * 
+ * @hideconstructor
+ * @extends ProjectGameClass
+ */
+export default class ProjectGameDeveloperClass extends ProjectGameClass
 {
     constructor(core,data)
     {

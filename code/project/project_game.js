@@ -1,3 +1,14 @@
+/**
+ * @module ProjectGameClass
+ * @ignore
+*/
+
+/**
+ * The main game class, your game class needs to extend from this
+ * class.
+ * 
+ * @hideconstructor
+ */
 export default class ProjectGameClass
 {
     constructor(core,data)
@@ -15,7 +26,7 @@ export default class ProjectGameClass
      * This is needed so local storage saves can have
      * different names
      * 
-     * @returns {String} Name of game
+     * @returns {string} Name of game
      */
     getName()
     {
@@ -26,7 +37,7 @@ export default class ProjectGameClass
      * Override this and return an entity class that will
      * run any game bots.
      * 
-     * @returns {Class} Class built off ProjectEntityClass for bots 
+     * @returns {class} Class built off ProjectEntityClass for bots 
      */
     getBotClass()
     {
@@ -35,35 +46,45 @@ export default class ProjectGameClass
     
     /**
      * Override this to return a different name for each
-     * indexed bot.  Default just returns 'bot '+idx.
+     * indexed bot.  Default just returns 'bot_X' where X
+     * is the index number.
      * 
-     * @returns {String} Name for a bot at idx index
+     * @returns {string} Name for a bot at idx index
      */
     getBotName(idx)
     {
-        return('bot '+idx);
+        return('bot_'+idx);
     }
     
     /**
      * Override this to return an entity class that will
      * be the class for remote players.
      * 
-     * @returns {Class} Class built off ProjectRemoteClass for remotes
+     * @returns {class} Class built off ProjectRemoteClass for remotes
      */
     getRemoteClass()
     {
         return(null);
     }
     
-        //
-        // general info
-        //
-        
+    /**
+     * Gets the project setup object, which contains all the
+     * information on how the user setup this game (for instance,
+     * things like mouse speed, etc.)
+     * 
+     * @returns {SetupClass} The setup object
+     */    
     getSetup()
     {
         return(this.core.setup);
     }
     
+    /**
+     * Gets the projects camera class, which you can use to
+     * change the camera.
+     * 
+     * @returns {CameraClass} The camera object
+     */
     getCamera()
     {
         return(this.core.camera);

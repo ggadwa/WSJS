@@ -1,10 +1,19 @@
+/**
+ * @module CameraClass
+ * @ignore
+*/
+
 import PointClass from '../utility/point.js';
 import CollisionClass from '../collision/collisions.js';
 
-//
-// camera class
-//
-
+/**
+ * The camera class for the project, returned from
+ * ProjectEntityClass.getCamera(), ProjectGameClass.getCamera(),
+ * and ProjectMapClass.getCamera().  You use this to change the
+ * camera setup in your project.
+ * 
+ * @hideconstructor
+ */
 export default class CameraClass
 {
     static CAMERA_MODE_FIRST_PERSON=0;
@@ -46,26 +55,43 @@ export default class CameraClass
         Object.seal(this);
     }
     
-        //
-        // camera changes
-        //
-        
+    /**
+     * Set the min/max view distance (really the webGL near and far Z.)
+     * 
+     * @param {number} nearZ The distance of the near clip plane
+     * @param {number} farZ The distance of the far clip plane
+     */ 
     setViewDistance(nearZ,farZ)
     {
         this.glNearZ=nearZ;
         this.glFarZ=farZ;
     }
     
+    /**
+     * Sets the camera to first person view.
+     */
     gotoFirstPerson()
     {
         this.mode=CameraClass.CAMERA_MODE_FIRST_PERSON;
     }
     
+    /**
+     * Returns TRUE if camera is in first person view.
+     * 
+     * @returns {boolean} TRUE if camera in first person view
+     */
     isFirstPerson()
     {
         return(this.mode===CameraClass.CAMERA_MODE_FIRST_PERSON);
     }
     
+    /**
+     * Sets the camera to third person behind view, which is behind
+     * the player back a distance and looked down/up on by an angle.
+     * 
+     * @param {number} thirdPersonDistance How far back the camera is
+     * @param {number} thirdPersonLookDegree What angle above (negative) or below (postive) the camera is
+     */
     gotoThirdPersonBehind(thirdPersonDistance,thirdPersonLookDegree)
     {
         this.mode=CameraClass.CAMERA_MODE_THIRD_PERSON_BEHIND;
@@ -73,6 +99,11 @@ export default class CameraClass
         this.thirdPersonLookDegree=thirdPersonLookDegree;
     }
     
+    /**
+     * Returns TRUE if camera is in third person behind view.
+     * 
+     * @returns {boolean} TRUE if camera in third person behind view
+     */
     isThirdPersonBehind()
     {
         return(this.mode===CameraClass.CAMERA_MODE_THIRD_PERSON_BEHIND);

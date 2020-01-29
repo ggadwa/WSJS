@@ -2,7 +2,6 @@ import PointClass from '../../utility/point.js';
 import RectClass from '../../utility/rect.js';
 import ColorClass from '../../utility/color.js';
 import BitmapClass from '../../bitmap/bitmap.js';
-import GenerateUtilityClass from '../utility/generate_utility.js';
 
 //
 // generate bitmap base class
@@ -126,33 +125,33 @@ export default class GenerateBitmapBaseClass
                 // random primary colors
                 
             case GenerateBitmapBaseClass.COLOR_SCHEME_RANDOM:
-                col=this.primaryColorList[GenerateUtilityClass.randomIndex(this.primaryColorList.length)];
-                darken=0.1-(GenerateUtilityClass.random()*0.2);
+                col=this.primaryColorList[this.core.randomIndex(this.primaryColorList.length)];
+                darken=0.1-(this.core.random()*0.2);
                 return(new ColorClass((col[0]-darken),(col[1]-darken),(col[2]-darken)));
                 
                 // doom browns and green
                 
             case GenerateBitmapBaseClass.COLOR_SCHEME_DOOM:
-                if (GenerateUtilityClass.randomPercentage(0.5)) {
+                if (this.core.randomPercentage(0.5)) {
                     color=new ColorClass(0.6,0.3,0.0);
                     this.adjustColorRandom(color,0.7,1,0);
                 }
                 else {
-                    col=GenerateUtilityClass.randomFloat(0.0,0.1);
-                    color=new ColorClass(col,GenerateUtilityClass.randomFloat(0.4,0.2),col);
+                    col=this.core.randomFloat(0.0,0.1);
+                    color=new ColorClass(col,this.core.randomFloat(0.4,0.2),col);
                 }
                 return(color);
             
                 // black and white
                 
             case GenerateBitmapBaseClass.COLOR_SCHEME_GRAY:
-                col=GenerateUtilityClass.randomFloat(0.3,0.7);
+                col=this.core.randomFloat(0.3,0.7);
                 return(new ColorClass(col,col,col));
                 
                 // pastel primary colors
                 
             case GenerateBitmapBaseClass.COLOR_SCHEME_PASTEL:
-                col=this.primaryColorList[GenerateUtilityClass.randomIndex(this.primaryColorList.length)];
+                col=this.primaryColorList[this.core.randomIndex(this.primaryColorList.length)];
                 midPoint=(col[0]+col[1]+col[2])/3.0;
                 color=new ColorClass((col[0]+(midPoint-col[0])*0.8),(col[1]+(midPoint-col[1])*0.8),(col[2]+(midPoint-col[2])*0.8));
                 color.fixOverflow();
@@ -180,7 +179,7 @@ export default class GenerateBitmapBaseClass
     
     getRandomGray(minFactor,maxFactor)
     {
-        let col=GenerateUtilityClass.randomFloat(minFactor,(maxFactor-minFactor));
+        let col=this.core.randomFloat(minFactor,(maxFactor-minFactor));
         return(new ColorClass(col,col,col));
     }
     
@@ -194,7 +193,7 @@ export default class GenerateBitmapBaseClass
     
     adjustColorRandom(color,minFactor,maxFactor)
     {
-        let f=GenerateUtilityClass.randomFloat(minFactor,(maxFactor-minFactor));
+        let f=this.core.randomFloat(minFactor,(maxFactor-minFactor));
         let col=new ColorClass((color.r*f),(color.g*f),(color.b*f));
         
         col.fixOverflow();
@@ -343,7 +342,7 @@ export default class GenerateBitmapBaseClass
             rowVectors=[];
             
             for (x=0;x!==gridXSize;x++) {
-                normal=new PointClass(GenerateUtilityClass.randomNegativeOneToOne(),GenerateUtilityClass.randomNegativeOneToOne(),0);
+                normal=new PointClass(this.core.randomNegativeOneToOne(),this.core.randomNegativeOneToOne(),0);
                 normal.normalize2D();
                 rowVectors.push(normal);
             }
@@ -435,7 +434,7 @@ export default class GenerateBitmapBaseClass
                 
                     // the static random color factor
                     
-                colFactor=colorFactorMin+(colorFactorAdd*GenerateUtilityClass.random());
+                colFactor=colorFactorMin+(colorFactorAdd*this.core.random());
 
                 idx=((y*this.colorCanvas.width)+x)*4;
                 
@@ -545,16 +544,16 @@ export default class GenerateBitmapBaseClass
         
             // random settings
             
-        lineSize=GenerateUtilityClass.randomInt(2,3);
-        startArc=GenerateUtilityClass.randomInt(0,36);
-        endArc=GenerateUtilityClass.randomInt(startArc,36);
+        lineSize=this.core.randomInt(2,3);
+        startArc=this.core.randomInt(0,36);
+        endArc=this.core.randomInt(startArc,36);
         
             // create randomized points
             // for oval
             
         for (n=0;n!=36;n++) {
-            rx[n]=GenerateUtilityClass.randomInt(0,20)-10;
-            ry[n]=GenerateUtilityClass.randomInt(0,20)-10;
+            rx[n]=this.core.randomInt(0,20)-10;
+            ry[n]=this.core.randomInt(0,20)-10;
         }
 
             // build the polygon/oval
@@ -628,12 +627,12 @@ export default class GenerateBitmapBaseClass
         nCount=Math.trunc((this.colorImgData.width*0.5)*density);
         
         for (n=0;n!==nCount;n++) {
-            x=GenerateUtilityClass.randomInt(0,(this.colorImgData.width-1));
-            y=GenerateUtilityClass.randomInt(0,(this.colorImgData.height-1));
-            wid=GenerateUtilityClass.randomInt(20,40);
-            high=GenerateUtilityClass.randomInt(20,40);
+            x=this.core.randomInt(0,(this.colorImgData.width-1));
+            y=this.core.randomInt(0,(this.colorImgData.height-1));
+            wid=this.core.randomInt(20,40);
+            high=this.core.randomInt(20,40);
             
-            this.createNormalNoiseDataSinglePolygon(x,y,(x+wid),(y+high),normalZFactor,GenerateUtilityClass.randomPercentage(0.5));
+            this.createNormalNoiseDataSinglePolygon(x,y,(x+wid),(y+high),normalZFactor,this.core.randomPercentage(0.5));
         }
         
             // blur to fix any missing pixels and make the
@@ -677,21 +676,21 @@ export default class GenerateBitmapBaseClass
 
                 // find a gravity point on an edge
 
-            switch (GenerateUtilityClass.randomIndex(4)) {
+            switch (this.core.randomIndex(4)) {
                 case 0:
                     gx=lft+distortSize;
-                    gy=GenerateUtilityClass.randomInBetween(top,bot);
+                    gy=this.core.randomInBetween(top,bot);
                     break;
                 case 1:
                     gx=rgt-distortSize;
-                    gy=GenerateUtilityClass.randomInBetween(top,bot);
+                    gy=this.core.randomInBetween(top,bot);
                     break;
                 case 2:
-                    gx=GenerateUtilityClass.randomInBetween(lft,rgt);
+                    gx=this.core.randomInBetween(lft,rgt);
                     gy=top+distortSize;
                     break;
                 default:
-                    gx=GenerateUtilityClass.randomInBetween(lft,rgt);
+                    gx=this.core.randomInBetween(lft,rgt);
                     gy=bot-distortSize;
                     break;
             }
@@ -1361,7 +1360,7 @@ export default class GenerateBitmapBaseClass
             
             for (y=top;y!==bot;y++) {
                 
-                if (GenerateUtilityClass.randomInt(0,100)<density) {
+                if (this.core.randomInt(0,100)<density) {
                     if ((lx>=0) && (lx<this.colorImgData.width)) {
                         idx=((y*this.colorImgData.width)+lx)*4;
                         colorData[idx]=Math.trunc(baseColor.r*255.0);
@@ -1370,7 +1369,7 @@ export default class GenerateBitmapBaseClass
                     }
                 }
                 
-                if (GenerateUtilityClass.randomInt(0,100)<density) {
+                if (this.core.randomInt(0,100)<density) {
                     if ((rx>=0) && (rx<this.colorImgData.width)) {
                         idx=((y*this.colorImgData.width)+rx)*4;
                         colorData[idx]=Math.trunc(baseColor.r*255.0);
@@ -1393,17 +1392,17 @@ export default class GenerateBitmapBaseClass
         x=lft;
         
         while (true) {
-            shineWid=GenerateUtilityClass.randomInt(Math.trunc(wid*0.035),Math.trunc(wid*0.15));
+            shineWid=this.core.randomInt(Math.trunc(wid*0.035),Math.trunc(wid*0.15));
             if ((x+shineWid)>rgt) shineWid=rgt-x;
             
                 // small % are no lines
                 
-            if (GenerateUtilityClass.randomPercentage(0.9)) {
+            if (this.core.randomPercentage(0.9)) {
                 shineColor=this.adjustColorRandom(metalColor,0.7,1.3);
                 this.drawMetalShineLine(x,top,bot,shineWid,shineColor);
             }
             
-            x+=(shineWid+GenerateUtilityClass.randomInt(Math.trunc(wid*0.03),Math.trunc(wid*0.05)));
+            x+=(shineWid+this.core.randomInt(Math.trunc(wid*0.03),Math.trunc(wid*0.05)));
             if (x>=rgt) break;
         }
         
@@ -1427,7 +1426,7 @@ export default class GenerateBitmapBaseClass
         
             // random shrink
             
-        xAdd=GenerateUtilityClass.random()*minXReduce;
+        xAdd=this.core.random()*minXReduce;
         
             // draw the dirt
             
@@ -1442,7 +1441,7 @@ export default class GenerateBitmapBaseClass
             if (lx>=rx) break;
             
             for (x=lx;x!==rx;x++) {
-                factor=GenerateUtilityClass.randomFloat(minMix,addMix);
+                factor=this.core.randomFloat(minMix,addMix);
 
                 idx=((y*this.colorImgData.width)+x)*4;
                 r=colorData[idx]/255.0;
@@ -1473,8 +1472,8 @@ export default class GenerateBitmapBaseClass
         minWid=Math.trunc((rgt-lft)*0.1);
         
         for (n=0;n!==additionalStreakCount;n++) {
-            sx=GenerateUtilityClass.randomInBetween(lft,(rgt-minWid));
-            ex=GenerateUtilityClass.randomInBetween((sx+minWid),rgt);
+            sx=this.core.randomInBetween(lft,(rgt-minWid));
+            ex=this.core.randomInBetween((sx+minWid),rgt);
             if (sx>=ex) continue;
             
             this.drawStreakDirtSingle(sx,top,ex,bot,minMix,addMix,color,0.1);
@@ -1511,9 +1510,9 @@ export default class GenerateBitmapBaseClass
 
             count--;
             if (count<=0) {
-                count=GenerateUtilityClass.randomInt(2,4);
+                count=this.core.randomInt(2,4);
                 
-                f=1.0+((1.0-(GenerateUtilityClass.random()*2.0))*factor);
+                f=1.0+((1.0-(this.core.random()*2.0))*factor);
                 
                 r=Math.trunc((baseColor.r*f)*255.0);
                 g=Math.trunc((baseColor.g*f)*255.0);
@@ -1565,9 +1564,9 @@ export default class GenerateBitmapBaseClass
             
             count--;
             if (count<=0) {
-                count=GenerateUtilityClass.randomInt(2,4);
+                count=this.core.randomInt(2,4);
                 
-                f=1.0+((1.0-(GenerateUtilityClass.random()*2.0))*factor);
+                f=1.0+((1.0-(this.core.random()*2.0))*factor);
                 
                 r=Math.trunc((baseColor.r*f)*255.0);
                 g=Math.trunc((baseColor.g*f)*255.0);
@@ -1951,7 +1950,7 @@ export default class GenerateBitmapBaseClass
     {
         let n,sx,sy,ex,ey,r;
         let aliasColor;
-        let segCount=GenerateUtilityClass.randomInt(2,5);
+        let segCount=this.core.randomInt(2,5);
         let horizontal=Math.abs(x2-x)>Math.abs(y2-y);
         
         let xAdd=Math.trunc((x2-x)/segCount);
@@ -1971,7 +1970,7 @@ export default class GenerateBitmapBaseClass
                 ey=sy+yAdd;
 
                 if ((n&0x1)===0) {      // straighten out line every other variation
-                    r=lineVariant-GenerateUtilityClass.randomIndex(lineVariant*2);
+                    r=lineVariant-this.core.randomIndex(lineVariant*2);
 
                     if (horizontal) {
                         ey+=r;
@@ -2018,7 +2017,7 @@ export default class GenerateBitmapBaseClass
     drawHorizontalCrack(y,x,x2,clipTop,clipBot,lineDir,lineVariant,color,canSplit)
     {
         let n,sx,sy,ex,ey;
-        let segCount=GenerateUtilityClass.randomInt(2,5);
+        let segCount=this.core.randomInt(2,5);
         let xAdd=Math.trunc((x2-x)/segCount);
         
         sx=x;
@@ -2030,7 +2029,7 @@ export default class GenerateBitmapBaseClass
                 ex=x2;
             }
             else {
-                ey=sy+(GenerateUtilityClass.randomIndex(lineVariant)*lineDir);
+                ey=sy+(this.core.randomIndex(lineVariant)*lineDir);
                 ex=sx+xAdd;
             }
             
@@ -2046,7 +2045,7 @@ export default class GenerateBitmapBaseClass
             
             if ((ey===clipTop) || (ey===clipBot)) break;
             
-            if ((canSplit) && (GenerateUtilityClass.randomPercentage(0.5))) {
+            if ((canSplit) && (this.core.randomPercentage(0.5))) {
                 if (lineDir>0) {
                     this.drawHorizontalCrack(ey,ex,x2,clipTop,clipBot,-lineDir,lineVariant,color,false);
                 }
@@ -2065,7 +2064,7 @@ export default class GenerateBitmapBaseClass
     drawVerticalCrack(x,y,y2,clipLft,clipRgt,lineDir,lineVariant,color,canSplit)
     {
         let n,sx,sy,ex,ey;
-        let segCount=GenerateUtilityClass.randomInt(2,5);
+        let segCount=this.core.randomInt(2,5);
         let yAdd=Math.trunc((y2-y)/segCount);
         
         sx=x;
@@ -2077,7 +2076,7 @@ export default class GenerateBitmapBaseClass
                 ey=y2;
             }
             else {
-                ex=sx+(GenerateUtilityClass.randomIndex(lineVariant)*lineDir);
+                ex=sx+(this.core.randomIndex(lineVariant)*lineDir);
                 ey=sy+yAdd;
             }
             
@@ -2093,7 +2092,7 @@ export default class GenerateBitmapBaseClass
             
             if ((ex===clipLft) || (ex===clipRgt)) break;
             
-            if ((canSplit) && (GenerateUtilityClass.randomPercentage(0.5))) {
+            if ((canSplit) && (this.core.randomPercentage(0.5))) {
                 if (lineDir>0) {
                     this.drawVerticalCrack(ex,ey,y2,clipLft,clipRgt,-lineDir,lineVariant,color,false);
                 }
@@ -2123,8 +2122,8 @@ export default class GenerateBitmapBaseClass
                 dy2=ey;
             }
             else {
-                dx2=Math.trunc(sx+(((ex-sx)*(n+1))/segCount))+GenerateUtilityClass.randomInt(0,lineXVariant);
-                dy2=Math.trunc(sy+(((ey-sy)*(n+1))/segCount))+GenerateUtilityClass.randomInt(0,lineYVarient);
+                dx2=Math.trunc(sx+(((ex-sx)*(n+1))/segCount))+this.core.randomInt(0,lineXVariant);
+                dy2=Math.trunc(sy+(((ey-sy)*(n+1))/segCount))+this.core.randomInt(0,lineYVarient);
             }
             
             this.drawLineColor(dx,dy,dx2,dy2,color);
@@ -2216,7 +2215,7 @@ export default class GenerateBitmapBaseClass
         
     test(variationMode)
     {
-        GenerateUtilityClass.setRandomSeed(Date.now());
+        this.core.setRandomSeed(Date.now());
         
             // setup all the bitmap parts
             

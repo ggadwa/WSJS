@@ -1,8 +1,10 @@
-import GenerateUtilityClass from '../utility/generate_utility.js';
-
 export default class GeneratePieceClass
 {
-    static pieces=
+    constructor(core)
+    {
+        this.core=core;
+    
+        this.pieces=
             [
                 {
                     "name":"big_box",
@@ -193,12 +195,9 @@ export default class GeneratePieceClass
                         ]
                 }
             ];
-
-    constructor()
-    {
     }
     
-    static dupTransformPiece(origPiece,rotate,flipX,flipZ)
+    dupTransformPiece(origPiece,rotate,flipX,flipZ)
     {
         let n,k,piece;
         
@@ -251,14 +250,13 @@ export default class GeneratePieceClass
         return(piece);
     }
     
-    static getDefaultPiece()
+    getDefaultPiece()
     {
         return(this.pieces[0]);
     }
 
-    static getRandomPiece()
+    getRandomPiece()
     {
-        
-        return(this.dupTransformPiece(this.pieces[GenerateUtilityClass.randomIndex(this.pieces.length)],GenerateUtilityClass.randomPercentage(0.5),GenerateUtilityClass.randomPercentage(0.5),GenerateUtilityClass.randomPercentage(0.5)));
+        return(this.dupTransformPiece(this.pieces[this.core.randomIndex(this.pieces.length)],this.core.randomPercentage(0.5),this.core.randomPercentage(0.5),this.core.randomPercentage(0.5)));
     }
 }

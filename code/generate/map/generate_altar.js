@@ -2,7 +2,6 @@ import PointClass from '../../utility/point.js';
 import BoundClass from '../../utility/bound.js';
 import MeshClass from '../../mesh/mesh.js';
 import GenerateMeshClass from './generate_mesh.js';
-import GenerateUtilityClass from '../utility/generate_utility.js';
 
 //
 // generate room altar decoration class
@@ -10,8 +9,14 @@ import GenerateUtilityClass from '../utility/generate_utility.js';
 
 export default class GenerateAltarClass
 {
-    constructor()
+    constructor(core,room,name,platformBitmap,segmentSize)
     {
+        this.core=core;
+        this.room=room;
+        this.name=name;
+        this.platformBitmap=platformBitmap;
+        this.segmentSize=segmentSize;
+        
         Object.seal(this);
     }
     
@@ -19,26 +24,26 @@ export default class GenerateAltarClass
         // single altar
         //
 
-    static addAltar(core,room,name,platformBitmap,lx,rx,tz,bz,stepHigh,boxCount,segmentSize)
+    addAltar(lx,rx,tz,bz,stepHigh,boxCount)
     {
         let n,y,x,z,dx,dz;
         let xBound,yBound,zBound;
-        let levelCount=GenerateUtilityClass.randomInt(5,5);
+        let levelCount=this.core.randomInt(5,5);
         
-        y=room.offset.y;
+        y=this.room.offset.y;
         
         for (n=0;n!==levelCount;n++) {
-            xBound=new BoundClass((room.offset.x+(lx*segmentSize)),(room.offset.x+(rx*segmentSize)));
+            xBound=new BoundClass((this.room.offset.x+(lx*this.segmentSize)),(this.room.offset.x+(rx*this.segmentSize)));
             yBound=new BoundClass(y,(y+stepHigh));
-            zBound=new BoundClass((room.offset.z+(tz*segmentSize)),(room.offset.z+(bz*segmentSize)));
+            zBound=new BoundClass((this.room.offset.z+(tz*this.segmentSize)),(this.room.offset.z+(bz*this.segmentSize)));
 
-            GenerateMeshClass.createCube(core,room,(name+'_'+boxCount),platformBitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,GenerateMeshClass.UV_MAP,segmentSize);
+            GenerateMeshClass.createCube(this.core,this.room,(this.name+'_'+boxCount),this.platformBitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,GenerateMeshClass.UV_MAP,this.segmentSize);
             boxCount++;
             
             if (n===0) {
                 for (z=tz;z<bz;z++) {
                     for (x=lx;x<rx;x++) {
-                        room.setGrid(0,x,z,1);
+                        this.room.setGrid(0,x,z,1);
                     }
                 }
             }
@@ -50,7 +55,7 @@ export default class GenerateAltarClass
             if ((dx<=1) || (dz<=1)) break;
             
             if (dx>dz) {
-                if (GenerateUtilityClass.randomPercentage(0.5)) {
+                if (this.core.randomPercentage(0.5)) {
                     lx++;
                 }
                 else {
@@ -58,7 +63,7 @@ export default class GenerateAltarClass
                 }
             }
             else {
-                if (GenerateUtilityClass.randomPercentage(0.5)) {
+                if (this.core.randomPercentage(0.5)) {
                     tz++;
                 }
                 else {
@@ -74,37 +79,37 @@ export default class GenerateAltarClass
         // alter
         //
 
-    static buildRoomAltar(core,room,name,platformBitmap,segmentSize)
+    build()
     {
         let mx,mz;
-        let stepHigh=Math.floor(segmentSize*0.1);
+        let stepHigh=Math.floor(this.segmentSize*0.1);
         let boxCount;
         
             // rooms with 10x10 can get half or quarter versions
             
-        if ((room.piece.size.x>=10) && (room.piece.size.z>=10)) {
+        if ((this.room.piece.size.x>=10) && (this.room.piece.size.z>=10)) {
             
-            mx=Math.trunc(room.piece.size.x*0.5);
-            mz=Math.trunc(room.piece.size.z*0.5);
+            mx=Math.trunc(this.room.piece.size.x*0.5);
+            mz=Math.trunc(this.room.piece.size.z*0.5);
             
-            switch (GenerateUtilityClass.randomIndex(3)) {
+            switch (this.core.randomIndex(3)) {
                 case 0:
-                    this.addAltar(core,room,name,platformBitmap,2,(room.piece.size.x-2),2,(room.piece.size.z-2),stepHigh,0,segmentSize);
+                    this.addAltar(2,(this.room.piece.size.x-2),2,(this.room.piece.size.z-2),stepHigh,0);
                     break;
                 case 1:
-                    boxCount=this.addAltar(core,room,name,platformBitmap,2,mx,2,(room.piece.size.z-2),stepHigh,0,segmentSize);
-                    this.addAltar(core,room,name,platformBitmap,mx,(room.piece.size.x-2),2,(room.piece.size.z-2),stepHigh,boxCount,segmentSize);
+                    boxCount=this.addAltar(2,mx,2,(this.room.piece.size.z-2),stepHigh,0);
+                    this.addAltar(mx,(this.room.piece.size.x-2),2,(this.room.piece.size.z-2),stepHigh,boxCount);
                     break;
                 case 2:
-                    boxCount=this.addAltar(core,room,name,platformBitmap,2,mx,2,mz,stepHigh,0,segmentSize);
-                    boxCount=this.addAltar(core,room,name,platformBitmap,2,mx,mz,(room.piece.size.z-2),stepHigh,boxCount,segmentSize);
-                    boxCount=this.addAltar(core,room,name,platformBitmap,mx,(room.piece.size.x-2),2,mz,stepHigh,boxCount,segmentSize);
-                    this.addAltar(core,room,name,platformBitmap,mx,(room.piece.size.x-2),mz,(room.piece.size.z-2),stepHigh,boxCount,segmentSize);
+                    boxCount=this.addAltar(2,mx,2,mz,stepHigh,0);
+                    boxCount=this.addAltar(2,mx,mz,(this.room.piece.size.z-2),stepHigh,boxCount);
+                    boxCount=this.addAltar(mx,(this.room.piece.size.x-2),2,mz,stepHigh,boxCount);
+                    this.addAltar(mx,(this.room.piece.size.x-2),mz,(this.room.piece.size.z-2),stepHigh,boxCount);
                     break;
             }
         }
         else {
-            this.addAltar(core,room,name,platformBitmap,2,(room.piece.size.x-2),2,(room.piece.size.z-2),stepHigh,0,segmentSize);
+            this.addAltar(2,(this.room.piece.size.x-2),2,(this.room.piece.size.z-2),stepHigh,0);
         }
     }
 

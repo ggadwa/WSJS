@@ -1,3 +1,8 @@
+/**
+ * @module ProjectEntityClass
+ * @ignore
+*/
+
 import PointClass from '../utility/point.js';
 import BoundClass from '../utility/bound.js';
 import QuaternionClass from '../utility/quaternion.js';
@@ -7,10 +12,15 @@ import ModelEntityAlterClass from '../model/model_entity_alter.js';
 import CollisionClass from '../collision/collisions.js';
 import NetworkClass from '../main/network.js';
 
-//
-// project entity base class
-//
-
+/**
+ * This is the main entity class, most all entities (objects that move
+ * around in the map with their own logic and usually have a model)
+ * should extend from.  There are special classes like ProjectEntityRemote
+ * (for remote entities) and ProjectEntityDeveloper (which has some
+ * extra development options.)
+ * 
+ *  @hideconstructor 
+ */
 export default class ProjectEntityClass
 {
     static RAD_TO_DEGREE=180.0/Math.PI;
@@ -104,15 +114,24 @@ export default class ProjectEntityClass
         this.modelEntityAlter.release();
     }
     
-        //
-        // general info
-        //
-        
+    /**
+     * Gets the project setup object, which contains all the
+     * information on how the user setup this game (for instance,
+     * things like mouse speed, etc.)
+     * 
+     * @returns {SetupClass} The setup object
+     */    
     getSetup()
     {
         return(this.core.setup);
     }
     
+    /**
+     * Gets the projects camera class, which you can use to
+     * change the camera.
+     * 
+     * @returns {CameraClass} The camera
+     */
     getCamera()
     {
         return(this.core.camera);
@@ -289,6 +308,18 @@ export default class ProjectEntityClass
         return(this.core.map.entityList.getPlayer());
     }
     
+    /**
+     * Adds a new entity to this map.  This entity will have
+     * it's spawnedBy set to the calling entity.
+     * 
+     * @param {class} entityClass Class of entity to spawn
+     * @param {string} name Name of entity
+     * @param {PointClass} position Position of entity
+     * @param {PointClass} angle Angle of entity
+     * @param {object} data Additional user data for entity
+     * @param {boolean} show TRUE if entity is not hidden
+     * @param {boolean} hold TRUE if this entity will be holding the newly added entity
+     */
     addEntity(entityClass,name,position,angle,data,show,hold)
     {
         let entity;
@@ -304,6 +335,19 @@ export default class ProjectEntityClass
         return(entity);
     }
     
+    /**
+     * Adds a new entity to this map.  This entity will have
+     * it's spawnedBy set from the spawnedBy parameter.
+     * 
+     * @param {ProjectEntityClass} The entity to set the newly added entities spawnedBy to
+     * @param {Class} entityClass Class of entity to spawn
+     * @param {string} name Name of entity
+     * @param {PointClass} position Position of entity
+     * @param {PointClass} angle Angle of entity
+     * @param {object} data Additional user data for entity
+     * @param {boolean} show TRUE if entity is not hidden
+     * @param {boolean} hold TRUE if this entity will be holding the newly added entity
+     */
     addEntityFromEntity(spawnedBy,entityClass,name,position,angle,data,show,hold)
     {
         let entity;
@@ -970,26 +1014,66 @@ export default class ProjectEntityClass
         // sounds
         //
         
+    /**
+     * Plays a sound, the sound is positioned at this entity.
+     * 
+     * @param {string} name Name of sound to play
+     * @param {number} rate Rate of sound (1.0 = natural rate)
+     * @param {boolean} loop TRUE if sound should loop until stopped
+     * @returns {number} A unique index for the playing sound
+     */
     playSound(name,rate,loop)
     {
         return(this.core.soundList.play(this,null,name,rate,loop));
     }
     
+    /**
+     * Plays a sound, the sound is positioned at the entity in
+     * the parameter entity.
+     * 
+     * @param {ProjectEntityClass} entity Entity that positions sound
+     * @param {string} name Name of sound to play
+     * @param {number} rate Rate of sound (1.0 = natural rate)
+     * @param {boolean} loop TRUE if sound should loop until stopped
+     * @returns {number} A unique index for the playing sound
+     */
     playSoundAtEntity(entity,name,rate,loop)
     {
         return(this.core.soundList.play(entity,null,name,rate,loop));
     }
     
+    /**
+     * Plays a global sound, this is a sound without position that
+     * plays the same loudness everywhere.
+     * 
+     * @param {string} name Name of sound to play
+     * @param {number} rate Rate of sound (1.0 = natural rate)
+     * @param {boolean} loop TRUE if sound should loop until stopped
+     * @returns {number} A unique index for the playing sound
+     */
     playGlobal(name,rate,loop)
     {
         return(this.core.soundList.play(null,null,name,rate,loop));
     }
     
+    /**
+     * Immediately stops the sound playing that is identified by the
+     * playIdx (the playIdx is returns from any of the play methods.)
+     * 
+     * @param {number} playIdx The sound to stop
+     */
     stopSound(playIdx)
     {
         this.core.soundList.stop(playIdx);
     }
     
+    /**
+     * Changes the rate of the playing sound that is identified by the
+     * playIdx (the playIdx is returns from any of the play methods.)
+     * 
+     * @param {number} playIdx The sound to change rate
+     * @param {number} rate New rate for sound (1.0 = natural rate)
+     */
     changeSoundRate(playIdx,rate)
     {
         this.core.soundList.changeRate(playIdx,rate);
@@ -1102,9 +1186,9 @@ export default class ProjectEntityClass
     /**
      * Override this to deal with the entity taking damage.
      * 
-     * @param {EntityClass} The entity dealing the damage
-     * @param {number} Amount of damage
-     * @param {PointClass} The hit position (in world space)
+     * @param {EntityClass} fromEntity The entity dealing the damage
+     * @param {number} damage Amount of damage
+     * @param {PointClass} hitPoint The hit position (in world space)
      */    
     damage(fromEntity,damage,hitPoint)
     {

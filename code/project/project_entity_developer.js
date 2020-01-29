@@ -1,3 +1,8 @@
+/**
+ * @module ProjectEntityDeveloperClass
+ * @ignore
+*/
+
 import PointClass from '../utility/point.js';
 import BoundClass from '../utility/bound.js';
 import CoreClass from '../main/core.js';
@@ -6,6 +11,16 @@ import ModelClass from '../model/model.js';
 import ImportModelClass from '../import/import_model.js';
 import MapPathNodeClass from '../map/map_path_node.js';
 
+/**
+ * Specialized version of ProjectEntityClass that adds certain
+ * extra options for developers, like no clip or flying flags and
+ * path creation tools.  Shipping games should extend their main
+ * player entities with ProjectEntityClass and use this for development
+ * only.
+ * 
+ * @hideconstructor
+ * @extends ProjectEntityClass
+ */
 export default class ProjectEntityDeveloperClass extends ProjectEntityClass
 {
     constructor(core,name,position,angle,data)

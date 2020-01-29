@@ -1,6 +1,17 @@
+/**
+ * @module ProjectMapClass
+ * @ignore
+*/
+
 import ImportMapClass from '../import/import_map.js';
 import GenerateMapClass from '../generate/map/generate_map.js';
 
+/**
+ * The main map class.  All your map scripts must extend
+ * from this class.
+ * 
+ * @hideconstructor
+ */
 export default class ProjectMapClass
 {
     constructor(core)
@@ -20,15 +31,24 @@ export default class ProjectMapClass
     {
     }
     
-        //
-        // general info
-        //
-        
+    /**
+     * Gets the project setup object, which contains all the
+     * information on how the user setup this game (for instance,
+     * things like mouse speed, etc.)
+     * 
+     * @returns {SetupClass} The setup object
+     */    
     getSetup()
     {
         return(this.core.setup);
     }
     
+    /**
+     * Gets the projects camera class, which you can use to
+     * change the camera.
+     * 
+     * @returns {CameraClass} The camera
+     */
     getCamera()
     {
         return(this.core.camera);
@@ -60,12 +80,12 @@ export default class ProjectMapClass
      * Adds an entity to this map, should only be called when
      * the system calls the ready() method.
      * 
-     * @entityClass {Class} Class of entity to spawn
-     * @name {string} Name of entity
-     * @position {PointClass} Position of entity
-     * @angle {PointClass} Angle of entity
-     * @data {Object} Additional user data for entity
-     * @show {boolean} TRUE if entity is not hidden
+     * @param {class} entityClass Class of entity to spawn
+     * @param {string} name Name of entity
+     * @param {PointClass} position Position of entity
+     * @param {PointClass} angle Angle of entity
+     * @param {object} data Additional user data for entity
+     * @param {boolean} show TRUE if entity is not hidden
      */
     addEntity(entityClass,name,position,angle,data,show)
     {
@@ -83,7 +103,7 @@ export default class ProjectMapClass
      * Override this to pass in the map JSON import
      * settings.
      * 
-     * @returns {Object} Map setup object
+     * @returns {object} Map setup object
      */
     getImportSettings()
     {

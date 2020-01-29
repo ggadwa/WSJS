@@ -1,6 +1,5 @@
 import BitmapClass from '../../bitmap/bitmap.js';
 import GenerateBitmapBaseClass from './generate_bitmap_base.js';
-import GenerateUtilityClass from '../utility/generate_utility.js';
 
 //
 // generate concrete bitmap class
@@ -42,7 +41,7 @@ export default class GenerateBitmapConcreteClass extends GenerateBitmapBaseClass
         
             // concrete expansion cuts
             
-        if (GenerateUtilityClass.randomPercentage(0.5)) {
+        if (this.core.randomPercentage(0.5)) {
             this.drawLineColor(1,0,1,this.colorImgData.height,jointColor);
             jointColor=this.adjustColor(jointColor,0.9);
             this.drawLineColor(0,0,0,this.colorImgData.height,jointColor);
@@ -52,7 +51,7 @@ export default class GenerateBitmapConcreteClass extends GenerateBitmapBaseClass
             this.drawLineNormal(2,0,2,this.colorImgData.height,this.NORMAL_LEFT_45);
         }
 
-        if (GenerateUtilityClass.randomPercentage(0.5)) {
+        if (this.core.randomPercentage(0.5)) {
             this.drawLineColor(0,1,this.colorImgData.width,1,jointColor);
             jointColor=this.adjustColor(jointColor,0.9);
             this.drawLineColor(0,0,this.colorImgData.width,0,jointColor);

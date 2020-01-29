@@ -1,7 +1,6 @@
 import ColorClass from '../../utility/color.js';
 import BitmapClass from '../../bitmap/bitmap.js';
 import GenerateBitmapBaseClass from './generate_bitmap_base.js';
-import GenerateUtilityClass from '../utility/generate_utility.js';
 
 //
 // generate computer bitmap class
@@ -62,7 +61,7 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
             if (lineVar<4) lineVar=4;
             
             for (n=0;n!==nLine;n++) {
-                y=GenerateUtilityClass.randomInBetween(top,bot);
+                y=this.core.randomInBetween(top,bot);
                 
                 lineColor=this.getRandomColor();
                 this.drawRandomLine(lft,y,rgt,y,lft,top,rgt,bot,lineVar,lineColor,true);
@@ -76,7 +75,7 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
             if (lineVar<4) lineVar=4;
             
             for (n=0;n!==nLine;n++) {
-                x=GenerateUtilityClass.randomInBetween(lft,rgt);
+                x=this.core.randomInBetween(lft,rgt);
                 
                 lineColor=this.getRandomColor();
                 this.drawRandomLine(x,top,x,bot,lft,top,rgt,bot,lineVar,lineColor,true);
@@ -98,7 +97,7 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
         shutterEdgeColor=this.adjustColor(shutterColor,0.9);
         
         sz=Math.trunc(Math.max((rgt-lft),(bot-top))*0.1);
-        shutterCount=GenerateUtilityClass.randomInt(sz,sz);
+        shutterCount=this.core.randomInt(sz,sz);
         
         if ((rgt-lft)>(bot-top)) {
             this.drawNormalWaveHorizontal(lft,top,rgt,bot,shutterColor,shutterEdgeColor,shutterCount);
@@ -118,7 +117,7 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
         top+=edgeSize;
         bot-=edgeSize;
         
-        sz=GenerateUtilityClass.randomInt(12,5);
+        sz=this.core.randomInt(12,5);
         
         xCount=Math.trunc((rgt-lft)/sz);
         yCount=Math.trunc((bot-top)/sz);
@@ -138,12 +137,12 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
                     // the light
                     
                 color=this.getRandomColor();
-                if (GenerateUtilityClass.randomPercentage(0.5)) color=this.adjustColor(color,0.8);
+                if (this.core.randomPercentage(0.5)) color=this.adjustColor(color,0.8);
                 this.drawOval((dx+1),(dy+1),(dx+(sz-1)),(dy+(sz-1)),0,1,0,0,sz,0.8,color,null,0.5,false,false,1,0);
                 
                     // the possible glow
                     
-                if (GenerateUtilityClass.randomPercentage(0.5)) this.drawOvalGlow(dx,dy,(dx+sz),(dy+sz),this.adjustColor(color,0.7));
+                if (this.core.randomPercentage(0.5)) this.drawOvalGlow(dx,dy,(dx+sz),(dy+sz),this.adjustColor(color,0.7));
             }
         }
     }
@@ -158,7 +157,7 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
         top+=edgeSize;
         bot-=edgeSize;
         
-        sz=GenerateUtilityClass.randomInt(10,15);
+        sz=this.core.randomInt(10,15);
         
         xCount=Math.trunc((rgt-lft)/sz);
         yCount=Math.trunc((bot-top)/sz);
@@ -185,7 +184,7 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
                 
                     // the possible glow
                     
-                if (GenerateUtilityClass.randomPercentage(0.5)) this.drawRectGlow(dx,dy,(dx+sz),(dy+sz),color);
+                if (this.core.randomPercentage(0.5)) this.drawRectGlow(dx,dy,(dx+sz),(dy+sz),color);
             }
         }
     }
@@ -209,7 +208,7 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
             // the drive sizes
             // pick randomly, but make sure they fill entire size
         
-        high=GenerateUtilityClass.randomInt(15,15);
+        high=this.core.randomInt(15,15);
         wid=high*2;
         
         ledWid=Math.trunc(high*0.1);
@@ -241,7 +240,7 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
                 
                     // the glowing indicator
                 
-                ledColor=ledColors[GenerateUtilityClass.randomIndex(3)];
+                ledColor=ledColors[this.core.randomIndex(3)];
                 
                 bx=(dx+wid)-(ledWid+5);
                 by=(dy+high)-(ledHigh+5);
@@ -283,13 +282,13 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
         rowCount=Math.trunc(((bot-top)-20)/10);
         
         for (y=0;y<rowCount;y++) {
-            colCount=GenerateUtilityClass.randomInt(3,(Math.trunc(((rgt-lft)-20)/7)-3));
+            colCount=this.core.randomInt(3,(Math.trunc(((rgt-lft)-20)/7)-3));
             
             dx=lft+10;
             
             for (x=0;x<colCount;x++) {
                 
-                switch (GenerateUtilityClass.randomIndex(5)) {
+                switch (this.core.randomIndex(5)) {
                     case 0:
                         this.drawRect(dx,dy,(dx+5),(dy+8),charColor);
                         break;
@@ -339,11 +338,11 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
             
             lx=mx;
             ty=my;
-            sz=GenerateUtilityClass.randomInt(minPanelSize,extraPanelSize);
+            sz=this.core.randomInt(minPanelSize,extraPanelSize);
             
                 // vertical stack
                 
-            if (GenerateUtilityClass.randomPercentage(0.5)) {
+            if (this.core.randomPercentage(0.5)) {
                 rx=lx+sz;
                 if (rx>=(rgt-(skipPanelSize+edgeSize))) rx=rgt-edgeSize;
                 by=bot-edgeSize;
@@ -365,7 +364,7 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
                 // be randonly in or out
                 
             this.drawRect(lx,ty,rx,by,panelColor);
-            this.draw3DFrameRect(lx,ty,rx,by,edgeSize,panelColor,GenerateUtilityClass.randomPercentage(0.5));
+            this.draw3DFrameRect(lx,ty,rx,by,edgeSize,panelColor,this.core.randomPercentage(0.5));
             
                 // draw the components
                 // we only allow one blank, wires, or shutter
@@ -373,7 +372,7 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
             rndTry=0;
             
             while (rndTry<25) {
-                componentType=GenerateUtilityClass.randomIndex(7);
+                componentType=this.core.randomIndex(7);
                 
                 rndSuccess=false;
 
@@ -442,8 +441,8 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
         let panelColor=this.getRandomColor();
         let panelInsideColor=this.adjustColor(panelColor,1.1);
         
-        let panelEdgeSize=GenerateUtilityClass.randomInt(2,3);
-        let panelInsideEdgeSize=GenerateUtilityClass.randomInt(2,2);
+        let panelEdgeSize=this.core.randomInt(2,3);
+        let panelInsideEdgeSize=this.core.randomInt(2,2);
        
             // this is a collection of plates that are
             // used to wrap the object around cubes

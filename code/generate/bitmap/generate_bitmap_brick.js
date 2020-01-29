@@ -1,7 +1,6 @@
 import ColorClass from '../../utility/color.js';
 import BitmapClass from '../../bitmap/bitmap.js';
 import GenerateBitmapBaseClass from './generate_bitmap_base.js';
-import GenerateUtilityClass from '../utility/generate_utility.js';
 
 //
 // generate brick bitmap class
@@ -35,7 +34,7 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
 
         f=1.0;
         if (!((lft<0) || (rgt>this.colorImgData.width))) {        // don't darken bricks that fall off edges
-            f=0.6+(GenerateUtilityClass.random()*0.4);
+            f=0.6+(this.core.random()*0.4);
         }
 
         if (isLarge) {
@@ -67,24 +66,24 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
 
                 // any cracks
 
-            if (GenerateUtilityClass.randomPercentage(0.1)) {
+            if (this.core.randomPercentage(0.1)) {
                 if ((rgt-lft)>45) {
-                    sx=GenerateUtilityClass.randomInBetween((lft+15),(rgt-15));
-                    ex=sx+(GenerateUtilityClass.randomInt(5,25)-15);
+                    sx=this.core.randomInBetween((lft+15),(rgt-15));
+                    ex=sx+(this.core.randomInt(5,25)-15);
 
                     lineColor=this.adjustColorRandom(drawBrickColor,0.65,0.75);
-                    this.drawVerticalCrack(sx,top,bot,lft,rgt,GenerateUtilityClass.randomSign(),10,lineColor,true);
+                    this.drawVerticalCrack(sx,top,bot,lft,rgt,this.core.randomSign(),10,lineColor,true);
                 }
             }
 
                 // streaks
 
-            if (GenerateUtilityClass.randomPercentage(0.2)) {
-                streakWid=GenerateUtilityClass.randomInBetween(Math.trunc((rgt-lft)*0.3),Math.trunc((rgt-lft)*0.6));
+            if (this.core.randomPercentage(0.2)) {
+                streakWid=this.core.randomInBetween(Math.trunc((rgt-lft)*0.3),Math.trunc((rgt-lft)*0.6));
                 if (streakWid<10) streakWid=10;
                 if (streakWid>(this.colorImgData.width*0.1)) streakWid=this.colorImgData.width*0.1;
 
-                sx=GenerateUtilityClass.randomInt(lft,((rgt-lft)-streakWid));
+                sx=this.core.randomInt(lft,((rgt-lft)-streakWid));
                 ex=sx+streakWid;
 
                 streakColor=this.adjustColorRandom(drawBrickColor,0.65,0.75);
@@ -98,8 +97,8 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
         let x,y,xCount,xAdd,yCount,yAdd;
         let halfWid,halfBrick,lft,top;
         
-        let edgeSize=GenerateUtilityClass.randomInt(Math.trunc(this.colorImgData.width*0.005),Math.trunc(this.colorImgData.width*0.0125));
-        let paddingSize=GenerateUtilityClass.randomInt(Math.trunc(this.colorImgData.width*0.005),Math.trunc(this.colorImgData.width*0.0125));
+        let edgeSize=this.core.randomInt(Math.trunc(this.colorImgData.width*0.005),Math.trunc(this.colorImgData.width*0.0125));
+        let paddingSize=this.core.randomInt(Math.trunc(this.colorImgData.width*0.005),Math.trunc(this.colorImgData.width*0.0125));
         
         let brickColor=this.getRandomColor();
         let altBrickColor=this.getRandomColor();
@@ -118,11 +117,11 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
         
             // draw the bricks
             
-        xCount=GenerateUtilityClass.randomInt(4,4);
+        xCount=this.core.randomInt(4,4);
         xAdd=Math.trunc(this.colorImgData.width/xCount);
         halfWid=Math.trunc(xAdd/2);
 
-        yCount=GenerateUtilityClass.randomInt(4,5);
+        yCount=this.core.randomInt(4,5);
         yAdd=Math.trunc(this.colorImgData.height/yCount);
 
         top=0;
@@ -132,8 +131,8 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
 
                 // special lines (full line or double bricks)
                 
-            if (GenerateUtilityClass.randomPercentage(0.2)) {
-                if (GenerateUtilityClass.randomPercentage(0.5)) {
+            if (this.core.randomPercentage(0.2)) {
+                if (this.core.randomPercentage(0.5)) {
                     this.generateSingleBrick(0,top,(this.colorImgData.width-1),(top+yAdd),edgeSize,paddingSize,brickColor,altBrickColor,false,false,true);
                 }
                 else {

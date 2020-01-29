@@ -1,6 +1,5 @@
 import BitmapClass from '../../bitmap/bitmap.js';
 import GenerateBitmapBaseClass from './generate_bitmap_base.js';
-import GenerateUtilityClass from '../utility/generate_utility.js';
 
 //
 // generate metal bitmap class
@@ -47,14 +46,14 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
         
         metalCorrColor=this.adjustColorRandom(metalColor,0.6,0.7);
 
-        corrCount=GenerateUtilityClass.randomInt(Math.trunc(wid*0.06),Math.trunc(wid*0.03));
+        corrCount=this.core.randomInt(Math.trunc(wid*0.06),Math.trunc(wid*0.03));
         corrWid=Math.trunc(wid/corrCount);
         corrHigh=Math.trunc(high/corrCount);
 
         lineWid=corrWid-4;
         lineHigh=corrHigh-4;
 
-        lineStyle=GenerateUtilityClass.randomIndex(GenerateBitmapMetalClass.CORRUGATION_LINES.length);
+        lineStyle=this.core.randomIndex(GenerateBitmapMetalClass.CORRUGATION_LINES.length);
 
             // corrugations
 
@@ -101,7 +100,7 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
         
             // corners
             
-        if (GenerateUtilityClass.randomPercentage(0.33)) {
+        if (this.core.randomPercentage(0.33)) {
             this.drawOval(lft,top,(lft+screwSize),(top+screwSize),0,1,0,0,edgeSize,0.8,screwColor,outlineColor,0.5,false,false,1,0);
             this.drawOval((rgt-screwSize),top,rgt,(top+screwSize),0,1,0,0,edgeSize,0.8,screwColor,outlineColor,0.5,false,false,1,0);
             this.drawOval((rgt-screwSize),(bot-screwSize),rgt,bot,0,1,0,0,edgeSize,0.8,screwColor,outlineColor,0.5,false,false,1,0);
@@ -110,7 +109,7 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
         
             // middles
             
-        if (GenerateUtilityClass.randomPercentage(0.33)) {
+        if (this.core.randomPercentage(0.33)) {
             mx=Math.trunc((lft+rgt)*0.5)-Math.trunc(screwSize*0.5);
             my=Math.trunc((top+bot)*0.5)-Math.trunc(screwSize*0.5);
             this.drawOval(mx,top,(mx+screwSize),(top+screwSize),0,1,0,0,edgeSize,0.8,screwColor,outlineColor,0.5,false,false,1,0);
@@ -127,7 +126,7 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
         
             // colors
             
-        if (GenerateUtilityClass.randomPercentage(0.5)) {
+        if (this.core.randomPercentage(0.5)) {
             color=metalColor;
             screwColor=altMetalColor;
         }
@@ -149,14 +148,14 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
         
             // variations
             
-        panelType=(variationMode===GenerateBitmapMetalClass.VARIATION_BOX)?0:GenerateUtilityClass.randomIndex(4);
+        panelType=(variationMode===GenerateBitmapMetalClass.VARIATION_BOX)?0:this.core.randomIndex(4);
             
         switch (panelType) {
             
                 // internal box
                 
             case 0:
-                sz=GenerateUtilityClass.randomInt(((edgeSize+screwSize)*2),(edgeSize*3));
+                sz=this.core.randomInt(((edgeSize+screwSize)*2),(edgeSize*3));
                 lft2=lft+sz;
                 rgt2=rgt-sz;
                 top2=top+sz;
@@ -181,8 +180,8 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
             case 2:
                 frameColor=this.adjustColorRandom(color,0.75,0.85);
                 sz=Math.trunc(Math.max((rgt-lft),(bot-top))*0.075);
-                waveCount=GenerateUtilityClass.randomInt(sz,sz);
-                if (GenerateUtilityClass.randomPercentage(0.5)) {
+                waveCount=this.core.randomInt(sz,sz);
+                if (this.core.randomPercentage(0.5)) {
                     this.drawNormalWaveHorizontal((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),color,frameColor,waveCount);
                 }
                 else {
@@ -208,7 +207,7 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
         mx=Math.trunc(this.colorImgData.width*0.5);
         my=Math.trunc(this.colorImgData.height*0.5);
         
-        panelCount=GenerateUtilityClass.randomIndex(3);
+        panelCount=this.core.randomIndex(3);
             
         switch (panelCount) {
             case 0:
@@ -249,8 +248,8 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
         
         let metalColor=this.getRandomColor();
         let altMetalColor=this.getRandomColor();
-        let edgeSize=GenerateUtilityClass.randomInt(Math.trunc(this.colorImgData.width*0.005),Math.trunc(this.colorImgData.width*0.005));
-        let screwSize=GenerateUtilityClass.randomInt(Math.trunc(this.colorImgData.width*0.008),Math.trunc(this.colorImgData.width*0.015));
+        let edgeSize=this.core.randomInt(Math.trunc(this.colorImgData.width*0.005),Math.trunc(this.colorImgData.width*0.005));
+        let screwSize=this.core.randomInt(Math.trunc(this.colorImgData.width*0.008),Math.trunc(this.colorImgData.width*0.015));
         
         switch (variationMode) {
             case GenerateBitmapMetalClass.VARIATION_NONE:

@@ -1,7 +1,6 @@
 import ColorClass from '../../utility/color.js';
 import BitmapClass from '../../bitmap/bitmap.js';
 import GenerateBitmapBaseClass from './generate_bitmap_base.js';
-import GenerateUtilityClass from '../utility/generate_utility.js';
 
 //
 // generate wood bitmap class
@@ -62,9 +61,9 @@ export default class GenerateBitmapWoodClass extends GenerateBitmapBaseClass
         
             // some random values
 
-        let boardCount=GenerateUtilityClass.randomInt(4,12);
+        let boardCount=this.core.randomInt(4,12);
         let boardSize=Math.trunc(this.colorImgData.width/boardCount);
-        let edgeSize=GenerateUtilityClass.randomInt(Math.trunc(this.colorImgData.width*0.005),Math.trunc(this.colorImgData.width*0.005));
+        let edgeSize=this.core.randomInt(Math.trunc(this.colorImgData.width*0.005),Math.trunc(this.colorImgData.width*0.005));
         let woodColor=this.getRandomColor();
         
             // perlin noise
@@ -83,7 +82,7 @@ export default class GenerateBitmapWoodClass extends GenerateBitmapBaseClass
             rgt=lft+boardSize;
             if (n===(boardCount-1)) rgt=this.colorImgData.width;
             
-            boardType=(variationMode===GenerateBitmapWoodClass.VARIATION_BOX)?0:GenerateUtilityClass.randomIndex(5);
+            boardType=(variationMode===GenerateBitmapWoodClass.VARIATION_BOX)?0:this.core.randomIndex(5);
             
             switch (boardType) {
                 case 0:

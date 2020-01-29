@@ -1,3 +1,8 @@
+/**
+ * @module ProjectEffectClass
+ * @ignore
+*/
+
 import PointClass from '../utility/point.js';
 import ColorClass from '../utility/color.js';
 import LightClass from '../light/light.js';
@@ -18,6 +23,13 @@ class ProjectEffectChunkClass
     }
 }
 
+/**
+ * This class represents a single running effect in the engine.  All effects
+ * must be extended from this class.  You never call the constructor on this,
+ * these are created from utility classes.
+ * 
+ * @hideconstructor
+ */
 export default class ProjectEffectClass
 {
     static DRAW_MODE_OPAQUE=0;
@@ -104,30 +116,66 @@ export default class ProjectEffectClass
         this.light.exponent=exponent;
     }
     
-        //
-        // sounds
-        //
-        
+    /**
+     * Plays a sound, the sound is positioned at this entity.
+     * 
+     * @param {string} name Name of sound to play
+     * @param {number} rate Rate of sound (1.0 = natural rate)
+     * @param {boolean} loop TRUE if sound should loop until stopped
+     * @returns {number} A unique index for the playing sound
+     */
     playSound(name,rate,loop)
     {
         return(this.core.soundList.play(this,null,name,rate,loop));
     }
     
+    /**
+     * Plays a sound, the sound is positioned at the entity in
+     * the parameter entity.
+     * 
+     * @param {ProjectEntityClass} entity Entity that positions sound
+     * @param {string} name Name of sound to play
+     * @param {number} rate Rate of sound (1.0 = natural rate)
+     * @param {boolean} loop TRUE if sound should loop until stopped
+     * @returns {number} A unique index for the playing sound
+     */
     playSoundAtEntity(entity,name,rate,loop)
     {
         return(this.core.soundList.play(entity,null,name,rate,loop));
     }
     
+    /**
+     * Plays a global sound, this is a sound without position that
+     * plays the same loudness everywhere.
+     * 
+     * @param {string} name Name of sound to play
+     * @param {number} rate Rate of sound (1.0 = natural rate)
+     * @param {boolean} loop TRUE if sound should loop until stopped
+     * @returns {number} A unique index for the playing sound
+     */
     playGlobal(name,rate,loop)
     {
         return(this.core.soundList.play(null,null,name,rate,loop));
     }
     
+    /**
+     * Immediately stops the sound playing that is identified by the
+     * playIdx (the playIdx is returns from any of the play methods.)
+     * 
+     * @param {number} playIdx The sound to stop
+     */
     stopSound(playIdx)
     {
         this.core.soundList.stop(playIdx);
     }
     
+    /**
+     * Changes the rate of the playing sound that is identified by the
+     * playIdx (the playIdx is returns from any of the play methods.)
+     * 
+     * @param {number} playIdx The sound to change rate
+     * @param {number} rate New rate for sound (1.0 = natural rate)
+     */
     changeSoundRate(playIdx,rate)
     {
         this.core.soundList.changeRate(playIdx,rate);
@@ -461,11 +509,11 @@ export default class ProjectEffectClass
         shader.drawEnd();
     }
     
-    /*
+    /**
      * Override this for any draw setup, and return TRUE
      * if the effect is within the view.  You should always
      * override this to improve performance.
-     * 
+     *
      * @returns {boolean} TRUE if this effect is within the view
      */    
     drawSetup()

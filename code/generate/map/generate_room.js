@@ -1,17 +1,17 @@
 import PointClass from '../../utility/point.js';
 import BoundClass from '../../utility/bound.js';
-import GenerateUtilityClass from '../utility/generate_utility.js';
 
 export default class GenerateRoomClass
 {
     static STAIR_PATH_DIRECTION_Z=0;
     static STAIR_PATH_DIRECTION_X=1;
     
-    constructor(piece,segmentSize)
+    constructor(core,piece,segmentSize)
     {
+        this.core=core;
         this.piece=piece;
 
-        this.storyCount=GenerateUtilityClass.randomInt(this.piece.storyMinimum,3);
+        this.storyCount=this.core.randomInt(this.piece.storyMinimum,3);
         
         this.offset=new PointClass(0,0,0);
         this.size=new PointClass((segmentSize*piece.size.x),(segmentSize*this.storyCount),(segmentSize*piece.size.z));

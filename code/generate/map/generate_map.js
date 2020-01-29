@@ -14,7 +14,6 @@ import GenerateComputerClass from './generate_computer.js';
 import GeneratePipeClass from './generate_pipe.js';
 import GenerateAltarClass from './generate_altar.js';
 import GenerateLightClass from './generate_light.js';
-import GenerateUtilityClass from '../utility/generate_utility.js';
 import GenerateBitmapBaseClass from '../bitmap/generate_bitmap_base.js';
 import GenerateBitmapRunClass from '../bitmap/generate_bitmap_run.js';
 
@@ -104,28 +103,28 @@ export default class GenerateMapClass
         // room decorations
         //
         
-    buildDecoration(room,roomIdx,stepBitmap,platformBitmap,pillarBitmap,boxBitmap,computerBitmap,pipeBitmap,segmentSize)
+    buildDecoration(room,roomIdx,genBitmapRun,segmentSize)
     {
             // build the decoration
             
-        switch (GenerateUtilityClass.randomIndex(6)) {
+        switch (this.core.randomIndex(6)) {
             case 0:
-                GenerateStoryClass.buildRoomStories(this.core,room,('story_'+roomIdx),stepBitmap,platformBitmap,segmentSize);
+                (new GenerateStoryClass(this.core,room,('story_'+roomIdx),genBitmapRun.generateStep(),genBitmapRun.generatePlatform(),segmentSize)).build();
                 break;
             case 1:
-                GeneratePillarClass.buildRoomPillars(this.core,room,('pillar_'+roomIdx),pillarBitmap,segmentSize);
+                (new GeneratePillarClass(this.core,room,('pillar_'+roomIdx),genBitmapRun.generatePillar(),segmentSize)).build();
                 break;
             case 2:
-                GenerateStorageClass.buildRoomStorage(this.core,room,('storage'+roomIdx),boxBitmap,segmentSize);
+                (new GenerateStorageClass(this.core,room,('storage'+roomIdx),genBitmapRun.generateBox(),segmentSize)).build();
                 break;
             case 3:
-                GenerateComputerClass.buildRoomComputer(this.core,room,('computer_'+roomIdx),platformBitmap,computerBitmap,segmentSize);
+                (new GenerateComputerClass(this.core,room,('computer_'+roomIdx),genBitmapRun.generatePlatform(),genBitmapRun.generateComputer(),segmentSize)).build();
                 break;
             case 4:
-                GeneratePipeClass.buildRoomPipes(this.core,room,('pipe_'+roomIdx),pipeBitmap,segmentSize);
+                (new GeneratePipeClass(this.core,room,('pipe_'+roomIdx),genBitmapRun.generatePipe(),segmentSize)).build();
                 break;
             case 5:
-                GenerateAltarClass.buildRoomAltar(this.core,room,('alter_'+roomIdx),platformBitmap,segmentSize);
+                (new GenerateAltarClass(this.core,room,('alter_'+roomIdx),genBitmapRun.generatePlatform(),segmentSize)).build();
                 break;
         }
     }
@@ -138,15 +137,16 @@ export default class GenerateMapClass
     {
         let x,z,doAll,touchRange;
         let noSkipX,noSkipZ;
+        let genStory=new GenerateStoryClass(core,room,name,stepBitmap,null,segmentSize);
         
         if (room.offset.z===(toRoom.offset.z+toRoom.size.z)) {
             touchRange=room.getTouchWallRange(toRoom,true,segmentSize);
             doAll=(touchRange.getSize()<=2);
-            noSkipX=GenerateUtilityClass.randomInBetween(touchRange.min,(touchRange.max+1));
+            noSkipX=this.core.randomInBetween(touchRange.min,(touchRange.max+1));
             
             for (x=touchRange.min;x<=touchRange.max;x++) {
-                if ((GenerateUtilityClass.randomPercentage(0.5)) || (x===noSkipX) || (doAll)) {
-                    GenerateStoryClass.addStairs(core,room,name,stepBitmap,segmentSize,x,0,GenerateStoryClass.PLATFORM_DIR_NEG_Z,0);
+                if ((this.core.randomPercentage(0.5)) || (x===noSkipX) || (doAll)) {
+                    genStory.addStairs(x,0,GenerateStoryClass.PLATFORM_DIR_NEG_Z,0);
                 }
             }
             return;
@@ -154,11 +154,11 @@ export default class GenerateMapClass
         if ((room.offset.z+room.size.z)===toRoom.offset.z) {
             touchRange=room.getTouchWallRange(toRoom,true,segmentSize);
             doAll=(touchRange.getSize()<=2);
-            noSkipX=GenerateUtilityClass.randomInBetween(touchRange.min,(touchRange.max+1));
+            noSkipX=this.core.randomInBetween(touchRange.min,(touchRange.max+1));
             
             for (x=touchRange.min;x<=touchRange.max;x++) {
-                if ((GenerateUtilityClass.randomPercentage(0.5)) || (x===noSkipX) || (doAll)) {
-                    GenerateStoryClass.addStairs(core,room,name,stepBitmap,segmentSize,x,room.piece.size.z-2,GenerateStoryClass.PLATFORM_DIR_POS_Z,0);
+                if ((this.core.randomPercentage(0.5)) || (x===noSkipX) || (doAll)) {
+                    genStory.addStairs(x,room.piece.size.z-2,GenerateStoryClass.PLATFORM_DIR_POS_Z,0);
                 }
             }
             return;
@@ -166,11 +166,11 @@ export default class GenerateMapClass
         if (room.offset.x===(toRoom.offset.x+toRoom.size.x)) {
             touchRange=room.getTouchWallRange(toRoom,false,segmentSize);
             doAll=(touchRange.getSize()<=2);
-            noSkipZ=GenerateUtilityClass.randomInBetween(touchRange.min,(touchRange.max+1));
+            noSkipZ=this.core.randomInBetween(touchRange.min,(touchRange.max+1));
             
             for (z=touchRange.min;z<=touchRange.max;z++) {
-                if ((GenerateUtilityClass.randomPercentage(0.5)) || (z===noSkipZ) || (doAll)) {
-                    GenerateStoryClass.addStairs(core,room,name,stepBitmap,segmentSize,0,z,GenerateStoryClass.PLATFORM_DIR_NEG_X,0);
+                if ((this.core.randomPercentage(0.5)) || (z===noSkipZ) || (doAll)) {
+                    genStory.addStairs(0,z,GenerateStoryClass.PLATFORM_DIR_NEG_X,0);
                 }
             }
             return;
@@ -178,11 +178,11 @@ export default class GenerateMapClass
         if ((room.offset.x+room.size.x)===toRoom.offset.x) {
             touchRange=room.getTouchWallRange(toRoom,false,segmentSize);
             doAll=(touchRange.getSize()<=2);
-            noSkipZ=GenerateUtilityClass.randomInBetween(touchRange.min,(touchRange.max+1));
+            noSkipZ=this.core.randomInBetween(touchRange.min,(touchRange.max+1));
             
             for (z=touchRange.min;z<=touchRange.max;z++) {
-                if ((GenerateUtilityClass.randomPercentage(0.5)) || (z===noSkipZ) || (doAll)) {
-                    GenerateStoryClass.addStairs(core,room,name,stepBitmap,segmentSize,room.piece.size.x-2,z,GenerateStoryClass.PLATFORM_DIR_POS_X,0);
+                if ((this.core.randomPercentage(0.5)) || (z===noSkipZ) || (doAll)) {
+                    genStory.addStairs(room.piece.size.x-2,z,GenerateStoryClass.PLATFORM_DIR_POS_X,0);
                 }
             }
             return;
@@ -203,7 +203,7 @@ export default class GenerateMapClass
             // can we change height?
             
         if ((room.offset.y===0) && (touchRoom.piece.decorate) && (touchRoom.storyCount>1)) {
-            if (GenerateUtilityClass.randomPercentage(0.25)) {
+            if (this.core.randomPercentage(0.25)) {
                 room.offset.y+=segmentSize;
                 touchRoom.requiredStairs.push(room);
             }
@@ -231,15 +231,29 @@ export default class GenerateMapClass
         offset=Math.trunc(segmentSize*0.5);
         
         while (path.nodes.length<nodeCount) {
-            room=rooms[GenerateUtilityClass.randomIndex(roomCount)];
-            x=GenerateUtilityClass.randomInBetween(1,(room.piece.size.x-1));
-            z=GenerateUtilityClass.randomInBetween(1,(room.piece.size.z-1));
+            
+                // only put stuff in decorated rooms
+                
+            room=rooms[this.core.randomIndex(roomCount)];
+            if (!room.piece.decorate) {
+                failCount++;
+                if (failCount>100) break;
+            }
+            
+                // skip if it's filled
+                
+            x=this.core.randomInBetween(1,(room.piece.size.x-1));
+            z=this.core.randomInBetween(1,(room.piece.size.z-1));
             
             if (room.getGrid(0,x,z)!==0) {
                 failCount++;
                 if (failCount>100) break;
             }
             
+                // add this and block it off
+                
+            room.setGrid(0,x,z,1);
+                
             x=room.offset.x+((x*segmentSize)+offset);
             z=room.offset.z+((z*segmentSize)+offset);
             pathNode=new MapPathNodeClass(path.nodes.length,new PointClass(x,room.offset.y,z),null,[],null,null);
@@ -254,12 +268,11 @@ export default class GenerateMapClass
     build(importSettings)
     {
         let n,k,seed;
-        let roomWallBitmap,floorBitmap,ceilingBitmap,stepBitmap,pillarBitmap,platformBitmap,boxBitmap,computerBitmap,pipeBitmap;
+        let genPiece,genBitmapRun;
         let roomTopY;
         let xAdd,zAdd,origX,origZ,touchIdx,failCount,placeCount,moveCount;
         let room,centerPnt;
         let roomCount,segmentSize,colorScheme;
-        let map=this.core.map;
         let rooms=[];
         
             // see the random number generator
@@ -267,49 +280,42 @@ export default class GenerateMapClass
         seed=(importSettings.autoGenerate.randomSeed===undefined)?Date.now():importSettings.autoGenerate.randomSeed;
         console.info('Random Seed: '+seed);
         
-        GenerateUtilityClass.setRandomSeed(seed);
+        this.core.setRandomSeed(seed);
         
             // some global settings
             
         roomCount=importSettings.autoGenerate.roomCount;
         segmentSize=importSettings.autoGenerate.segmentSize;
-        colorScheme=GenerateUtilityClass.randomIndex(GenerateBitmapBaseClass.COLOR_SCHEME_COUNT);
+        colorScheme=this.core.randomIndex(GenerateBitmapBaseClass.COLOR_SCHEME_COUNT);
         colorScheme=GenerateBitmapBaseClass.COLOR_SCHEME_RANDOM;    // testing
         
-            // bitmaps
+            // some generators
             
-        roomWallBitmap=GenerateBitmapRunClass.generateWall(this.core,colorScheme);
-        floorBitmap=GenerateBitmapRunClass.generateFloor(this.core,colorScheme);
-        ceilingBitmap=GenerateBitmapRunClass.generateCeiling(this.core,colorScheme);
-        stepBitmap=GenerateBitmapRunClass.generateStep(this.core,colorScheme);
-        pillarBitmap=GenerateBitmapRunClass.generateDecoration(this.core,colorScheme);
-        platformBitmap=GenerateBitmapRunClass.generatePlatform(this.core,colorScheme);
-        boxBitmap=GenerateBitmapRunClass.generateBox(this.core,colorScheme);
-        computerBitmap=GenerateBitmapRunClass.generateComputer(this.core,colorScheme);
-        pipeBitmap=GenerateBitmapRunClass.generatePipe(this.core,colorScheme);
+        genPiece=new GeneratePieceClass(this.core);
+        genBitmapRun=new GenerateBitmapRunClass(this.core,colorScheme);
         
             // first room in center of map
             
-        room=new GenerateRoomClass(GeneratePieceClass.getDefaultPiece(),segmentSize);
+        room=new GenerateRoomClass(this.core,genPiece.getDefaultPiece(),segmentSize);
         room.offset.setFromValues(0,0,0);
         rooms.push(room);
         
             // other rooms start outside of center
             // room and gravity brings them in until they connect
         
-        roomCount=GenerateUtilityClass.randomInt(10,10);
+        roomCount=this.core.randomInt(10,10);
         failCount=25;
         
         while ((rooms.length<roomCount) && (failCount>0)) {
                 
-            room=new GenerateRoomClass(GeneratePieceClass.getRandomPiece(),segmentSize);
+            room=new GenerateRoomClass(this.core,genPiece.getRandomPiece(),segmentSize);
             
             placeCount=10;
             
             while (placeCount>0) {
-                room.offset.x=GenerateUtilityClass.randomInBetween(-100,100)*segmentSize;
+                room.offset.x=this.core.randomInBetween(-100,100)*segmentSize;
                 room.offset.y=0;
-                room.offset.z=GenerateUtilityClass.randomInBetween(-100,100)*segmentSize;
+                room.offset.z=this.core.randomInBetween(-100,100)*segmentSize;
                 if (!room.collides(rooms)) break;
                 
                 placeCount--;
@@ -395,17 +401,17 @@ export default class GenerateMapClass
                 
                 // meshes
 
-            GenerateMeshClass.buildRoomWalls(this.core,room,centerPnt,('wall_'+n),roomWallBitmap,segmentSize);
-            GenerateMeshClass.buildRoomFloorCeiling(this.core,room,centerPnt,('floor_'+n),floorBitmap,room.offset.y,segmentSize);
-            GenerateMeshClass.buildRoomFloorCeiling(this.core,room,centerPnt,('ceiling_'+n),ceilingBitmap,roomTopY,segmentSize);
+            GenerateMeshClass.buildRoomWalls(this.core,room,centerPnt,('wall_'+n),genBitmapRun.generateWall(),segmentSize);
+            GenerateMeshClass.buildRoomFloorCeiling(this.core,room,centerPnt,('floor_'+n),genBitmapRun.generateFloor(),room.offset.y,segmentSize);
+            GenerateMeshClass.buildRoomFloorCeiling(this.core,room,centerPnt,('ceiling_'+n),genBitmapRun.generateCeiling(),roomTopY,segmentSize);
             
                 // decorations
 
-            if (room.piece.decorate) this.buildDecoration(room,n,stepBitmap,platformBitmap,pillarBitmap,boxBitmap,computerBitmap,pipeBitmap,segmentSize);
+            if (room.piece.decorate) this.buildDecoration(room,n,genBitmapRun,segmentSize);
             
                 // room lights
 
-            GenerateLightClass.buildRoomLight(this.core,room,('light_'+n),stepBitmap,segmentSize);
+            (new GenerateLightClass(this.core,room,('light_'+n),genBitmapRun.generateStep(),segmentSize)).build();
         }
         
             // any steps
@@ -414,7 +420,7 @@ export default class GenerateMapClass
             room=rooms[n];
             
             for (k=0;k!==room.requiredStairs.length;k++) {
-                this.buildSteps(this.core,room,('room_'+n+'_step_'+k),room.requiredStairs[k],stepBitmap,segmentSize);
+                this.buildSteps(this.core,room,('room_'+n+'_step_'+k),room.requiredStairs[k],genBitmapRun.generateStep(),segmentSize);
             }
         }
         
