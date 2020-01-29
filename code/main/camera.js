@@ -47,9 +47,15 @@ export default class CameraClass
     }
     
         //
-        // mode changes
+        // camera changes
         //
         
+    setViewDistance(nearZ,farZ)
+    {
+        this.glNearZ=nearZ;
+        this.glFarZ=farZ;
+    }
+    
     gotoFirstPerson()
     {
         this.mode=CameraClass.CAMERA_MODE_FIRST_PERSON;

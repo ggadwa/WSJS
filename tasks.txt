@@ -18,9 +18,10 @@
 
     - decorations
        - don't repeat decorations
-       - pools
+       - pool decorations
+       - moving blocks (half size of segmentSize, in random circular motion)
        - better uv for pillars
-       - panels for computers areas
+       - control panel decorations
        - connectors for pipes
 
 - demo
@@ -31,7 +32,6 @@
 - reaper
 
 - kart
-    - use this.getCamera().gotoThirdPersonBehind(20000,-20); in game.js
 
 - js docs (especially in the project_ classes)
 - slowly transition to public/private fields (especially in the project_ classes)
