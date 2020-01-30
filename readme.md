@@ -1,4 +1,6 @@
-# WSJS a javascript 3D game development engine
+# WSJS
+
+A javascript-based 3D game development engine.
 
 ## Repository Contents
 
