@@ -4,26 +4,27 @@ import MeshClass from '../../mesh/mesh.js';
 
 export default class GenerateMeshClass
 {
-    static STAIR_STEP_COUNT=10;
-    
-    static STAIR_DIR_POS_Z=0;
-    static STAIR_DIR_NEG_Z=1;
-    static STAIR_DIR_POS_X=2;
-    static STAIR_DIR_NEG_X=3;
-    
-    static UV_WHOLE=0;
-    static UV_BOX=1;
-    static UV_MAP=2;
-
-    constructor()
+    constructor(core)
     {
+        this.STAIR_STEP_COUNT=10;
+
+        this.STAIR_DIR_POS_Z=0;
+        this.STAIR_DIR_NEG_Z=1;
+        this.STAIR_DIR_POS_X=2;
+        this.STAIR_DIR_NEG_X=3;
+
+        this.UV_WHOLE=0;
+        this.UV_BOX=1;
+        this.UV_MAP=2;
+
+        this.core=core;
     }
     
         //
         // build UVs for vertex lists
         //
             
-    static buildUVs(vertexArray,normalArray,uvScale)
+    buildUVs(vertexArray,normalArray,uvScale)
     {
         let n,k,nVertex,offset;
         let x,y,ang,mapUp;
@@ -114,7 +115,7 @@ export default class GenerateMeshClass
         // build normals
         //
         
-    static buildNormals(vertexArray,indexArray,meshCenter,normalsIn)
+    buildNormals(vertexArray,indexArray,meshCenter,normalsIn)
     {
         let n,flip,nTrig,trigIdx,offset;
         let v0,v1,v2,normalArray;
@@ -211,7 +212,7 @@ export default class GenerateMeshClass
         // build tangents
         //
 
-    static buildTangents(vertexArray,uvArray,indexArray)
+    buildTangents(vertexArray,uvArray,indexArray)
     {
         let n,nTrig,trigIdx,offset;
         let u10,u20,v10,v20;
@@ -329,13 +330,13 @@ export default class GenerateMeshClass
         // mesh utilities
         //
         
-    static addQuadToIndexes(indexArray,trigIdx)
+    addQuadToIndexes(indexArray,trigIdx)
     {
         indexArray.push(trigIdx,(trigIdx+1),(trigIdx+2),trigIdx,(trigIdx+2),(trigIdx+3));
         return(trigIdx+4);
     }
     
-    static addBox(core,name,bitmap,negX,posX,negY,posY,negZ,posZ,isNegX,isPosX,isNegY,isPosY,isNegZ,isPosZ,segmentSize)
+    addBox(name,bitmap,negX,posX,negY,posY,negZ,posZ,isNegX,isPosX,isNegY,isPosY,isNegZ,isPosZ,segmentSize)
     {
         let vertexArray=[];
         let indexArray=[];
@@ -368,18 +369,18 @@ export default class GenerateMeshClass
             trigIdx=this.addQuadToIndexes(indexArray,trigIdx);
         }
             
-        normalArray=GenerateMeshClass.buildNormals(vertexArray,indexArray,centerPnt,false);
-        uvArray=GenerateMeshClass.buildUVs(vertexArray,normalArray,(1/segmentSize));
-        tangentArray=GenerateMeshClass.buildTangents(vertexArray,uvArray,indexArray);
+        normalArray=this.buildNormals(vertexArray,indexArray,centerPnt,false);
+        uvArray=this.buildUVs(vertexArray,normalArray,(1/segmentSize));
+        tangentArray=this.buildTangents(vertexArray,uvArray,indexArray);
         
-        return(core.map.meshList.add(new MeshClass(core,name,bitmap,-1,-1,new Float32Array(vertexArray),normalArray,tangentArray,uvArray,null,null,new Uint16Array(indexArray))));
+        return(this.core.map.meshList.add(new MeshClass(this.core,name,bitmap,-1,-1,new Float32Array(vertexArray),normalArray,tangentArray,uvArray,null,null,new Uint16Array(indexArray))));
     }
     
         //
         // room pieces
         //
         
-    static buildRoomFloorCeiling(core,room,centerPnt,name,bitmap,y,segmentSize)
+    buildRoomFloorCeiling(room,centerPnt,name,bitmap,y,segmentSize)
     {
         let vertexArray=[];
         let normalArray;
@@ -392,16 +393,16 @@ export default class GenerateMeshClass
         vertexArray.push((room.offset.x+room.size.x),y,(room.offset.z+room.size.z));
         vertexArray.push(room.offset.x,y,(room.offset.z+room.size.z));
 
-        GenerateMeshClass.addQuadToIndexes(indexArray,0);
+        this.addQuadToIndexes(indexArray,0);
         
-        normalArray=GenerateMeshClass.buildNormals(vertexArray,indexArray,centerPnt,true);
-        uvArray=GenerateMeshClass.buildUVs(vertexArray,normalArray,(1/segmentSize));
-        tangentArray=GenerateMeshClass.buildTangents(vertexArray,uvArray,indexArray);
+        normalArray=this.buildNormals(vertexArray,indexArray,centerPnt,true);
+        uvArray=this.buildUVs(vertexArray,normalArray,(1/segmentSize));
+        tangentArray=this.buildTangents(vertexArray,uvArray,indexArray);
         
-        core.map.meshList.add(new MeshClass(core,name,bitmap,-1,-1,new Float32Array(vertexArray),normalArray,tangentArray,uvArray,null,null,new Uint16Array(indexArray)));
+        this.core.map.meshList.add(new MeshClass(this.core,name,bitmap,-1,-1,new Float32Array(vertexArray),normalArray,tangentArray,uvArray,null,null,new Uint16Array(indexArray)));
     }
     
-    static buildRoomWalls(core,room,centerPnt,name,bitmap,segmentSize)
+    buildRoomWalls(room,centerPnt,name,bitmap,segmentSize)
     {
         let n,k,k2,y;
         let nVertex,trigIdx;
@@ -429,7 +430,7 @@ export default class GenerateMeshClass
                 vertexArray.push((Math.trunc(piece.vertexes[k2][0]*segmentSize)+room.offset.x),y,(Math.trunc(piece.vertexes[k2][1]*segmentSize)+room.offset.z));
                 vertexArray.push((Math.trunc(piece.vertexes[k][0]*segmentSize)+room.offset.x),y,(Math.trunc(piece.vertexes[k][1]*segmentSize)+room.offset.z));
 
-                trigIdx=GenerateMeshClass.addQuadToIndexes(indexArray,trigIdx);
+                trigIdx=this.addQuadToIndexes(indexArray,trigIdx);
             }
 
             y+=segmentSize;
@@ -439,18 +440,18 @@ export default class GenerateMeshClass
 
         vertexArray=new Float32Array(vertexArray);
         indexArray=new Uint16Array(indexArray);
-        normalArray=GenerateMeshClass.buildNormals(vertexArray,indexArray,centerPnt,true);
-        uvArray=GenerateMeshClass.buildUVs(vertexArray,normalArray,(1/segmentSize));
-        tangentArray=GenerateMeshClass.buildTangents(vertexArray,uvArray,indexArray);
+        normalArray=this.buildNormals(vertexArray,indexArray,centerPnt,true);
+        uvArray=this.buildUVs(vertexArray,normalArray,(1/segmentSize));
+        tangentArray=this.buildTangents(vertexArray,uvArray,indexArray);
         
-        core.map.meshList.add(new MeshClass(core,name,bitmap,-1,-1,vertexArray,normalArray,tangentArray,uvArray,null,null,indexArray));
+        this.core.map.meshList.add(new MeshClass(this.core,name,bitmap,-1,-1,vertexArray,normalArray,tangentArray,uvArray,null,null,indexArray));
     }
     
         //
         // staircases
         //
         
-    static buildStairs(core,room,name,stepBitmap,segmentSize,x,y,z,dir,stepWidth,sides)
+    buildStairs(room,name,stepBitmap,segmentSize,x,y,z,dir,stepWidth,sides)
     {
         let n,trigIdx;
         let sx,sx2,sy,sz,sz2;
@@ -461,19 +462,19 @@ export default class GenerateMeshClass
         let tangentArray;
         let indexArray=[];
         let stepSize=Math.trunc((segmentSize*10)*0.02);
-        let stepHigh=Math.trunc(segmentSize/GenerateMeshClass.STAIR_STEP_COUNT);
+        let stepHigh=Math.trunc(segmentSize/this.STAIR_STEP_COUNT);
 
             // initial locations
 
         switch (dir) {
-            case GenerateMeshClass.STAIR_DIR_POS_Z:
-            case GenerateMeshClass.STAIR_DIR_NEG_Z:
+            case this.STAIR_DIR_POS_Z:
+            case this.STAIR_DIR_NEG_Z:
                 sx=x;
                 sx2=sx+(segmentSize*stepWidth);
                 centerPnt=new PointClass(Math.trunc(x+(segmentSize*0.5)),room.offset.y,Math.trunc(z+segmentSize));
                 break;
-            case GenerateMeshClass.STAIR_DIR_POS_X:
-            case GenerateMeshClass.STAIR_DIR_NEG_X:
+            case this.STAIR_DIR_POS_X:
+            case this.STAIR_DIR_NEG_X:
                 sz=z;
                 sz2=sz+(segmentSize*stepWidth);
                 centerPnt=new PointClass(Math.trunc(x+segmentSize),room.offset.y,Math.trunc(z+(segmentSize*0.5)));
@@ -485,24 +486,24 @@ export default class GenerateMeshClass
         trigIdx=0;
         sy=y+stepHigh;
         
-        for (n=0;n!==GenerateMeshClass.STAIR_STEP_COUNT;n++) { 
+        for (n=0;n!==this.STAIR_STEP_COUNT;n++) { 
             
                 // step top
                 
             switch (dir) {
-                case GenerateMeshClass.STAIR_DIR_POS_Z:
+                case this.STAIR_DIR_POS_Z:
                     sz=z+(n*stepSize);
                     sz2=sz+stepSize;
                     break;
-                case GenerateMeshClass.STAIR_DIR_NEG_Z:
+                case this.STAIR_DIR_NEG_Z:
                     sz=(z+(segmentSize*2))-(n*stepSize);
                     sz2=sz-stepSize;
                     break;
-                case GenerateMeshClass.STAIR_DIR_POS_X:
+                case this.STAIR_DIR_POS_X:
                     sx=x+(n*stepSize);
                     sx2=sx+stepSize;
                     break;
-                case GenerateMeshClass.STAIR_DIR_NEG_X:
+                case this.STAIR_DIR_NEG_X:
                     sx=(x+(segmentSize*2))-(n*stepSize);
                     sx2=sx-stepSize;
                     break;
@@ -513,20 +514,20 @@ export default class GenerateMeshClass
             vertexArray.push(sx2,sy,sz2);
             vertexArray.push(sx,sy,sz2);
             
-            trigIdx=GenerateMeshClass.addQuadToIndexes(indexArray,trigIdx);
+            trigIdx=this.addQuadToIndexes(indexArray,trigIdx);
             
                 // step front
                 
             switch (dir) {
-                case GenerateMeshClass.STAIR_DIR_POS_Z:
-                case GenerateMeshClass.STAIR_DIR_NEG_Z:
+                case this.STAIR_DIR_POS_Z:
+                case this.STAIR_DIR_NEG_Z:
                     vertexArray.push(sx,sy,sz);
                     vertexArray.push(sx2,sy,sz);
                     vertexArray.push(sx2,(sy-stepHigh),sz);
                     vertexArray.push(sx,(sy-stepHigh),sz);
                     break;
-                case GenerateMeshClass.STAIR_DIR_POS_X:
-                case GenerateMeshClass.STAIR_DIR_NEG_X:
+                case this.STAIR_DIR_POS_X:
+                case this.STAIR_DIR_NEG_X:
                     vertexArray.push(sx,sy,sz);
                     vertexArray.push(sx,sy,sz2);
                     vertexArray.push(sx,(sy-stepHigh),sz2);
@@ -534,14 +535,14 @@ export default class GenerateMeshClass
                     break;
             }
             
-            trigIdx=GenerateMeshClass.addQuadToIndexes(indexArray,trigIdx);
+            trigIdx=this.addQuadToIndexes(indexArray,trigIdx);
             
                 // step sides
                 
             if (sides) {
                 switch (dir) {
-                    case GenerateMeshClass.STAIR_DIR_POS_Z:
-                    case GenerateMeshClass.STAIR_DIR_NEG_Z:
+                    case this.STAIR_DIR_POS_Z:
+                    case this.STAIR_DIR_NEG_Z:
                         vertexArray.push(sx,sy,sz);
                         vertexArray.push(sx,sy,sz2);
                         vertexArray.push(sx,y,sz2);
@@ -551,8 +552,8 @@ export default class GenerateMeshClass
                         vertexArray.push(sx2,y,sz2);
                         vertexArray.push(sx2,y,sz);
                         break;
-                    case GenerateMeshClass.STAIR_DIR_POS_X:
-                    case GenerateMeshClass.STAIR_DIR_NEG_X:
+                    case this.STAIR_DIR_POS_X:
+                    case this.STAIR_DIR_NEG_X:
                         vertexArray.push(sx,sy,sz);
                         vertexArray.push(sx2,sy,sz);
                         vertexArray.push(sx2,y,sz);
@@ -564,8 +565,8 @@ export default class GenerateMeshClass
                         break;
                 }
 
-                trigIdx=GenerateMeshClass.addQuadToIndexes(indexArray,trigIdx);
-                trigIdx=GenerateMeshClass.addQuadToIndexes(indexArray,trigIdx);
+                trigIdx=this.addQuadToIndexes(indexArray,trigIdx);
+                trigIdx=this.addQuadToIndexes(indexArray,trigIdx);
             }
             
             sy+=stepHigh;
@@ -577,7 +578,7 @@ export default class GenerateMeshClass
             sy=y+segmentSize;
             
             switch (dir) {
-                case GenerateMeshClass.STAIR_DIR_POS_Z:
+                case this.STAIR_DIR_POS_Z:
                     sx=x+(segmentSize*stepWidth);
                     sz=z+(segmentSize*2);
                     vertexArray.push(x,y,sz);
@@ -585,14 +586,14 @@ export default class GenerateMeshClass
                     vertexArray.push(sx,sy,sz);
                     vertexArray.push(x,sy,sz);
                     break;
-                case GenerateMeshClass.STAIR_DIR_NEG_Z:
+                case this.STAIR_DIR_NEG_Z:
                     sx=x+(segmentSize*stepWidth);
                     vertexArray.push(x,y,z);
                     vertexArray.push(sx,y,z);
                     vertexArray.push(sx,sy,z);
                     vertexArray.push(x,sy,z);
                     break;
-                case GenerateMeshClass.STAIR_DIR_POS_X:
+                case this.STAIR_DIR_POS_X:
                     sx=x+(segmentSize*2);
                     sz=z+(segmentSize*stepWidth);
                     vertexArray.push(sx,y,z);
@@ -600,7 +601,7 @@ export default class GenerateMeshClass
                     vertexArray.push(sx,sy,sz);
                     vertexArray.push(sx,sy,z);
                     break;
-                case GenerateMeshClass.STAIR_DIR_NEG_X:
+                case this.STAIR_DIR_NEG_X:
                     sz=z+(segmentSize*stepWidth);
                     vertexArray.push(x,y,z);
                     vertexArray.push(x,y,sz);
@@ -609,41 +610,41 @@ export default class GenerateMeshClass
                     break;
             }
 
-            trigIdx=GenerateMeshClass.addQuadToIndexes(indexArray,trigIdx);
+            trigIdx=this.addQuadToIndexes(indexArray,trigIdx);
         }
         
             // create the mesh
             
-        normalArray=GenerateMeshClass.buildNormals(vertexArray,indexArray,centerPnt,false);
-        uvArray=GenerateMeshClass.buildUVs(vertexArray,normalArray,(1/segmentSize));
-        tangentArray=GenerateMeshClass.buildTangents(vertexArray,uvArray,indexArray);
+        normalArray=this.buildNormals(vertexArray,indexArray,centerPnt,false);
+        uvArray=this.buildUVs(vertexArray,normalArray,(1/segmentSize));
+        tangentArray=this.buildTangents(vertexArray,uvArray,indexArray);
         
-        core.map.meshList.add(new MeshClass(core,name,stepBitmap,-1,-1,new Float32Array(vertexArray),normalArray,tangentArray,uvArray,null,null,new Uint16Array(indexArray)));
+        this.core.map.meshList.add(new MeshClass(this.core,name,stepBitmap,-1,-1,new Float32Array(vertexArray),normalArray,tangentArray,uvArray,null,null,new Uint16Array(indexArray)));
     }
     
-    static buildRoomStairs(core,room,name,stepBitmap,segmentSize)
+    buildRoomStairs(room,name,stepBitmap,segmentSize)
     {
         let dir,stepWidth;
         
             // determine room to room direction
             
         if (room.forwardPath) {
-            dir=GenerateMeshClass.STAIR_DIR_POS_Z;
+            dir=this.STAIR_DIR_POS_Z;
             stepWidth=room.piece.size.x;
         }
         else {
-            dir=(room.pathXDeviation>0)?GenerateMeshClass.STAIR_DIR_POS_X:GenerateMeshClass.STAIR_DIR_NEG_X;
+            dir=(room.pathXDeviation>0)?this.STAIR_DIR_POS_X:this.STAIR_DIR_NEG_X;
             stepWidth=room.piece.size.z;
         }
         
-        this.buildStairs(core,room,name,stepBitmap,segmentSize,room.offset.x,room.offset.y,room.offset.z,dir,stepWidth,false);
+        this.buildStairs(room,name,stepBitmap,segmentSize,room.offset.x,room.offset.y,room.offset.z,dir,stepWidth,false);
     }
     
         //
         // cubes
         //
 
-    static createCubeRotated(core,room,name,bitmap,xBound,yBound,zBound,rotAngle,left,right,front,back,top,bottom,normalsIn,uvMode,segmentSize)
+    createCubeRotated(room,name,bitmap,xBound,yBound,zBound,rotAngle,left,right,front,back,top,bottom,normalsIn,uvMode,segmentSize)
     {
         let idx,centerPnt,rotPnt;
         let n,mesh;
@@ -663,10 +664,10 @@ export default class GenerateMeshClass
             vertexArray.push(xBound.min,yBound.max,zBound.max);     
             
             switch (uvMode) {
-                case GenerateMeshClass.UV_WHOLE:
+                case this.UV_WHOLE:
                     uvArray.push(0,0,0,1,1,1,1,0);
                     break;
-                case GenerateMeshClass.UV_BOX:
+                case this.UV_BOX:
                     uvArray.push(0,0,0,0.499,0.499,0.499,0.499,0);
                     break;
             }
@@ -684,11 +685,11 @@ export default class GenerateMeshClass
             vertexArray.push(xBound.max,yBound.max,zBound.max);
             
             switch (uvMode) {
-                case GenerateMeshClass.UV_WHOLE:
-                    uvArray.push(1,0,0,1,1,0,1,0);
+                case this.UV_WHOLE:
+                    uvArray.push(0,1,0,0,1,0,1,1);
                     break;
-                case GenerateMeshClass.UV_BOX:
-                    uvArray.push(0.499,0,0.499,0.499,0,0.499,0,0);
+                case this.UV_BOX:
+                    uvArray.push(0,0.499,0,0,0.499,0,0.499,0.499);
                     break;
             }
             
@@ -705,10 +706,10 @@ export default class GenerateMeshClass
             vertexArray.push(xBound.max,yBound.max,zBound.min);
             
             switch (uvMode) {
-                case GenerateMeshClass.UV_WHOLE:
+                case this.UV_WHOLE:
                     uvArray.push(1,0,1,1,0,1,0,0);
                     break;
-                case GenerateMeshClass.UV_BOX:
+                case this.UV_BOX:
                     uvArray.push(1,0,1,0.499,0.5,0.499,0.5,0);
                     break;
             }
@@ -726,10 +727,10 @@ export default class GenerateMeshClass
             vertexArray.push(xBound.max,yBound.max,zBound.max);
             
             switch (uvMode) {
-                case GenerateMeshClass.UV_WHOLE:
+                case this.UV_WHOLE:
                     uvArray.push(0,0,0,1,1,1,1,0);
                     break;
-                case GenerateMeshClass.UV_BOX:
+                case this.UV_BOX:
                     uvArray.push(0.5,0,0.5,0.499,1,0.499,1,0);
                     break;
             }
@@ -747,10 +748,10 @@ export default class GenerateMeshClass
             vertexArray.push(xBound.max,yBound.max,zBound.max);
             
             switch (uvMode) {
-                case GenerateMeshClass.UV_WHOLE:
+                case this.UV_WHOLE:
                     uvArray.push(0,0,0,1,1,1,1,0);
                     break;
-                case GenerateMeshClass.UV_BOX:
+                case this.UV_BOX:
                     uvArray.push(0,0.499,0,1,0.499,1,0.499,0.499);
                     break;
             }
@@ -768,10 +769,10 @@ export default class GenerateMeshClass
             vertexArray.push(xBound.max,yBound.min,zBound.max);
             
             switch (uvMode) {
-                case GenerateMeshClass.UV_WHOLE:
+                case this.UV_WHOLE:
                     uvArray.push(0,0,0,1,1,1,1,0);
                     break;
-                case GenerateMeshClass.UV_BOX:
+                case this.UV_BOX:
                     uvArray.push(0,0.499,0,1,0.499,1,0.499,0.499);
                     break;
             }
@@ -798,25 +799,25 @@ export default class GenerateMeshClass
 
             // create the mesh
 
-        normalArray=GenerateMeshClass.buildNormals(vertexArray,indexArray,centerPnt,normalsIn);
-        if (uvMode===GenerateMeshClass.UV_MAP) uvArray=GenerateMeshClass.buildUVs(vertexArray,normalArray,(1/segmentSize));
-        tangentArray=GenerateMeshClass.buildTangents(vertexArray,uvArray,indexArray);
+        normalArray=this.buildNormals(vertexArray,indexArray,centerPnt,normalsIn);
+        if (uvMode===this.UV_MAP) uvArray=this.buildUVs(vertexArray,normalArray,(1/segmentSize));
+        tangentArray=this.buildTangents(vertexArray,uvArray,indexArray);
         
-        mesh=new MeshClass(core,name,bitmap,-1,-1,new Float32Array(vertexArray),new Float32Array(normalArray),tangentArray,new Float32Array(uvArray),null,null,new Uint16Array(indexArray));
+        mesh=new MeshClass(this.core,name,bitmap,-1,-1,new Float32Array(vertexArray),new Float32Array(normalArray),tangentArray,new Float32Array(uvArray),null,null,new Uint16Array(indexArray));
         mesh.simpleCollisions=true;
-        core.map.meshList.add(mesh);
+        this.core.map.meshList.add(mesh);
     }
     
-    static createCube(core,room,name,bitmap,xBound,yBound,zBound,left,right,front,back,top,bottom,normalsIn,uvMode,segmentSize)
+    createCube(room,name,bitmap,xBound,yBound,zBound,left,right,front,back,top,bottom,normalsIn,uvMode,segmentSize)
     {
-        return(this.createCubeRotated(core,room,name,bitmap,xBound,yBound,zBound,null,left,right,front,back,top,bottom,normalsIn,uvMode,segmentSize));
+        return(this.createCubeRotated(room,name,bitmap,xBound,yBound,zBound,null,left,right,front,back,top,bottom,normalsIn,uvMode,segmentSize));
     }
     
         //
         // cylinders
         //
     
-    static createCylinderSegmentList(segmentCount,segmentExtra,segmentRoundPercentage)
+    createCylinderSegmentList(segmentCount,segmentExtra,segmentRoundPercentage)
     {
         let n;
         let segCount=this.core.randomInt(segmentCount,segmentExtra);
@@ -838,7 +839,7 @@ export default class GenerateMeshClass
         return(segments);
     }
     
-    static createCylinder(core,room,name,bitmap,centerPnt,yBound,segments,radius,top,bot)
+    createCylinder(room,name,bitmap,centerPnt,yBound,segments,radius,top,bot)
     {
         let n,k,t,y,rd,tx,tz,tx2,tz2,bx,bz,bx2,bz2,mesh;
         let topRad,botRad;
@@ -1015,18 +1016,18 @@ export default class GenerateMeshClass
         
             // create the mesh
 
-        tangentArray=GenerateMeshClass.buildTangents(vertexArray,uvArray,indexArray);
+        tangentArray=this.buildTangents(vertexArray,uvArray,indexArray);
         
-        mesh=new MeshClass(core,name,bitmap,-1,-1,new Float32Array(vertexArray),new Float32Array(normalArray),tangentArray,new Float32Array(uvArray),null,null,new Uint16Array(indexArray));
+        mesh=new MeshClass(this.core,name,bitmap,-1,-1,new Float32Array(vertexArray),new Float32Array(normalArray),tangentArray,new Float32Array(uvArray),null,null,new Uint16Array(indexArray));
         mesh.simpleCollisions=true;
-        core.map.meshList.add(mesh);
+        this.core.map.meshList.add(mesh);
     }
     
-    static createMeshCylinderSimple(core,room,name,bitmap,centerPnt,yBound,radius,top,bot)
+    createMeshCylinderSimple(room,name,bitmap,centerPnt,yBound,radius,top,bot)
     {
         let segments=[1.0,1.0];
         
-        this.createCylinder(core,room,name,bitmap,centerPnt,yBound,segments,radius,top,bot);
+        this.createCylinder(room,name,bitmap,centerPnt,yBound,segments,radius,top,bot);
     }
  
 }

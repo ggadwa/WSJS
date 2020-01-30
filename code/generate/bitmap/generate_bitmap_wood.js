@@ -8,12 +8,12 @@ import GenerateBitmapBaseClass from './generate_bitmap_base.js';
 
 export default class GenerateBitmapWoodClass extends GenerateBitmapBaseClass
 {
-    static VARIATION_NONE=0;
-    static VARIATION_BOX=1;
-    
     constructor(core,colorScheme)
     {
         super(core,colorScheme);
+        
+        this.VARIATION_NONE=0;
+        this.VARIATION_BOX=1;
         
         this.hasNormal=true;
         this.hasSpecular=true;
@@ -82,7 +82,7 @@ export default class GenerateBitmapWoodClass extends GenerateBitmapBaseClass
             rgt=lft+boardSize;
             if (n===(boardCount-1)) rgt=this.colorImgData.width;
             
-            boardType=(variationMode===GenerateBitmapWoodClass.VARIATION_BOX)?0:this.core.randomIndex(5);
+            boardType=(variationMode===this.VARIATION_BOX)?0:this.core.randomIndex(5);
             
             switch (boardType) {
                 case 0:
@@ -111,7 +111,7 @@ export default class GenerateBitmapWoodClass extends GenerateBitmapBaseClass
 
             // box outlines
             
-        if (variationMode===GenerateBitmapWoodClass.VARIATION_BOX) {
+        if (variationMode===this.VARIATION_BOX) {
             woodColor=this.adjustColor(woodColor,0.7);
             this.generateWoodDrawBoard(0,0,boardSize,this.colorImgData.height,edgeSize,woodColor);
             this.generateWoodDrawBoard((this.colorImgData.width-boardSize),0,this.colorImgData.width,this.colorImgData.height,edgeSize,woodColor);

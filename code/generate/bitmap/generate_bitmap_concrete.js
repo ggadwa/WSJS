@@ -7,11 +7,11 @@ import GenerateBitmapBaseClass from './generate_bitmap_base.js';
 
 export default class GenerateBitmapConcreteClass extends GenerateBitmapBaseClass
 {
-    static VARIATION_NONE=0;
-    
     constructor(core,colorScheme)
     {
         super(core,colorScheme);
+        
+        this.VARIATION_NONE=0;
         
         this.hasNormal=true;
         this.hasSpecular=true;

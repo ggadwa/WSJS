@@ -9,15 +9,15 @@ import BitmapClass from '../../bitmap/bitmap.js';
 
 export default class GenerateBitmapBaseClass
 {
-    static COLOR_SCHEME_RANDOM=0;
-    static COLOR_SCHEME_DOOM=1;
-    static COLOR_SCHEME_GRAY=2;
-    static COLOR_SCHEME_PASTEL=3;
-    
-    static COLOR_SCHEME_COUNT=4;
-    
     constructor(core,colorScheme)
     {
+        this.COLOR_SCHEME_RANDOM=0;
+        this.COLOR_SCHEME_DOOM=1;
+        this.COLOR_SCHEME_GRAY=2;
+        this.COLOR_SCHEME_PASTEL=3;
+    
+        this.COLOR_SCHEME_COUNT=4;
+    
         this.core=core;
         this.colorScheme=colorScheme;
         
@@ -119,19 +119,19 @@ export default class GenerateBitmapBaseClass
     {
         let col,darken;
         let color,midPoint;
-                
+        
         switch (this.colorScheme) {
             
                 // random primary colors
                 
-            case GenerateBitmapBaseClass.COLOR_SCHEME_RANDOM:
+            case this.COLOR_SCHEME_RANDOM:
                 col=this.primaryColorList[this.core.randomIndex(this.primaryColorList.length)];
                 darken=0.1-(this.core.random()*0.2);
                 return(new ColorClass((col[0]-darken),(col[1]-darken),(col[2]-darken)));
                 
                 // doom browns and green
                 
-            case GenerateBitmapBaseClass.COLOR_SCHEME_DOOM:
+            case this.COLOR_SCHEME_DOOM:
                 if (this.core.randomPercentage(0.5)) {
                     color=new ColorClass(0.6,0.3,0.0);
                     this.adjustColorRandom(color,0.7,1,0);
@@ -144,13 +144,13 @@ export default class GenerateBitmapBaseClass
             
                 // black and white
                 
-            case GenerateBitmapBaseClass.COLOR_SCHEME_GRAY:
+            case this.COLOR_SCHEME_GRAY:
                 col=this.core.randomFloat(0.3,0.7);
                 return(new ColorClass(col,col,col));
                 
                 // pastel primary colors
                 
-            case GenerateBitmapBaseClass.COLOR_SCHEME_PASTEL:
+            case this.COLOR_SCHEME_PASTEL:
                 col=this.primaryColorList[this.core.randomIndex(this.primaryColorList.length)];
                 midPoint=(col[0]+col[1]+col[2])/3.0;
                 color=new ColorClass((col[0]+(midPoint-col[0])*0.8),(col[1]+(midPoint-col[1])*0.8),(col[2]+(midPoint-col[2])*0.8));

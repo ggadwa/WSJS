@@ -9,11 +9,12 @@ import GenerateMeshClass from './generate_mesh.js';
 
 export default class GenerateAltarClass
 {
-    constructor(core,room,name,platformBitmap,segmentSize)
+    constructor(core,room,name,genMesh,platformBitmap,segmentSize)
     {
         this.core=core;
         this.room=room;
         this.name=name;
+        this.genMesh=genMesh;
         this.platformBitmap=platformBitmap;
         this.segmentSize=segmentSize;
         
@@ -37,7 +38,7 @@ export default class GenerateAltarClass
             yBound=new BoundClass(y,(y+stepHigh));
             zBound=new BoundClass((this.room.offset.z+(tz*this.segmentSize)),(this.room.offset.z+(bz*this.segmentSize)));
 
-            GenerateMeshClass.createCube(this.core,this.room,(this.name+'_'+boxCount),this.platformBitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,GenerateMeshClass.UV_MAP,this.segmentSize);
+            this.genMesh.createCube(this.room,(this.name+'_'+boxCount),this.platformBitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,this.genMesh.UV_MAP,this.segmentSize);
             boxCount++;
             
             if (n===0) {

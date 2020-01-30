@@ -9,11 +9,12 @@ import GenerateMeshClass from './generate_mesh.js';
 
 export default class GeneratePillarClass
 {
-    constructor(core,room,name,pillarBitmap,segmentSize)
+    constructor(core,room,name,genMesh,pillarBitmap,segmentSize)
     {
         this.core=core;
         this.room=room;
         this.name=name;
+        this.genMesh=genMesh;
         this.pillarBitmap=pillarBitmap;
         this.segmentSize=segmentSize;
 
@@ -30,7 +31,7 @@ export default class GeneratePillarClass
         let offset,radius,baseRadius,baseHigh;
         let centerPnt=new PointClass(0,0,0);
         let yBound,yBottomBaseBound,yTopBaseBound;
-        let cylinderSegments=GenerateMeshClass.createCylinderSegmentList(1,(3*this.room.storyCount),0.25);
+        let cylinderSegments=this.genMesh.createCylinderSegmentList(1,(3*this.room.storyCount),0.25);
         
             // bounds with margins
             
@@ -70,9 +71,9 @@ export default class GeneratePillarClass
                     z=this.room.offset.z+((gz*this.segmentSize)+offset);
                     centerPnt.setFromValues(x,0,z);
                     
-                    GenerateMeshClass.createMeshCylinderSimple(this.core,this.room,(this.name+'_base_bot_'+n),this.pillarBitmap,centerPnt,yBottomBaseBound,baseRadius,true,false);
-                    GenerateMeshClass.createCylinder(this.core,this.room,(this.name+'_'+n),this.pillarBitmap,centerPnt,yBound,cylinderSegments,radius,false,false);
-                    GenerateMeshClass.createMeshCylinderSimple(this.core,this.room,(this.name+'_base_top_'+n),this.pillarBitmap,centerPnt,yTopBaseBound,baseRadius,false,true);
+                    this.genMesh.createMeshCylinderSimple(this.room,(this.name+'_base_bot_'+n),this.pillarBitmap,centerPnt,yBottomBaseBound,baseRadius,true,false);
+                    this.genMesh.createCylinder(this.room,(this.name+'_'+n),this.pillarBitmap,centerPnt,yBound,cylinderSegments,radius,false,false);
+                    this.genMesh.createMeshCylinderSimple(this.room,(this.name+'_base_top_'+n),this.pillarBitmap,centerPnt,yTopBaseBound,baseRadius,false,true);
                     
                     this.room.setGrid(0,x,z,1);
                 }

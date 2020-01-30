@@ -192,12 +192,12 @@ export default class GenerateBitmapRunClass
         
         switch (this.core.randomIndex(2)) {
             case 0:
-                variationMode=GenerateBitmapWoodClass.VARIATION_BOX;
                 genBitmap=new GenerateBitmapWoodClass(this.core,this.colorScheme);
+                variationMode=genBitmap.VARIATION_BOX;
                 break;
             case 1:
-                variationMode=GenerateBitmapMetalClass.VARIATION_BOX;
                 genBitmap=new GenerateBitmapMetalClass(this.core,this.colorScheme);
+                variationMode=genBitmap.VARIATION_BOX;
                 break;
         }
         
@@ -213,7 +213,7 @@ export default class GenerateBitmapRunClass
         if (this.computerBitmap!==null) return(this.computerBitmap);
         
         genBitmap=new GenerateBitmapComputerClass(this.core,this.colorScheme);
-        this.computerBitmap=genBitmap.generate(GenerateBitmapComputerClass.VARIATION_NONE);
+        this.computerBitmap=genBitmap.generate(genBitmap.VARIATION_NONE);
         
         return(this.computerBitmap);
     }
@@ -225,7 +225,7 @@ export default class GenerateBitmapRunClass
         if (this.pipeBitmap!==null) return(this.pipeBitmap);
         
         genBitmap=new GenerateBitmapMetalClass(this.core,this.colorScheme);
-        this.pipeBitmap=genBitmap.generate(GenerateBitmapMetalClass.VARIATION_PIPE);
+        this.pipeBitmap=genBitmap.generate(genBitmap.VARIATION_PIPE);
         
         return(this.pipeBitmap);
     }

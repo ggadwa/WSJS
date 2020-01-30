@@ -6,11 +6,12 @@ import GenerateMeshClass from './generate_mesh.js';
 
 export default class GenerateLightClass
 {
-    constructor(core,room,name,lightBitmap,segmentSize)
+    constructor(core,room,name,genMesh,lightBitmap,segmentSize)
     {
         this.core=core;
         this.room=room;
         this.name=name;
+        this.genMesh=genMesh;
         this.lightBitmap=lightBitmap;
         this.segmentSize=segmentSize;
 
@@ -60,7 +61,7 @@ export default class GenerateLightClass
             y=this.room.offset.y+(this.segmentSize*this.room.storyCount);
             z=this.room.offset.z+((gz*this.segmentSize)+lightOffset);
             
-            GenerateMeshClass.addBox(this.core,(this.name+'_'+n),this.lightBitmap,(x-lightSize),(x+lightSize),(y-lightSize),(y+lightSize),(z-lightSize),(z+lightSize),true,true,true,true,true,true,this.segmentSize);
+            this.genMesh.addBox((this.name+'_'+n),this.lightBitmap,(x-lightSize),(x+lightSize),(y-lightSize),(y+lightSize),(z-lightSize),(z+lightSize),true,true,true,true,true,true,this.segmentSize);
             
             color=new ColorClass(this.core.randomFloat(0.7,0.3),this.core.randomFloat(0.7,0.3),this.core.randomFloat(0.7,0.3));
             exponent=this.core.randomFloat(0.25,0.25);

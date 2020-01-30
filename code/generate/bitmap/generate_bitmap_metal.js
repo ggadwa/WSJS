@@ -7,21 +7,22 @@ import GenerateBitmapBaseClass from './generate_bitmap_base.js';
 
 export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
 {
-    static VARIATION_NONE=0;
-    static VARIATION_BOX=1;
-    static VARIATION_PIPE=2;
+    constructor(core,colorScheme)
+    {
+        super(core,colorScheme);
+        
+        this.VARIATION_NONE=0;
+        this.VARIATION_BOX=1;
+        this.VARIATION_PIPE=2;
     
-    static CORRUGATION_LINES=
+        this.CORRUGATION_LINES=
             [
                 [[[0.0,1.0],[1.0,0.0]],[[0.0,0.0],[1.0,1.0]],[[0.0,0.0],[1.0,1.0]],[[0.0,1.0],[1.0,0.0]]],  // diamonds
                 [[[0.0,1.0],[1.0,0.0]],[[0.0,0.0],[1.0,1.0]],[[0.0,1.0],[1.0,0.0]],[[0.0,0.0],[1.0,1.0]]],  // waves
                 [[[0.5,0.0],[0.5,1.0]],[[0.0,0.5],[1.0,0.5]],[[0.0,0.5],[1.0,0.5]],[[0.5,0.0],[0.5,1.0]]]   // pluses
             ];
     
-    constructor(core,colorScheme)
-    {
-        super(core,colorScheme);
-        
+       
         this.hasNormal=true;
         this.hasSpecular=true;
         this.hasGlow=false;
@@ -53,7 +54,7 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
         lineWid=corrWid-4;
         lineHigh=corrHigh-4;
 
-        lineStyle=this.core.randomIndex(GenerateBitmapMetalClass.CORRUGATION_LINES.length);
+        lineStyle=this.core.randomIndex(this.CORRUGATION_LINES.length);
 
             // corrugations
 
@@ -66,7 +67,7 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
             for (x=0;x!==corrCount;x++) {
 
                 idx=((y&0x1)*2)+(x&0x1);
-                line=GenerateBitmapMetalClass.CORRUGATION_LINES[lineStyle][idx];
+                line=this.CORRUGATION_LINES[lineStyle][idx];
 
                 sx=dx+(line[0][0]*lineWid);
                 sy=dy+(line[0][1]*lineHigh);
@@ -148,7 +149,7 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
         
             // variations
             
-        panelType=(variationMode===GenerateBitmapMetalClass.VARIATION_BOX)?0:this.core.randomIndex(4);
+        panelType=(variationMode===this.VARIATION_BOX)?0:this.core.randomIndex(4);
             
         switch (panelType) {
             
@@ -252,13 +253,13 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
         let screwSize=this.core.randomInt(Math.trunc(this.colorImgData.width*0.008),Math.trunc(this.colorImgData.width*0.015));
         
         switch (variationMode) {
-            case GenerateBitmapMetalClass.VARIATION_NONE:
+            case this.VARIATION_NONE:
                 this.generateMetalRegular(metalColor,altMetalColor,edgeSize,screwSize,variationMode);
                 break;
-            case GenerateBitmapMetalClass.VARIATION_BOX:
+            case this.VARIATION_BOX:
                 this.generateMetalBox(metalColor,altMetalColor,edgeSize,screwSize,variationMode);
                 break;
-            case GenerateBitmapMetalClass.VARIATION_PIPE:
+            case this.VARIATION_PIPE:
                 this.generateMetalPipe(metalColor,altMetalColor,edgeSize,screwSize,variationMode);
                 break;
         }

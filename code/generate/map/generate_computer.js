@@ -9,11 +9,12 @@ import GenerateMeshClass from './generate_mesh.js';
 
 export default class GenerateComputerClass
 {
-    constructor(core,room,name,platformBitmap,computerBitmap,segmentSize)
+    constructor(core,room,name,genMesh,platformBitmap,computerBitmap,segmentSize)
     {
         this.core=core;
         this.room=room;
         this.name=name;
+        this.genMesh=genMesh;
         this.platformBitmap=platformBitmap;
         this.computerBitmap=computerBitmap;
         this.segmentSize=segmentSize;
@@ -62,7 +63,7 @@ export default class GenerateComputerClass
         yBound=new BoundClass(this.room.offset.y,(this.room.offset.y+botY));
         zBound=new BoundClass((this.room.offset.z+(tz*this.segmentSize)),(this.room.offset.z+(bz*this.segmentSize)));
             
-        GenerateMeshClass.createCube(this.core,this.room,(this.name+'_pedestal'),this.platformBitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,GenerateMeshClass.UV_MAP,this.segmentSize);
+        this.genMesh.createCube(this.room,(this.name+'_pedestal'),this.platformBitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,this.genMesh.UV_MAP,this.segmentSize);
         
             // if enough room, make a path
             // through the computers
@@ -90,7 +91,7 @@ export default class GenerateComputerClass
                 k=(this.room.offset.x+(x*this.segmentSize))+widOffset;
                 xBound.setFromValues(k,(k+wid));
                 
-                GenerateMeshClass.createCube(this.core,this.room,(this.name+'_computer_'+computerCount),this.computerBitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,GenerateMeshClass.UV_BOX,this.segmentSize);
+                this.genMesh.createCube(this.room,(this.name+'_computer_'+computerCount),this.computerBitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,this.genMesh.UV_BOX,this.segmentSize);
                 computerCount++;
                 
                 this.room.setGrid(0,x,z,1);

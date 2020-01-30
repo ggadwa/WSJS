@@ -8,12 +8,12 @@ import GenerateBitmapBaseClass from './generate_bitmap_base.js';
 
 export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
 {
-    static VARIATION_NONE=0;
-    static VARIATION_CONTROL_PANEL=0;
-    
     constructor(core,colorScheme)
     {
         super(core,colorScheme);
+        
+        this.VARIATION_NONE=0;
+        this.VARIATION_CONTROL_PANEL=0;    
         
         this.bitmapTextureSize=1024;
         this.hasNormal=true;

@@ -9,11 +9,12 @@ import GenerateMeshClass from './generate_mesh.js';
 
 export default class GenerateStorageClass
 {
-    constructor(core,room,name,boxBitmap,segmentSize)
+    constructor(core,room,name,genMesh,boxBitmap,segmentSize)
     {
         this.core=core;
         this.room=room;
         this.name=name;
+        this.genMesh=genMesh;
         this.boxBitmap=boxBitmap;
         this.segmentSize=segmentSize;
 
@@ -53,7 +54,7 @@ export default class GenerateStorageClass
             
         for (stackLevel=0;stackLevel!==stackCount;stackLevel++) {
             rotAngle.setFromValues(0.0,(this.core.randomFloat(-10.0,20.0)),0.0);
-            GenerateMeshClass.createCubeRotated(this.core,this.room,(this.name+'_'+storageCount+'_'+stackLevel),this.boxBitmap,boxXBound,boxYBound,boxZBound,rotAngle,true,true,true,true,true,(stackLevel!==0),false,GenerateMeshClass.UV_WHOLE,this.segmentSize);
+            this.genMesh.createCubeRotated(this.room,(this.name+'_'+storageCount+'_'+stackLevel),this.boxBitmap,boxXBound,boxYBound,boxZBound,rotAngle,true,true,true,true,true,(stackLevel!==0),false,this.genMesh.UV_WHOLE,this.segmentSize);
             
                 // go up one level
 

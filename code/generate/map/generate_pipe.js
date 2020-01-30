@@ -12,11 +12,12 @@ export default class GeneratePipeClass
     static PIPE_SIDE_COUNT=12;
     static PIPE_CURVE_SEGMENT_COUNT=5;
     
-    constructor(core,room,name,pipeBitmap,segmentSize)
+    constructor(core,room,name,genMesh,pipeBitmap,segmentSize)
     {
         this.core=core;
         this.room=room;
         this.name=name;
+        this.genMesh=genMesh;
         this.pipeBitmap=pipeBitmap;
         this.segmentSize=segmentSize;
 
@@ -149,7 +150,7 @@ export default class GeneratePipeClass
         
             // finally create the mesh
 
-        tangentArray=GenerateMeshClass.buildTangents(vertexArray,uvArray,indexArray);
+        tangentArray=this.genMesh.buildTangents(vertexArray,uvArray,indexArray);
         
         mesh=new MeshClass(this.core,this.name,this.pipeBitmap,-1,-1,new Float32Array(vertexArray),new Float32Array(normalArray),tangentArray,new Float32Array(uvArray),null,null,new Uint16Array(indexArray));
         mesh.simpleCollisions=true;
@@ -295,7 +296,7 @@ export default class GeneratePipeClass
         
             // finally create the mesh
 
-        tangentArray=GenerateMeshClass.buildTangents(vertexArray,uvArray,indexArray);
+        tangentArray=this.genMesh.buildTangents(vertexArray,uvArray,indexArray);
         
         mesh=new MeshClass(this.core,this.name,this.pipeBitmap,-1,-1,new Float32Array(vertexArray),new Float32Array(normalArray),tangentArray,new Float32Array(uvArray),null,null,new Uint16Array(indexArray));
         mesh.simpleCollisions=true;

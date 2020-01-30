@@ -103,28 +103,28 @@ export default class GenerateMapClass
         // room decorations
         //
         
-    buildDecoration(room,roomIdx,genBitmapRun,segmentSize)
+    buildDecoration(room,roomIdx,genMesh,genBitmap,segmentSize)
     {
             // build the decoration
             
         switch (this.core.randomIndex(6)) {
             case 0:
-                (new GenerateStoryClass(this.core,room,('story_'+roomIdx),genBitmapRun.generateStep(),genBitmapRun.generatePlatform(),segmentSize)).build();
+                (new GenerateStoryClass(this.core,room,('story_'+roomIdx),genMesh,genBitmap.generateStep(),genBitmap.generatePlatform(),segmentSize)).build();
                 break;
             case 1:
-                (new GeneratePillarClass(this.core,room,('pillar_'+roomIdx),genBitmapRun.generatePillar(),segmentSize)).build();
+                (new GeneratePillarClass(this.core,room,('pillar_'+roomIdx),genMesh,genBitmap.generatePillar(),segmentSize)).build();
                 break;
             case 2:
-                (new GenerateStorageClass(this.core,room,('storage'+roomIdx),genBitmapRun.generateBox(),segmentSize)).build();
+                (new GenerateStorageClass(this.core,room,('storage'+roomIdx),genMesh,genBitmap.generateBox(),segmentSize)).build();
                 break;
             case 3:
-                (new GenerateComputerClass(this.core,room,('computer_'+roomIdx),genBitmapRun.generatePlatform(),genBitmapRun.generateComputer(),segmentSize)).build();
+                (new GenerateComputerClass(this.core,room,('computer_'+roomIdx),genMesh,genBitmap.generatePlatform(),genBitmap.generateComputer(),segmentSize)).build();
                 break;
             case 4:
-                (new GeneratePipeClass(this.core,room,('pipe_'+roomIdx),genBitmapRun.generatePipe(),segmentSize)).build();
+                (new GeneratePipeClass(this.core,room,('pipe_'+roomIdx),genMesh,genBitmap.generatePipe(),segmentSize)).build();
                 break;
             case 5:
-                (new GenerateAltarClass(this.core,room,('alter_'+roomIdx),genBitmapRun.generatePlatform(),segmentSize)).build();
+                (new GenerateAltarClass(this.core,room,('alter_'+roomIdx),genMesh,genBitmap.generatePlatform(),segmentSize)).build();
                 break;
         }
     }
@@ -133,11 +133,11 @@ export default class GenerateMapClass
         // add additional room
         //
         
-    buildSteps(core,room,name,toRoom,stepBitmap,segmentSize)
+    buildSteps(core,room,name,toRoom,genMesh,stepBitmap,segmentSize)
     {
         let x,z,doAll,touchRange;
         let noSkipX,noSkipZ;
-        let genStory=new GenerateStoryClass(core,room,name,stepBitmap,null,segmentSize);
+        let genStory=new GenerateStoryClass(core,room,name,genMesh,stepBitmap,null,segmentSize);
         
         if (room.offset.z===(toRoom.offset.z+toRoom.size.z)) {
             touchRange=room.getTouchWallRange(toRoom,true,segmentSize);
@@ -146,7 +146,7 @@ export default class GenerateMapClass
             
             for (x=touchRange.min;x<=touchRange.max;x++) {
                 if ((this.core.randomPercentage(0.5)) || (x===noSkipX) || (doAll)) {
-                    genStory.addStairs(x,0,GenerateStoryClass.PLATFORM_DIR_NEG_Z,0);
+                    genStory.addStairs(x,0,genStory.PLATFORM_DIR_NEG_Z,0);
                 }
             }
             return;
@@ -158,7 +158,7 @@ export default class GenerateMapClass
             
             for (x=touchRange.min;x<=touchRange.max;x++) {
                 if ((this.core.randomPercentage(0.5)) || (x===noSkipX) || (doAll)) {
-                    genStory.addStairs(x,room.piece.size.z-2,GenerateStoryClass.PLATFORM_DIR_POS_Z,0);
+                    genStory.addStairs(x,room.piece.size.z-2,genStory.PLATFORM_DIR_POS_Z,0);
                 }
             }
             return;
@@ -170,7 +170,7 @@ export default class GenerateMapClass
             
             for (z=touchRange.min;z<=touchRange.max;z++) {
                 if ((this.core.randomPercentage(0.5)) || (z===noSkipZ) || (doAll)) {
-                    genStory.addStairs(0,z,GenerateStoryClass.PLATFORM_DIR_NEG_X,0);
+                    genStory.addStairs(0,z,genStory.PLATFORM_DIR_NEG_X,0);
                 }
             }
             return;
@@ -182,7 +182,7 @@ export default class GenerateMapClass
             
             for (z=touchRange.min;z<=touchRange.max;z++) {
                 if ((this.core.randomPercentage(0.5)) || (z===noSkipZ) || (doAll)) {
-                    genStory.addStairs(room.piece.size.x-2,z,GenerateStoryClass.PLATFORM_DIR_POS_X,0);
+                    genStory.addStairs(room.piece.size.x-2,z,genStory.PLATFORM_DIR_POS_X,0);
                 }
             }
             return;
@@ -268,11 +268,11 @@ export default class GenerateMapClass
     build(importSettings)
     {
         let n,k,seed;
-        let genPiece,genBitmapRun;
+        let genPiece,genMesh,genBitmap;
         let roomTopY;
         let xAdd,zAdd,origX,origZ,touchIdx,failCount,placeCount,moveCount;
         let room,centerPnt;
-        let roomCount,segmentSize,colorScheme;
+        let roomCount,segmentSize;
         let rooms=[];
         
             // see the random number generator
@@ -282,17 +282,16 @@ export default class GenerateMapClass
         
         this.core.setRandomSeed(seed);
         
+            // some generators
+            
+        genPiece=new GeneratePieceClass(this.core);
+        genMesh=new GenerateMeshClass(this.core);
+        genBitmap=new GenerateBitmapRunClass(this.core,0);      // 0 is the random color scheme, we can just generate a random integer later for this
+        
             // some global settings
             
         roomCount=importSettings.autoGenerate.roomCount;
         segmentSize=importSettings.autoGenerate.segmentSize;
-        colorScheme=this.core.randomIndex(GenerateBitmapBaseClass.COLOR_SCHEME_COUNT);
-        colorScheme=GenerateBitmapBaseClass.COLOR_SCHEME_RANDOM;    // testing
-        
-            // some generators
-            
-        genPiece=new GeneratePieceClass(this.core);
-        genBitmapRun=new GenerateBitmapRunClass(this.core,colorScheme);
         
             // first room in center of map
             
@@ -401,17 +400,17 @@ export default class GenerateMapClass
                 
                 // meshes
 
-            GenerateMeshClass.buildRoomWalls(this.core,room,centerPnt,('wall_'+n),genBitmapRun.generateWall(),segmentSize);
-            GenerateMeshClass.buildRoomFloorCeiling(this.core,room,centerPnt,('floor_'+n),genBitmapRun.generateFloor(),room.offset.y,segmentSize);
-            GenerateMeshClass.buildRoomFloorCeiling(this.core,room,centerPnt,('ceiling_'+n),genBitmapRun.generateCeiling(),roomTopY,segmentSize);
+            genMesh.buildRoomWalls(room,centerPnt,('wall_'+n),genBitmap.generateWall(),segmentSize);
+            genMesh.buildRoomFloorCeiling(room,centerPnt,('floor_'+n),genBitmap.generateFloor(),room.offset.y,segmentSize);
+            genMesh.buildRoomFloorCeiling(room,centerPnt,('ceiling_'+n),genBitmap.generateCeiling(),roomTopY,segmentSize);
             
                 // decorations
 
-            if (room.piece.decorate) this.buildDecoration(room,n,genBitmapRun,segmentSize);
+            if (room.piece.decorate) this.buildDecoration(room,n,genMesh,genBitmap,segmentSize);
             
                 // room lights
 
-            (new GenerateLightClass(this.core,room,('light_'+n),genBitmapRun.generateStep(),segmentSize)).build();
+            (new GenerateLightClass(this.core,room,('light_'+n),genMesh,genBitmap.generateStep(),segmentSize)).build();
         }
         
             // any steps
@@ -420,7 +419,7 @@ export default class GenerateMapClass
             room=rooms[n];
             
             for (k=0;k!==room.requiredStairs.length;k++) {
-                this.buildSteps(this.core,room,('room_'+n+'_step_'+k),room.requiredStairs[k],genBitmapRun.generateStep(),segmentSize);
+                this.buildSteps(this.core,room,('room_'+n+'_step_'+k),room.requiredStairs[k],genMesh,genBitmap.generateStep(),segmentSize);
             }
         }
         

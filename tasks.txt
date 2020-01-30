@@ -1,5 +1,4 @@
 - big
-    - generate mesh class is next
     - createFromVectorAndAngle (static)
     - createStaticFontTexture/deleteStaticFontTexture
     - main_config and generator_config
@@ -13,10 +12,12 @@
     - player needs local animations (fix -- check)
     - predictions
     - need open system for passing message (like firing weapons, etc)
+    - WSServer needs readme
 
 - generator
     - better specs (generated with color?)
     - nodes don't seem right in certain rooms (like boxes)
+    - the random color scheme
 
     - lights
        - regular
