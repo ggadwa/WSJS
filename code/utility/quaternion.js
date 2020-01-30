@@ -12,14 +12,6 @@ export default class QuaternionClass
         Object.seal(this);
     }
     
-    static createFromVectorAndAngle(x,y,z,ang)
-    {
-        let rd=(ang*QuaternionClass.DEGREE_TO_RAD)*0.5;
-        let sn=Math.sin(rd);
-        
-        return(new QuaternionClass((sn*x),(sn*y),(sn*z),Math.cos(rd)));
-    }
-    
     setIdentity()
     {
         this.x=0;

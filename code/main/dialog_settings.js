@@ -71,7 +71,7 @@ export default class DialogSettingsClass extends DialogBaseClass
         
         this.core.setup.name=document.getElementById('name').value;
 
-        SetupClass.save(this.core,this.core.setup);
+        this.core.setup.save(this.core);
         
             // close the dialog
             

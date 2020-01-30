@@ -263,7 +263,9 @@ export default class CoreClass
         
         this.camera=new CameraClass(this);
         
-        this.setup=SetupClass.load(this);
+        this.setup=new SetupClass();
+        this.setup.load(this);
+        
         this.settingsDialog=new DialogSettingsClass(this);
         this.connectDialog=new DialogConnectClass(this);
     }

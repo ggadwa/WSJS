@@ -27,6 +27,20 @@ export default class ProjectEntityClass
     
     constructor(core,name,position,angle,data)
     {
+        this.TEXT_ALIGN_LEFT=0;     // when we have statics (safari) then use the class static
+        this.TEXT_ALIGN_CENTER=1;
+        this.TEXT_ALIGN_RIGHT=2;
+        
+        this.TOUCH_QUADRANT_ANY=-1;
+        this.TOUCH_QUADRANT_TOPLEFT=0;
+        this.TOUCH_QUADRANT_TOPRIGHT=1;
+        this.TOUCH_QUADRANT_BOTTOMLEFT=2;
+        this.TOUCH_QUADRANT_BOTTOMRIGHT=3
+        
+        this.TOUCH_DIRECTION_ANY=-1;
+        this.TOUCH_DIRECTION_X=0;
+        this.TOUCH_DIRECTION_Y=1;
+        
         this.core=core;
         
         this.name=name;
@@ -188,14 +202,14 @@ export default class ProjectEntityClass
         return(y);
     }
     
-    getNextTouchClick(quardent)
+    getNextTouchClick(quadrant)
     {
-        return(this.core.input.getNextTouchClick(quardent));
+        return(this.core.input.getNextTouchClick(quadrant));
     }
     
-    getNextTouchSwipe(quardent,direction)
+    getNextTouchSwipe(quadrant,direction)
     {
-        return(this.core.input.getNextTouchSwipe(quardent,direction));
+        return(this.core.input.getNextTouchSwipe(quadrant,direction));
     }
     
         //

@@ -13,6 +13,10 @@ export default class ProjectGameClass
 {
     constructor(core,data)
     {
+        this.TEXT_ALIGN_LEFT=0;     // when we have statics (safari) then use the class static
+        this.TEXT_ALIGN_CENTER=1;
+        this.TEXT_ALIGN_RIGHT=2;
+
         this.core=core;
         this.data=data;
     }

@@ -12,42 +12,43 @@
  */
 export default class SetupClass
 {
-    static BOT_SKILL_EASY=0;
-    static BOT_SKILL_MODERATE=1;
-    static BOT_SKILL_NORMAL=2;
-    static BOT_SKILL_SKILLED=3;
-    static BOT_SKILL_HARD=4;
-    
-    name='Player';
-    
-    localGame=true;
-    
-    serverURL='127.0.0.1';
-    savedServerURLList=['127.0.0.1'];
-    
-    botCount=5;
-    botSkill=SetupClass.BOT_SKILL_NORMAL;
-    
-    mouseXSensitivity=0.3;
-    mouseXAcceleration=0.4;
-    mouseXInvert=false;
-    mouseYSensitivity=0.2;
-    mouseYAcceleration=0.1;
-    mouseYInvert=false;
-
-    soundVolume=0.3;
-    musicVolume=0.3;
-    
-    static load(core)
+    constructor()
     {
-        let jsonStr=window.localStorage.getItem(core.projectGame.getName()+'_setup');
-        if (jsonStr!==null) return(JSON.parse(jsonStr));
+        this.BOT_SKILL_EASY=0;
+        this.BOT_SKILL_MODERATE=1;
+        this.BOT_SKILL_NORMAL=2;
+        this.BOT_SKILL_SKILLED=3;
+        this.BOT_SKILL_HARD=4;
         
-        return(new SetupClass());
+        this.name='Player';
+
+        this.localGame=true;
+
+        this.serverURL='127.0.0.1';
+        this.savedServerURLList=['127.0.0.1'];
+
+        this.botCount=5;
+        this.botSkill=this.BOT_SKILL_NORMAL;
+
+        this.mouseXSensitivity=0.3;
+        this.mouseXAcceleration=0.4;
+        this.mouseXInvert=false;
+        this.mouseYSensitivity=0.2;
+        this.mouseYAcceleration=0.1;
+        this.mouseYInvert=false;
+
+        this.soundVolume=0.3;
+        this.musicVolume=0.3;
     }
     
-    static save(core,setup)
+    load(core)  // core has to be passed in other JSON is circular
     {
-        window.localStorage.setItem((core.projectGame.getName()+'_setup'),JSON.stringify(setup));
+        let jsonStr=window.localStorage.getItem(core.projectGame.getName()+'_setup');
+        if (jsonStr!==null) Object.assign(this,JSON.parse(jsonStr));
+    }
+    
+    save(core)
+    {
+        window.localStorage.setItem((core.projectGame.getName()+'_setup'),JSON.stringify(this));
     }
 }

@@ -1,10 +1,10 @@
 - big
-    - createFromVectorAndAngle (static)
-    - createStaticFontTexture/deleteStaticFontTexture
-    - main_config and generator_config
     - remove all static
     - remove all class fields (ugh)
     - webGL instead of webGL2
+    - (KART) remove import InterfaceTextClass from '../../../code/interface/interface_text.js';
+
+- point/bound/color/rect in docs - rerun docs
 
 - networking
     - odd null error on logon at times (fix -- check)
@@ -12,7 +12,9 @@
     - player needs local animations (fix -- check)
     - predictions
     - need open system for passing message (like firing weapons, etc)
-    - WSServer needs readme
+    - needs preferences -- WSJS root/IP Address -- pop up if they don't exist
+    - bindAddr=InetAddress.getByName(ip)
+    - WSServer update readme with prefs
 
 - generator
     - better specs (generated with color?)

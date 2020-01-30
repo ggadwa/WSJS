@@ -3,9 +3,6 @@ import BoundClass from '../../utility/bound.js';
 
 export default class GenerateRoomClass
 {
-    static STAIR_PATH_DIRECTION_Z=0;
-    static STAIR_PATH_DIRECTION_X=1;
-    
     constructor(core,piece,segmentSize)
     {
         this.core=core;

@@ -10,6 +10,18 @@ export default class InterfaceClass
 {
     constructor(core)
     {
+        this.TEXT_TEXTURE_WIDTH=512;
+        this.TEXT_TEXTURE_HEIGHT=512;
+        this.TEXT_CHAR_PER_ROW=10;
+        this.TEXT_CHAR_WIDTH=50;
+        this.TEXT_CHAR_HEIGHT=50;
+        this.TEXT_FONT_NAME='Arial';
+        this.TEXT_FONT_SIZE=48;
+        
+        this.TEXT_ALIGN_LEFT=0;
+        this.TEXT_ALIGN_CENTER=1;
+        this.TEXT_ALIGN_RIGHT=2;
+        
         this.core=core;
         
         this.elements=new Map();
@@ -20,6 +32,9 @@ export default class InterfaceClass
         this.tintVertexArray=new Float32Array(2*6);     // 2D, only 2 vertex coordinates
         this.tintVertexBuffer=null;
         this.tintColor=new ColorClass(0,0,0);
+        
+        this.fontTexture=null;
+        this.fontCharWidths=new Float32Array(128);
         
         Object.seal(this);
     }
@@ -37,9 +52,9 @@ export default class InterfaceClass
         this.elements.clear();
         this.texts.clear();
         
-            // create the static font texture
+            // create the font texture
             
-        InterfaceTextClass.createStaticFontTexture(this.core.gl);
+        this.createFontTexture();
         
             // tint vertexes
             // (two triangles)
@@ -84,9 +99,72 @@ export default class InterfaceClass
             text.release();
         }
         
-            // and the static font texture
+            // and the font texture
             
-        InterfaceTextClass.deleteStaticFontTexture(this.core.gl);
+        this.deleteFontTexture();
+    }
+    
+        //
+        // build font bitmap
+        //
+        
+    createFontTexture()
+    {
+        let x,y,yAdd,cIdx,charStr,ch;
+        let canvas,ctx;
+        let gl=this.core.gl;
+        
+            // create the text bitmap
+
+        canvas=document.createElement('canvas');
+        canvas.width=this.TEXT_TEXTURE_WIDTH;
+        canvas.height=this.TEXT_TEXTURE_HEIGHT;
+        ctx=canvas.getContext('2d');
+        
+            // background is black, text is white
+            // so it can be colored
+            
+        ctx.fillStyle='#000000';
+        ctx.fillRect(0,0,this.TEXT_TEXTURE_WIDTH,this.TEXT_TEXTURE_HEIGHT);
+
+            // draw the text
+
+        ctx.font=(this.TEXT_FONT_SIZE+'px ')+this.TEXT_FONT_NAME;
+        ctx.textAlign='left';
+        ctx.textBaseline='middle';
+        ctx.fillStyle='#FFFFFF';
+
+        yAdd=Math.trunc(this.TEXT_CHAR_HEIGHT/2);
+
+        for (ch=32;ch!==127;ch++) {
+            cIdx=ch-32;
+            x=(cIdx%this.TEXT_CHAR_PER_ROW)*this.TEXT_CHAR_WIDTH;
+            y=Math.trunc(cIdx/this.TEXT_CHAR_PER_ROW)*this.TEXT_CHAR_HEIGHT;
+            y+=yAdd;
+
+            charStr=String.fromCharCode(ch);
+            this.fontCharWidths[cIdx]=((ctx.measureText(charStr).width+4)/this.TEXT_CHAR_WIDTH);
+            if (this.fontCharWidths[cIdx]>1.0) this.fontCharWidths[cIdx]=1.0;
+
+            ctx.fillText(charStr,(x+2),(y-1));
+
+            x+=this.TEXT_CHAR_WIDTH;
+        }
+
+            // finally load into webGL
+            
+        this.fontTexture=gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D,this.fontTexture);
+        gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,canvas);
+        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_NEAREST);
+        gl.generateMipmap(gl.TEXTURE_2D);
+        gl.bindTexture(gl.TEXTURE_2D,null);
+    }
+    
+    deleteFontTexture()
+    {
+        this.core.gl.deleteTexture(this.fontTexture);
     }
     
         //
@@ -256,7 +334,7 @@ export default class InterfaceClass
         
         for (n=0;n!==nLine;n++) {
             if (n===(nLine-1)) col=new ColorClass(1,0.3,0.3);
-            text=new InterfaceTextClass(this.core,consoleStrings[n],5,y,20,InterfaceTextClass.TEXT_ALIGN_LEFT,col,1);
+            text=new InterfaceTextClass(this.core,consoleStrings[n],5,y,20,this.TEXT_ALIGN_LEFT,col,1);
             text.initialize();
             text.draw();
             text.release();

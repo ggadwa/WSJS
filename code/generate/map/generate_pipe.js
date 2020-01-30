@@ -9,11 +9,11 @@ import GenerateMeshClass from './generate_mesh.js';
 
 export default class GeneratePipeClass 
 {
-    static PIPE_SIDE_COUNT=12;
-    static PIPE_CURVE_SEGMENT_COUNT=5;
-    
     constructor(core,room,name,genMesh,pipeBitmap,segmentSize)
     {
+        this.PIPE_SIDE_COUNT=12;
+        this.PIPE_CURVE_SEGMENT_COUNT=5;
+        
         this.core=core;
         this.room=room;
         this.name=name;
@@ -61,19 +61,19 @@ export default class GeneratePipeClass
         iIdx=0;
         
         ang=0.0;
-        angAdd=360.0/GeneratePipeClass.PIPE_SIDE_COUNT;
+        angAdd=360.0/this.PIPE_SIDE_COUNT;
 
-        for (n=0;n!==GeneratePipeClass.PIPE_SIDE_COUNT;n++) {
+        for (n=0;n!==this.PIPE_SIDE_COUNT;n++) {
             ang2=ang+angAdd;
 
                 // the two Us
 
-            u1=(ang*GeneratePipeClass.PIPE_SIDE_COUNT)/360.0;
-            u2=(ang2*GeneratePipeClass.PIPE_SIDE_COUNT)/360.0;
+            u1=(ang*this.PIPE_SIDE_COUNT)/360.0;
+            u2=(ang2*this.PIPE_SIDE_COUNT)/360.0;
 
                 // force last segment to wrap
 
-            if (n===(GeneratePipeClass.PIPE_SIDE_COUNT-1)) ang2=0.0;
+            if (n===(this.PIPE_SIDE_COUNT-1)) ang2=0.0;
 
             rd=ang*PointClass.DEGREE_TO_RAD;
             tx=nextPnt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
@@ -180,15 +180,15 @@ export default class GeneratePipeClass
         
             // turn segments
             
-        yAdd=Math.trunc((radius*2)/GeneratePipeClass.PIPE_CURVE_SEGMENT_COUNT);
+        yAdd=Math.trunc((radius*2)/this.PIPE_CURVE_SEGMENT_COUNT);
         if (yFlip) yAdd=-yAdd;
         
-        xTurnAdd=xTurn/GeneratePipeClass.PIPE_CURVE_SEGMENT_COUNT;
-        zTurnAdd=zTurn/GeneratePipeClass.PIPE_CURVE_SEGMENT_COUNT;
+        xTurnAdd=xTurn/this.PIPE_CURVE_SEGMENT_COUNT;
+        zTurnAdd=zTurn/this.PIPE_CURVE_SEGMENT_COUNT;
         
-        angAdd=360.0/GeneratePipeClass.PIPE_SIDE_COUNT;
+        angAdd=360.0/this.PIPE_SIDE_COUNT;
         
-        for (k=0;k!==GeneratePipeClass.PIPE_CURVE_SEGMENT_COUNT;k++) {
+        for (k=0;k!==this.PIPE_CURVE_SEGMENT_COUNT;k++) {
             
             nextPnt.setFromPoint(pnt);
             
@@ -205,17 +205,17 @@ export default class GeneratePipeClass
 
             ang=0.0;
 
-            for (n=0;n!==GeneratePipeClass.PIPE_SIDE_COUNT;n++) {
+            for (n=0;n!==this.PIPE_SIDE_COUNT;n++) {
                 ang2=ang+angAdd;
                 
                     // the two Us
                     
-                u1=(ang*GeneratePipeClass.PIPE_SIDE_COUNT)/360.0;
-                u2=(ang2*GeneratePipeClass.PIPE_SIDE_COUNT)/360.0;
+                u1=(ang*this.PIPE_SIDE_COUNT)/360.0;
+                u2=(ang2*this.PIPE_SIDE_COUNT)/360.0;
 
                     // force last segment to wrap
                     
-                if (n===(GeneratePipeClass.PIPE_SIDE_COUNT-1)) ang2=0.0;
+                if (n===(this.PIPE_SIDE_COUNT-1)) ang2=0.0;
 
                 rd=ang*PointClass.DEGREE_TO_RAD;
                 tx=nextPnt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));

@@ -5,7 +5,6 @@
 
 import ColorClass from '../utility/color.js';
 import ProjectGameClass from '../project/project_game.js';
-import InterfaceTextClass from '../interface/interface_text.js';
 
 /**
  * A specialized version of ProjectGameClass that has additional
@@ -28,10 +27,10 @@ export default class ProjectGameDeveloperClass extends ProjectGameClass
         
         super.createInterface();
         
-        this.addInterfaceText('fps','',x,23,20,InterfaceTextClass.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1);
-        this.addInterfaceText('meshCount','',x,46,20,InterfaceTextClass.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1);
-        this.addInterfaceText('trigCount','',x,69,20,InterfaceTextClass.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1);
-        this.addInterfaceText('modelCount','',x,92,20,InterfaceTextClass.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1);
+        this.addInterfaceText('fps','',x,23,20,this.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1);
+        this.addInterfaceText('meshCount','',x,46,20,this.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1);
+        this.addInterfaceText('trigCount','',x,69,20,this.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1);
+        this.addInterfaceText('modelCount','',x,92,20,this.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1);
     }
     
     run()

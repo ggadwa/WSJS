@@ -3,25 +3,14 @@ import InterfaceClass from '../interface/interface.js';
 
 export default class InterfaceTextClass
 {
-    static TEXT_TEXTURE_WIDTH=512;
-    static TEXT_TEXTURE_HEIGHT=512;
-    static TEXT_CHAR_PER_ROW=10;
-    static TEXT_CHAR_WIDTH=50;
-    static TEXT_CHAR_HEIGHT=50;
-    static TEXT_FONT_SIZE=48;
-    static TEXT_FONT_NAME='Arial';
-
-    static TEXT_MAX_STRING_LEN=256;
-
-    static TEXT_ALIGN_LEFT=0;
-    static TEXT_ALIGN_CENTER=1;
-    static TEXT_ALIGN_RIGHT=2;
-    
-    static FONT_TEXTURE=null;
-    static FONT_CHAR_WIDS=new Float32Array(128);
-    
     constructor(core,str,x,y,fontSize,align,color,alpha)
     {
+        this.TEXT_MAX_STRING_LEN=256;
+
+        this.TEXT_ALIGN_LEFT=core.interface.TEXT_ALIGN_LEFT;
+        this.TEXT_ALIGN_CENTER=core.interface.TEXT_ALIGN_CENTER;
+        this.TEXT_ALIGN_RIGHT=core.interface.TEXT_ALIGN_RIGHT;
+    
         this.core=core;
         this.str=str;
         this.x=x;
@@ -53,9 +42,9 @@ export default class InterfaceTextClass
     {
         let gl=this.core.gl;
         
-        this.vertexArray=new Float32Array((InterfaceTextClass.TEXT_MAX_STRING_LEN*4)*2);
-        this.uvArray=new Float32Array((InterfaceTextClass.TEXT_MAX_STRING_LEN*4)*2);
-        this.indexArray=new Uint16Array((InterfaceTextClass.TEXT_MAX_STRING_LEN*2)*3);
+        this.vertexArray=new Float32Array((this.TEXT_MAX_STRING_LEN*4)*2);
+        this.uvArray=new Float32Array((this.TEXT_MAX_STRING_LEN*4)*2);
+        this.indexArray=new Uint16Array((this.TEXT_MAX_STRING_LEN*2)*3);
         
             // setup buffer data here so we can subdata later
             
@@ -84,74 +73,13 @@ export default class InterfaceTextClass
     }
     
         //
-        // build font bitmap
-        //
-        
-    static createStaticFontTexture(gl)
-    {
-        let x,y,yAdd,cIdx,charStr,ch;
-        let canvas,ctx;
-        
-            // create the text bitmap
-
-        canvas=document.createElement('canvas');
-        canvas.width=InterfaceTextClass.TEXT_TEXTURE_WIDTH;
-        canvas.height=InterfaceTextClass.TEXT_TEXTURE_HEIGHT;
-        ctx=canvas.getContext('2d');
-        
-            // background is black, text is white
-            // so it can be colored
-            
-        ctx.fillStyle='#000000';
-        ctx.fillRect(0,0,InterfaceTextClass.TEXT_TEXTURE_WIDTH,InterfaceTextClass.TEXT_TEXTURE_HEIGHT);
-
-            // draw the text
-
-        ctx.font=(InterfaceTextClass.TEXT_FONT_SIZE+'px ')+InterfaceTextClass.TEXT_FONT_NAME;
-        ctx.textAlign='left';
-        ctx.textBaseline='middle';
-        ctx.fillStyle='#FFFFFF';
-
-        yAdd=Math.trunc(InterfaceTextClass.TEXT_CHAR_HEIGHT/2);
-
-        for (ch=32;ch!==127;ch++) {
-            cIdx=ch-32;
-            x=(cIdx%InterfaceTextClass.TEXT_CHAR_PER_ROW)*InterfaceTextClass.TEXT_CHAR_WIDTH;
-            y=Math.trunc(cIdx/InterfaceTextClass.TEXT_CHAR_PER_ROW)*InterfaceTextClass.TEXT_CHAR_HEIGHT;
-            y+=yAdd;
-
-            charStr=String.fromCharCode(ch);
-            InterfaceTextClass.FONT_CHAR_WIDS[cIdx]=((ctx.measureText(charStr).width+4)/InterfaceTextClass.TEXT_CHAR_WIDTH);
-            if (InterfaceTextClass.FONT_CHAR_WIDS[cIdx]>1.0) InterfaceTextClass.FONT_CHAR_WIDS[cIdx]=1.0;
-
-            ctx.fillText(charStr,(x+2),(y-1));
-
-            x+=InterfaceTextClass.TEXT_CHAR_WIDTH;
-        }
-
-            // finally load into webGL
-            
-        InterfaceTextClass.FONT_TEXTURE=gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D,InterfaceTextClass.FONT_TEXTURE);
-        gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,canvas);
-        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_NEAREST);
-        gl.generateMipmap(gl.TEXTURE_2D);
-        gl.bindTexture(gl.TEXTURE_2D,null);
-    }
-    
-    static deleteStaticFontTexture(gl)
-    {
-        gl.deleteTexture(InterfaceTextClass.FONT_TEXTURE);
-    }
-    
-        //
         // string lengths
         //
         
     getStringDrawWidth(charWid,str)
     {
         let n,cIdx,len;
+        let fontCharWidths=this.core.interface.fontCharWidths;
         let wid=0;
 
             // figure out the size
@@ -162,7 +90,7 @@ export default class InterfaceTextClass
         
         for (n=0;n!==len;n++) {
             cIdx=str.charCodeAt(n)-32;
-            wid+=Math.trunc(charWid*InterfaceTextClass.FONT_CHAR_WIDS[cIdx]);
+            wid+=Math.trunc(charWid*fontCharWidths[cIdx]);
         }
         
         return(wid);
@@ -179,6 +107,7 @@ export default class InterfaceTextClass
         let n,x2,ty,by,vIdx,uvIdx,iIdx,elementIdx;
         let cIdx,gx,gy,gxAdd,gyAdd;
         let len,nTrig;
+        let fontCharWidths=this.core.interface.fontCharWidths;
         let shader=this.core.shaderList.textShader;
         let gl=this.core.gl;
         
@@ -188,16 +117,16 @@ export default class InterfaceTextClass
         len=this.str.length;
         if (len===0) return;
         
-        if (len>InterfaceTextClass.TEXT_MAX_STRING_LEN) len=InterfaceTextClass.TEXT_MAX_STRING_LEN;
+        if (len>this.TEXT_MAX_STRING_LEN) len=this.TEXT_MAX_STRING_LEN;
 
             // figure out the size
             // and alignment
 
         switch (this.align) {
-            case InterfaceTextClass.TEXT_ALIGN_CENTER:
+            case this.TEXT_ALIGN_CENTER:
                 x-=Math.trunc(this.getStringDrawWidth(this.fontSize,this.str)*0.5);
                 break;
-            case InterfaceTextClass.TEXT_ALIGN_RIGHT:
+            case this.TEXT_ALIGN_RIGHT:
                 x-=this.getStringDrawWidth(this.fontSize,this.str);
                 break;
         }
@@ -216,8 +145,8 @@ export default class InterfaceTextClass
         iIdx=0;
         elementIdx=0;
 
-        gxAdd=InterfaceTextClass.TEXT_CHAR_WIDTH/InterfaceTextClass.TEXT_TEXTURE_WIDTH;
-        gyAdd=InterfaceTextClass.TEXT_CHAR_HEIGHT/InterfaceTextClass.TEXT_TEXTURE_HEIGHT;
+        gxAdd=this.core.interface.TEXT_CHAR_WIDTH/this.core.interface.TEXT_TEXTURE_WIDTH;
+        gyAdd=this.core.interface.TEXT_CHAR_HEIGHT/this.core.interface.TEXT_TEXTURE_HEIGHT;
 
         for (n=0;n!==len;n++) {
             x2=x+this.fontSize;
@@ -232,8 +161,8 @@ export default class InterfaceTextClass
             this.vertexArray[vIdx++]=by;
 
             cIdx=this.str.charCodeAt(n)-32;
-            gx=((cIdx%InterfaceTextClass.TEXT_CHAR_PER_ROW)*InterfaceTextClass.TEXT_CHAR_WIDTH)/InterfaceTextClass.TEXT_TEXTURE_WIDTH;
-            gy=(Math.trunc(cIdx/InterfaceTextClass.TEXT_CHAR_PER_ROW)*InterfaceTextClass.TEXT_CHAR_HEIGHT)/InterfaceTextClass.TEXT_TEXTURE_HEIGHT;
+            gx=((cIdx%this.core.interface.TEXT_CHAR_PER_ROW)*this.core.interface.TEXT_CHAR_WIDTH)/this.core.interface.TEXT_TEXTURE_WIDTH;
+            gy=(Math.trunc(cIdx/this.core.interface.TEXT_CHAR_PER_ROW)*this.core.interface.TEXT_CHAR_HEIGHT)/this.core.interface.TEXT_TEXTURE_HEIGHT;
 
             this.uvArray[uvIdx++]=gx;
             this.uvArray[uvIdx++]=gy;
@@ -254,13 +183,13 @@ export default class InterfaceTextClass
 
             elementIdx+=4;
             
-            x+=Math.trunc(this.fontSize*InterfaceTextClass.FONT_CHAR_WIDS[cIdx]);
+            x+=Math.trunc(this.fontSize*fontCharWidths[cIdx]);
         }
 
             // set the shader and bitmap
 
         gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D,InterfaceTextClass.FONT_TEXTURE);
+        gl.bindTexture(gl.TEXTURE_2D,this.core.interface.fontTexture);
 
         if (overrideColor!==null) {
             gl.uniform4f(shader.colorUniform,overrideColor.r,overrideColor.g,overrideColor.b,this.alpha);

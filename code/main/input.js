@@ -1,5 +1,5 @@
-import InputTouchClickClass from '../main/input_touch_click.js';
-import InputTouchSwipeClass from '../main/input_touch_swipe.js';
+import ProjectEntityTouchClickClass from '../project/project_entity_touch_click.js';
+import ProjectEntityTouchSwipeClass from '../project/project_entity_touch_swipe.js';
 
 //
 // touch utility classes
@@ -7,23 +7,6 @@ import InputTouchSwipeClass from '../main/input_touch_swipe.js';
 
 class TouchTrackClass
 {
-    static QUADRANT_TOPLEFT=0;
-    static QUADRANT_TOPRIGHT=1;
-    static QUADRANT_BOTTOMLEFT=2;
-    static QUADRANT_BOTTOMRIGHT=3;
-
-    static CLICK_TICK=300;
-    
-    id=null;
-    timestamp=0;
-    
-    x=0;
-    y=0;
-    lastX=0;
-    lastY=0;
-    
-    quadrant=TouchTrackClass.QUADRANT_TOPLEFT;
-    
     constructor(core,id,timestamp,x,y)
     {
         this.id=id;
@@ -33,10 +16,10 @@ class TouchTrackClass
         this.y=y;
                 
         if (y<Math.trunc(core.canvas.height*0.5)) {
-            this.quadrant=(x<Math.trunc(core.canvas.width*0.5))?TouchTrackClass.QUADRANT_TOPLEFT:TouchTrackClass.QUADRANT_TOPRIGHT;
+            this.quadrant=(x<Math.trunc(core.canvas.width*0.5))?core.input.TOUCH_QUADRANT_TOPLEFT:core.input.TOUCH_QUADRANT_TOPRIGHT;
         }
         else {
-            this.quadrant=(x<Math.trunc(core.canvas.width*0.5))?TouchTrackClass.QUADRANT_BOTTOMLEFT:TouchTrackClass.QUADRANT_BOTTOMRIGHT;
+            this.quadrant=(x<Math.trunc(core.canvas.width*0.5))?core.input.TOUCH_QUADRANT_BOTTOMLEFT:core.input.TOUCH_QUADRANT_BOTTOMRIGHT;
         }
         
         this.lastX=x;
@@ -50,10 +33,21 @@ class TouchTrackClass
 
 export default class InputClass
 {
-    static INPUT_WHEEL_REFRESH_TICK=500;
-    
     constructor(core)
     {
+        this.TOUCH_QUADRANT_ANY=-1;
+        this.TOUCH_QUADRANT_TOPLEFT=0;
+        this.TOUCH_QUADRANT_TOPRIGHT=1;
+        this.TOUCH_QUADRANT_BOTTOMLEFT=2;
+        this.TOUCH_QUADRANT_BOTTOMRIGHT=3;
+        
+        this.TOUCH_DIRECTION_ANY=-1;
+        this.TOUCH_DIRECTION_X=0;
+        this.TOUCH_DIRECTION_Y=1;
+        
+        this.TOUCH_CLICK_TICK=300;
+        this.INPUT_WHEEL_REFRESH_TICK=500;
+
         this.core=core;
 
             // input flags
@@ -273,7 +267,7 @@ export default class InputClass
         click=this.mouseWheelClick;
         
         this.mouseWheelClick=0;
-        this.mouseWheelClickRefreshTick=this.core.timestamp+InputClass.INPUT_WHEEL_REFRESH_TICK;
+        this.mouseWheelClickRefreshTick=this.core.timestamp+this.INPUT_WHEEL_REFRESH_TICK;
         
         return(click);
     }
@@ -315,16 +309,16 @@ export default class InputClass
         // touch events
         //
     
-    getNextTouchClick(quardent)
+    getNextTouchClick(quadrant)
     {
         let n,touchClick;
         
         if (this.touchClickList.length===0) return(null);
-        if (quardent===InputTouchClickClass.QUADRANT_ANY) return(this.touchClickList.pop());
+        if (quadrant===this.TOUCH_QUADRANT_ANY) return(this.touchClickList.pop());
         
         for (n=0;n!==this.touchClickList.length;n++) {
             touchClick=this.touchClickList[n];
-            if (touchClick.quadrant===quardent) {
+            if (touchClick.quadrant===quadrant) {
                 this.touchClickList.splice(n,1);
                 return(touchClick);
             }
@@ -333,18 +327,25 @@ export default class InputClass
         return(null);
     }
     
-    getNextTouchSwipe(quardent,direction)
+    getNextTouchSwipe(quadrant,direction)
     {
-        let n,touchSwipe;
+        let n,touchSwipe,swipeDir;
         
         if (this.touchSwipeList.length===0) return(null);
-        if (quardent===InputTouchSwipeClass.QUADRANT_ANY) return(this.touchSwipeList.pop());
+        if (quadrant===this.TOUCH_QUADRANT_ANY) return(this.touchSwipeList.pop());
         
         for (n=0;n!==this.touchSwipeList.length;n++) {
             touchSwipe=this.touchSwipeList[n];
-            if (touchSwipe.quadrant!==quardent) continue;
+            if (touchSwipe.quadrant!==quadrant) continue;
+    
+            if (direction===this.DIRECTION_ANY) {
+                swipeDir=this.DIRECTION_ANY;
+            }
+            else {
+                swipeDir=(Math.abs(this.startX-this.endX)>Math.abs(this.startY-this.endY))?this.DIRECTION_X:this.DIRECTION_Y;
+            }
             
-            if ((direction===InputTouchSwipeClass.DIRECTION_ANY) || (direction===touchSwipe.getDirection())) {
+            if (direction===swipeDir) {
                 this.touchSwipeList.splice(n,1);
                 return(touchSwipe);
             }
@@ -395,7 +396,7 @@ export default class InputClass
                 // figure if click and delete from tracking
                 
             touchTrack=this.touchTrackList[idx];
-            if ((this.core.timestamp-touchTrack.timestamp)<=TouchTrackClass.CLICK_TICK) this.touchClickList.push(new TouchClickClass(touchTrack.id,touchTrack.x,touchTrack.y,touchTrack.quadrant));
+            if ((this.core.timestamp-touchTrack.timestamp)<=this.TOUCH_CLICK_TICK) this.touchClickList.push(new ProjectEntityTouchClickClass(touchTrack.id,touchTrack.x,touchTrack.y,touchTrack.quadrant));
                 
             this.touchTrackList.splice(idx,1);
         }
@@ -416,7 +417,7 @@ export default class InputClass
             
             for (touchTrack of this.touchTrackList) {
                 if (touchTrack.id===touch.identifier) {
-                    this.touchSwipeList.push(new TouchSwipeClass(touchTrack.id,touchTrack.lastX,touchTrack.lastY,event.pageX,event.pageY,touchTrack.quadrant));
+                    this.touchSwipeList.push(new ProjectEntityTouchSwipeClass(touchTrack.id,touchTrack.lastX,touchTrack.lastY,event.pageX,event.pageY,touchTrack.quadrant));
                     touchTrack.lastX=event.pageX;
                     touchTrack.lastY=event.pageY;
                     break;
