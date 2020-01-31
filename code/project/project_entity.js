@@ -125,7 +125,7 @@ export default class ProjectEntityClass
     
     release()
     {
-        this.modelEntityAlter.release();
+        if (this.modelEntityAlter!==null) this.modelEntityAlter.release();
     }
     
     /**
@@ -375,6 +375,11 @@ export default class ProjectEntityClass
         this.core.map.entityList.add(entity);
         
         return(entity);
+    }
+    
+    removeEntity(entity)
+    {
+        entity.markDelete=true;
     }
     
     holdEntity(entity)
@@ -1119,15 +1124,15 @@ export default class ProjectEntityClass
         
         dataView.setInt16(0,NetworkClass.MESSAGE_TYPE_ENTITY_UPDATE);
         dataView.setInt16(2,remoteId);
-        dataView.setInt32(4,this.position.x);
-        dataView.setInt32(8,this.position.y);
-        dataView.setInt32(12,this.position.z);
-        dataView.setFloat32(16,this.angle.x);
-        dataView.setFloat32(20,this.angle.y);
-        dataView.setFloat32(24,this.angle.z);
-        dataView.setFloat32(28,this.scale.x);
-        dataView.setFloat32(32,this.scale.y);
-        dataView.setFloat32(36,this.scale.z);
+        dataView.setInt32(4,this.modelEntityAlter.position.x);
+        dataView.setInt32(8,this.modelEntityAlter.position.y);
+        dataView.setInt32(12,this.modelEntityAlter.position.z);
+        dataView.setFloat32(16,this.modelEntityAlter.angle.x);
+        dataView.setFloat32(20,this.modelEntityAlter.angle.y);
+        dataView.setFloat32(24,this.modelEntityAlter.angle.z);
+        dataView.setFloat32(28,this.modelEntityAlter.scale.x);
+        dataView.setFloat32(32,this.modelEntityAlter.scale.y);
+        dataView.setFloat32(36,this.modelEntityAlter.scale.z);
         dataView.setInt16(40,this.modelEntityAlter.currentAnimationIdx);
         dataView.setInt32(42,this.modelEntityAlter.currentAnimationStartTimestamp);
         dataView.setInt32(46,this.modelEntityAlter.currentAnimationLoopStartTick);

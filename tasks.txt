@@ -2,19 +2,29 @@
     - remove all static
     - remove all class fields (ugh)
     - webGL instead of webGL2
-    - (KART) remove import InterfaceTextClass from '../../../code/interface/interface_text.js';
 
-- point/bound/color/rect in docs - rerun docs
+- rerun docs
 
 - networking
-    - odd null error on logon at times (fix -- check)
-    - leave doesn't remove remote (fix -- check)
-    - player needs local animations (fix -- check)
+    - entities need boxes passed on join
+    - need animation running or timing information for animation to work
+    - need to transmit show/hide meshes (as bitmask?)
+    - need to synchronize map movements (movements might need their own clock)
     - predictions
     - need open system for passing message (like firing weapons, etc)
-    - needs preferences -- WSJS root/IP Address -- pop up if they don't exist
-    - bindAddr=InetAddress.getByName(ip)
-    - WSServer update readme with prefs
+
+        this.currentAnimationIdx=-1;
+        this.currentAnimationStartTimestamp=0;
+        this.currentAnimationLoopStartTick=0;
+        this.currentAnimationLoopEndTick=0;
+        this.currentAnimationData=new Float32Array(4);
+        
+        this.queuedAnimationStop=false;
+        
+        this.queuedAnimationIdx=-1;
+        this.queuedAnimationStartTimestamp=0;
+        this.queuedAnimationLoopStartTick=0;
+        this.queuedAnimationLoopEndTick=0;
 
 - generator
     - better specs (generated with color?)

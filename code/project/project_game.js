@@ -99,6 +99,14 @@ export default class ProjectGameClass
         return(this.core.isMultiplayer);
     }
     
+    remoteEntering(name)
+    {
+    }
+    
+    remoteLeaving(name)
+    {
+    }
+    
         //
         // create maps
         //

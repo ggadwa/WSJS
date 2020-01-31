@@ -99,6 +99,11 @@ export default class ProjectMapClass
         return(entity);
     }
     
+    removeEntity(entity)
+    {
+        entity.markDelete=true;
+    }
+    
     /*
      * Override this to pass in the map JSON import
      * settings.
