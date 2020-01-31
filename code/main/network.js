@@ -6,32 +6,37 @@ import ProjectEntityRemoteClass from '../project/project_entity_remote.js';
 
 export default class NetworkClass
 {
-    static PORT=52419;
-    
-    static USER_NAME_LENGTH=32;
-
-    static MESSAGE_TYPE_ENTITY_ENTER=0;
-    static MESSAGE_TYPE_ENTITY_LEAVE=1;
-    static MESSAGE_TYPE_ENTITY_LOGON_REQUEST=2;
-    static MESSAGE_TYPE_ENTITY_LOGON_REPLY=3;
-    static MESSAGE_TYPE_ENTITY_UPDATE=4;
-    static MESSAGE_TYPE_ENTITY_CUSTOM=5;
-    
-    core=null;
-    socket=null;
-    queue=null;
-    
-    id=0;
-    connectOKCallback=null;
-    connectErrorCallback=null;
-    inConnectWait=false;
-    lastErrorMessage=null;
-    
     constructor(core)
     {
+        this.PORT=52419;
+        
+        this.MESSAGE_TYPE_ENTITY_ENTER=0;
+        this.MESSAGE_TYPE_ENTITY_LEAVE=1;
+        this.MESSAGE_TYPE_ENTITY_LOGON_REQUEST=2;
+        this.MESSAGE_TYPE_ENTITY_LOGON_REPLY=3;
+        this.MESSAGE_TYPE_MAP_SYNC_REQUEST=4;
+        this.MESSAGE_TYPE_MAP_SYNC_REPLY=5;
+        this.MESSAGE_TYPE_ENTITY_UPDATE=4;
+        this.MESSAGE_TYPE_ENTITY_CUSTOM=5;
+        
+        this.USER_NAME_LENGTH=32;
+
         this.core=core;
         
         this.socket=null;
+        this.queue=null;
+    
+        this.id=0;
+        
+        this.connectOKCallback=null;
+        this.connectErrorCallback=null;
+        this.inConnectWait=false;
+    
+        this.syncOKCallback=null;
+        this.syncErrorCallback=null;
+        this.inSyncWait=false;
+            
+        this.lastErrorMessage=null;
         
         Object.seal(this);
     }
@@ -47,7 +52,7 @@ export default class NetworkClass
         
             // now connect
             
-        this.socket=new WebSocket('ws://'+this.core.setup.serverURL+':'+NetworkClass.PORT);
+        this.socket=new WebSocket('ws://'+this.core.setup.serverURL+':'+this.PORT);
         this.socket.addEventListener('open',this.open.bind(this));
         this.socket.addEventListener('close',this.close.bind(this));
         this.socket.addEventListener('message',this.message.bind(this));
@@ -60,6 +65,20 @@ export default class NetworkClass
             this.socket.close(1000);        // 1000 is code for normal close
             this.socket=null;
         } 
+    }
+    
+        //
+        // sync -- this makes sure that our time is equivalent to
+        // server time, which is got by bounching a message to the first player
+        // in the list (who is considered real time.)
+        //
+        
+    sync(okCallback,errorCallback)
+    {
+        this.syncOKCallback=okCallback;
+        this.syncErrorCallback=errorCallback;
+        
+        this.syncOKCallback();      // TODO -- implement
     }
     
         //
@@ -113,8 +132,8 @@ export default class NetworkClass
         let msg=new ArrayBuffer(2+32+2+4);
         let dataView=new DataView(msg);
         
-        dataView.setInt16(0,NetworkClass.MESSAGE_TYPE_ENTITY_LOGON_REQUEST);
-        this.setStringInDataView(dataView,2,this.core.setup.name,NetworkClass.USER_NAME_LENGTH);
+        dataView.setInt16(0,this.MESSAGE_TYPE_ENTITY_LOGON_REQUEST);
+        this.setStringInDataView(dataView,2,this.core.setup.name,this.USER_NAME_LENGTH);
         
         this.socket.send(msg);
     }
@@ -140,7 +159,7 @@ export default class NetworkClass
                 // ignore any spurious no logon replies
                 
             dataView=new DataView(buffer);
-            if (dataView.getInt16(0)!==NetworkClass.MESSAGE_TYPE_ENTITY_LOGON_REPLY) return;
+            if (dataView.getInt16(0)!==this.MESSAGE_TYPE_ENTITY_LOGON_REPLY) return;
             
                 // negative ids are errors
                 // todo: probably some specific errors here based on negative id
@@ -190,7 +209,7 @@ export default class NetworkClass
         let userName,entity;
         let remoteClass=this.core.projectGame.getRemoteClass();
         
-        userName=this.getStringFromDataView(dataView,4,NetworkClass.USER_NAME_LENGTH);
+        userName=this.getStringFromDataView(dataView,4,this.USER_NAME_LENGTH);
         
         console.info('ENTER>'+remoteId+'>'+userName);
         
@@ -243,15 +262,15 @@ export default class NetworkClass
 
             switch (msgType) {
                 
-                case NetworkClass.MESSAGE_TYPE_ENTITY_ENTER:
+                case this.MESSAGE_TYPE_ENTITY_ENTER:
                     this.handleEntityEnter(remoteId,dataView);
                     break;
                     
-                case NetworkClass.MESSAGE_TYPE_ENTITY_LEAVE:
+                case this.MESSAGE_TYPE_ENTITY_LEAVE:
                     this.handleEntityLeave(remoteId,dataView);
                     break;
                     
-                case NetworkClass.MESSAGE_TYPE_ENTITY_UPDATE:
+                case this.MESSAGE_TYPE_ENTITY_UPDATE:
                     this.handleEntityUpdate(remoteId,dataView);
                     break;
             }
@@ -264,7 +283,7 @@ export default class NetworkClass
         
     sendEntityUpdate(entity)
     {
-        this.socket.send(entity.getUpdateNetworkData(this.id));
+        this.socket.send(entity.getUpdateNetworkData(this.MESSAGE_TYPE_ENTITY_UPDATE,this.id));
     }
     
         //
@@ -276,7 +295,7 @@ export default class NetworkClass
         let buffer=new ArrayBuffer(92);
         let dataView=new DataView(buffer);
         
-        dataView.setInt16(0,NetworkClass.MESSAGE_TYPE_ENTITY_CUSTOM);
+        dataView.setInt16(0,this.MESSAGE_TYPE_ENTITY_CUSTOM);
         dataView.setInt16(2,this.id);
         dataView.setInt32(4,((intParam0===null)?0:intParam0));
         dataView.setInt32(8,((intParam1===null)?0:intParam1));

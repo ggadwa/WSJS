@@ -32,12 +32,12 @@ class ProjectEffectChunkClass
  */
 export default class ProjectEffectClass
 {
-    static DRAW_MODE_OPAQUE=0;
-    static DRAW_MODE_TRANSPARENT=1;
-    static DRAW_MODE_ADDITIVE=2;
-    
     constructor(core,position,data,show)
     {
+        this.DRAW_MODE_OPAQUE=0;
+        this.DRAW_MODE_TRANSPARENT=1;
+        this.DRAW_MODE_ADDITIVE=2;
+    
         this.core=core;
         
         this.position=position.copy();
@@ -471,10 +471,10 @@ export default class ProjectEffectClass
     
                 switch (currentDrawMode)
                 {
-                    case ProjectEffectClass.DRAW_MODE_TRANSPARENT:
+                    case this.DRAW_MODE_TRANSPARENT:
                         gl.blendFunc(this.core.gl.SRC_ALPHA,this.core.gl.ONE_MINUS_SRC_ALPHA);
                         break;
-                    case ProjectEffectClass.DRAW_MODE_ADDITIVE:
+                    case this.DRAW_MODE_ADDITIVE:
                         gl.blendFunc(this.core.gl.SRC_ALPHA,this.core.gl.ONE);
                         break;
                     default:

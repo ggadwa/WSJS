@@ -103,11 +103,11 @@ export default class MapEffectListClass
                 // add the light to the list
                 
             if (idx===-1) {
-                if (this.core.lights.length<CoreClass.MAX_LIGHT_COUNT) this.core.lights.push(light);
+                if (this.core.lights.length<this.core.MAX_LIGHT_COUNT) this.core.lights.push(light);
             }
             else {
                 this.core.lights.splice(idx,0,light);
-                if (this.core.lights.length>CoreClass.MAX_LIGHT_COUNT) this.core.lights.pop();
+                if (this.core.lights.length>this.core.MAX_LIGHT_COUNT) this.core.lights.pop();
             }
         }
     }

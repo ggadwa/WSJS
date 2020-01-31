@@ -4,8 +4,6 @@
 
 export default class ModelSkinClass
 {
-    static MAX_SKELETON_JOINT=128;
-    
     constructor()
     {
             // all the joints for this skin

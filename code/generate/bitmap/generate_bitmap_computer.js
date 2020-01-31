@@ -99,6 +99,8 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
         sz=Math.trunc(Math.max((rgt-lft),(bot-top))*0.1);
         shutterCount=this.core.randomInt(sz,sz);
         
+        this.drawMetalShine(lft,top,rgt,bot,shutterColor);
+        
         if ((rgt-lft)>(bot-top)) {
             this.drawNormalWaveHorizontal(lft,top,rgt,bot,shutterColor,shutterEdgeColor,shutterCount);
         }
@@ -461,7 +463,7 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
         
             // finish with the specular
 
-        this.createSpecularMap(0.4);
+        this.createSpecularMap(200,0.4);
     }
 
 }

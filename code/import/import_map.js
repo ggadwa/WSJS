@@ -163,7 +163,7 @@ export default class ImportMapClass
                     moveRotate=new PointClass(0,0,0);
                     if (moveDef.rotate!==undefined) moveRotate.setFromValues(moveDef.rotate.x,moveDef.rotate.y,moveDef.rotate.z);
                     
-                    movement.addMove(new MoveClass(moveDef.tick,movePoint,moveRotate,MoveClass.lookupPauseType(moveDef.pauseType),((moveDef.pauseData===undefined)?null:moveDef.pauseData),((moveDef.sound===undefined)?null:moveDef.sound),((moveDef.trigger===undefined)?null:moveDef.trigger)));
+                    movement.addMove(new MoveClass(moveDef.tick,movePoint,moveRotate,movement.lookupPauseType(moveDef.pauseType),((moveDef.pauseData===undefined)?null:moveDef.pauseData),((moveDef.sound===undefined)?null:moveDef.sound),((moveDef.trigger===undefined)?null:moveDef.trigger)));
                 }
 
                 this.core.map.movementList.add(movement);

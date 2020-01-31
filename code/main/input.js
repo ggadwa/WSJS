@@ -54,7 +54,7 @@ export default class InputClass
 
         this.eventsAttached=false;
         
-        this.keyFlags=new Uint8Array(255);
+        this.keyFlags=new Map();
         
         this.mouseChangeX=0;
         this.mouseChangeY=0;
@@ -157,22 +157,33 @@ export default class InputClass
    
     keyClear()
     {
-        let n;
-            
-        for (n=0;n!==255;n++) {
-            this.keyFlags[n]=0;
-        }
+        this.keyFlags.clear();
     }
 
     keyDownEvent(event)
     {
-        this.keyFlags[event.keyCode]=1;
+        this.keyFlags.set(event.key,true);
     }
-    
-        
+     
     keyUpEvent(event)
     {
-        this.keyFlags[event.keyCode]=0;
+        this.keyFlags.set(event.key,false);
+    }
+    
+    isKeyDown(key)
+    {
+        let flag=this.keyFlags.get(key);
+        return((flag===undefined)?false:flag);
+    }
+    
+    isKeyDownAndClear(key)
+    {
+        let flag=this.keyFlags.get(key);
+        if (flag===undefined) return(false);
+        if (!flag) return(false);
+        
+        this.keyFlags.set(key,false);
+        return(true);
     }
     
         //

@@ -8,10 +8,10 @@ import SoundPlayClass from '../sound/sound_play.js';
 
 export default class SoundListClass
 {
-    static MAX_CONCURRENT_SOUNDS=8;                   // maximum number of concurrent sounds you can have playing
-    
     constructor(core)
     {
+        this.MAX_CONCURRENT_SOUNDS=8;                   // maximum number of concurrent sounds you can have playing
+        
         this.core=core;
         
         this.sounds=new Map();
@@ -53,7 +53,7 @@ export default class SoundListClass
         
         this.soundPlays=[];
         
-        for (n=0;n!==SoundListClass.MAX_CONCURRENT_SOUNDS;n++) {
+        for (n=0;n!==this.MAX_CONCURRENT_SOUNDS;n++) {
             this.soundPlays.push(new SoundPlayClass(this));
         }
        
@@ -68,7 +68,7 @@ export default class SoundListClass
     {
         let n;
         
-        for (n=0;n!==SoundListClass.MAX_CONCURRENT_SOUNDS;n++) {
+        for (n=0;n!==this.MAX_CONCURRENT_SOUNDS;n++) {
             this.soundPlays[n].close();
         }
         
@@ -157,19 +157,29 @@ export default class SoundListClass
         this.listenerForwardVector.setFromValues(0,0,1);
         this.listenerForwardVector.rotateY(null,this.currentListenerEntity.angle.y);
         
-        this.listener.positionX.value=this.currentListenerEntity.position.x;
-        this.listener.positionY.value=this.currentListenerEntity.position.y;
-        this.listener.positionZ.value=this.currentListenerEntity.position.z;
-        this.listener.forwardX.value=this.listenerForwardVector.x;
-        this.listener.forwardY.value=this.listenerForwardVector.y;
-        this.listener.forwardZ.value=this.listenerForwardVector.z;
-        this.listener.upX.value=0.0;
-        this.listener.upY.value=1.0;
-        this.listener.upZ.value=0.0;
+        if (this.listener.positionX) {        // backwards compatiablity
+            this.listener.positionX.value=this.currentListenerEntity.position.x;
+            this.listener.positionY.value=this.currentListenerEntity.position.y;
+            this.listener.positionZ.value=this.currentListenerEntity.position.z;
+        }
+        else {
+            this.listener.setPosition(this.currentListenerEntity.position.x,this.currentListenerEntity.position.y,this.currentListenerEntity.position.z);
+        }
+        if (this.listener.forwardX) {        // backwards compatiablity
+            this.listener.forwardX.value=this.listenerForwardVector.x;
+            this.listener.forwardY.value=this.listenerForwardVector.y;
+            this.listener.forwardZ.value=this.listenerForwardVector.z;
+            this.listener.upX.value=0.0;
+            this.listener.upY.value=1.0;
+            this.listener.upZ.value=0.0;
+        }
+        else {
+            this.listener.setOrientation(this.listenerForwardVector.x,this.listenerForwardVector.y,this.listenerForwardVector.z,0,1,0);
+        }
         
             // update all playing sounds
             
-        for (n=0;n!==SoundListClass.MAX_CONCURRENT_SOUNDS;n++) {
+        for (n=0;n!==this.MAX_CONCURRENT_SOUNDS;n++) {
             if (!this.soundPlays[n].free) this.soundPlays[n].update(this.currentListenerEntity);
         }
     }
@@ -193,7 +203,7 @@ export default class SoundListClass
         
             // find a free sound play
             
-        for (n=0;n!==SoundListClass.MAX_CONCURRENT_SOUNDS;n++) {
+        for (n=0;n!==this.MAX_CONCURRENT_SOUNDS;n++) {
             if (this.soundPlays[n].free) {
                 idx=n;
                 soundPlay=this.soundPlays[n];
@@ -221,7 +231,7 @@ export default class SoundListClass
     {
         let n;
         
-        for (n=0;n!==SoundListClass.MAX_CONCURRENT_SOUNDS;n++) {
+        for (n=0;n!==this.MAX_CONCURRENT_SOUNDS;n++) {
             if (!this.soundPlays[n].free) this.soundPlays[n].stop();
         }
     }

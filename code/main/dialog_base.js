@@ -2,23 +2,22 @@ import SetupClass from '../main/setup.js';
 
 export default class DialogBaseClass
 {
-    static DIALOG_WIDTH=1000;
-    static DIALOG_HEIGHT=500;
-    static DIALOG_BACKGROUND='#EEEEEE';
-    static DIALOG_BACKGROUND_DIM='#777777';
-    static DIALOG_OPACITY=0.9;
-    static DIALOG_OUTLINE_COLOR='#000033';
-    static TAB_WIDTH=150;
-    static TAB_HEIGHT=30;
-    static DIALOG_BUTTON_COLOR='#7777AA';
-    static DIALOG_BUTTON_COLOR_HIGHLIGHT='#8888FF';
-    
-    core=null;
-    tabList=null;
-    
     constructor(core)
     {
+        this.DIALOG_WIDTH=1000;
+        this.DIALOG_HEIGHT=500;
+        this.DIALOG_BACKGROUND='#EEEEEE';
+        this.DIALOG_BACKGROUND_DIM='#777777';
+        this.DIALOG_OPACITY=0.9;
+        this.DIALOG_OUTLINE_COLOR='#000033';
+        this.DIALOG_TAB_WIDTH=150;
+        this.DIALOG_TAB_HEIGHT=30;
+        this.DIALOG_BUTTON_COLOR='#7777AA';
+        this.DIALOG_BUTTON_COLOR_HIGHLIGHT='#8888FF';
+        
         this.core=core;
+        
+        this.tabList=null;
     }
     
         //
@@ -30,7 +29,7 @@ export default class DialogBaseClass
         let tabName;
         
         for (tabName of this.tabList) {
-            document.getElementById('tab_'+tabName).style.backgroundColor=(tabName===name)?DialogBaseClass.DIALOG_BACKGROUND:DialogBaseClass.DIALOG_BACKGROUND_DIM;
+            document.getElementById('tab_'+tabName).style.backgroundColor=(tabName===name)?this.DIALOG_BACKGROUND:this.DIALOG_BACKGROUND_DIM;
             document.getElementById('view_'+tabName).style.display=(tabName===name)?'':'none';
         }
     }
@@ -55,11 +54,11 @@ export default class DialogBaseClass
         dialogDiv.id='dialog';
         dialogDiv.style.boxSizing='border-box';
         dialogDiv.style.position='absolute';
-        dialogDiv.style.left='calc(50% - '+Math.trunc(DialogBaseClass.DIALOG_WIDTH*0.5)+'px)';
-        dialogDiv.style.top='calc(50% - '+Math.trunc(DialogBaseClass.DIALOG_HEIGHT*0.5)+'px)';
-        dialogDiv.style.width=DialogBaseClass.DIALOG_WIDTH+'px';
-        dialogDiv.style.height=DialogBaseClass.DIALOG_HEIGHT+'px';
-        dialogDiv.style.opacity=DialogBaseClass.DIALOG_OPACITY;
+        dialogDiv.style.left='calc(50% - '+Math.trunc(this.DIALOG_WIDTH*0.5)+'px)';
+        dialogDiv.style.top='calc(50% - '+Math.trunc(this.DIALOG_HEIGHT*0.5)+'px)';
+        dialogDiv.style.width=this.DIALOG_WIDTH+'px';
+        dialogDiv.style.height=this.DIALOG_HEIGHT+'px';
+        dialogDiv.style.opacity=this.DIALOG_OPACITY;
         
             // the tabs
             
@@ -76,17 +75,17 @@ export default class DialogBaseClass
             tabDiv.style.position='absolute';
             tabDiv.style.left=x+'px';
             tabDiv.style.top='0px';
-            tabDiv.style.width=DialogBaseClass.TAB_WIDTH+'px';
-            tabDiv.style.height=DialogBaseClass.TAB_HEIGHT+'px';
+            tabDiv.style.width=this.DIALOG_TAB_WIDTH+'px';
+            tabDiv.style.height=this.DIALOG_TAB_HEIGHT+'px';
             tabDiv.style.fontFamily='Arial';
             tabDiv.style.fontSize='14pt';
             tabDiv.style.fontWeight='bold';
             tabDiv.style.paddingLeft='6px';
             tabDiv.style.paddingTop='4px';
-            tabDiv.style.backgroundColor=selected?DialogBaseClass.DIALOG_BACKGROUND:DialogBaseClass.DIALOG_BACKGROUND_DIM;
-            tabDiv.style.borderTop='1px solid '+DialogBaseClass.DIALOG_OUTLINE_COLOR;
-            tabDiv.style.borderLeft='1px solid '+DialogBaseClass.DIALOG_OUTLINE_COLOR;
-            tabDiv.style.borderRight='1px solid '+DialogBaseClass.DIALOG_OUTLINE_COLOR;
+            tabDiv.style.backgroundColor=selected?this.DIALOG_BACKGROUND:this.DIALOG_BACKGROUND_DIM;
+            tabDiv.style.borderTop='1px solid '+this.DIALOG_OUTLINE_COLOR;
+            tabDiv.style.borderLeft='1px solid '+this.DIALOG_OUTLINE_COLOR;
+            tabDiv.style.borderRight='1px solid '+this.DIALOG_OUTLINE_COLOR;
             tabDiv.style.borderTopRightRadius='8px';
             tabDiv.style.cursor='pointer';
             tabDiv.style.userSelect='none';
@@ -105,12 +104,12 @@ export default class DialogBaseClass
             viewDiv.style.boxSizing='border-box';
             viewDiv.style.position='absolute';
             viewDiv.style.left='0px';
-            viewDiv.style.top=(DialogBaseClass.TAB_HEIGHT-1)+'px';
-            viewDiv.style.width=(DialogBaseClass.DIALOG_WIDTH-0)+'px';
-            viewDiv.style.height=(DialogBaseClass.DIALOG_HEIGHT-DialogBaseClass.TAB_HEIGHT)+'px';
+            viewDiv.style.top=(this.DIALOG_TAB_HEIGHT-1)+'px';
+            viewDiv.style.width=(this.DIALOG_WIDTH-0)+'px';
+            viewDiv.style.height=(this.DIALOG_HEIGHT-this.DIALOG_TAB_HEIGHT)+'px';
             viewDiv.style.padding='25px';
-            viewDiv.style.backgroundColor=DialogBaseClass.DIALOG_BACKGROUND;
-            viewDiv.style.border='1px solid '+DialogBaseClass.DIALOG_OUTLINE_COLOR;
+            viewDiv.style.backgroundColor=this.DIALOG_BACKGROUND;
+            viewDiv.style.border='1px solid '+this.DIALOG_OUTLINE_COLOR;
             viewDiv.style.zIndex=100;
 
                 // add to html
@@ -118,7 +117,7 @@ export default class DialogBaseClass
             dialogDiv.appendChild(tabDiv);
             dialogDiv.appendChild(viewDiv);
             
-            x+=DialogBaseClass.TAB_WIDTH;
+            x+=this.DIALOG_TAB_WIDTH;
         }
         
             // go button
@@ -128,24 +127,24 @@ export default class DialogBaseClass
         buttonDiv.id='go';    
         buttonDiv.style.boxSizing='border-box';
         buttonDiv.style.position='absolute';
-        buttonDiv.style.left=(DialogBaseClass.DIALOG_WIDTH-DialogBaseClass.TAB_WIDTH)+'px';
+        buttonDiv.style.left=(this.DIALOG_WIDTH-this.DIALOG_TAB_WIDTH)+'px';
         buttonDiv.style.top='0px';
-        buttonDiv.style.width=DialogBaseClass.TAB_WIDTH+'px';
-        buttonDiv.style.height=(DialogBaseClass.TAB_HEIGHT-4)+'px';
+        buttonDiv.style.width=this.DIALOG_TAB_WIDTH+'px';
+        buttonDiv.style.height=(this.DIALOG_TAB_HEIGHT-4)+'px';
         buttonDiv.style.fontFamily='Arial';
         buttonDiv.style.fontSize='14pt';
         buttonDiv.style.fontWeight='bold';
         buttonDiv.style.textAlign='center';
         buttonDiv.style.paddingTop='3px';
-        buttonDiv.style.backgroundColor=DialogBaseClass.DIALOG_BUTTON_COLOR;
-        buttonDiv.style.border='1px solid '+DialogBaseClass.DIALOG_OUTLINE_COLOR;
+        buttonDiv.style.backgroundColor=this.DIALOG_BUTTON_COLOR;
+        buttonDiv.style.border='1px solid '+this.DIALOG_OUTLINE_COLOR;
         buttonDiv.style.borderRadius='4px';
         buttonDiv.style.cursor='pointer';
         buttonDiv.style.userSelect='none';
         
         buttonDiv.onclick=buttonOnClick;
-        buttonDiv.onmouseover=new Function('this.style.backgroundColor=\''+DialogBaseClass.DIALOG_BUTTON_COLOR_HIGHLIGHT+'\'');
-        buttonDiv.onmouseout=new Function('this.style.backgroundColor=\''+DialogBaseClass.DIALOG_BUTTON_COLOR+'\'');
+        buttonDiv.onmouseover=new Function('this.style.backgroundColor=\''+this.DIALOG_BUTTON_COLOR_HIGHLIGHT+'\'');
+        buttonDiv.onmouseout=new Function('this.style.backgroundColor=\''+this.DIALOG_BUTTON_COLOR+'\'');
         
         buttonDiv.appendChild(document.createTextNode('Go'));
         

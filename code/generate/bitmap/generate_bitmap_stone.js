@@ -101,6 +101,6 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
         
             // finish with the specular
 
-        this.createSpecularMap(0.5);
+        this.createSpecularMap(125,0.5);
     }
 }

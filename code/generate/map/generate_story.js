@@ -60,21 +60,21 @@ export default class GenerateStoryClass
 
         movement=new MovementClass(this.core,[meshIdx],null,new PointClass(0,0,0),new PointClass(0,0,0));
 
-        movement.addMove(new MoveClass(waitMilliSec,new PointClass(0,0,0),new PointClass(0,0,0),MoveClass.PAUSE_NONE,null,null,null));
+        movement.addMove(new MoveClass(waitMilliSec,new PointClass(0,0,0),new PointClass(0,0,0),movement.MOVEMENT_PAUSE_NONE,null,null,null));
 
         for (n=1;n<this.room.storyCount;n++) {
             y=-(this.segmentSize*n);
-            movement.addMove(new MoveClass(moveMilliSec,new PointClass(0,y,0),new PointClass(0,0,0),MoveClass.PAUSE_NONE,null,null,null));
-            movement.addMove(new MoveClass(waitMilliSec,new PointClass(0,y,0),new PointClass(0,0,0),MoveClass.PAUSE_NONE,null,null,null));
+            movement.addMove(new MoveClass(moveMilliSec,new PointClass(0,y,0),new PointClass(0,0,0),movement.MOVEMENT_PAUSE_NONE,null,null,null));
+            movement.addMove(new MoveClass(waitMilliSec,new PointClass(0,y,0),new PointClass(0,0,0),movement.MOVEMENT_PAUSE_NONE,null,null,null));
         }
 
         for (n=(this.room.storyCount-2);n>0;n--) {
             y=-(this.segmentSize*n);
-            movement.addMove(new MoveClass(moveMilliSec,new PointClass(0,y,0),new PointClass(0,0,0),MoveClass.PAUSE_NONE,null,null,null));
-            movement.addMove(new MoveClass(waitMilliSec,new PointClass(0,y,0),new PointClass(0,0,0),MoveClass.PAUSE_NONE,null,null,null));
+            movement.addMove(new MoveClass(moveMilliSec,new PointClass(0,y,0),new PointClass(0,0,0),movement.MOVEMENT_PAUSE_NONE,null,null,null));
+            movement.addMove(new MoveClass(waitMilliSec,new PointClass(0,y,0),new PointClass(0,0,0),movement.MOVEMENT_PAUSE_NONE,null,null,null));
         }
 
-        movement.addMove(new MoveClass(moveMilliSec,new PointClass(0,0,0),new PointClass(0,0,0),MoveClass.PAUSE_NONE,null,null,null));
+        movement.addMove(new MoveClass(moveMilliSec,new PointClass(0,0,0),new PointClass(0,0,0),movement.MOVEMENT_PAUSE_NONE,null,null,null));
 
         this.core.map.movementList.add(movement);
     }

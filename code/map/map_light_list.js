@@ -96,7 +96,7 @@ export default class MapLightListClass
             light.dist=Math.sqrt((x*x)+(y*y)+(z*z));
         }
         
-            // find the CoreClass.MAX_LIGHT_COUNT closest lights
+            // find the this.core.MAX_LIGHT_COUNT closest lights
             // and put them into the view list, skipping ambients
             // which we add to the list at the end so they
             // always get into the list
@@ -124,11 +124,11 @@ export default class MapLightListClass
                 // add the light
                 
             if (idx===-1) {
-                if (this.core.lights.length<CoreClass.MAX_LIGHT_COUNT) this.core.lights.push(light);
+                if (this.core.lights.length<this.core.MAX_LIGHT_COUNT) this.core.lights.push(light);
             }
             else {
                 this.core.lights.splice(idx,0,light);
-                if (this.core.lights.length>CoreClass.MAX_LIGHT_COUNT) this.core.lights.pop();
+                if (this.core.lights.length>this.core.MAX_LIGHT_COUNT) this.core.lights.pop();
             }
         }
     }
@@ -145,7 +145,7 @@ export default class MapLightListClass
             if (!light.ambient) continue;
             
             this.core.lights.splice(0,0,light);
-            if (this.core.lights.length>CoreClass.MAX_LIGHT_COUNT) this.core.lights.pop();
+            if (this.core.lights.length>this.core.MAX_LIGHT_COUNT) this.core.lights.pop();
         }
     }
     

@@ -75,14 +75,14 @@ export default class GeneratePipeClass
 
             if (n===(this.PIPE_SIDE_COUNT-1)) ang2=0.0;
 
-            rd=ang*PointClass.DEGREE_TO_RAD;
+            rd=ang*(Math.PI/180.0);
             tx=nextPnt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
             tz=nextPnt.z+((radius*Math.cos(rd))-(radius*Math.sin(rd)));
 
             bx=pnt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
             bz=pnt.z+((radius*Math.cos(rd))-(radius*Math.sin(rd)));
 
-            rd=ang2*PointClass.DEGREE_TO_RAD;
+            rd=ang2*(Math.PI/180.0);
             tx2=nextPnt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
             tz2=nextPnt.z+((radius*Math.cos(rd))-(radius*Math.sin(rd)));
 
@@ -217,14 +217,14 @@ export default class GeneratePipeClass
                     
                 if (n===(this.PIPE_SIDE_COUNT-1)) ang2=0.0;
 
-                rd=ang*PointClass.DEGREE_TO_RAD;
+                rd=ang*(Math.PI/180.0);
                 tx=nextPnt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
                 tz=nextPnt.z+((radius*Math.cos(rd))-(radius*Math.sin(rd)));
                 
                 bx=pnt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
                 bz=pnt.z+((radius*Math.cos(rd))-(radius*Math.sin(rd)));
 
-                rd=ang2*PointClass.DEGREE_TO_RAD;
+                rd=ang2*(Math.PI/180.0);
                 tx2=nextPnt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
                 tz2=nextPnt.z+((radius*Math.cos(rd))-(radius*Math.sin(rd)));
                 

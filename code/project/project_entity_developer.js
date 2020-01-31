@@ -90,9 +90,7 @@ export default class ProjectEntityDeveloperClass extends ProjectEntityClass
         
             // i key picks a new parent from closest node
             
-        if (input.keyFlags[73]) {
-            input.keyFlags[73]=false;
-            
+        if (input.isKeyDownAndClear('i')) {
             nodeIdx=this.findNearestPathNode(1000000);
             if (nodeIdx===-1) return;
             
@@ -105,9 +103,7 @@ export default class ProjectEntityDeveloperClass extends ProjectEntityClass
             // o splits a path at two nodes,
             // hit o on each node, then o for new node
             
-        if (input.keyFlags[79]) {
-            input.keyFlags[79]=false;
-            
+        if (input.isKeyDownAndClear('o')) {
             nodeIdx=this.findNearestPathNode(1000000);
             if (nodeIdx===-1) return;
             
@@ -141,8 +137,7 @@ export default class ProjectEntityDeveloperClass extends ProjectEntityClass
         
             // p key adds to path
             
-        if (input.keyFlags[80]) {
-            input.keyFlags[80]=false;
+        if (input.isKeyDownAndClear('p')) {
             
                 // is there a close node?
                 // if so connect to that
@@ -181,9 +176,7 @@ export default class ProjectEntityDeveloperClass extends ProjectEntityClass
         
             // u key adds a key to nearest node
             
-        if (input.keyFlags[85]) {
-            input.keyFlags[85]=false;
-            
+        if (input.isKeyDownAndClear('u')) {
             nodeIdx=this.findNearestPathNode(5000);
             if (nodeIdx!==-1) {
                 path.editorParentNodeIdx=nodeIdx;
@@ -202,7 +195,7 @@ export default class ProjectEntityDeveloperClass extends ProjectEntityClass
         
             // [ key deletes selected node
             
-        if (input.keyFlags[219]) {
+        if (input.isKeyDownAndClear('[')) {
             input.keyFlags[219]=false;
             
             if (path.editorParentNodeIdx!==-1) {
@@ -236,9 +229,7 @@ export default class ProjectEntityDeveloperClass extends ProjectEntityClass
         
             // ] key moves selected node to player
 
-        if (input.keyFlags[221]) {
-            input.keyFlags[221]=false;
-            
+        if (input.isKeyDownAndClear(']')) {
             if (path.editorParentNodeIdx!==-1) {
                 path.nodes[path.editorParentNodeIdx].position.setFromPoint(this.position);
                 console.info('Moved node '+path.editorParentNodeIdx);
@@ -247,9 +238,7 @@ export default class ProjectEntityDeveloperClass extends ProjectEntityClass
         
             // \ key displays json of path
             
-        if (input.keyFlags[220]) {
-            input.keyFlags[220]=false;
-            
+        if (input.isKeyDownAndClear('\\')) {            
             str='                "paths":\n';
             str+='                    [\n';
             
@@ -282,32 +271,28 @@ export default class ProjectEntityDeveloperClass extends ProjectEntityClass
         
             // backspace prints out position info
             
-        if (input.keyFlags[8]) {
-            input.keyFlags[8]=false;
+        if (input.isKeyDownAndClear('Backspace')) {
             this.positionInfo();
             return;
         }
         
             // - for no clip
             
-        if (input.keyFlags[189]) {
-            input.keyFlags[189]=false;
+        if (input.isKeyDownAndClear('-')) {
             this.debugPlayerNoClip=!this.debugPlayerNoClip;
             console.info('player no clip='+this.debugPlayerNoClip);
         }
         
             // = for fly
         
-        if (input.keyFlags[187]) {
-            input.keyFlags[187]=false;
+        if (input.isKeyDownAndClear('=')) {
             this.debugPlayerFly=!this.debugPlayerFly;
             console.info('player fly='+this.debugPlayerFly);
         }
         
             // delete turns on path editor
             
-        if (input.keyFlags[46]) {
-            input.keyFlags[46]=false;
+        if (input.isKeyDownAndClear('Delete')) {
             this.core.debugPaths=!this.core.debugPaths;
             console.info('path editor='+this.core.debugPaths);
             if (this.core.debugPaths) {
@@ -323,32 +308,28 @@ export default class ProjectEntityDeveloperClass extends ProjectEntityClass
         
             // end turns on entity bounds
             
-        if (input.keyFlags[35]) {
-            input.keyFlags[35]=false;
+        if (input.isKeyDownAndClear('End')) {
             this.core.debugEntityBounds=!this.core.debugEntityBounds;
             console.info('draw entity bounds='+this.core.debugEntityBounds);
         }
         
             // page down turns on entity skeletons
         
-        if (input.keyFlags[34]) {
-            input.keyFlags[34]=false;
+        if (input.isKeyDownAndClear('PageDown')) {
             this.core.debugSkeletons=!this.core.debugSkeletons;
             console.info('draw entity skeletons='+this.core.debugSkeletons);
         }
         
             // page up turns on collision surfaces
             
-        if (input.keyFlags[33]) {
-            input.keyFlags[33]=false;
+        if (input.isKeyDownAndClear('PageUp')) {
             this.core.debugCollisionSurfaces=!this.core.debugCollisionSurfaces;
             console.info('draw collision surfaces='+this.core.debugCollisionSurfaces);
         }
         
             // home turns off damage
             
-        if (input.keyFlags[36]) {
-            input.keyFlags[36]=false;
+        if (input.isKeyDownAndClear('Home')) {
             this.debugNoDamage=!this.debugNoDamage;
             console.info('no damage='+this.debugNoDamage);
         }

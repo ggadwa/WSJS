@@ -12,6 +12,8 @@ export default class MeshClass
 {
     constructor(core,name,bitmap,noSkinAttachedNodeIdx,skinIdx,vertexArray,normalArray,tangentArray,uvArray,jointArray,weightArray,indexArray)
     {
+        this.FLOOR_MIN_XZ_ELIMINATION_SIZE=500;       // if the min x/z of a segment is less than this, then it's elimated as a floor/ceiling segment
+
         this.core=core;
         this.name=name;
         this.bitmap=bitmap;
@@ -323,7 +325,7 @@ export default class MeshClass
                 // detect if triangle is a floor
                 
             if (ny>=maxFloorCeilingDetectionFactor) {
-                if (Math.min(xSize,zSize)<CollisionTrigClass.FLOOR_MIN_XZ_ELIMINATION_SIZE) continue;
+                if (Math.min(xSize,zSize)<this.FLOOR_MIN_XZ_ELIMINATION_SIZE) continue;
                 this.collisionFloorTrigs.push(new CollisionTrigClass(new PointClass(x0,y0,z0),new PointClass(x1,y1,z1),new PointClass(x2,y2,z2)));
             }
             
@@ -331,7 +333,7 @@ export default class MeshClass
                 
             else {
                 if (ny<=-maxFloorCeilingDetectionFactor) {
-                    if (Math.min(xSize,zSize)<CollisionTrigClass.FLOOR_MIN_XZ_ELIMINATION_SIZE) continue;
+                    if (Math.min(xSize,zSize)<this.FLOOR_MIN_XZ_ELIMINATION_SIZE) continue;
                     this.collisionCeilingTrigs.push(new CollisionTrigClass(new PointClass(x0,y0,z0),new PointClass(x1,y1,z1),new PointClass(x2,y2,z2)));
                 }
 

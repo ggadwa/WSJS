@@ -61,7 +61,7 @@ export default class GenerateBitmapHexagonClass extends GenerateBitmapBaseClass
         
             // finish with the specular
 
-        this.createSpecularMap(0.6);
+        this.createSpecularMap(120,0.6);
     }
 
 }

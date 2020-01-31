@@ -15,16 +15,6 @@ import SkyClass from '../map/sky.js';
 
 export default class MapClass
 {
-    meshList=null;
-    liquidList=null;
-    lightList=null;
-    entityList=null;
-    movementList=null;
-    effectList=null;
-    cubeList=null;
-    path=null;
-    sky=null;
-    
     constructor(core)
     {
         this.core=core;

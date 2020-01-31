@@ -4,14 +4,25 @@
 
 export default class ModelAnimationChannelClass
 {
-    static TRS_TYPE_TRANSLATION=0;
-    static TRS_TYPE_ROTATION=1;
-    static TRS_TYPE_SCALE=2;
-    
-    constructor(nodeIdx,trsType)
+    constructor(nodeIdx,trsTypeName)
     {
+        this.TRS_TYPE_TRANSLATION=0;
+        this.TRS_TYPE_ROTATION=1;
+        this.TRS_TYPE_SCALE=2;
+    
         this.nodeIdx=nodeIdx;
-        this.trsType=trsType;
+        
+        switch (trsTypeName) {
+            case 'translation':
+                this.trsType=this.TRS_TYPE_TRANSLATION;
+                break;
+            case 'rotation':
+                this.trsType=this.TRS_TYPE_ROTATION;
+                break;
+            case 'scale':
+                this.trsType=this.TRS_TYPE_SCALE;
+                break;
+        }
         
         this.poses=[];
         
@@ -21,7 +32,6 @@ export default class ModelAnimationChannelClass
     getPoseDataForTick(tick,outData)
     {
         let n,f;
-        // let fi,x,y,z,w;
         let tickLen,tickOffset;
         let endPoseIdx;
         let startPose,endPose;
@@ -51,9 +61,9 @@ export default class ModelAnimationChannelClass
                 outData[n]=endPose.data[n];
             }
             
-            return;
+
         //}
-        
+        /*
             // get the tween factor
             
         startPose=this.poses[endPoseIdx-1];
@@ -68,6 +78,7 @@ export default class ModelAnimationChannelClass
         for (n=0;n!==startPose.data.length;n++) {
             outData[n]=startPose.data[n]+(f*(endPose.data[n]-startPose.data[n]));
         }
+         */
     }
     
 }

@@ -1,7 +1,5 @@
 export default class Matrix4Class
 {
-    static DEGREE_TO_RAD=Math.PI/180.0;
-
     constructor()
     {
         this.data=new Float32Array(16);
@@ -75,7 +73,7 @@ export default class Matrix4Class
     
     setRotationFromXAngle(xAng)
     {
-        let rad=xAng*Matrix4Class.DEGREE_TO_RAD;
+        let rad=xAng*(Math.PI/180.0);
         
         this.setIdentity();
         
@@ -86,7 +84,7 @@ export default class Matrix4Class
     
     setRotationFromYAngle(yAng)
     {
-        let rad=yAng*Matrix4Class.DEGREE_TO_RAD;
+        let rad=yAng*(Math.PI/180.0);
         
         this.setIdentity();
         
@@ -97,7 +95,7 @@ export default class Matrix4Class
     
     setRotationFromZAngle(zAng)
     {
-        let rad=zAng*Matrix4Class.DEGREE_TO_RAD;
+        let rad=zAng*(Math.PI/180.0);
         
         this.setIdentity();
         

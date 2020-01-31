@@ -4,10 +4,10 @@
 
 export default class ShaderClass
 {
-    static SHADER_BASE_PATH='../../shaders/';
-    
     constructor(core)
     {
+        this.SHADER_BASE_PATH='../../shaders/';
+        
         this.core=core;
         
         this.shaderName=null;
@@ -77,7 +77,7 @@ export default class ShaderClass
         
         vertexShaderSource=null;
         
-        await this.loadShader(ShaderClass.SHADER_BASE_PATH+this.shaderName+'.vert')
+        await this.loadShader(this.SHADER_BASE_PATH+this.shaderName+'.vert')
             .then
                 (
                         // resolved
@@ -99,7 +99,7 @@ export default class ShaderClass
         
         fragmentShaderSource=null;
         
-        await this.loadShader(ShaderClass.SHADER_BASE_PATH+this.shaderName+'.frag')
+        await this.loadShader(this.SHADER_BASE_PATH+this.shaderName+'.frag')
             .then
                 (
                         // resolved

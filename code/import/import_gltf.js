@@ -537,8 +537,8 @@ export default class ImportGLTFClass
                 skin=this.jsonData.skins[n];
                 joints=skin.joints;
 
-                if (joints.length>ModelSkinClass.MAX_SKELETON_JOINT) {
-                    console.log('too many joints in skeleton ('+joints.length+' out of '+ModelSkinClass.MAX_SKELETON_JOINT+' in model '+this.importSettings.name);
+                if (joints.length>this.core.MAX_SKELETON_JOINT) {
+                    console.log('too many joints in skeleton ('+joints.length+' out of '+this.core.MAX_SKELETON_JOINT+' in model '+this.importSettings.name);
                     return(false);
                 }
 
@@ -928,27 +928,15 @@ export default class ImportGLTFClass
                     // currently only handling translation, rotation,
                     // and scale
                     
-                channel=null;
-                
-                switch (channelNode.target.path) {
-                    case 'translation':
-                        channel=new ModelAnimationChannelClass(channelNode.target.node,ModelAnimationChannelClass.TRS_TYPE_TRANSLATION);
-                        break;
-                    case 'rotation':
-                        channel=new ModelAnimationChannelClass(channelNode.target.node,ModelAnimationChannelClass.TRS_TYPE_ROTATION);
-                        break;
-                    case 'rotation':
-                        channel=new ModelAnimationChannelClass(channelNode.target.node,ModelAnimationChannelClass.TRS_TYPE_SCALE);
-                        break;
-                }
-                
-                if (channel===null) continue;
+                if ((channelNode.target.path!=='translation') && (channelNode.target.path!=='rotation') && (channelNode.target.path!=='scale')) continue;
+                    
+                channel=new ModelAnimationChannelClass(channelNode.target.node,channelNode.target.path);
                 
                     // read in the samplier
                     
                 samplerNode=animateNode.samplers[channelNode.sampler];
                     
-                isVec4=(channel.trsType===ModelAnimationChannelClass.TRS_TYPE_ROTATION);
+                isVec4=(channel.trsType===channel.TRS_TYPE_ROTATION);
                 timeArray=this.decodeBuffer(samplerNode.input,1);
                 vectorArray=this.decodeBuffer(samplerNode.output,(isVec4?4:3));
                 

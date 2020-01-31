@@ -221,9 +221,32 @@ class MainClass
 
         this.core.setPauseState(true,true);
         
+            // if we are in a networked game, last thing to
+            // do is request a map_sync to get the map in the right time
+            
+        if (this.core.isMultiplayer) {
+            this.core.loadingScreenUpdate();
+            this.core.loadingScreenAddString('Connecting to Server');
+            this.core.loadingScreenDraw();
+        
+            this.core.network.sync(this.runMultiplayerSyncOK.bind(this),this.runMultiplayerSyncError.bind(this));     // return here, callback from connection or error
+            return;
+        }
+        
             // start the main loop
         
         window.requestAnimationFrame(mainLoop);
+    }
+    
+    runMultiplayerSyncOK()
+    {
+        window.requestAnimationFrame(mainLoop);
+    }
+    
+    runMultiplayerSyncError()
+    {
+        alert(this.core.network.lastErrorMessage);
+        this.network.disconnect();
     }
 }
 

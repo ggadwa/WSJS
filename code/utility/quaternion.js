@@ -1,7 +1,5 @@
 export default class QuaternionClass
 {
-    static DEGREE_TO_RAD=Math.PI/180.0;
-    
     constructor(x,y,z,w)
     {
         this.x=x;
@@ -38,7 +36,7 @@ export default class QuaternionClass
     
     setFromVectorAndAngle(x,y,z,ang)
     {
-        let rd=ang*QuaternionClass.DEGREE_TO_RAD;
+        let rd=ang*(Math.PI/180.0);
         let sn=Math.sin(rd*0.5);
         
         this.x=sn*x;

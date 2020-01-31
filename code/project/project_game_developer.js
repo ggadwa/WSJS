@@ -9,7 +9,8 @@ import ProjectGameClass from '../project/project_game.js';
 /**
  * A specialized version of ProjectGameClass that has additional
  * options for developing games, mostly notable fps/count outputs.
- * A shipping game should extend it's main game class from ProjectGameClass.
+ * A shipping game should extend it's main game class from ProjectGameClass
+ * and use this for development only.
  * 
  * @hideconstructor
  * @extends ProjectGameClass

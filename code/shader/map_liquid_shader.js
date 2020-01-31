@@ -57,7 +57,7 @@ export default class MapLiquidShaderClass extends ShaderClass
         this.lightMinUniform=gl.getUniformLocation(this.program,'lightMin');
         this.lightMaxUniform=gl.getUniformLocation(this.program,'lightMax');
         
-        for (n=0;n!==CoreClass.MAX_LIGHT_COUNT;n++) {
+        for (n=0;n!==this.core.MAX_LIGHT_COUNT;n++) {
             this.lights.push(new ShaderLightClass());
 
             name='lights['+n+']';
@@ -101,7 +101,7 @@ export default class MapLiquidShaderClass extends ShaderClass
             
             // if intensity = 0 light is off
         
-        for (n=0;n!==CoreClass.MAX_LIGHT_COUNT;n++) {
+        for (n=0;n!==this.core.MAX_LIGHT_COUNT;n++) {
 
             light=this.lights[n];
             viewLight=this.core.lights[n];

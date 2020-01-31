@@ -93,7 +93,7 @@ export default class GenerateBitmapMosaicClass extends GenerateBitmapBaseClass
 
             // finish with the specular
 
-        this.createSpecularMap(0.5);
+        this.createSpecularMap(120,0.5);
     }
 
 }

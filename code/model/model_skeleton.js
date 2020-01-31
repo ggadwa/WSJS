@@ -4,8 +4,6 @@
 
 export default class ModelSkeletonClass
 {
-    static MAX_SKELETON_JOINT=128;
-    
     constructor(core)
     {
         this.core=core;

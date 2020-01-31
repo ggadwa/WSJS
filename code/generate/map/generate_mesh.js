@@ -887,14 +887,14 @@ export default class GenerateMeshClass
                     
                 if (n===(sideCount-1)) ang2=0.0;
 
-                rd=ang*PointClass.DEGREE_TO_RAD;
+                rd=ang*(Math.PI/180.0);
                 tx=centerPnt.x+((topRad*Math.sin(rd))+(topRad*Math.cos(rd)));
                 tz=centerPnt.z+((topRad*Math.cos(rd))-(topRad*Math.sin(rd)));
                 
                 bx=centerPnt.x+((botRad*Math.sin(rd))+(botRad*Math.cos(rd)));
                 bz=centerPnt.z+((botRad*Math.cos(rd))-(botRad*Math.sin(rd)));
 
-                rd=ang2*PointClass.DEGREE_TO_RAD;
+                rd=ang2*(Math.PI/180.0);
                 tx2=centerPnt.x+((topRad*Math.sin(rd))+(topRad*Math.cos(rd)));
                 tz2=centerPnt.z+((topRad*Math.cos(rd))-(topRad*Math.sin(rd)));
                 
@@ -959,7 +959,7 @@ export default class GenerateMeshClass
             topRad=segments[0]*radius;
 
             for (n=0;n!==sideCount;n++) {
-                rd=ang*PointClass.DEGREE_TO_RAD;
+                rd=ang*(Math.PI/180.0);
                 
                 u1=(Math.sin(rd)*0.5)+0.5;
                 u2=(Math.cos(rd)*0.5)+0.5;
@@ -990,7 +990,7 @@ export default class GenerateMeshClass
             botRad=segments[segments.length-1]*radius;
 
             for (n=0;n!==sideCount;n++) {
-                rd=ang*PointClass.DEGREE_TO_RAD;
+                rd=ang*(Math.PI/180.0);
                 
                 u1=(Math.sin(rd)*0.5)+0.5;
                 u2=(Math.cos(rd)*0.5)+0.5;

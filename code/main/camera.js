@@ -16,32 +16,23 @@ import CollisionClass from '../collision/collisions.js';
  */
 export default class CameraClass
 {
-    static CAMERA_MODE_FIRST_PERSON=0;
-    static CAMERA_MODE_THIRD_PERSON_BEHIND=1;
-    
-    mode=CameraClass.CAMERA_MODE_FIRST_PERSON;
-    
-    glFOV=55.0;
-    glNearZ=500;
-    glFarZ=500000;
-    
-    decalZ=10;            // how far to push the Z for decal meshes
-    
-    position=null;
-    angle=null;
-    
-    thirdPersonDistance=0;
-    thirdPersonLookDegree=0;
-    
-    collision=null;
-    rayAngle=null;
-    rayVector=null;
-    rayHitPosition=null;
-    
     constructor(core)
     {
-        this.core=core;
+        this.CAMERA_MODE_FIRST_PERSON=0;
+        this.CAMERA_MODE_THIRD_PERSON_BEHIND=1;
         
+        this.core=core;
+    
+        this.mode=this.CAMERA_MODE_FIRST_PERSON;
+    
+        this.glFOV=55.0;
+        this.glNearZ=500;
+        this.glFarZ=500000;
+        this.decalZ=10;            // how far to push the Z for decal meshes
+
+        this.thirdPersonDistance=0;
+        this.thirdPersonLookDegree=0;
+    
         this.position=new PointClass(0.0,0.0,0.0);
         this.angle=new PointClass(0.0,0.0,0.0);
         
@@ -72,7 +63,7 @@ export default class CameraClass
      */
     gotoFirstPerson()
     {
-        this.mode=CameraClass.CAMERA_MODE_FIRST_PERSON;
+        this.mode=this.CAMERA_MODE_FIRST_PERSON;
     }
     
     /**
@@ -82,7 +73,7 @@ export default class CameraClass
      */
     isFirstPerson()
     {
-        return(this.mode===CameraClass.CAMERA_MODE_FIRST_PERSON);
+        return(this.mode===this.CAMERA_MODE_FIRST_PERSON);
     }
     
     /**
@@ -94,7 +85,7 @@ export default class CameraClass
      */
     gotoThirdPersonBehind(thirdPersonDistance,thirdPersonLookDegree)
     {
-        this.mode=CameraClass.CAMERA_MODE_THIRD_PERSON_BEHIND;
+        this.mode=this.CAMERA_MODE_THIRD_PERSON_BEHIND;
         this.thirdPersonDistance=thirdPersonDistance;
         this.thirdPersonLookDegree=thirdPersonLookDegree;
     }
@@ -106,7 +97,7 @@ export default class CameraClass
      */
     isThirdPersonBehind()
     {
-        return(this.mode===CameraClass.CAMERA_MODE_THIRD_PERSON_BEHIND);
+        return(this.mode===this.CAMERA_MODE_THIRD_PERSON_BEHIND);
     }
     
         //
@@ -119,7 +110,7 @@ export default class CameraClass
         
             // third person cameras behind camera
             
-        if (this.mode===CameraClass.CAMERA_MODE_THIRD_PERSON_BEHIND) {
+        if (this.mode===this.CAMERA_MODE_THIRD_PERSON_BEHIND) {
             
                 // start at the eye point
                 

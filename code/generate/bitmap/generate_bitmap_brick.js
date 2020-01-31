@@ -173,7 +173,7 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
         
             // finish with the specular
 
-        this.createSpecularMap(0.4);
+        this.createSpecularMap(125,0.4);
     }
 
 }

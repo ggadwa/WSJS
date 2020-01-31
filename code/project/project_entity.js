@@ -23,11 +23,9 @@ import NetworkClass from '../main/network.js';
  */
 export default class ProjectEntityClass
 {
-    static RAD_TO_DEGREE=180.0/Math.PI;
-    
     constructor(core,name,position,angle,data)
     {
-        this.TEXT_ALIGN_LEFT=0;     // when we have statics (safari) then use the class static
+        this.TEXT_ALIGN_LEFT=0;     // when we have statics (safari) then use the class static to create these (still don't want people to include other classes)
         this.TEXT_ALIGN_CENTER=1;
         this.TEXT_ALIGN_RIGHT=2;
         
@@ -40,6 +38,9 @@ export default class ProjectEntityClass
         this.TOUCH_DIRECTION_ANY=-1;
         this.TOUCH_DIRECTION_X=0;
         this.TOUCH_DIRECTION_Y=1;
+        
+        this.MODEL_ROTATION_ORDER_XYZ=0;
+        this.MODEL_ROTATION_ORDER_XZY=1;
         
         this.core=core;
         
@@ -169,9 +170,14 @@ export default class ProjectEntityClass
         // input
         //
         
-    isKeyDown(keyCode)
+    isKeyDown(key)
     {
-        return(this.core.input.keyFlags[keyCode]);
+        return(this.core.input.isKeyDown(key));
+    }
+    
+    isKeyDownAndClear(key)
+    {
+        return(this.core.input.isKeyDownAndClear(key));
     }
     
     isMouseButtonDown(buttonIdx)
@@ -964,7 +970,7 @@ export default class ProjectEntityClass
         this.reflectLineVector.normalize();
             
         f=this.reflectLineVector.dot(this.reflectMovementVector);
-        ang=Math.acos(f)*ProjectEntityClass.RAD_TO_DEGREE;
+        ang=Math.acos(f)*(180.0/Math.PI);
         
             // calculate the reflection angle
             
@@ -1117,27 +1123,30 @@ export default class ProjectEntityClass
         this.core.network.sendCustomMessage(this,intParam0,intParam1,intParam2,floatParam0,floatParam1,floatParam2,stringParam0,stringParam1,stringParam2);
     }
     
-    getUpdateNetworkData(remoteId)
+    getUpdateNetworkData(msgType,remoteId)
     {
-        let buffer=new ArrayBuffer(55);
+        let buffer=new ArrayBuffer(63);
         let dataView=new DataView(buffer);
         
-        dataView.setInt16(0,NetworkClass.MESSAGE_TYPE_ENTITY_UPDATE);
+        dataView.setInt16(0,mstType);
         dataView.setInt16(2,remoteId);
-        dataView.setInt32(4,this.modelEntityAlter.position.x);
-        dataView.setInt32(8,this.modelEntityAlter.position.y);
-        dataView.setInt32(12,this.modelEntityAlter.position.z);
-        dataView.setFloat32(16,this.modelEntityAlter.angle.x);
-        dataView.setFloat32(20,this.modelEntityAlter.angle.y);
-        dataView.setFloat32(24,this.modelEntityAlter.angle.z);
-        dataView.setFloat32(28,this.modelEntityAlter.scale.x);
-        dataView.setFloat32(32,this.modelEntityAlter.scale.y);
-        dataView.setFloat32(36,this.modelEntityAlter.scale.z);
-        dataView.setInt16(40,this.modelEntityAlter.currentAnimationIdx);
-        dataView.setInt32(42,this.modelEntityAlter.currentAnimationStartTimestamp);
-        dataView.setInt32(46,this.modelEntityAlter.currentAnimationLoopStartTick);
-        dataView.setInt32(50,this.modelEntityAlter.currentAnimationLoopEndTick);
-        dataView.setInt8(54,(this.modelEntityAlter.queuedAnimationStop?0:1));
+        dataView.setInt16(4,this.radius);
+        dataView.setInt16(6,this.height);
+        dataView.setInt32(8,this.modelEntityAlter.position.x);
+        dataView.setInt32(12,this.modelEntityAlter.position.y);
+        dataView.setInt32(16,this.modelEntityAlter.position.z);
+        dataView.setFloat32(20,this.modelEntityAlter.angle.x);
+        dataView.setFloat32(24,this.modelEntityAlter.angle.y);
+        dataView.setFloat32(28,this.modelEntityAlter.angle.z);
+        dataView.setFloat32(32,this.modelEntityAlter.scale.x);
+        dataView.setFloat32(36,this.modelEntityAlter.scale.y);
+        dataView.setFloat32(40,this.modelEntityAlter.scale.z);
+        dataView.setInt32(44,this.modelEntityAlter.getUpdateNetworkShowData());
+        dataView.setInt16(48,this.modelEntityAlter.currentAnimationIdx);
+        dataView.setInt32(50,this.modelEntityAlter.currentAnimationStartTimestamp);
+        dataView.setInt32(54,this.modelEntityAlter.currentAnimationLoopStartTick);
+        dataView.setInt32(58,this.modelEntityAlter.currentAnimationLoopEndTick);
+        dataView.setInt8(62,(this.modelEntityAlter.queuedAnimationStop?0:1));
         
         return(buffer);
     }
@@ -1146,32 +1155,41 @@ export default class ProjectEntityClass
     {
         let x,y,z;
         
-        x=dataView.getInt32(4);
-        y=dataView.getInt32(8);
-        z=dataView.getInt32(12);
+            // size and position
+            
+        this.radius=dataView.getInt16(4);
+        this.height=dataView.getInt16(6);
+        
+        x=dataView.getInt32(8);
+        y=dataView.getInt32(12);
+        z=dataView.getInt32(16);
         
         this.remotePositionChange.setFromValues((x-this.position.x),(y-this.position.y),(z-this.position.z));
         this.position.setFromValues(x,y,z);
         
-        x=dataView.getFloat32(16);
-        y=dataView.getFloat32(20);
-        z=dataView.getFloat32(24);
+        x=dataView.getFloat32(20);
+        y=dataView.getFloat32(24);
+        z=dataView.getFloat32(28);
         
         this.remoteAngleChange.setFromValues((x-this.angle.x),(y-this.angle.y),(z-this.angle.z));
         this.angle.setFromValues(x,y,z);
         
-        x=dataView.getFloat32(28);
-        y=dataView.getFloat32(32);
-        z=dataView.getFloat32(36);
+        x=dataView.getFloat32(32);
+        y=dataView.getFloat32(36);
+        z=dataView.getFloat32(40);
         
         this.remoteScaleChange.setFromValues((x-this.scale.x),(y-this.scale.y),(z-this.scale.z));
         this.scale.setFromValues(x,y,z);
         
-        this.modelEntityAlter.currentAnimationIdx=dataView.getInt16(40);
-        this.modelEntityAlter.currentAnimationStartTimestamp=dataView.getInt32(42);
-        this.modelEntityAlter.currentAnimationLoopStartTick=dataView.getInt32(46);
-        this.modelEntityAlter.currentAnimationLoopEndTick=dataView.getInt32(50);
-        this.modelEntityAlter.queuedAnimationStop=(dataView.getInt8(54)!==0);
+            // animations
+            
+        this.modelEntityAlter.putUpdateNetworkShowData(dataView.getInt32(44));
+        
+        this.modelEntityAlter.currentAnimationIdx=dataView.getInt16(48);
+        this.modelEntityAlter.currentAnimationStartTimestamp=dataView.getInt32(50);
+        this.modelEntityAlter.currentAnimationLoopStartTick=dataView.getInt32(54);
+        this.modelEntityAlter.currentAnimationLoopEndTick=dataView.getInt32(58);
+        this.modelEntityAlter.queuedAnimationStop=(dataView.getInt8(62)!==0);
        
             // mark as having a remote update
             // this is so we only do one remote update

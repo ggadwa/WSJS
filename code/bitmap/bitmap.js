@@ -2,23 +2,23 @@ import ColorClass from '../utility/color.js';
 
 export default class BitmapClass
 {
-    static BITMAP_NORMAL_URL=0;         // bitmaps are a bunch of files by URL
-    static BITMAP_SIMPLE_URL=1;         // bitmap is a single file of just a color map
-    static BITMAP_COLOR=2;              // bitmap is just an RGB color
-    static BITMAP_GENERATED=3;          // bitmap is generated
-    
-    static NORMAL_MAX_SHIFT=31;
-    static NORMAL_NO_SHIFT_CLAMP=0.7;
-    static SPECULAR_CONTRAST=150;
-    static SPECULAR_CONTRAST_CLAMP=0.4;
-    
-    static DEFAULT_SPECULAR=5;
-    
     constructor(core)
     {
+        this.BITMAP_NORMAL_URL=0;         // bitmaps are a bunch of files by URL
+        this.BITMAP_SIMPLE_URL=1;         // bitmap is a single file of just a color map
+        this.BITMAP_COLOR=2;              // bitmap is just an RGB color
+        this.BITMAP_GENERATED=3;          // bitmap is generated
+    
+        this.NORMAL_MAX_SHIFT=31;
+        this.NORMAL_NO_SHIFT_CLAMP=0.7;
+        
+        this.DEFAULT_SPECULAR=5;
+        this.SPECULAR_CONTRAST=150;
+        this.SPECULAR_CONTRAST_CLAMP=0.4;
+
         this.core=core;
         
-        this.bitmapType=BitmapClass.BITMAP_NORMAL_URL;
+        this.bitmapType=this.BITMAP_NORMAL_URL;
         
         this.colorURL=null;
         this.colorBase=null;
@@ -57,13 +57,13 @@ export default class BitmapClass
 
     initializeNormalURL(colorURL,normalURL,specularURL,specularFactor,scale)
     {
-        this.bitmapType=BitmapClass.BITMAP_NORMAL_URL;
+        this.bitmapType=this.BITMAP_NORMAL_URL;
         
         this.colorURL=colorURL;
         this.colorBase=null;
         this.normalURL=normalURL;
         this.specularURL=specularURL;
-        this.specularFactor=(specularFactor!==null)?specularFactor:new ColorClass(BitmapClass.DEFAULT_SPECULAR,BitmapClass.DEFAULT_SPECULAR,BitmapClass.DEFAULT_SPECULAR);
+        this.specularFactor=(specularFactor!==null)?specularFactor:new ColorClass(this.DEFAULT_SPECULAR,this.DEFAULT_SPECULAR,this.DEFAULT_SPECULAR);
         this.scale=scale;
         
         this.buildSimpleName();
@@ -71,7 +71,7 @@ export default class BitmapClass
     
     initializeSimpleURL(colorURL)
     {
-        this.bitmapType=BitmapClass.BITMAP_SIMPLE_URL;
+        this.bitmapType=this.BITMAP_SIMPLE_URL;
         
         this.colorURL=colorURL;
         this.colorBase=null;
@@ -85,13 +85,13 @@ export default class BitmapClass
     
     initializeColor(colorURL,colorBase)
     {
-        this.bitmapType=BitmapClass.BITMAP_COLOR;
+        this.bitmapType=this.BITMAP_COLOR;
         
         this.colorURL=colorURL;
         this.colorBase=colorBase;
         this.normalURL=null;
         this.specularURL=null;
-        this.specularFactor=new ColorClass(BitmapClass.DEFAULT_SPECULAR,BitmapClass.DEFAULT_SPECULAR,BitmapClass.DEFAULT_SPECULAR);
+        this.specularFactor=new ColorClass(this.DEFAULT_SPECULAR,this.DEFAULT_SPECULAR,this.DEFAULT_SPECULAR);
         this.scale=null;
         
         this.buildSimpleName();
@@ -99,7 +99,7 @@ export default class BitmapClass
     
     initializeGenerated(colorURL,colorImage,normalImage,specularImage,specularFactor,glowImage,glowFrequency,glowMin,glowMax)
     {
-        this.bitmapType=BitmapClass.BITMAP_GENERATED;
+        this.bitmapType=this.BITMAP_GENERATED;
         
         this.colorURL=colorURL;
         this.colorBase=null;
@@ -259,7 +259,7 @@ export default class BitmapClass
                 // if below a certain darkness, then no
                 // normal
                 
-            if (f>BitmapClass.NORMAL_NO_SHIFT_CLAMP) {
+            if (f>this.NORMAL_NO_SHIFT_CLAMP) {
                 data[idx++]=127;
                 data[idx++]=127;
                 data[idx++]=255;
@@ -270,7 +270,7 @@ export default class BitmapClass
             
                 // otherwise clamp it
                 
-            rg=127-Math.trunc((f*BitmapClass.NORMAL_MAX_SHIFT)/BitmapClass.NORMAL_NO_SHIFT_CLAMP);
+            rg=127-Math.trunc((f*this.NORMAL_MAX_SHIFT)/this.NORMAL_NO_SHIFT_CLAMP);
             
             data[idx++]=rg;
             data[idx++]=rg;
@@ -285,8 +285,8 @@ export default class BitmapClass
     
     createSpecularFromColorImage()
     {
-        let n,pixelCount,idx;
-        let f,contrastFactor;
+        let n,nPixel,idx;
+        let f,i,min,max,expandFactor,contrastFactor;
         let canvas,ctx,imgData,data;
         
             // creating a specular map
@@ -303,23 +303,61 @@ export default class BitmapClass
         
 	imgData=ctx.getImageData(0,0,canvas.width,canvas.height);
         data=imgData.data;
+        
+        nPixel=canvas.width*canvas.height;
 
-            // gray scale contrast
+            // get the contrast factor
+            
+        contrastFactor=(259*(this.SPECULAR_CONTRAST+255))/(255*(259-this.SPECULAR_CONTRAST));
+        
+            // find a min-max across the entire map, we do this
+            // so we can readjust the contrast to be 0..1
+            
+        min=max=(data[0]+data[1]+data[2])*0.33
+
+        idx=0;
+        
+        for (n=0;n!==nPixel;n++) {
+            f=(data[idx]+data[idx+1]+data[idx+2])*0.33;
+            if (f<min) min=f;
+            if (f>max) max=f;
+
+            idx+=4;
+        }
+        
+        if (min>=max) {
+            expandFactor=0;
+            min=0;
+        }
+        else {
+            expandFactor=255.0/(max-min);
+        }
+        
+            // now run the contrast
             
         idx=0;
-        pixelCount=canvas.width*canvas.height;
         
-        contrastFactor=(259*(BitmapClass.SPECULAR_CONTRAST+255))/(255*(259-BitmapClass.SPECULAR_CONTRAST));
-        
-        for (n=0;n!=pixelCount;n++) {
-            f=(data[idx]+data[idx+1]+data[idx+2])*0.33;
-            f=Math.trunc(((contrastFactor*(f-128))+128)*BitmapClass.SPECULAR_CLAMP);
+        for (n=0;n!==nPixel;n++) {
             
-            data[idx++]=f;
-            data[idx++]=f;
-            data[idx++]=f;
+                // get the pixel back into 0..1
+                
+            f=(data[idx]+data[idx+1]+data[idx+2])*0.33;
+            f=(f-min)*expandFactor;
+            
+                // apply the contrast and
+                // clamp it
+                
+            f=((contrastFactor*(f-128))+128);
+            if (f<0) f=0;
+            if (f>255) f=255;
+            
+            i=Math.trunc(f*this.SPECULAR_CONTRAST_CLAMP);
+                    
+            data[idx++]=i;
+            data[idx++]=i;
+            data[idx++]=i;
             data[idx++]=255;
-        }
+        } 
 		
 	ctx.putImageData(imgData,0,0);
         
@@ -361,9 +399,9 @@ export default class BitmapClass
             // are created if missing.  This can be built from
             // loading or a file or a base color
         
-        if (this.bitmapType!==BitmapClass.BITMAP_GENERATED) {
+        if (this.bitmapType!==this.BITMAP_GENERATED) {
             
-            if (this.bitmapType===BitmapClass.BITMAP_COLOR) {
+            if (this.bitmapType===this.BITMAP_COLOR) {
                 this.colorImage=this.createSolidColorImage(Math.trunc(this.colorBase.r*255),Math.trunc(this.colorBase.g*255),Math.trunc(this.colorBase.b*255));
             }
             else {
@@ -410,7 +448,7 @@ export default class BitmapClass
             // simple or color bitmaps exit here
             // as they have no other elements like normals, etc
             
-        if (this.bitmapType===BitmapClass.BITMAP_SIMPLE_URL) {
+        if (this.bitmapType===this.BITMAP_SIMPLE_URL) {
             this.loaded=true;
             return(true);
         }
@@ -441,7 +479,7 @@ export default class BitmapClass
         
             // normal bitmap
         
-        if (this.bitmapType!==BitmapClass.BITMAP_GENERATED) {
+        if (this.bitmapType!==this.BITMAP_GENERATED) {
             this.normalImage=null;
 
             if (this.normalURL!==null) {
@@ -477,7 +515,7 @@ export default class BitmapClass
 
             // specular bitmap
             
-        if (this.bitmapType!==BitmapClass.BITMAP_GENERATED) {
+        if (this.bitmapType!==this.BITMAP_GENERATED) {
             this.specularImage=null;
 
             if (this.specularURL!==null) {
@@ -516,7 +554,7 @@ export default class BitmapClass
             // will use fake glowmap
         
         
-        if (this.bitmapType!==BitmapClass.BITMAP_GENERATED) {
+        if (this.bitmapType!==this.BITMAP_GENERATED) {
             this.glowImage=null;
 
             if (this.glowURL!==null) {

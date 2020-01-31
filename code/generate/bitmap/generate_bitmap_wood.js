@@ -121,7 +121,7 @@ export default class GenerateBitmapWoodClass extends GenerateBitmapBaseClass
         
             // finish with the specular
 
-        this.createSpecularMap(0.2);
+        this.createSpecularMap(100,0.2);
     }
 
 }

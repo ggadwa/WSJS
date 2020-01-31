@@ -10,6 +10,12 @@ export default class MovementClass
 {
     constructor(core,meshIdxList,reverseMeshIdxList,rotateOffset,centerOffset)
     {
+        this.MOVEMENT_PAUSE_NONE=0;
+        this.MOVEMENT_PAUSE_TRIGGER=1;
+        this.MOVEMENT_PAUSE_APPROACH=2;
+        this.MOVEMENT_PAUSE_LEAVE=3;
+        this.MOVEMENT_PAUSE_STOP=4;
+    
         this.core=core;
         this.meshIdxList=meshIdxList;
         this.reverseMeshIdxList=reverseMeshIdxList;
@@ -33,6 +39,15 @@ export default class MovementClass
         this.lastRotateAng=new PointClass(0,0,0);
         
         this.moves=[];
+    }
+    
+    lookupPauseType(pauseName)
+    {
+        if (pauseName==='trigger') return(this.MOVEMENT_PAUSE_TRIGGER);
+        if (pauseName==='approach') return(this.MOVEMENT_PAUSE_APPROACH);
+        if (pauseName==='leave') return(this.MOVEMENT_PAUSE_LEAVE);
+        if (pauseName==='stop') return(this.MOVEMENT_PAUSE_STOP);
+        return(this.MOVEMENT_PAUSE_NONE);
     }
     
     addMove(move)
@@ -89,16 +104,16 @@ export default class MovementClass
             move=this.moves[nextIdx];
             
             switch (move.pauseType) {
-                case MoveClass.PAUSE_TRIGGER:
+                case this.MOVEMENT_PAUSE_TRIGGER:
                     paused=!this.core.checkTrigger(move.pauseData);
                     break;
-                case MoveClass.PAUSE_APPROACH:
+                case this.MOVEMENT_PAUSE_APPROACH:
                     paused=(this.originalCenterPnt.distance(this.core.map.entityList.getPlayer().position)>move.pauseData);
                     break;
-                case MoveClass.PAUSE_LEAVE:
+                case this.MOVEMENT_PAUSE_LEAVE:
                     paused=(this.originalCenterPnt.distance(this.core.map.entityList.getPlayer().position)<move.pauseData);
                     break;
-                case MoveClass.PAUSE_STOP:
+                case this.MOVEMENT_PAUSE_STOP:
                     paused=true;
                     this.stopped=true;      // do one last move to line up with end, and then this movement permanently stops
                     break;

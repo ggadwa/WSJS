@@ -24,29 +24,11 @@ import DialogConnectClass from '../main/dialog_connect.js';
 
 export default class CoreClass
 {
-    static MAX_LIGHT_COUNT=32;      // same as lights[x] in shaders
-    
-    static GL_OPTIONS={
-            alpha:false,
-            depth:true,
-            stencil:false,
-            antialias:false,
-            premultipliedAlpha:false,
-            desynchronized:true,
-            preserveDrawingBuffer:true,
-            failIfMajorPerformanceCaveat:false
-        }; 
-        
-    isMultiplayer=false;
-    
-    setup=null;
-    settingsDialog=null;
-    connectDialog=null;
-    
-    network=null;
-   
     constructor()
     {
+        this.MAX_LIGHT_COUNT=32;        // max lights in scene, needs to be the same as lights[x] in shaders
+        this.MAX_SKELETON_JOINT=128;    // max joints in a skeleton, in core for convenience as we don't have static yet
+
             // the opengl context
 
         this.gl=null;
@@ -77,6 +59,7 @@ export default class CoreClass
         
             // networking
             
+        this.isMultiplayer=false;
         this.network=new NetworkClass(this);
         
             // pause flag
@@ -131,6 +114,10 @@ export default class CoreClass
         this.text=null;
         this.interface=null;
         this.camera=null;
+
+        this.setup=null;
+        this.settingsDialog=null;
+        this.connectDialog=null;
 
             // main loop
 
@@ -219,9 +206,20 @@ export default class CoreClass
     
     initialize()
     {
+        let glOptions={
+            alpha:false,
+            depth:true,
+            stencil:false,
+            antialias:false,
+            premultipliedAlpha:false,
+            desynchronized:true,
+            preserveDrawingBuffer:true,
+            failIfMajorPerformanceCaveat:false
+        }; 
+
             // get the gl context
 
-        this.gl=this.canvas.getContext("webgl2",CoreClass.GL_OPTIONS);
+        this.gl=this.canvas.getContext("webgl2",glOptions);
         if (this.gl===null) {
             alert('WebGL2 not available, try a newer browser');
             return;
@@ -524,13 +522,13 @@ export default class CoreClass
         
             // fill in any missing lights with NULL
 
-        while (this.lights.length<CoreClass.MAX_LIGHT_COUNT) {
+        while (this.lights.length<this.MAX_LIGHT_COUNT) {
             this.lights.push(null);
         }
         
             // and create light eye cordinates
 
-        for (n=0;n!==CoreClass.MAX_LIGHT_COUNT;n++) {
+        for (n=0;n!==this.MAX_LIGHT_COUNT;n++) {
             light=this.lights[n];
             if (light!==null) this.convertToEyeCoordinates(light.position,light.eyePosition);
         }

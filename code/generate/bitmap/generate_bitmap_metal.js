@@ -119,11 +119,29 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
             this.drawOval(lft,my,(lft+screwSize),(my+screwSize),0,1,0,0,edgeSize,0.8,screwColor,outlineColor,0.5,false,false,1,0);
         }
     }
+    
+    generateMetalWave(lft,top,rgt,bot,color)
+    {
+        let frameColor;
+        let sz,waveCount;
+        
+        this.drawMetalShine(lft,top,rgt,bot,color);
+        
+        frameColor=this.adjustColorRandom(color,0.75,0.85);
+        sz=Math.trunc(Math.max((rgt-lft),(bot-top))*0.045);
+        waveCount=this.core.randomInt(sz,sz);
+        if (this.core.randomPercentage(0.5)) {
+            this.drawNormalWaveHorizontal(lft,top,rgt,bot,color,frameColor,waveCount);
+        }
+        else {
+            this.drawNormalWaveVertical(lft,top,rgt,bot,color,frameColor,waveCount);
+        }
+    }
 
     generateMetalPanel(lft,top,rgt,bot,metalColor,altMetalColor,edgeSize,screwSize,variationMode)
     {
         let lft2,rgt2,top2,bot2,sz;
-        let color,frameColor,screwColor,waveCount,panelType;
+        let color,frameColor,screwColor,panelType;
         
             // colors
             
@@ -179,15 +197,7 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
                 // wave
                 
             case 2:
-                frameColor=this.adjustColorRandom(color,0.75,0.85);
-                sz=Math.trunc(Math.max((rgt-lft),(bot-top))*0.075);
-                waveCount=this.core.randomInt(sz,sz);
-                if (this.core.randomPercentage(0.5)) {
-                    this.drawNormalWaveHorizontal((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),color,frameColor,waveCount);
-                }
-                else {
-                    this.drawNormalWaveVertical((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),color,frameColor,waveCount);
-                }
+                this.generateMetalWave((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),color);
                 break;
                 
                 // empty
@@ -266,7 +276,7 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
         
             // finish with the specular
 
-        this.createSpecularMap(0.6);
+        this.createSpecularMap(120,0.6);
     }
 
 }

@@ -68,7 +68,7 @@ export default class ModelMeshShaderClass extends ShaderClass
         this.noSkinUniform=gl.getUniformLocation(this.program,'noSkin');
         this.noSkinAttachedNodeMatrixUniform=gl.getUniformLocation(this.program,'noSkinAttachedNodeMatrix');
         
-        for (n=0;n!==ModelSkeletonClass.MAX_SKELETON_JOINT;n++) {
+        for (n=0;n!==this.core.MAX_SKELETON_JOINT;n++) {
             name='jointMatrix['+n+']';
             this.jointMatrixUniformArray.push(gl.getUniformLocation(this.program,name));
         }
@@ -79,7 +79,7 @@ export default class ModelMeshShaderClass extends ShaderClass
         this.lightMinUniform=gl.getUniformLocation(this.program,'lightMin');
         this.lightMaxUniform=gl.getUniformLocation(this.program,'lightMax');
 
-        for (n=0;n!==CoreClass.MAX_LIGHT_COUNT;n++) {
+        for (n=0;n!==this.core.MAX_LIGHT_COUNT;n++) {
             this.lights.push(new ShaderLightClass());
 
             name='lights['+n+']';
@@ -124,7 +124,7 @@ export default class ModelMeshShaderClass extends ShaderClass
             // these are packed, where the first vec4 is x,y,z,intensity (position and intensity)
             // and the second vec4 is r,g,b,exponent (color and exponent)
 
-        for (n=0;n!==CoreClass.MAX_LIGHT_COUNT;n++) {
+        for (n=0;n!==this.core.MAX_LIGHT_COUNT;n++) {
 
             light=this.lights[n];
             viewLight=this.core.lights[n];

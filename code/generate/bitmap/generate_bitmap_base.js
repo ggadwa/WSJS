@@ -2,6 +2,7 @@ import PointClass from '../../utility/point.js';
 import RectClass from '../../utility/rect.js';
 import ColorClass from '../../utility/color.js';
 import BitmapClass from '../../bitmap/bitmap.js';
+import CoreClass from '../../main/core.js';
 
 //
 // generate bitmap base class
@@ -1599,10 +1600,6 @@ export default class GenerateBitmapBaseClass
 
         if ((rgt<=lft) || (bot<=top)) return;
         
-            // the background
-            
-        this.drawRect(lft,top,rgt,bot,color);
-        
             // the waves
             
         waveAdd=Math.trunc((rgt-lft)/waveCount);
@@ -1670,10 +1667,6 @@ export default class GenerateBitmapBaseClass
         let normalData=this.normalImgData.data;
 
         if ((rgt<=lft) || (bot<=top)) return;
-        
-            // the background
-            
-        this.drawRect(lft,top,rgt,bot,color);
         
             // the waves
         
@@ -2140,53 +2133,66 @@ export default class GenerateBitmapBaseClass
         // specular routines
         //
 
-    createSpecularMap(clamp)
+    createSpecularMap(contrast,clamp)
     {
         let n,idx,nPixel;
-        let f,fMin,fMax,fDif;
+        let f,i,min,max,expandFactor,contrastFactor;
         let colorData=this.colorImgData.data;
         let specularData=this.specularImgData.data;
-
-        idx=0;
+        
         nPixel=this.colorImgData.width*this.colorImgData.height;
         
-            // get the min-max across the entire
-            // bitmap
+            // get the contrast factor
             
-        fMin=1.0;
-        fMax=0.0;
+        contrastFactor=(259*(contrast+255))/(255*(259-contrast));
+        
+            // find a min-max across the entire map, we do this
+            // so we can readjust the contrast to be 0..1
+            
+        min=max=(colorData[0]+colorData[1]+colorData[2])*0.33
 
+        idx=0;
+        
         for (n=0;n!==nPixel;n++) {
-            f=(colorData[idx]+colorData[idx+1]+colorData[idx+2])/(255.0*3.0);
-            if (f<fMin) fMin=f;
-            if (f>fMax) fMax=f;
+            f=(colorData[idx]+colorData[idx+1]+colorData[idx+2])*0.33;
+            if (f<min) min=f;
+            if (f>max) max=f;
 
             idx+=4;
         }
         
-            // more than likely never going to happen, but
-            // just in case reset if min-max are bad
-            
-        if (fMin>fMax) {
-            fMin=0.0;
-            fMax=1.0;
+        if (min>=max) {
+            expandFactor=0;
+            min=0;
+        }
+        else {
+            expandFactor=255.0/(max-min);
         }
         
-            // use the the min/max to reclamp
-            // to 0...1 then * clamp
-        
+            // now run the contrast
+            
         idx=0;
-        fDif=fMax-fMin;
         
         for (n=0;n!==nPixel;n++) {
-            f=(colorData[idx]+colorData[idx+1]+colorData[idx+2])/(255.0*3.0);
-            f=((f-fMin)/fDif)*clamp;
-            f*=255.0;
+            
+                // get the pixel back into 0..1
+                
+            f=(colorData[idx]+colorData[idx+1]+colorData[idx+2])*0.33;
+            f=(f-min)*expandFactor;
+            
+                // apply the contrast and
+                // clamp it
+                
+            f=((contrastFactor*(f-128))+128);
+            if (f<0) f=0;
+            if (f>255) f=255;
+            
+            i=Math.trunc(f*clamp);
                     
-            specularData[idx++]=f;
-            specularData[idx++]=f;
-            specularData[idx++]=f;
-            specularData[idx++]=0xFF;
+            specularData[idx++]=i;
+            specularData[idx++]=i;
+            specularData[idx++]=i;
+            specularData[idx++]=255;
         } 
     }
         
@@ -2215,6 +2221,7 @@ export default class GenerateBitmapBaseClass
         
     test(variationMode)
     {
+        this.core=new CoreClass();  // just so we can have the random # generator
         this.core.setRandomSeed(Date.now());
         
             // setup all the bitmap parts

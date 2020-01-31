@@ -14,12 +14,13 @@ import ModelAnimationChannelClass from '../model/model_animation_channel.js';
 
 export default class ModelEntityAlterClass
 {
-    static MAX_MESH_COUNT=64;           // max number of meshes we can keep show/hides for
-    
-    static DEGREE_TO_RAD=Math.PI/180.0;
-    
     constructor(core,entity)
     {
+        this.MODEL_ROTATION_ORDER_XYZ=0;
+        this.MODEL_ROTATION_ORDER_XZY=1;
+        
+        this.MAX_SHOW_HIDE_MESH_COUNT=32;           // max number of meshes we can keep show/hides for, set to 32 for network traffic
+    
         this.core=core;
         this.entity=entity;
         
@@ -27,10 +28,10 @@ export default class ModelEntityAlterClass
         this.angle=new PointClass(0,0,0);
         this.scale=new PointClass(0,0,0);
         
-        this.rotationOrder=ModelClass.MODEL_ROTATION_ORDER_XYZ;
+        this.rotationOrder=this.MODEL_ROTATION_ORDER_XYZ;
         
         this.inCameraSpace=false;
-        this.meshHideList=new Uint8Array(ModelEntityAlterClass.MAX_MESH_COUNT);
+        this.meshHideList=new Uint8Array(this.MAX_SHOW_HIDE_MESH_COUNT);
         
         this.modelMatrix=new Matrix4Class();
         this.cullModelMatrix=new Matrix4Class();
@@ -105,7 +106,26 @@ export default class ModelEntityAlterClass
     show(name,show)
     {
         let meshIdx=this.entity.model.meshList.find(name);
-        if ((meshIdx!==-1) && (meshIdx<ModelEntityAlterClass.MAX_MESH_COUNT)) this.meshHideList[meshIdx]=show?0:1;
+        if ((meshIdx!==-1) && (meshIdx<this.MAX_SHOW_HIDE_MESH_COUNT)) this.meshHideList[meshIdx]=show?0:1;
+    }
+    
+    getUpdateNetworkShowData()
+    {
+        let n;
+        let mask=0;
+        
+        for (n=0;n!==this.MAX_SHOW_HIDE_MESH_COUNT;n++) {
+            if (this.meshHideList[n]) mask=mask|(0x1<<n);
+        }
+    }
+    
+    putUpdateNetworkShowData(mask)
+    {
+        let n;
+        
+        for (n=0;n!==this.MAX_SHOW_HIDE_MESH_COUNT;n++) {
+            this.meshHideList[n]=((mask&(0x1<<n))!==0);
+        }
     }
     
         //
@@ -117,7 +137,7 @@ export default class ModelEntityAlterClass
         this.modelMatrix.setTranslationFromPoint(this.position);
         
         switch (this.rotationOrder) {
-            case ModelClass.MODEL_ROTATION_ORDER_XYZ:
+            case this.MODEL_ROTATION_ORDER_XYZ:
                 this.rotMatrix.setRotationFromZAngle(this.angle.z);
                 this.modelMatrix.multiply(this.rotMatrix);
                 this.rotMatrix.setRotationFromYAngle(this.angle.y);
@@ -125,7 +145,7 @@ export default class ModelEntityAlterClass
                 this.rotMatrix.setRotationFromXAngle(this.angle.x);
                 this.modelMatrix.multiply(this.rotMatrix);
                 break;
-            case ModelClass.MODEL_ROTATION_ORDER_XZY:
+            case this.MODEL_ROTATION_ORDER_XZY:
                 this.rotMatrix.setRotationFromYAngle(this.angle.y);
                 this.modelMatrix.multiply(this.rotMatrix);
                 this.rotMatrix.setRotationFromZAngle(this.angle.z);
@@ -317,13 +337,13 @@ export default class ModelEntityAlterClass
                 // change the node
             
             switch (channel.trsType) {
-                case ModelAnimationChannelClass.TRS_TYPE_TRANSLATION:
+                case channel.TRS_TYPE_TRANSLATION:
                     node.poseTranslation.setFromValues(this.currentAnimationData[0],this.currentAnimationData[1],this.currentAnimationData[2]);
                     break;
-                case ModelAnimationChannelClass.TRS_TYPE_ROTATION:
+                case channel.TRS_TYPE_ROTATION:
                     node.poseRotation.setFromValues(this.currentAnimationData[0],this.currentAnimationData[1],this.currentAnimationData[2],this.currentAnimationData[3]);
                     break;
-                case ModelAnimationChannelClass.TRS_TYPE_SCALE:
+                case channel.TRS_TYPE_SCALE:
                     node.poseScale.setFromValues(this.currentAnimationData[0],this.currentAnimationData[1],this.currentAnimationData[2]);
                     break;
             }
@@ -653,7 +673,7 @@ export default class ModelEntityAlterClass
             // top and bottom circle
             
         for (n=0;n!==36;n++) {
-            rad=ModelEntityAlterClass.DEGREE_TO_RAD*(n*10)
+            rad=(Math.PI/180.0)*(n*10)
 
             vertices[vIdx++]=this.position.x+(entity.radius*Math.sin(rad));
             vertices[vIdx++]=this.position.y+entity.height;
@@ -664,7 +684,7 @@ export default class ModelEntityAlterClass
         }
         
         for (n=0;n!==36;n++) {
-            rad=ModelEntityAlterClass.DEGREE_TO_RAD*(n*10)
+            rad=(Math.PI/180.0)*(n*10)
 
             vertices[vIdx++]=this.position.x+(entity.radius*Math.sin(rad));
             vertices[vIdx++]=this.position.y;
@@ -677,7 +697,7 @@ export default class ModelEntityAlterClass
             // a couple lines
         
         for (n=0;n!==4;n++) {
-            rad=ModelEntityAlterClass.DEGREE_TO_RAD*(n*90);
+            rad=(Math.PI/180.0)*(n*90);
 
             vertices[vIdx++]=this.position.x+(entity.radius*Math.sin(rad));
             vertices[vIdx++]=this.position.y+entity.height;

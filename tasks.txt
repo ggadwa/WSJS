@@ -1,33 +1,19 @@
 - big
-    - remove all static
-    - remove all class fields (ugh)
-    - webGL instead of webGL2
+    - kart !!! setModelRotationOrder (use THIS)
+    - kart !!! DRAW_MODE_ -> this.
+    - kart !!! new isKeyDown('a')
 
-- rerun docs
+- check safari
+- finish touch interface
 
 - networking
-    - entities need boxes passed on join
-    - need animation running or timing information for animation to work
-    - need to transmit show/hide meshes (as bitmask?)
-    - need to synchronize map movements (movements might need their own clock)
+    - entities need boxes passed (radius/height) --> TEST
+    - need map_sync message (timestamp + map movements - round robin out to first player) todo partially implemented
+    - need to transmit show/hide meshes --> TEST
     - predictions
     - need open system for passing message (like firing weapons, etc)
 
-        this.currentAnimationIdx=-1;
-        this.currentAnimationStartTimestamp=0;
-        this.currentAnimationLoopStartTick=0;
-        this.currentAnimationLoopEndTick=0;
-        this.currentAnimationData=new Float32Array(4);
-        
-        this.queuedAnimationStop=false;
-        
-        this.queuedAnimationIdx=-1;
-        this.queuedAnimationStartTimestamp=0;
-        this.queuedAnimationLoopStartTick=0;
-        this.queuedAnimationLoopEndTick=0;
-
 - generator
-    - better specs (generated with color?)
     - nodes don't seem right in certain rooms (like boxes)
     - the random color scheme
 
@@ -40,7 +26,7 @@
        - pipe, needs random line & random screw line
 
     - decorations
-       - don't repeat decorations
+       - don't repeat decorations for connected rooms
        - pool decorations
        - moving blocks (half size of segmentSize, in random circular motion)
        - better uv for pillars
@@ -57,13 +43,5 @@
 
 - kart
 
-- js docs (especially in the project_ classes)
-    - doc main classes
-    - doc project class
-    - [got to wsjs directory] jsdoc -c "docs_config.json"
-
-- slowly transition to public/private fields (especially in the project_ classes)
-- SAFARI - wait for public/private class fields
-- FIREFOX - wait for static class fields
-- finish touch interface when iOS updated
+- js doc: [got to wsjs directory] jsdoc -c "docs_config.json"
 

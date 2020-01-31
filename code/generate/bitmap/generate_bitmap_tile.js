@@ -195,7 +195,7 @@ export default class GenerateBitmapTileClass extends GenerateBitmapBaseClass
 
             // finish with the specular
 
-        this.createSpecularMap(0.4);
+        this.createSpecularMap(120,0.4);
     }
 
 }

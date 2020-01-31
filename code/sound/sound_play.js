@@ -76,19 +76,34 @@ export default class SoundPlayClass
             this.pannerNode.coneOuterGain=0;
             
             if (entity!==null) {
-                this.pannerNode.positionX.value=entity.position.x;
-                this.pannerNode.positionY.value=entity.position.y;
-                this.pannerNode.positionZ.value=entity.position.z;
+                if (this.pannerNode.positionX) {        // backwards compatiablity
+                    this.pannerNode.positionX.value=entity.position.x;
+                    this.pannerNode.positionY.value=entity.position.y;
+                    this.pannerNode.positionZ.value=entity.position.z;
+                }
+                else {
+                    this.pannerNode.setPosition(entity.position.x,entity.position.y,entity.position.z);
+                }
             }
             else {
-                this.pannerNode.positionX.value=mesh.center.x;
-                this.pannerNode.positionY.value=mesh.center.y;
-                this.pannerNode.positionZ.value=mesh.center.z;
+                if (this.pannerNode.positionX) {        // backwards compatiablity
+                    this.pannerNode.positionX.value=mesh.center.x;
+                    this.pannerNode.positionY.value=mesh.center.y;
+                    this.pannerNode.positionZ.value=mesh.center.z;
+                }
+                else {
+                    this.pannerNode.setPosition(mesh.center.x,mesh.center.y,mesh.center.z);
+                }
             }
             
-            this.pannerNode.orientationX.value=1;
-            this.pannerNode.orientationY.value=0;
-            this.pannerNode.orientationZ.value=0;
+            if (this.pannerNode.orientationX) {
+                this.pannerNode.orientationX.value=1;
+                this.pannerNode.orientationY.value=0;
+                this.pannerNode.orientationZ.value=0;
+            }
+            else {
+                this.pannerNode.setOrientation(1,0,0);
+            }
             
             this.sourceNode.connect(this.pannerNode);
             
