@@ -167,7 +167,7 @@ export default class CoreClass
     }
     
         //
-        // initialize and release
+        // canvas
         //
 
     createCanvas()
@@ -198,9 +198,15 @@ export default class CoreClass
         this.canvas.width=wid;
         this.canvas.height=high;
         
-        this.canvas.oncontextmenu=function(event) {'return(false)'};
+        this.canvas.oncontextmenu=this.canvasRightClickCancel.bind(this);
         
         document.body.appendChild(this.canvas);
+    }
+    
+    canvasRightClickCancel(event)
+    {
+        event.preventDefault();
+        return(false);
     }
     
         //

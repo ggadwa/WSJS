@@ -35,10 +35,6 @@ export default class ProjectEntityClass
         this.TOUCH_QUADRANT_BOTTOMLEFT=2;
         this.TOUCH_QUADRANT_BOTTOMRIGHT=3
         
-        this.TOUCH_DIRECTION_ANY=-1;
-        this.TOUCH_DIRECTION_X=0;
-        this.TOUCH_DIRECTION_Y=1;
-        
         this.MODEL_ROTATION_ORDER_XYZ=0;
         this.MODEL_ROTATION_ORDER_XZY=1;
         
@@ -208,14 +204,19 @@ export default class ProjectEntityClass
         return(y);
     }
     
-    getNextTouchClick(quadrant)
+    getTouchTrackCount()
     {
-        return(this.core.input.getNextTouchClick(quadrant));
+        return(this.core.input.getTouchTrackCount());
     }
     
-    getNextTouchSwipe(quadrant,direction)
+    getTouchClick(idx)
     {
-        return(this.core.input.getNextTouchSwipe(quadrant,direction));
+        return(this.core.input.getTouchClick(idx));
+    }
+    
+    getTouchSwipe(idx)
+    {
+        return(this.core.input.getTouchSwipe(idx));
     }
     
         //

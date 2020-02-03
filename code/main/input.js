@@ -1,31 +1,5 @@
-import ProjectEntityTouchClickClass from '../project/project_entity_touch_click.js';
-import ProjectEntityTouchSwipeClass from '../project/project_entity_touch_swipe.js';
+import TouchTrackClass from '../main/touch_track.js';
 
-//
-// touch utility classes
-//
-
-class TouchTrackClass
-{
-    constructor(core,id,timestamp,x,y)
-    {
-        this.id=id;
-        this.timestamp=timestamp;
-        
-        this.x=x;
-        this.y=y;
-                
-        if (y<Math.trunc(core.canvas.height*0.5)) {
-            this.quadrant=(x<Math.trunc(core.canvas.width*0.5))?core.input.TOUCH_QUADRANT_TOPLEFT:core.input.TOUCH_QUADRANT_TOPRIGHT;
-        }
-        else {
-            this.quadrant=(x<Math.trunc(core.canvas.width*0.5))?core.input.TOUCH_QUADRANT_BOTTOMLEFT:core.input.TOUCH_QUADRANT_BOTTOMRIGHT;
-        }
-        
-        this.lastX=x;
-        this.lastY=y;
-    }
-}
 
 //
 // input class
@@ -35,17 +9,16 @@ export default class InputClass
 {
     constructor(core)
     {
+        let n;
+        
+        this.TOUCH_MAX_TRACK=5;
+        
         this.TOUCH_QUADRANT_ANY=-1;
         this.TOUCH_QUADRANT_TOPLEFT=0;
         this.TOUCH_QUADRANT_TOPRIGHT=1;
         this.TOUCH_QUADRANT_BOTTOMLEFT=2;
         this.TOUCH_QUADRANT_BOTTOMRIGHT=3;
         
-        this.TOUCH_DIRECTION_ANY=-1;
-        this.TOUCH_DIRECTION_X=0;
-        this.TOUCH_DIRECTION_Y=1;
-        
-        this.TOUCH_CLICK_TICK=300;
         this.INPUT_WHEEL_REFRESH_TICK=500;
 
         this.core=core;
@@ -65,6 +38,8 @@ export default class InputClass
         
         this.canvasLeft=0;
         this.canvasTop=0;
+        this.canvasMidX=0;
+        this.canvasMidY=0;
         
             // listeners
             // need to set them to a variables so remove
@@ -86,13 +61,16 @@ export default class InputClass
         this.touchCancelListener=this.touchCancel.bind(this);
         this.touchMoveListener=this.touchMove.bind(this);
         
-            // touches
+            // touches, we pre-allocate a good bit
+            // of this to stop GC
             
         this.hasTouch=(navigator.maxTouchPoints>1);
             
         this.touchTrackList=[];
-        this.touchClickList=[];
-        this.touchSwipeList=[];
+        
+        for (n=0;n!==this.TOUCH_MAX_TRACK;n++) {
+            this.touchTrackList.push(new TouchTrackClass(this.core));
+        }
         
         Object.seal(this);
     }
@@ -219,6 +197,9 @@ export default class InputClass
         rect=this.core.canvas.getBoundingClientRect();
         this.canvasLeft=rect.left;
         this.canvasTop=rect.top;
+        
+        this.canvasMidX=Math.trunc(this.core.canvas.width*0.5);
+        this.canvasMidY=Math.trunc(this.core.canvas.height*0.5);
     }
     
     pointerLockEnd()
@@ -333,96 +314,87 @@ export default class InputClass
         // touch events
         //
     
-    getNextTouchClick(quadrant)
+    getTouchTrackCount()
     {
-        let n,touchClick;
-        
-        if (this.touchClickList.length===0) return(null);
-        if (quadrant===this.TOUCH_QUADRANT_ANY) return(this.touchClickList.pop());
-        
-        for (n=0;n!==this.touchClickList.length;n++) {
-            touchClick=this.touchClickList[n];
-            if (touchClick.quadrant===quadrant) {
-                this.touchClickList.splice(n,1);
-                return(touchClick);
-            }
-        }
-        
-        return(null);
+        return(this.TOUCH_MAX_TRACK);
     }
     
-    getNextTouchSwipe(quadrant,direction)
+    getTouchClick(idx)
     {
-        let n,touchSwipe,swipeDir;
+        let track=this.touchTrackList[idx];
+        let pass=track.touchPass;
         
-        if (this.touchSwipeList.length===0) return(null);
-        if (quadrant===this.TOUCH_QUADRANT_ANY) return(this.touchSwipeList.pop());
+        if ((track.free)||(!track.isClick)) return(null);
         
-        for (n=0;n!==this.touchSwipeList.length;n++) {
-            touchSwipe=this.touchSwipeList[n];
-            if (touchSwipe.quadrant!==quadrant) continue;
+        pass.id=track.id;
+        pass.x=track.x;
+        pass.y=track.y;
+        pass.quadrant=track.quadrant;
+        
+        track.free=true;            // got the click, free this track up
+        
+        return(pass);
+    }
     
-            if (direction===this.DIRECTION_ANY) {
-                swipeDir=this.DIRECTION_ANY;
-            }
-            else {
-                swipeDir=(Math.abs(this.startX-this.endX)>Math.abs(this.startY-this.endY))?this.DIRECTION_X:this.DIRECTION_Y;
-            }
-            
-            if (direction===swipeDir) {
-                this.touchSwipeList.splice(n,1);
-                return(touchSwipe);
-            }
-        }
+    getTouchSwipe(idx)
+    {
+        let track=this.touchTrackList[idx];
+        let pass=track.touchPass;
         
-        return(null);
+        if ((track.free)||(track.isClick)) return(null);
+        
+        pass.id=track.id;
+        pass.x=track.moveX;
+        pass.y=track.moveY;
+        pass.quadrant=track.quadrant;
+        
+        track.resetMove();
+        
+        if (track.id===null) track.free=true;            // if the ID is null, than we got a end on this touch and can free it now that we've got the last movement
+        
+        return(pass);
     }
     
     touchClear()
     {
-        this.touchTrackList=[];
-        this.touchClickList=[];
-        this.touchSwipeList=[];
+        let track;
+
+        for (track of this.touchTrackList) {
+            track.free=true;
+        }
     }
     
     touchStart(event)
     {
-        let touch;
+        let touch,track;
         
         event.preventDefault();
         
         for (touch of event.changedTouches) {
-            this.touchTrackList.push(new TouchTrackClass(this.core,touch.identifier,this.core.timestamp,(touch.clientX-this.canvasLeft),(touch.clientY-this.canvasTop)));
+            for (track of this.touchTrackList) {
+                if (!track.free) continue;
+                
+                track.start(touch.identifier,(touch.clientX-this.canvasLeft),(touch.clientY-this.canvasTop));
+                break;
+            }
         }
     }
     
     touchEnd(event)
     {
-        let n,idx,touch,touchTrack;
+        let touch,track;
         
         event.preventDefault();
         
         for (touch of event.changedTouches) {
-            
-                // find the tracking object
-                
-            idx=-1;
-            
-            for (n=0;n!=this.touchTrackList.length;n++) {
-                if (this.touchTrackList[n].id===touch.identifier) {
-                    idx=n;
+            for (track of this.touchTrackList) {
+                if (track.free) continue;
+                        
+                if (track.id===touch.identifier) {
+                    track.end();
                     break;
                 }
             }
-            
-            if (idx===-1) continue;
-            
-                // figure if click and delete from tracking
-                
-            touchTrack=this.touchTrackList[idx];
-            if ((this.core.timestamp-touchTrack.timestamp)<=this.TOUCH_CLICK_TICK) this.touchClickList.push(new ProjectEntityTouchClickClass(touchTrack.id,touchTrack.x,touchTrack.y,touchTrack.quadrant));
-                
-            this.touchTrackList.splice(idx,1);
         }
     }
     
@@ -433,21 +405,14 @@ export default class InputClass
     
     touchMove(event)
     {
-        let x,y;
-        let touch,touchTrack;
+        let touch,track;
         
         event.preventDefault();
         
         for (touch of event.changedTouches) {
-            
-            x=(touch.clientX-this.canvasLeft);
-            y=(touch.clientY-this.canvasTop);
-            
-            for (touchTrack of this.touchTrackList) {
-                if (touchTrack.id===touch.identifier) {
-                    this.touchSwipeList.push(new ProjectEntityTouchSwipeClass(touchTrack.id,touchTrack.lastX,touchTrack.lastY,x,y,touchTrack.quadrant));
-                    touchTrack.lastX=x;
-                    touchTrack.lastY=y;
+            for (track of this.touchTrackList) {
+                if ((!track.free) && (track.id===touch.identifier)) {
+                    track.move((touch.clientX-this.canvasLeft),(touch.clientY-this.canvasTop));
                     break;
                 }
             }

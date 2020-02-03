@@ -1,8 +1,15 @@
-- need removeMesh json
+- need removeMesh json [meshSkip] -> test
+- right click on safari bad --> test
 
-- right click on safari bad
 - check iOS
 - finish touch interface
+- need joystick controls in touch (old scruffy)
+- game json defines button area
+
+- move a lot of what's in demo entity to project
+- make entity json instead of scripts?
+
+- need to do some optimizations
 
 - networking
     - entities need boxes passed (radius/height) --> TEST

@@ -719,6 +719,12 @@ export default class ImportGLTFClass
         for (n=0;n!==meshesNode.length;n++) {
             meshNode=meshesNode[n];
             
+                // mesh skipping
+               
+            if (this.importSettings.meshSkip!==undefined) {
+                if (this.importSettings.meshSkip.includes(meshNode.name)) continue;
+            }
+            
                 // always store a matrix for each mesh
                 // from the nodes, this is mostly used by
                 // maps to precalculate the vertexes as there
