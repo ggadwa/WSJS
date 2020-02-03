@@ -1,9 +1,7 @@
-- big
-    - kart !!! setModelRotationOrder (use THIS)
-    - kart !!! DRAW_MODE_ -> this.
-    - kart !!! new isKeyDown('a')
+- need removeMesh json
 
-- check safari
+- right click on safari bad
+- check iOS
 - finish touch interface
 
 - networking

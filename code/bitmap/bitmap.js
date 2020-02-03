@@ -4,10 +4,11 @@ export default class BitmapClass
 {
     constructor(core)
     {
-        this.BITMAP_NORMAL_URL=0;         // bitmaps are a bunch of files by URL
-        this.BITMAP_SIMPLE_URL=1;         // bitmap is a single file of just a color map
-        this.BITMAP_COLOR=2;              // bitmap is just an RGB color
-        this.BITMAP_GENERATED=3;          // bitmap is generated
+        this.BITMAP_NORMAL_URL=0;           // bitmaps are a bunch of files by URL
+        this.BITMAP_SIMPLE_URL=1;           // bitmap is a single file of just a color map
+        this.BITMAP_INTERFACE_URL=2;        // this is an interface bitmap, so no mipmaps, etc
+        this.BITMAP_COLOR=3;                // bitmap is just an RGB color
+        this.BITMAP_GENERATED=4;            // bitmap is generated
     
         this.NORMAL_MAX_SHIFT=31;
         this.NORMAL_NO_SHIFT_CLAMP=0.7;
@@ -72,6 +73,20 @@ export default class BitmapClass
     initializeSimpleURL(colorURL)
     {
         this.bitmapType=this.BITMAP_SIMPLE_URL;
+        
+        this.colorURL=colorURL;
+        this.colorBase=null;
+        this.normalURL=null;
+        this.specularURL=null;
+        this.specularFactor=null;
+        this.scale=null;
+        
+        this.buildSimpleName();
+    }
+    
+    initializeInterfaceURL(colorURL)
+    {
+        this.bitmapType=this.BITMAP_INTERFACE_URL;
         
         this.colorURL=colorURL;
         this.colorBase=null;
@@ -368,6 +383,12 @@ export default class BitmapClass
         // load texture
         //
         
+    isImagePowerOf2(image)
+    {
+        if (image.width!==image.height) return(false);
+        return(Math.ceil(Math.log2(image.width))===Math.floor(Math.log2(image.width)));
+    }
+    
     loadImagePromise(url)
     {
             // special check for embedded images, everything
@@ -433,22 +454,29 @@ export default class BitmapClass
             
         this.hasColorImageAlpha=this.checkImageForAlpha(this.colorImage);
         
-               
             // force the alpha into the rgb so alphas
             // don't muddy up during mipmapping
             
         this.texture=gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D,this.texture);
         gl.texImage2D(gl.TEXTURE_2D,0,(this.hasColorImageAlpha?gl.RGBA:gl.RGB),(this.hasColorImageAlpha?gl.RGBA:gl.RGB),gl.UNSIGNED_BYTE,this.colorImage);
-        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_NEAREST);
-        gl.generateMipmap(gl.TEXTURE_2D);
+        
+        if ((this.bitmapType!==this.BITMAP_INTERFACE_URL) && (this.isImagePowerOf2(this.colorImage))) {
+            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_NEAREST);
+            gl.generateMipmap(gl.TEXTURE_2D);
+        }
+        else {
+            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
+        }
+        
         gl.bindTexture(gl.TEXTURE_2D,null);
         
-            // simple or color bitmaps exit here
+            // simple, interface, or color bitmaps exit here
             // as they have no other elements like normals, etc
             
-        if (this.bitmapType===this.BITMAP_SIMPLE_URL) {
+        if ((this.bitmapType===this.BITMAP_SIMPLE_URL) || (this.bitmapType===this.BITMAP_INTERFACE_URL) || (this.bitmapType===this.BITMAP_COLOR)) {
             this.loaded=true;
             return(true);
         }
@@ -508,9 +536,17 @@ export default class BitmapClass
         this.normalMap=gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D,this.normalMap);
         gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,this.normalImage);
-        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_NEAREST);
-        gl.generateMipmap(gl.TEXTURE_2D);
+        
+        if ((this.isImagePowerOf2(this.normalImage))) {
+            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_NEAREST);
+            gl.generateMipmap(gl.TEXTURE_2D);
+        }
+        else {
+            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
+        }
+        
         gl.bindTexture(gl.TEXTURE_2D,null);
 
             // specular bitmap
@@ -544,9 +580,17 @@ export default class BitmapClass
         this.specularMap=gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D,this.specularMap);
         gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,this.specularImage);
-        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_NEAREST);
-        gl.generateMipmap(gl.TEXTURE_2D);
+        
+        if ((this.isImagePowerOf2(this.specularImage))) {
+            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_NEAREST);
+            gl.generateMipmap(gl.TEXTURE_2D);
+        }
+        else {
+            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
+        }
+        
         gl.bindTexture(gl.TEXTURE_2D,null);
         
             // glow bitmap
@@ -583,9 +627,17 @@ export default class BitmapClass
         this.glowMap=gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D,this.glowMap);
         gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,this.glowImage);
-        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_NEAREST);
-        gl.generateMipmap(gl.TEXTURE_2D);
+        
+        if ((this.isImagePowerOf2(this.glowImage))) {
+            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_NEAREST);
+            gl.generateMipmap(gl.TEXTURE_2D);
+        }
+        else {
+            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
+        }
+        
         gl.bindTexture(gl.TEXTURE_2D,null);
         
         this.loaded=true;

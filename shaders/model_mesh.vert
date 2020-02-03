@@ -13,7 +13,7 @@ uniform highp mat4 modelMatrix;
 
 uniform bool noSkin;
 uniform highp mat4 noSkinAttachedNodeMatrix;
-uniform highp mat4 jointMatrix[128];
+uniform highp mat4 jointMatrix[64];
 
 out highp vec3 eyeVector,eyePosition;
 out highp vec2 fragUV;

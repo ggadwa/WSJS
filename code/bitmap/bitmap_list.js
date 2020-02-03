@@ -157,8 +157,13 @@ export default class BitmapListClass
         for (bitmapDef of loadBitmapList) {
             if (!this.bitmaps.has(bitmapDef.url)) {
                 bitmap=new BitmapClass(this.core);
-                bitmap.initializeSimpleURL(bitmapDef.url);
-
+                if (bitmapDef.interface===true) {       // need to work around being undefined here
+                    bitmap.initializeInterfaceURL(bitmapDef.url);
+                }
+                else {
+                    bitmap.initializeSimpleURL(bitmapDef.url);
+                }
+                
                 this.bitmaps.set(bitmapDef.url,bitmap);
             }
         }

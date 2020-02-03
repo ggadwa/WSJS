@@ -218,6 +218,7 @@ export default class DialogBaseClass
                     input.value=value;
                     input.min=0;
                     input.max=100;
+                    input.height='55px';
                     break;
                 case 'checkbox':
                     input.checked=value;

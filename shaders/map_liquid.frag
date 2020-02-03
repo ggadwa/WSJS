@@ -9,7 +9,7 @@ struct lightType {
     mediump vec4 colorExponent;
 };
 
-uniform lightType lights[32];
+uniform lightType lights[24];
 
 in highp vec3 eyePosition;
 in highp vec2 fragUV;
@@ -29,7 +29,7 @@ void main(void)
 
     lowp vec3 lightCol=vec3(0,0,0);
 
-    for (int n=0;n!=32;n++) {
+    for (int n=0;n!=24;n++) {
 
             // if intensity = 0.0, then light is off
 

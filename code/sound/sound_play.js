@@ -161,15 +161,25 @@ export default class SoundPlayClass
     update()
     {
         if (this.entity!==null) {
-            this.pannerNode.positionX.value=this.entity.position.x;
-            this.pannerNode.positionY.value=this.entity.position.y;
-            this.pannerNode.positionZ.value=this.entity.position.z;
+            if (this.pannerNode.positionX) {
+                this.pannerNode.positionX.value=this.entity.position.x;
+                this.pannerNode.positionY.value=this.entity.position.y;
+                this.pannerNode.positionZ.value=this.entity.position.z;
+            }
+            else {
+                this.pannerNode.setPosition(this.entity.position.x,this.entity.position.y,this.entity.position.z);
+            }
             return;
         }
         if (this.mesh!==null) {
-            this.pannerNode.positionX.value=this.mesh.center.x;
-            this.pannerNode.positionY.value=this.mesh.center.y;
-            this.pannerNode.positionZ.value=this.mesh.center.z;
+            if (this.pannerNode.positionX) {
+                this.pannerNode.positionX.value=this.mesh.center.x;
+                this.pannerNode.positionY.value=this.mesh.center.y;
+                this.pannerNode.positionZ.value=this.mesh.center.z;
+            }
+            else {
+                this.pannerNode.setPosition(this.mesh.center.x,this.mesh.center.y,this.mesh.center.z);
+            }
         }
     }
 

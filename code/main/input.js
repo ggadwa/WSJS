@@ -63,6 +63,9 @@ export default class InputClass
         this.mouseWheelClick=0;
         this.mouseWheelClickRefreshTick=core.timestamp;
         
+        this.canvasLeft=0;
+        this.canvasTop=0;
+        
             // listeners
             // need to set them to a variables so remove
             // can find them later
@@ -192,54 +195,64 @@ export default class InputClass
         
     pointerLockStart()
     {
+        let rect;
+        
         this.mouseButtonClear();
         this.touchClear();
         
-            // request the pointer lock
+            // if not touch, request pointer lock
             
-        document.addEventListener('pointerlockchange',this.pointerLockChangeListener,false);
-        document.addEventListener('pointerlockerror',this.pointerLockErrorListener,false);
-        this.core.canvas.requestPointerLock();
+        if (!this.hasTouch) {
+            document.addEventListener('pointerlockchange',this.pointerLockChangeListener,false);
+            document.addEventListener('pointerlockerror',this.pointerLockErrorListener,false);
+            this.core.canvas.requestPointerLock();
+        }
+        else {
+            document.addEventListener('touchstart',this.touchStartListener,false);
+            document.addEventListener('touchend',this.touchEndListener,false);
+            document.addEventListener('touchcancel',this.touchCancelListener,false);
+            document.addEventListener('touchmove',this.touchMoveListener,false);
+        }
+        
+            // remember canvas positioning
+            
+        rect=this.core.canvas.getBoundingClientRect();
+        this.canvasLeft=rect.left;
+        this.canvasTop=rect.top;
     }
     
     pointerLockEnd()
     {
-            // stop pointer lock
+            // if not touch, stop pointer lock
             
-        document.exitPointerLock();
-        document.removeEventListener('pointerlockchange',this.pointerLockChangeListener,false);
-        document.removeEventListener('pointerlockerror',this.pointerLockErrorListener,false);
+        if (!this.hasTouch) {
+            document.exitPointerLock();
+            document.removeEventListener('pointerlockchange',this.pointerLockChangeListener,false);
+            document.removeEventListener('pointerlockerror',this.pointerLockErrorListener,false);
+        }
+        else {
+            document.removeEventListener('touchstart',this.touchStartListener,false);
+            document.removeEventListener('touchend',this.touchEndListener,false);
+            document.removeEventListener('touchcancel',this.touchCancelListener,false);
+            document.removeEventListener('touchmove',this.touchMoveListener,false);
+            
+            this.core.setPauseState(true,false);            // a pointer lock release auto pauses the game
+        }
     }
     
     pointerLockChange(event)
     {
         if (document.pointerLockElement===this.core.canvas) {
-            if (!this.hasTouch) {
-                document.addEventListener('mousedown',this.mouseDownListener,false);
-                document.addEventListener('mouseup',this.mouseUpListener,false);
-                document.addEventListener('wheel',this.mouseWheelListener,false);
-                document.addEventListener('mousemove',this.mouseMovedListener,false);
-            }
-            else {
-                document.addEventListener('touchstart',this.touchStartListener,false);
-                document.addEventListener('touchend',this.touchEndListener,false);
-                document.addEventListener('touchcancel',this.touchCancelListener,false);
-                document.addEventListener('touchmove',this.touchMoveListener,false);
-            }
+            document.addEventListener('mousedown',this.mouseDownListener,false);
+            document.addEventListener('mouseup',this.mouseUpListener,false);
+            document.addEventListener('wheel',this.mouseWheelListener,false);
+            document.addEventListener('mousemove',this.mouseMovedListener,false);
         }
         else {
-            if (!this.hasTouch) {
-                document.removeEventListener('mousedown',this.mouseDownListener,false);
-                document.removeEventListener('mouseup',this.mouseUpListener,false);
-                document.removeEventListener('wheel',this.mouseWheelListener,false);
-                document.removeEventListener('mousemove',this.mouseMovedListener,false);
-            }
-            else {
-                document.removeEventListener('touchstart',this.touchStartListener,false);
-                document.removeEventListener('touchend',this.touchEndListener,false);
-                document.removeEventListener('touchcancel',this.touchCancelListener,false);
-                document.removeEventListener('touchmove',this.touchMoveListener,false);
-            }
+            document.removeEventListener('mousedown',this.mouseDownListener,false);
+            document.removeEventListener('mouseup',this.mouseUpListener,false);
+            document.removeEventListener('wheel',this.mouseWheelListener,false);
+            document.removeEventListener('mousemove',this.mouseMovedListener,false);
             
             this.core.setPauseState(true,false);            // a pointer lock release auto pauses the game
         }
@@ -379,7 +392,7 @@ export default class InputClass
         event.preventDefault();
         
         for (touch of event.changedTouches) {
-            this.touchTrackList.push(new TouchTrackClass(this.core,touch.identifier,this.core.timestamp,event.pageX,event.pageY));
+            this.touchTrackList.push(new TouchTrackClass(this.core,touch.identifier,this.core.timestamp,(touch.clientX-this.canvasLeft),(touch.clientY-this.canvasTop)));
         }
     }
     
@@ -420,17 +433,21 @@ export default class InputClass
     
     touchMove(event)
     {
+        let x,y;
         let touch,touchTrack;
         
         event.preventDefault();
         
         for (touch of event.changedTouches) {
             
+            x=(touch.clientX-this.canvasLeft);
+            y=(touch.clientY-this.canvasTop);
+            
             for (touchTrack of this.touchTrackList) {
                 if (touchTrack.id===touch.identifier) {
-                    this.touchSwipeList.push(new ProjectEntityTouchSwipeClass(touchTrack.id,touchTrack.lastX,touchTrack.lastY,event.pageX,event.pageY,touchTrack.quadrant));
-                    touchTrack.lastX=event.pageX;
-                    touchTrack.lastY=event.pageY;
+                    this.touchSwipeList.push(new ProjectEntityTouchSwipeClass(touchTrack.id,touchTrack.lastX,touchTrack.lastY,x,y,touchTrack.quadrant));
+                    touchTrack.lastX=x;
+                    touchTrack.lastY=y;
                     break;
                 }
             }

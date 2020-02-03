@@ -58,6 +58,19 @@ export default class SoundClass
         }
     }
     
+    decodeAudioPromise(data)
+    {
+            // safari doesn't have the promise version of this
+            
+        return(
+                new Promise((resolve,reject) =>
+                    {
+                        this.ctx.decodeAudioData(data,resolve,reject);
+                    }
+                )
+           );
+    }
+    
     async load()
     {
         let data=null;
@@ -86,7 +99,8 @@ export default class SoundClass
            
         this.buffer=null;
         
-        await this.ctx.decodeAudioData(data)
+        await this.decodeAudioPromise(data)
+        //await this.ctx.decodeAudioData(data)      // safari doesn't have the promise version of this
             .then
                 (
                         // resolved

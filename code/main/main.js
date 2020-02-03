@@ -149,7 +149,7 @@ class MainClass
     async initLoadSounds()
     {
         if (!(await this.core.soundList.loadAllSounds())) return;
-        
+    
         this.core.loadingScreenUpdate();
         this.core.loadingScreenAddString('Load Images');
         this.core.loadingScreenDraw();

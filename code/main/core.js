@@ -26,8 +26,8 @@ export default class CoreClass
 {
     constructor()
     {
-        this.MAX_LIGHT_COUNT=32;        // max lights in scene, needs to be the same as lights[x] in shaders
-        this.MAX_SKELETON_JOINT=128;    // max joints in a skeleton, in core for convenience as we don't have static yet
+        this.MAX_LIGHT_COUNT=24;        // max lights in scene, needs to be the same as lights[x] in shaders
+        this.MAX_SKELETON_JOINT=64;    // max joints in a skeleton, needs to be the same as jointMatrix[x] in shaders
 
             // the opengl context
 
@@ -194,8 +194,11 @@ export default class CoreClass
         this.canvas.style.position='absolute';
         this.canvas.style.left=lft+'px';
         this.canvas.style.top=top+'px';
+        this.canvas.style.touchAction='none';
         this.canvas.width=wid;
         this.canvas.height=high;
+        
+        this.canvas.oncontextmenu=function(event) {'return(false)'};
         
         document.body.appendChild(this.canvas);
     }
