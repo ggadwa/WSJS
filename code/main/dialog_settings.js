@@ -25,6 +25,11 @@ export default class DialogSettingsClass extends DialogBaseClass
         this.addInput(viewDiv,'mouseYSensitivity','Mouse Y Sensitivity:','range',null,Math.trunc(this.core.setup.mouseYSensitivity*100),null);
         this.addInput(viewDiv,'mouseYAcceleration','Mouse X Acceleration:','range',null,Math.trunc(this.core.setup.mouseYAcceleration*100),null);
         this.addInput(viewDiv,'mouseYInvert','Invert Mouse Y:','checkbox',null,this.core.setup.mouseYInvert,null);
+        
+        this.addInput(viewDiv,'touchStickXSensitivity','Touch Stick X Sensitivity:','range',null,Math.trunc(this.core.setup.mouseXSensitivity*100),null);
+        this.addInput(viewDiv,'touchStickYSensitivity','Touch Stick Y Sensitivity:','range',null,Math.trunc(this.core.setup.mouseYSensitivity*100),null);
+        
+        this.addInput(viewDiv,'snapLook','Snap Look:','checkbox',null,this.core.setup.snapLook,null);
     }
     
     addSoundControls(viewDiv)
@@ -65,6 +70,11 @@ export default class DialogSettingsClass extends DialogBaseClass
         this.core.setup.mouseYSensitivity=document.getElementById('mouseYSensitivity').value/100.0;
         this.core.setup.mouseYAcceleration=document.getElementById('mouseYAcceleration').value/100.0;
         this.core.setup.mouseYInvert=document.getElementById('mouseYInvert').checked;
+        
+        this.core.setup.touchStickXSensitivity=document.getElementById('touchStickXSensitivity').value/100.0;
+        this.core.setup.touchStickYSensitivity=document.getElementById('touchStickYSensitivity').value/100.0;
+        
+        this.core.setup.snapLook=document.getElementById('snapLook').checked;
 
         this.core.setup.soundVolume=document.getElementById('soundVolume').value/100.0;
         this.core.setup.musicVolume=document.getElementById('musicVolume').value/100.0;

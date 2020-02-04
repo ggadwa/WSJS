@@ -204,19 +204,34 @@ export default class ProjectEntityClass
         return(y);
     }
     
-    getTouchTrackCount()
+    isTouchStickLeftClick()
     {
-        return(this.core.input.getTouchTrackCount());
+        return(this.core.input.isTouchStickLeftClick());
     }
     
-    getTouchClick(idx)
+    getTouchStickLeftX()
     {
-        return(this.core.input.getTouchClick(idx));
+        return(this.core.input.getTouchStickLeftX());
     }
     
-    getTouchSwipe(idx)
+    getTouchStickLeftY()
     {
-        return(this.core.input.getTouchSwipe(idx));
+        return(this.core.input.getTouchStickLeftY());
+    }
+    
+    isTouchStickRightClick()
+    {
+        return(this.core.input.isTouchStickRightClick());
+    }
+    
+    getTouchStickRightX()
+    {
+        return(this.core.input.getTouchStickRightX());
+    }
+    
+    getTouchStickRightY()
+    {
+        return(this.core.input.getTouchStickRightY());
     }
     
         //

@@ -1,6 +1,7 @@
 import ColorClass from '../utility/color.js';
 import InterfaceElementClass from '../interface/interface_element.js';
 import InterfaceTextClass from '../interface/interface_text.js';
+import TouchStickClass from '../interface/interface_touch_stick.js';
 
 //
 // interface class
@@ -35,6 +36,9 @@ export default class InterfaceClass
         
         this.fontTexture=null;
         this.fontCharWidths=new Float32Array(128);
+        
+        this.touchStickLeft=null;
+        this.touchStickRight=null;
         
         Object.seal(this);
     }
@@ -77,6 +81,14 @@ export default class InterfaceClass
         gl.bindBuffer(gl.ARRAY_BUFFER,this.tintVertexBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,this.tintVertexArray,gl.STATIC_DRAW);
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
+        
+            // touch sticks
+            
+        this.touchStickLeft=new TouchStickClass(this.core);
+        this.touchStickLeft.initialize();
+        
+        this.touchStickRight=new TouchStickClass(this.core);
+        this.touchStickRight.initialize();
 
         return(true);
     }
@@ -84,6 +96,11 @@ export default class InterfaceClass
     release()
     {
         let element,text;
+        
+            // release touch sticks
+            
+        this.touchStickLeft.release();
+        this.touchStickRight.release();
         
             // release tint
             
@@ -305,6 +322,17 @@ export default class InterfaceClass
         }
         
         this.core.shaderList.textShader.drawEnd();
+        
+            // sticks
+            
+        if (this.core.input.hasTouch) {
+            this.core.shaderList.interfaceShader.drawStart();
+            
+            this.touchStickLeft.draw();
+            this.touchStickRight.draw();
+            
+            this.core.shaderList.interfaceShader.drawEnd();
+        }
 
         gl.disable(gl.BLEND);
         gl.enable(gl.DEPTH_TEST);

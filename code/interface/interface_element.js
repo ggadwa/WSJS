@@ -19,7 +19,6 @@ export default class InterfaceElementClass
         
         this.vertexArray=new Float32Array(2*4);     // 2D, only 2 vertex coordinates
         this.uvArray=new Float32Array(2*4);
-        this.indexArray=new Uint16Array(6);
         
         this.vertexBuffer=null;
         this.uvBuffer=null;
@@ -30,6 +29,7 @@ export default class InterfaceElementClass
     
     initialize()
     {
+        let indexArray;
         let gl=this.core.gl;
         
             // pre build data for vertex and uv
@@ -46,16 +46,17 @@ export default class InterfaceElementClass
         
             // always drawing a single quad
             
-        this.indexArray[0]=0;
-        this.indexArray[1]=1;
-        this.indexArray[2]=2;
-        this.indexArray[3]=0;
-        this.indexArray[4]=2;
-        this.indexArray[5]=3;
+        indexArray=new Uint16Array(6);
+        indexArray[0]=0;
+        indexArray[1]=1;
+        indexArray[2]=2;
+        indexArray[3]=0;
+        indexArray[4]=2;
+        indexArray[5]=3;
         
         this.indexBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.indexArray,gl.STATIC_DRAW);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,indexArray,gl.STATIC_DRAW);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
         
         return(true);

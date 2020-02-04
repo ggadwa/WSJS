@@ -2,9 +2,6 @@
 - right click on safari bad --> test
 
 - check iOS
-- finish touch interface
-- need joystick controls in touch (old scruffy)
-- game json defines button area
 
 - move a lot of what's in demo entity to project
 - make entity json instead of scripts?
