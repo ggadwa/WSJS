@@ -1,10 +1,8 @@
-- need removeMesh json [meshSkip] -> test
-- right click on safari bad --> test
+- do the json scripting
 
-- check iOS
-
-- move a lot of what's in demo entity to project
-- make entity json instead of scripts?
+   - pulse in weapon add ammo
+   - need a receive event
+   - need draw setup in JSON (type=worldSpace,cameraSpace) positionOffset, angleOffset
 
 - need to do some optimizations
 

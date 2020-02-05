@@ -26,8 +26,8 @@ export default class DialogSettingsClass extends DialogBaseClass
         this.addInput(viewDiv,'mouseYAcceleration','Mouse X Acceleration:','range',null,Math.trunc(this.core.setup.mouseYAcceleration*100),null);
         this.addInput(viewDiv,'mouseYInvert','Invert Mouse Y:','checkbox',null,this.core.setup.mouseYInvert,null);
         
-        this.addInput(viewDiv,'touchStickXSensitivity','Touch Stick X Sensitivity:','range',null,Math.trunc(this.core.setup.mouseXSensitivity*100),null);
-        this.addInput(viewDiv,'touchStickYSensitivity','Touch Stick Y Sensitivity:','range',null,Math.trunc(this.core.setup.mouseYSensitivity*100),null);
+        this.addInput(viewDiv,'touchStickXSensitivity','Touch Stick X Sensitivity:','range',null,Math.trunc(this.core.setup.touchStickXSensitivity*100),null);
+        this.addInput(viewDiv,'touchStickYSensitivity','Touch Stick Y Sensitivity:','range',null,Math.trunc(this.core.setup.touchStickYSensitivity*100),null);
         
         this.addInput(viewDiv,'snapLook','Snap Look:','checkbox',null,this.core.setup.snapLook,null);
     }
