@@ -60,6 +60,7 @@ export default class ProjectEntityClass
         this.eyeOffset=0;
         this.bumpHeight=0;
 
+        this.id=0;
         this.remoteId=-1;       // the network ID
         
         this.gravityMinValue=10;

@@ -1,8 +1,21 @@
 - do the json scripting
 
    - pulse in weapon add ammo
-   - need a receive event
-   - need draw setup in JSON (type=worldSpace,cameraSpace) positionOffset, angleOffset
+                                    {"type":"pulseInterface","element":"health","tick":500,"expand":5},
+                                    {"type":"pulseInterface","element":"pistol_bullet","tick":500,"expand":5},
+                                    {"type":"pulseInterface","element":"m16_bullet","tick":500,"expand":5},
+                                    {"type":"pulseInterface","element":"grenade","tick":500,"expand":5},
+
+   - redo all the developer stuff as a flag
+
+   ----> current todo
+          - calc needs to have a result item, put variable there (stores if #var), and always return true/false for equals
+          - conditions in messages
+          - need repeat time out on messages (for shooting) -> fireFrequency
+          - finish pistol weapon
+          - replace to other weapons
+          - put other weapons back in captain chest json
+          - do health
 
 - need to do some optimizations
 

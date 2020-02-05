@@ -1,15 +1,20 @@
-import PointClass from '../../../code/utility/point.js';
-import ProjectEntityClass from '../../../code/project/project_entity.js';
+import PointClass from '../utility/point.js';
+import CalcClass from '../project/calc.js';
+import ProjectEntityClass from '../project/project_entity.js';
 
 //
-// captain chest class
+// json entity class
 //
 
 export default class EntityJsonClass extends ProjectEntityClass
 {
     initialize()
     {
-        let event;
+        this.DRAW_TYPE_NORMAL=0;
+        this.DRAW_TYPE_PLAYER=1;
+        this.DRAW_TYPE_IN_HAND=2;
+        
+        let event,variable;
         
         super.initialize();
         
@@ -24,6 +29,16 @@ export default class EntityJsonClass extends ProjectEntityClass
             }
         }
         
+            // variables
+          
+        this.variables=new Map();
+        
+        if (this.json.variables!==undefined) {
+            for (variable of this.json.variables) {
+                this.variables.set(variable.name,variable.value);
+            }
+        }
+        
             // setup
             
         this.radius=this.json.setup.radius;
@@ -31,6 +46,19 @@ export default class EntityJsonClass extends ProjectEntityClass
             
         this.setModel(this.json.model.name);
         this.scale.setFromValues(this.json.model.scale.x,this.json.model.scale.y,this.json.model.scale.z);
+        
+            // get the draw type
+            
+        this.drawType=(['normal','player','inHand']).indexOf(this.json.draw.type);
+        if (this.drawType<0) this.drawType=0;
+        
+        this.drawAngle=new PointClass(0,0,0);
+        this.handPosition=this.getPointFromJson(this.json.draw.handPosition);
+        this.handAngle=this.getPointFromJson(this.json.draw.handAngle);
+        
+            // misc
+            
+        this.currentMessageContent=null;        // used to track current message content for @content look ups
     }
     
     getJson()
@@ -38,6 +66,10 @@ export default class EntityJsonClass extends ProjectEntityClass
         return(null);
     }
     
+        //
+        // utilities and lookups
+        //
+        
     jsonNameTranslate(name)
     {
         if (name.length<1) return(name);
@@ -53,9 +85,88 @@ export default class EntityJsonClass extends ProjectEntityClass
         return(name);
     }
     
+    jsonContentTranslate(content)
+    {
+        if (typeof(content)!=='string') return(content);
+        
+        if (content==='@content') return(this.currentMessageContent);
+        return(content);
+    }
+    
+    jsonVariableTranslate(value)
+    {
+        let varValue;
+        
+        if (typeof(value)!=='string') return(value);
+        
+        if (value.length<1) return(value);
+        if (value.charAt(0)!=='#') return(value);
+        
+        varValue=this.variables.get(value.substring(1));
+        if (varValue!==undefined) return(varValue);
+        
+        console.log('Unknown variable name: '+value.substring(1));
+        return('');
+    }
+    
+    getEntityFromJson(name)
+    {
+        let entity;
+        
+            // special lookups
+            
+        if (name==='@player') return(this.getPlayerEntity());
+        if (name==='@parent') return((this.spawnedBy!==null)?this.spawnedBy:this);
+        if (name==='@self') return(this);
+        
+        if (name.startsWith('@hold.')) {
+            entity=this.core.map.entityList.findHold(this,name.substring(6));
+            if (entity!==null) return(entity);
+            
+            console.log('Unknown held entity: '+name.substring(6));
+            return(null);
+        }
+        
+            // by name
+            
+        entity=this.getEntityList().find(name);
+        if (entity!==null) return(entity);
+        
+        console.log('Unknown entity: '+name);
+        return(null);
+    }
+    
+    getPointFromJson(jsonPnt)
+    {
+        if (jsonPnt===undefined) return(new PointClass(0,0,0));
+        return(new PointClass(jsonPnt.x,jsonPnt.y,jsonPnt.z));
+    }
+    
+        //
+        // calculator
+        //
+        
+    calc(action)
+    {
+            // have we already compiled this?
+            
+        if (action.compiledCalc===undefined) {
+            action.compileCalc=new CalcClass(this.core,this,action.code);
+            if (!action.compileCalc.compile()) return;        // compile failed
+        }
+        
+            // run it
+            
+        action.compileCalc.run(this.currentMessageContent,action.minClamp,action.maxClamp);
+    }
+    
+        //
+        // actions
+        //
+        
     runActions(actions)
     {
-        let action,name;
+        let action,name,entity;
         
         if (actions===undefined) return;
         
@@ -72,11 +183,21 @@ export default class EntityJsonClass extends ProjectEntityClass
                     break;
                     
                 case 'playSound':
-                    this.playSound(this.jsonNameTranslate(action.name),action.rate,action.loop);
+                    entity=this;
+                    if (action.entity!==undefined) {
+                        entity=this.getEntityFromJson(action.entity);
+                        if (entity===null) return(false);
+                    }
+                    
+                    this.core.soundList.play(entity,null,action.name,action.rate,action.loop);
                     break;
                     
                 case 'pulseInterface':
-                    this.pulseInterfaceElement(action.element,action.tick,action.expand);
+                    this.core.interface.pulseElement(action.element,action.tick,action.expand);
+                    break;
+                    
+                case 'updateInterfaceText':
+                    this.core.interface.updateText(action.element,this.jsonVariableTranslate(action.text));
                     break;
                     
                 case 'trigger':
@@ -85,9 +206,14 @@ export default class EntityJsonClass extends ProjectEntityClass
                     break;
                     
                 case 'send':
+                    entity=this.getEntityFromJson(action.entity);
+                    if (entity===null) return(false);
+                    
+                    entity.receiveMessage(action.message,this.jsonContentTranslate(action.content));
                     break;
                     
-                case 'sendToHold':
+                case 'calc':
+                    this.calc(action);
                     break;
                     
                 default:
@@ -97,56 +223,20 @@ export default class EntityJsonClass extends ProjectEntityClass
         }
     }
     
-    /*
-     * 
-
-                                    {"type":"send","entity":"@player","message":"addHealth","value":25},
-                                    {"type":"sendToHold","entity":"@player","holdEntity":"weapon_pistol","message":"addAmmo","content":10},
-                                    {"type":"sendToHold","entity":"@player","holdEntity":"weapon_m16","message":"addAmmo","content":50},
-                                    {"type":"sendToHold","entity":"@player","holdEntity":"weapon_grenade","message":"addAmmo","content":1},
-
-     */
-    
-    getEntityFromJson(name)
-    {
-        let entity;
+        //
+        // conditions
+        //
         
-            // special lookups
-            
-        if (name==='@player') return(this.getPlayerEntity());
-        if (name==='@self') return(this);
-        
-            // by name
-            
-        entity=this.getEntityList().find(name);
-        if (entity==null) {
-            console.log('Unknown entity: '+name);
-            return(null);
-        }
-        
-        return(entity);
-    }
-    
-    getEntityHoldFromJson(entityName,holdName)
-    {
-        let entity=this.getEntityFromJson(entityName);
-        if (entity==null) return(null);
-        
-        entity=this.core.map.entityList.findHold(entity,holdName);
-        if (entity==null) {
-            console.log('Unknown entity: '+name);
-            return(null);
-        }
-        
-        return(entity);
-    }
-    
     areConditionsMet(conditions)
     {
         let condition,entity;
         
-        if (conditions===undefined) return(false);
+            // no conditions means always
+            
+        if (conditions===undefined) return(true);
         
+            // otherwise fast fail the conditions in order
+            
         for (condition of conditions) {
             
             switch(condition.type) {
@@ -171,6 +261,10 @@ export default class EntityJsonClass extends ProjectEntityClass
         return(true);
     }
     
+        //
+        // events
+        //
+        
     runEvents(events)
     {
         let event;
@@ -191,6 +285,42 @@ export default class EntityJsonClass extends ProjectEntityClass
         }
     }
         
+        //
+        // messages
+        //
+        
+    receiveMessage(name,content)
+    {
+        let message;
+        let messages=this.json.messages;
+        
+        if (messages===undefined) return;
+        
+            // remember what the content is for @content lookups
+            
+        this.currentMessageContent=content;
+        
+            // run through the messages
+            // if we have conditions, we can have the same message
+            // defined and it falls through until hitting one with
+            // a met condition
+            
+        for (message of messages) {
+            if (message.message===name) {
+                if (this.areConditionsMet(message.conditions)) {
+                    this.runActions(message.actions);
+                    return;
+                }
+            }
+        }
+        
+        console.log('Unhandled message in '+this.name+': '+name);
+    }
+
+        //
+        // old mainlines -- todo replace later
+        //
+        
     ready()
     {
         this.runActions(this.json.readyActions);
@@ -200,4 +330,28 @@ export default class EntityJsonClass extends ProjectEntityClass
     {
         this.runEvents(this.json.events);
     }
+    
+        //
+        // old draw setup -- redo this later
+        //
+        
+    drawSetup()
+    {
+        switch (this.drawType) {
+            
+            case this.DRAW_TYPE_NORMAL:
+                this.setModelDrawPosition(this.position,this.angle,this.scale,false);
+                return(true);
+                
+            case this.DRAW_TYPE_PLAYER:
+                this.drawAngle.setFromValues(0,this.angle.y,0);
+                this.setModelDrawPosition(this.position,this.drawAngle,this.scale,false);
+                return(this.core.camera.isThirdPersonBehind()) ;
+            
+            case this.DRAW_TYPE_IN_HAND:
+                this.setModelDrawPosition(this.handPosition,this.handAngle,this.scale,true);
+                return(this.core.camera.isFirstPerson());
+        }
+    }
+
 }

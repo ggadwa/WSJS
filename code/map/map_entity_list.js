@@ -265,13 +265,14 @@ export default class MapEntityListClass
     {
         let entity;
 
-        for (entity of this.entities) {            
+        for (entity of this.entities) {
             if (heldBy!==null) {
                 if (entity.heldBy!==heldBy) continue;
             }
             else {
                 if (entity.heldBy!==null) continue;
             }
+            
             entity.draw();
         }
     }
