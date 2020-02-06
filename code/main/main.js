@@ -1,6 +1,9 @@
 import PointClass from '../utility/point.js';
 import CoreClass from '../main/core.js';
 
+
+import CalcClass from '../project/calc.js';
+
 //
 // main class
 //

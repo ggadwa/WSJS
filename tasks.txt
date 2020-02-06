@@ -1,4 +1,5 @@
-- do the json scripting
+- json must be SHARED
+- load json ahead of time and fail out at map level if compile bad
 
    - pulse in weapon add ammo
                                     {"type":"pulseInterface","element":"health","tick":500,"expand":5},
@@ -8,14 +9,41 @@
 
    - redo all the developer stuff as a flag
 
+
    ----> current todo
-          - calc needs to have a result item, put variable there (stores if #var), and always return true/false for equals
-          - conditions in messages
-          - need repeat time out on messages (for shooting) -> fireFrequency
+          - need effects as JSON
           - finish pistol weapon
           - replace to other weapons
           - put other weapons back in captain chest json
           - do health
+
+        
+        
+        let calc;
+        let entity={};
+        entity.variables=new Map();
+        entity.variables.set('flag',0);
+        entity.variables.set('flag2',1);
+        
+        calc=new CalcClass(null,entity,null,"0+1+2-3",null,null);
+        calc.compile();
+        calc=new CalcClass(null,entity,null,"flag=false",null,null);
+        calc.compile();
+        calc=new CalcClass(null,entity,null,"flag!=false",null,null);
+        calc.compile();
+        calc=new CalcClass(null,entity,null,"flag3<7",null,null);
+        calc.compile();
+        calc=new CalcClass(null,entity,null,"flag2<=@content",null,null);
+        calc.compile();
+        calc=new CalcClass(null,entity,null,"(0+1)+((2-3)*4)",null,null);
+        calc.compile();
+        calc=new CalcClass(null,entity,null,"((0+1)",null,null);
+        calc.compile();
+        calc=new CalcClass(null,entity,null,"(0+1) && (0+2) || true",null,null);
+        calc.compile();
+        
+        return;
+        
 
 - need to do some optimizations
 

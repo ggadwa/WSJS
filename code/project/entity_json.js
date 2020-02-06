@@ -14,29 +14,19 @@ export default class EntityJsonClass extends ProjectEntityClass
         this.DRAW_TYPE_PLAYER=1;
         this.DRAW_TYPE_IN_HAND=2;
         
-        let event,variable;
-        
         super.initialize();
         
         this.json=this.getJson();
         
-            // run through all the actions and force
-            // a fired property so we can track fire once actions
-            
-        if (this.json.events!==undefined) {
-            for (event of this.json.events) {
-                event.fired=false;
-            }
-        }
-        
             // variables
           
         this.variables=new Map();
+        this.createVariables();
         
-        if (this.json.variables!==undefined) {
-            for (variable of this.json.variables) {
-                this.variables.set(variable.name,variable.value);
-            }
+            // compile any calcs
+            
+        if (!this.compileCalcs()) {
+            // fail here
         }
         
             // setup
@@ -59,11 +49,92 @@ export default class EntityJsonClass extends ProjectEntityClass
             // misc
             
         this.currentMessageContent=null;        // used to track current message content for @content look ups
+        
+        return(true);
     }
     
     getJson()
     {
         return(null);
+    }
+    
+        //
+        // create variables
+        //
+        
+    createVariables()
+    {
+        let variable;
+                
+        if (this.json.variables===undefined) return;
+        
+        for (variable of this.json.variables) {
+            this.variables.set(variable.name,variable.value);
+        }
+    }
+    
+        //
+        // compile calcs
+        //
+    
+    compileCalcsConditions(conditions)
+    {
+        let condition;
+        
+        if (conditions===undefined) return(true);
+        
+        for (condition of conditions) {
+            if (condition.type==='calc') {
+                condition.compileCalc=new CalcClass(this.core,this,null,condition.code,null,null);
+                if (!condition.compileCalc.compile()) return(false);        // compile failed
+            }
+        }
+        
+        return(true);
+    }
+    
+    compileCalcsActions(actions)
+    {
+        let action,minClamp,maxClamp;
+        
+        if (actions===undefined) return(true);
+        
+        for (action of actions) {
+            if (action.type==='calc') {
+                if (action.set===undefined) {
+                    console.log('Action calcs require a set attribute');
+                    return(false);
+                }
+                
+                minClamp=(action.minClamp===undefined)?null:action.minClamp;
+                maxClamp=(action.maxClamp===undefined)?null:action.maxClamp;
+                
+                action.compileCalc=new CalcClass(this.core,this,action.set,action.code,minClamp,maxClamp);
+                if (!action.compileCalc.compile()) return(false);        // compile failed
+            }
+        }
+        
+        return(true);
+    }
+    
+    compileCalcs()
+    {
+        let event,message;
+        
+        if (this.json.events!==undefined) {
+            for (event of this.json.events) {
+                if (!this.compileCalcsConditions(event.conditions)) return(false);
+                if (!this.compileCalcsActions(event.actions)) return(false);
+            }
+        }
+        if (this.json.messages!==undefined) {
+            for (message of this.json.messages) {
+                if (!this.compileCalcsConditions(message.conditions)) return(false);
+                if (!this.compileCalcsActions(message.actions)) return(false);
+            }
+        }
+        
+        return(true);
     }
     
         //
@@ -85,27 +156,21 @@ export default class EntityJsonClass extends ProjectEntityClass
         return(name);
     }
     
-    jsonContentTranslate(content)
+    jsonContentTranslate(value)
     {
-        if (typeof(content)!=='string') return(content);
-        
-        if (content==='@content') return(this.currentMessageContent);
-        return(content);
-    }
-    
-    jsonVariableTranslate(value)
-    {
-        let varValue;
-        
         if (typeof(value)!=='string') return(value);
         
-        if (value.length<1) return(value);
-        if (value.charAt(0)!=='#') return(value);
+        if (value==='@timestamp') return(this.core.timestamp);
+        if (value==='@content') return(this.currentMessageContent);
+        return(value);
+    }
+    
+    jsonVariableTranslate(name)
+    {
+        let value=this.variables.get(name);
+        if (value!==undefined) return(value);
         
-        varValue=this.variables.get(value.substring(1));
-        if (varValue!==undefined) return(varValue);
-        
-        console.log('Unknown variable name: '+value.substring(1));
+        console.log('Unknown variable name: '+name);
         return('');
     }
     
@@ -140,24 +205,6 @@ export default class EntityJsonClass extends ProjectEntityClass
     {
         if (jsonPnt===undefined) return(new PointClass(0,0,0));
         return(new PointClass(jsonPnt.x,jsonPnt.y,jsonPnt.z));
-    }
-    
-        //
-        // calculator
-        //
-        
-    calc(action)
-    {
-            // have we already compiled this?
-            
-        if (action.compiledCalc===undefined) {
-            action.compileCalc=new CalcClass(this.core,this,action.code);
-            if (!action.compileCalc.compile()) return;        // compile failed
-        }
-        
-            // run it
-            
-        action.compileCalc.run(this.currentMessageContent,action.minClamp,action.maxClamp);
     }
     
         //
@@ -197,7 +244,12 @@ export default class EntityJsonClass extends ProjectEntityClass
                     break;
                     
                 case 'updateInterfaceText':
-                    this.core.interface.updateText(action.element,this.jsonVariableTranslate(action.text));
+                    if (action.text!==undefined) {
+                        this.core.interface.updateText(action.element,action.text);
+                    }
+                    else {
+                        this.core.interface.updateText(action.element,this.jsonVariableTranslate(action.variable));
+                    }
                     break;
                     
                 case 'trigger':
@@ -213,7 +265,7 @@ export default class EntityJsonClass extends ProjectEntityClass
                     break;
                     
                 case 'calc':
-                    this.calc(action);
+                    action.compileCalc.run(this.currentMessageContent);
                     break;
                     
                 default:
@@ -252,6 +304,10 @@ export default class EntityJsonClass extends ProjectEntityClass
                     if (!this.isEntityInRange(entity,condition.distance)) return(false);
                     break;
                     
+                case 'calc':
+                    if (!condition.compileCalc.run(this.currentMessageContent)) return(false);
+                    break;
+                    
                 default:
                     console.log('Unknown condition type: '+condition.type);
                     return(false);
@@ -275,13 +331,11 @@ export default class EntityJsonClass extends ProjectEntityClass
             
                 // are the conditions met?
                 
-            if ((event.fireOnce) && (event.fired)) continue;
             if (!this.areConditionsMet(event.conditions)) continue;
             
                 // run the actions
             
             this.runActions(event.actions);
-            event.fired=true;
         }
     }
         
@@ -291,7 +345,7 @@ export default class EntityJsonClass extends ProjectEntityClass
         
     receiveMessage(name,content)
     {
-        let message;
+        let message,handled;
         let messages=this.json.messages;
         
         if (messages===undefined) return;
@@ -305,8 +359,11 @@ export default class EntityJsonClass extends ProjectEntityClass
             // defined and it falls through until hitting one with
             // a met condition
             
+        handled=false;
+        
         for (message of messages) {
             if (message.message===name) {
+                handled=true;
                 if (this.areConditionsMet(message.conditions)) {
                     this.runActions(message.actions);
                     return;
@@ -314,7 +371,7 @@ export default class EntityJsonClass extends ProjectEntityClass
             }
         }
         
-        console.log('Unhandled message in '+this.name+': '+name);
+        if (!handled) console.log('Unhandled message in '+this.name+': '+name);
     }
 
         //
