@@ -1,9 +1,6 @@
 import PointClass from '../utility/point.js';
 import CoreClass from '../main/core.js';
 
-
-import CalcClass from '../project/calc.js';
-
 //
 // main class
 //
@@ -176,16 +173,14 @@ class MainClass
             // call the map ready as it can load entities
         
         this.core.projectMap.ready();
+        
+            // load any map effects
+            
+        if (!this.core.map.effectList.loadMapEffects()) return;        // halt on bad effect start
 
             // load the entities
             
-        try {
-            this.core.map.entityList.loadMapEntities();
-        }
-        catch (ex) {
-            console.log(ex);
-            return;
-        }
+        if (!this.core.map.entityList.loadMapEntities()) return;    // halt on bad entity start
         
         this.core.loadingScreenUpdate();
         this.core.loadingScreenAddString('Final Setup');

@@ -153,23 +153,23 @@ export default class MapEntityListClass
                 // else is a map entity
 
             if (n===0) {
-                this.core.map.entityList.setPlayer(new entityDef.entity(this.core,entityName,entityPosition,entityAngle,entityData));
+                if (!this.setPlayer(new entityDef.entity(this.core,entityName,entityPosition,entityAngle,entityData))) return(false);
             }
             else {
                 entity=new entityDef.entity(this.core,entityName,entityPosition,entityAngle,entityData);
-                this.core.map.entityList.add(entity);
+                if (!this.add(entity)) return(false);
             }
         }
             
             // load any bots if it's a local multiplayer game
             
-        if (!((this.core.isMultiplayer) && (this.core.setup.localGame))) return;
+        if (!((this.core.isMultiplayer) && (this.core.setup.localGame))) return(true);
 
         botClass=this.core.projectGame.getBotClass();
 
         for (n=0;n!==this.core.setup.botCount;n++) {
             entity=new botClass(this.core,this.core.projectGame.getBotName(n),new PointClass(0,0,0),new PointClass(0,0,0),null);
-            this.core.map.entityList.add(entity);
+            if (!this.add(entity)) return(false);
         }
         
         return(true);

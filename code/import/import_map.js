@@ -21,7 +21,6 @@ export default class ImportMapClass
     async load(importSettings)
     {
         let n,k,scale,idx;
-        let effect,effectDef,effectPosition,effectShow;
         let light,lightDef,lightAmbient;
         let liquid,liquidDef,liquidBitmap;
         let movement,meshIdxList,reverseMeshIdxList,movementDef;
@@ -45,27 +44,6 @@ export default class ImportMapClass
         if (scale===undefined) scale=1;
         
         this.core.map.meshList.scaleMeshes(scale);
-        
-            // run through the effects so bitmaps get into list
-            
-        if (importSettings.effects!==undefined) {
-            for (n=0;n!==importSettings.effects.length;n++) {
-                effectDef=importSettings.effects[n];
-                
-                if (effectDef.position!==undefined) {
-                    effectPosition=new PointClass(effectDef.position.x,effectDef.position.y,effectDef.position.z);
-                }
-                else {
-                    effectPosition=new PointClass(0,0,0);
-                }
-                
-                effectShow=true;
-                if (effectDef.show!==undefined) effectShow=effectDef.show;
-                
-                effect=new effectDef.effect(this.core,effectPosition,effectDef.data,effectShow);
-                this.core.map.effectList.add(effect);
-            }
-        }
         
             // the lights
             

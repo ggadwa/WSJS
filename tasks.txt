@@ -1,6 +1,8 @@
 - json must be SHARED
 - load json ahead of time and fail out at map level if compile bad
 
+- KART: update light positions in effects
+
    - pulse in weapon add ammo
                                     {"type":"pulseInterface","element":"health","tick":500,"expand":5},
                                     {"type":"pulseInterface","element":"pistol_bullet","tick":500,"expand":5},
@@ -12,6 +14,9 @@
 
    ----> current todo
           - need effects as JSON
+          - need to do effect wave
+          - rest of flame
+          - sound effects (effect_explosion_fire)
           - finish pistol weapon
           - replace to other weapons
           - put other weapons back in captain chest json

@@ -32,6 +32,7 @@ export default class ProjectGameDeveloperClass extends ProjectGameClass
         this.addInterfaceText('meshCount','',x,46,20,this.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1);
         this.addInterfaceText('trigCount','',x,69,20,this.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1);
         this.addInterfaceText('modelCount','',x,92,20,this.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1);
+        this.addInterfaceText('effectCount','',x,115,20,this.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1);
     }
     
     run()
@@ -51,5 +52,6 @@ export default class ProjectGameDeveloperClass extends ProjectGameClass
         this.updateInterfaceText('meshCount',('mesh:'+this.core.drawMeshCount));
         this.updateInterfaceText('trigCount',('trig:'+this.core.drawTrigCount));
         this.updateInterfaceText('modelCount',('model:'+this.core.drawModelCount));
+        this.updateInterfaceText('effectCount',('effect:'+this.core.drawEffectCount));
     }
 }

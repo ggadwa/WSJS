@@ -150,6 +150,7 @@ export default class CoreClass
         this.drawMeshCount=0;
         this.drawTrigCount=0;
         this.drawModelCount=0;
+        this.drawEffectCount=0;
 
             // loading screen
 
@@ -547,6 +548,7 @@ export default class CoreClass
         this.drawMeshCount=0;
         this.drawTrigCount=0;
         this.drawModelCount=0;
+        this.drawEffectCount=0;
         
             // draw the sky and map
             

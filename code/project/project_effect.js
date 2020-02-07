@@ -40,6 +40,8 @@ export default class ProjectEffectClass
     
         this.core=core;
         
+        this.json=null;
+        
         this.position=position.copy();
         this.data=data;
         
