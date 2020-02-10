@@ -207,7 +207,7 @@ export default class NetworkClass
     handleEntityEnter(remoteId,dataView)
     {
         let userName,entity;
-        let remoteClass=this.core.projectGame.getRemoteClass();
+        let remoteClass=EntityRemoteClass; // this.core.projectGame.getRemoteClass();  -- TODO deal with this after json
         
         userName=this.getStringFromDataView(dataView,4,this.USER_NAME_LENGTH);
         
@@ -216,7 +216,7 @@ export default class NetworkClass
         entity=new remoteClass(this.core,remoteId,userName);
         this.core.map.entityList.add(entity);
         
-        this.core.projectGame.remoteEntering(userName);
+        this.core.map.entityList.getPlayer().remoteEntering(userName);
     }
     
     handleEntityLeave(remoteId,dataView)
@@ -228,7 +228,7 @@ export default class NetworkClass
         entity=this.core.map.entityList.findRemoteById(remoteId);
         if (entity!==null) entity.markDelete=true;
         
-        this.core.projectGame.remoteLeaving(entity.name);
+        this.core.map.entityList.getPlayer().remoteLeaving(entity.name);
     }
     
     handleEntityUpdate(remoteId,dataView)

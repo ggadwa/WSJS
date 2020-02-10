@@ -46,7 +46,7 @@ export default class ImportGLTFClass
     async loadGLTFBin()
     {
         let resp;
-        let url='../models/'+this.importSettings.name+'/scene.bin';
+        let url='../models/'+this.importSettings.name+'/'+this.jsonData.buffers[0].uri;     // right now assume a single buffer, this isn't necessarly true though TODO on this
         
         try {
             resp=await fetch(url);
@@ -56,26 +56,6 @@ export default class ImportGLTFClass
         catch (e) {
             return(Promise.reject('Unable to load '+url+'; '+e.message));
         }
-    }
-    
-    async loadGLTF()
-    {
-        this.jsonData=null;
-        this.binData=null;
-        
-        await Promise.all([this.loadGLTFJson(),this.loadGLTFBin()])
-            .then
-                (
-                    (values)=>{
-                        this.jsonData=values[0];
-                        this.binData=values[1];
-                    },
-                    (value)=>{
-                        console.log(value);
-                    }
-                );
-
-        return(this.jsonData!==null);
     }
     
         //
@@ -977,21 +957,38 @@ export default class ImportGLTFClass
         
     async import(meshList,skeleton)
     {
-        let success;
+        this.jsonData=null;
+        this.binData=null;
         
-            // load the files
+            // load the gltf
             
-        success=true;
-        
-        await this.loadGLTF()
+        await this.loadGLTFJson()
             .then
                 (
                     value=>{
-                        success=value;
+                        this.jsonData=value;
                     },
-                )
-                
-        if (!success) return;
+                    value=>{
+                        console.log(value);
+                    }
+                );
+
+        if (this.jsonData===null) return(false);
+        
+            // load the bin
+            
+        await this.loadGLTFBin()
+            .then
+                (
+                    value=>{
+                        this.binData=value;
+                    },
+                    value=>{
+                        console.log(value);
+                    }
+                );
+
+        if (this.binData===null) return(false);
         
             // process the file
             

@@ -272,7 +272,6 @@ export default class CoreClass
         this.camera=new CameraClass(this);
         
         this.setup=new SetupClass();
-        this.setup.load(this);
         
         this.settingsDialog=new DialogSettingsClass(this);
         this.connectDialog=new DialogConnectClass(this);
@@ -285,6 +284,15 @@ export default class CoreClass
         this.shaderList.release();
         this.soundList.release();
         this.bitmapList.release();
+    }
+    
+        //
+        // setup
+        //
+        
+    loadSetup()
+    {
+        this.setup.load(this);      // requires game to be initialized, so we do this later
     }
     
         //

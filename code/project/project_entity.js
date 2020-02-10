@@ -458,7 +458,7 @@ export default class ProjectEntityClass
         // interface utilities
         //
         
-    addInterfaceElement(id,colorURL,uvOffset,uvSize,rect,color,alpha)
+    addInterfaceElement(id,colorURL,width,height,positionMode,positionOffset,color,alpha)
     {
         let bitmap=this.core.bitmapList.get(colorURL);
         if (bitmap===null) {
@@ -466,7 +466,7 @@ export default class ProjectEntityClass
             return;
         }
                     
-        this.core.interface.addElement(id,bitmap,uvOffset,uvSize,rect,color,alpha);
+        this.core.interface.addElement(id,bitmap,width,height,positionMode,positionOffset,color,alpha);
     }
     
     showInterfaceElement(id,show)
@@ -479,9 +479,9 @@ export default class ProjectEntityClass
         this.core.interface.pulseElement(id,tick,expand);
     }
     
-    addInterfaceText(id,text,x,y,fontSize,align,color,alpha)
+    addInterfaceText(id,text,positionMode,positionOffset,fontSize,align,color,alpha)
     {
-        this.core.interface.addText(id,text,x,y,fontSize,align,color,alpha);
+        this.core.interface.addText(id,text,positionMode,positionOffset,fontSize,align,color,alpha);
     }
     
     removeInterfaceText(id)
@@ -1217,6 +1217,14 @@ export default class ProjectEntityClass
             // updates show remote
 
         this.show=true;
+    }
+    
+    remoteEntering(name)
+    {
+    }
+    
+    remoteLeaving(name)
+    {
     }
 
     /**

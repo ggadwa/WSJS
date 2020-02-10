@@ -165,10 +165,10 @@ export default class MapEntityListClass
             
         if (!((this.core.isMultiplayer) && (this.core.setup.localGame))) return(true);
 
-        botClass=this.core.projectGame.getBotClass();
+        botClass=EntityMultiplayerBotClass; // this.core.projectGame.getBotClass();  - TODO DEAL WITH THIS AFTER JSON
 
         for (n=0;n!==this.core.setup.botCount;n++) {
-            entity=new botClass(this.core,this.core.projectGame.getBotName(n),new PointClass(0,0,0),new PointClass(0,0,0),null);
+            entity=new botClass(this.core,this.core.projectGame.json.bot.names[n],new PointClass(0,0,0),new PointClass(0,0,0),null);
             if (!this.add(entity)) return(false);
         }
         

@@ -1,4 +1,5 @@
 import ColorClass from '../utility/color.js';
+import RectClass from '../../../code/utility/rect.js';
 import InterfaceElementClass from '../interface/interface_element.js';
 import InterfaceTextClass from '../interface/interface_text.js';
 import TouchStickClass from '../interface/interface_touch_stick.js';
@@ -22,6 +23,16 @@ export default class InterfaceClass
         this.TEXT_ALIGN_LEFT=0;
         this.TEXT_ALIGN_CENTER=1;
         this.TEXT_ALIGN_RIGHT=2;
+        
+        this.TEXT_ALIGN_LIST=['left','center','right'];
+        
+        this.POSITION_MODE_TOP_LEFT=0;
+        this.POSITION_MODE_TOP_RIGHT=1;
+        this.POSITION_MODE_BOTTOM_LEFT=2;
+        this.POSITION_MODE_BOTTOM_RIGHT=3;
+        this.POSITION_MODE_MIDDLE=4;
+        
+        this.POSITION_MODE_LIST=['topLeft','topRight','bottomLeft','bottomRight','middle'];
         
         this.core=core;
         
@@ -188,28 +199,77 @@ export default class InterfaceClass
         // add interface chunks
         //
         
-    addElement(id,bitmap,uvOffset,uvSize,rect,color,alpha)
+    addElement(id,bitmap,width,height,positionMode,positionOffset,color,alpha)
     {
-        let element=new InterfaceElementClass(this.core,bitmap,uvOffset,uvSize,rect,color,alpha);
+        let element;
+        let rect=new RectClass(positionOffset.x,positionOffset.y,(positionOffset.x+width),(positionOffset.y+height));
         
+        switch (positionMode) {
+            case this.POSITION_MODE_TOP_RIGHT:
+                rect.move(this.core.canvas.width,0);
+                break;
+            case this.POSITION_MODE_BOTTOM_LEFT:
+                rect.move(0,this.core.canvas.height);
+                break;
+            case this.POSITION_MODE_BOTTOM_RIGHT:
+                rect.move(this.core.canvas.width,this.core.canvas.height);
+                break;
+            case this.POSITION_MODE_MIDDLE:
+                rect.move(Math.trunc(this.core.canvas.width*0.5),Math.trunc(this.core.canvas.height*0.5));
+                break;
+        }
+            
+        element=new InterfaceElementClass(this.core,bitmap,rect,color,alpha);
         element.initialize();
         this.elements.set(id,element);
     }
     
     showElement(id,show)
     {
-        this.elements.get(id).show=show;
+        let element=this.elements.get(id);
+        if (element===undefined) {
+            console.log('Interface element ID does not exist: '+id);
+            return;
+        }
+        
+        element.show=show;
     }
     
     pulseElement(id,tick,expand)
     {
-        this.elements.get(id).pulse(tick,expand);
+        let element=this.elements.get(id);
+        if (element===undefined) {
+            console.log('Interface element ID does not exist: '+id);
+            return;
+        }
+        
+        element.pulse(tick,expand);
     }
     
-    addText(id,str,x,y,fontSize,align,color,alpha)
+    addText(id,str,positionMode,positionOffset,fontSize,align,color,alpha)
     {
-        let text=new InterfaceTextClass(this.core,(''+str),x,y,fontSize,align,color,alpha);
+        let text;
+        let x=positionOffset.x;
+        let y=positionOffset.y;
         
+        switch (positionMode) {
+            case this.POSITION_MODE_TOP_RIGHT:
+                x+=this.core.canvas.width;
+                break;
+            case this.POSITION_MODE_BOTTOM_LEFT:
+                y+=this.core.canvas.height;
+                break;
+            case this.POSITION_MODE_BOTTOM_RIGHT:
+                x+=this.core.canvas.width;
+                y+=this.core.canvas.height;
+                break;
+            case this.POSITION_MODE_MIDDLE:
+                x+=Math.trunc(this.core.canvas.width*0.5);
+                y+=Math.trunc(this.core.canvas.height*0.5);
+                break;
+        }
+
+        text=new InterfaceTextClass(this.core,(''+str),x,y,fontSize,align,color,alpha);
         text.initialize();
         this.texts.set(id,text);
     }
@@ -217,6 +277,10 @@ export default class InterfaceClass
     removeText(id)
     {
         let text;
+        if (text===undefined) {
+            console.log('Interface text ID does not exist: '+id);
+            return;
+        }
                 
         text=this.texts.get(id);
         if (text!==undefined) {
@@ -228,6 +292,10 @@ export default class InterfaceClass
     showText(id,show)
     {
         let text=this.texts.get(id);
+        if (text===undefined) {
+            console.log('Interface text ID does not exist: '+id);
+            return;
+        }
         
         text.show=show;
         text.hideTick=-1;
@@ -236,6 +304,10 @@ export default class InterfaceClass
     updateText(id,str)
     {
         let text=this.texts.get(id);
+        if (text===undefined) {
+            console.log('Interface text ID does not exist: '+id);
+            return;
+        }
         
         text.str=''+str;      // make sure it's a string
         text.hideTick=-1;
@@ -244,6 +316,10 @@ export default class InterfaceClass
     updateTemporaryText(id,str,tick)
     {
         let text=this.texts.get(id);
+        if (text===undefined) {
+            console.log('Interface text ID does not exist: '+id);
+            return;
+        }
         
         text.str=''+str;      // make sure it's a string
         text.show=true;

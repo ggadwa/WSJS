@@ -1,12 +1,10 @@
 export default class InterfaceElementClass
 {
-    constructor(core,bitmap,uvOffset,uvSize,rect,color,alpha)
+    constructor(core,bitmap,rect,color,alpha)
     {
         this.core=core;
         
         this.bitmap=bitmap;
-        this.uvOffset=uvOffset;
-        this.uvSize=uvSize;
         this.rect=rect;
         this.color=color;
         this.alpha=alpha;
@@ -122,26 +120,14 @@ export default class InterfaceElementClass
         this.vertexArray[6]=lx;
         this.vertexArray[7]=by;
         
-        if (this.uvOffset===null) {
-            this.uvArray[0]=0;
-            this.uvArray[1]=0;
-            this.uvArray[2]=1;
-            this.uvArray[3]=0;
-            this.uvArray[4]=1;
-            this.uvArray[5]=1;
-            this.uvArray[6]=0;
-            this.uvArray[7]=1;
-        }
-        else {
-            this.uvArray[0]=this.uvOffset.x;
-            this.uvArray[1]=this.uvOffset.y;
-            this.uvArray[2]=this.uvOffset.x+this.uvSize.x;
-            this.uvArray[3]=this.uvOffset.y;
-            this.uvArray[4]=this.uvOffset.x+this.uvSize.x;
-            this.uvArray[5]=this.uvOffset.y+this.uvSize.y;
-            this.uvArray[4]=this.uvOffset.x;
-            this.uvArray[5]=this.uvOffset.y+this.uvSize.y;
-        }
+        this.uvArray[0]=0;
+        this.uvArray[1]=0;
+        this.uvArray[2]=1;
+        this.uvArray[3]=0;
+        this.uvArray[4]=1;
+        this.uvArray[5]=1;
+        this.uvArray[6]=0;
+        this.uvArray[7]=1;
         
             // setup the bitmap
             

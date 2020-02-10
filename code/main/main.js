@@ -1,5 +1,7 @@
 import PointClass from '../utility/point.js';
 import CoreClass from '../main/core.js';
+import GameJsonClass from '../project/game_json.js';
+import MapDungeonClass from '../../demo/scripts/maps/map_dungeon.js';
 
 //
 // main class
@@ -13,15 +15,17 @@ class MainClass
             // object for all game objects
 
         this.core=new CoreClass();
+        this.data=null;
 
         Object.seal(this);
     }
     
-    run(gameClass,isMultiplayer,data)
+    run(isMultiplayer,data)
     {
-            // setup networking
+            // misc setup
             
         this.core.isMultiplayer=isMultiplayer;
+        this.data=data;
         
             // remove any old html and start
             // the canvas
@@ -31,8 +35,6 @@ class MainClass
         
             // the project objects
             
-        this.core.projectGame=new gameClass(this.core,data);
-        this.core.projectMap=this.core.projectGame.getStartProjectMap();
         
         setTimeout(this.initCore.bind(this),1);
     }
@@ -43,16 +45,23 @@ class MainClass
         if (!(await this.core.loadShaders())) return;
 
         this.core.loadingScreenUpdate();
-        this.core.loadingScreenAddString('Initializing Internal Structures');
+        this.core.loadingScreenAddString('Initializing Game');
         this.core.loadingScreenDraw();
 
-        setTimeout(this.initInternal.bind(this),1);
+        setTimeout(this.initGame.bind(this),1);
     }
 
-    initInternal()
+    async initGame()
     {
+        this.core.projectGame=new GameJsonClass(this.core,this.data);
+        if (!(await this.core.projectGame.initialize())) return;
+        
+          //TODO all of   
+        //this.core.projectGame=new gameClass(this.core,data);
+        this.core.projectMap=new MapDungeonClass(this.core);        // redo this TODO
         if (!this.core.map.initialize()) return;
-        this.core.projectGame.initialize();
+        
+        this.core.loadSetup();          // requires game to be loaded first
 
             // next step
 
@@ -193,7 +202,7 @@ class MainClass
     {
             // setup the interface
 
-        this.core.projectGame.createInterface();
+        if (!this.core.projectGame.ready()) return;       // halt on bad ready
         
             // setup draw buffers
 
