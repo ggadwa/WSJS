@@ -124,6 +124,7 @@ export default class MapEffectListClass
             if (!effect.show) continue;
             
             light=effect.light;
+            if (light===null) continue;
             if (light.intensity===0) continue;
             
                 // always reset light to

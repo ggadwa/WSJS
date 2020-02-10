@@ -4,23 +4,66 @@ import BoundClass from '../utility/bound.js';
 import LightClass from '../light/light.js';
 import ProjectEffectClass from '../project/project_effect.js';
 
-class ProjectEffectChunkClass2
+class ProjectEffectChunkClass
 {
-    constructor(bitmap,glDrawType,indexCount,drawMode)
+    constructor(bitmap,glDrawType,indexCount,drawMode,motionPoints,grid,gridPeriod,gridOffset,wave,waveRandomStart,wavePeriod,waveSize)
     {
+        let n;
+        
         this.bitmap=bitmap;
         this.glDrawType=glDrawType;
         this.indexCount=indexCount;
         this.drawMode=drawMode;
+        this.motionPoints=motionPoints;
         
+            // sprite catalog/grid type setup
+            
+        this.grid=grid;
+        this.gridSquareRoot=Math.trunc(Math.sqrt(this.grid));
+        this.gridPeriod=gridPeriod;
+        this.gridOffset=gridOffset;
+        
+        if (grid===1) {
+            this.uSize=this.vSize=1.0;
+        }
+        else {
+            this.uSize=this.vSize=1.0/this.gridSquareRoot;
+        }
+        
+            // offsets into gl buffers
+            
         this.vertexOffset=0;
         this.indexOffset=0;
         
+            // frame based items
+            
+        this.spread=0.0;
         this.width=0;
         this.height=0;
         this.rotate=0;
         this.color=new ColorClass(1,1,1);
         this.alpha=1.0;
+        
+        this.drawPoints=[];
+        
+        if (this.motionPoints!==null) {
+            for (n=0;n!==this.motionPoints.length;n++) {
+                this.drawPoints.push(new PointClass(0,0,0));
+            }
+        }
+        
+            // waves
+            
+        this.wave=wave;
+        this.wavePeriod=wavePeriod;
+        this.waveSize=waveSize;
+        this.wavePeriodicTickOffset=new Int32Array(12);
+            
+        if ((wave) && (waveRandomStart)) {
+            for (n=0;n!==12;n++) {
+                this.wavePeriodicTickOffset[n]=Math.random()*wavePeriod;
+            }
+        }
         
         Object.seal(this);
     }
@@ -39,6 +82,8 @@ export default class EffectJsonClass extends ProjectEffectClass
         this.DRAW_MODE_OPAQUE=0;
         this.DRAW_MODE_TRANSPARENT=1;
         this.DRAW_MODE_ADDITIVE=2;
+        
+        this.startTimestamp=0;
         
         this.vertexes=null;
         this.uvs=null;
@@ -61,8 +106,7 @@ export default class EffectJsonClass extends ProjectEffectClass
         this.tempPoint=new PointClass(0,0,0);
         this.motionPoint=new PointClass(0,0,0);
         
-        this.light=new LightClass(new PointClass(0,0,0),new ColorClass(1.0,1.0,1.0),0,1.0,false);
-        this.light.position.setFromPoint(position);
+        this.light=null;
     }
     
     getJson()
@@ -72,26 +116,29 @@ export default class EffectJsonClass extends ProjectEffectClass
     
     initialize()
     {
-        let billboard,triangle;
-        let drawMode,bitmap;
+        let n,billboard,triangle,particle;
+        let drawMode,grid,bitmap;
+        let dx,dy,dz,motionPoints;
         let vertexCount,indexCount;
         let gl=this.core.gl;
         let drawModeList=['opaque','transparent','additive'];
         
         super.initialize();
         
-        this.json=this.getJson();
+        try {
+            this.json=this.getJson();   // eventually need to parse from file here
+        }
+        catch (e) {
+            console.info('JSON is bad: '+e);
+            return(false);
+        }
+        
+        this.startTimestamp=this.core.timestamp;
         
             // lights
             
-        this.light.color.setFromValues(this.json.light.color.r,this.json.light.color.g,this.json.light.color.b);
-        this.light.exponent=this.json.light.exponent;
-        this.light.setIntensity(this.json.light.intensity);
-        
-        if (this.json.light.glow) {
-            this.lightIntensityGlowDrop=Math.trunc(this.json.light.intensity*this.json.light.glowPercentage);
-            this.lightPeriodicTick=this.json.light.glowPeriod;
-            this.lightPeriodicTickOffset=(this.json.light.glowRandomStart)?Math.trunc(Math.random()*this.lightPeriodicTick):0;
+        if (this.json.light!==undefined) {
+            this.light=new LightClass(this.position.copy(),new ColorClass(1.0,1.0,1.0),0,1.0,false);
         }
         
             // setup the chunk classes and
@@ -114,13 +161,15 @@ export default class EffectJsonClass extends ProjectEffectClass
                     return(false);
                 }
                 
+                grid=(billboard.grid===undefined)?1:billboard.grid;
+                
                 bitmap=this.core.bitmapList.get(billboard.bitmap);
                 if (bitmap===undefined) {
                     console.log('Unknown effect bitmap: '+billboard.bitmap);
                     return(false);
                 }
                 
-                this.chunks.push(new ProjectEffectChunkClass2(bitmap,gl.TRIANGLES,6,drawMode));
+                this.chunks.push(new ProjectEffectChunkClass(bitmap,gl.TRIANGLES,6,drawMode,null,grid,billboard.gridPeriod,billboard.gridOffset,billboard.wave,billboard.waveRandomStart,billboard.wavePeriod,billboard.waveSize));
                 
                     // drawing one quad
                     
@@ -147,7 +196,7 @@ export default class EffectJsonClass extends ProjectEffectClass
                     return(false);
                 }
                 
-                this.chunks.push(new ProjectEffectChunkClass2(bitmap,gl.TRIANGLES,3,drawMode));
+                this.chunks.push(new ProjectEffectChunkClass(bitmap,gl.TRIANGLES,3,drawMode,null,1,0,0,triangle.wave,triangle.waveRandomStart,triangle.wavePeriod,triangle.waveSize));
                 
                     // drawing one quad
                     
@@ -155,10 +204,50 @@ export default class EffectJsonClass extends ProjectEffectClass
                 indexCount+=3;
             }
         }
+        
+        if (this.json.particles!==undefined) {
+            
+            for (particle of this.json.particles) {
+                
+                    // setup the chunk
 
+                drawMode=drawModeList.indexOf(particle.mode);
+                if (drawMode===-1) {
+                    console.log('Unknown effect draw mode: '+particle.mode);
+                    return(false);
+                }
+                
+                grid=(particle.grid===undefined)?1:particle.grid;
+                
+                bitmap=this.core.bitmapList.get(particle.bitmap);
+                if (bitmap===undefined) {
+                    console.log('Unknown effect bitmap: '+particle.bitmap);
+                    return(false);
+                }
+                
+                    // need motion points
+                    
+                motionPoints=[];
+                
+                dx=particle.motion.x*2;
+                dy=particle.motion.y*2;
+                dz=particle.motion.z*2;
 
-               
-               
+                for (n=0;n!==particle.count;n++) {
+                    motionPoints.push(new PointClass((((dx*Math.random())-particle.motion.x)*0.5),(((dy*Math.random())-particle.motion.y)*0.5),(((dz*Math.random())-particle.motion.z))*0.5));  // multiply by 0.5 as these are "radius" but listed as "diameter"
+                }
+                
+                this.chunks.push(new ProjectEffectChunkClass(bitmap,gl.TRIANGLES,(particle.count*6),drawMode,motionPoints,grid,particle.gridPeriod,particle.gridOffset,false,false,0,0));
+                    
+                    // count quads
+                    
+                vertexCount+=(particle.count*4);
+                indexCount+=(particle.count*6);
+            }
+        }
+
+            // webgl buffers
+            
         if (indexCount!==0) {
         
                 // internal vertexes, uvs and indexes
@@ -183,7 +272,11 @@ export default class EffectJsonClass extends ProjectEffectClass
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.indexes,gl.DYNAMIC_DRAW);
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
-        }    
+        }
+        
+            // finally any sound
+            
+        if (this.json.sound!==undefined) this.core.soundList.play(this,null,this.json.sound.name,this.json.sound.rate,this.json.sound.loop);
        
         return(true);
     }
@@ -203,19 +296,34 @@ export default class EffectJsonClass extends ProjectEffectClass
         // vertex list adds
         //
         
-    addQuadToVertexList(chunk,centerPnt,u,v,uSize,vSize)
+    addQuadToVertexList(chunk,centerPnt)
     {
+        let gridIdx,u,v;
+        let halfWid,halfHigh;
         let elementIdx=Math.trunc(this.vertexIdx/3);
-         
-            // remember offsets
+        
+            // the grid
             
-        chunk.vertexOffset=this.vertexIdx;
-        chunk.indexOffset=this.indexIdx;
+        if (chunk.grid!==1) {
+            gridIdx=Math.trunc(((this.core.timestamp%chunk.gridPeriod)/chunk.gridPeriod)*chunk.grid);
+            gridIdx=(gridIdx+chunk.gridOffset)%chunk.grid;
+            
+            u=(gridIdx%chunk.gridSquareRoot)*chunk.vSize;
+            v=(Math.trunc(gridIdx/chunk.gridSquareRoot))*chunk.uSize;
+        }
+        else {
+            u=v=0.0;
+        }
+        
+            // need half width/height
+            
+        halfWid=Math.trunc(chunk.width*0.5);
+        halfHigh=Math.trunc(chunk.height*0.5);
        
             // top left
             
-        this.tempPoint.x=-chunk.width;
-        this.tempPoint.y=-chunk.height;
+        this.tempPoint.x=halfWid;
+        this.tempPoint.y=halfHigh;
         this.tempPoint.z=0.0;
         if (chunk.rotate!==0.0) this.tempPoint.rotateZ(null,chunk.rotate);
         this.tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
@@ -229,8 +337,8 @@ export default class EffectJsonClass extends ProjectEffectClass
 
             // top right
             
-        this.tempPoint.x=chunk.width;
-        this.tempPoint.y=-chunk.height;
+        this.tempPoint.x=-halfWid;
+        this.tempPoint.y=halfHigh;
         this.tempPoint.z=0.0;
         if (chunk.rotate!==0.0) this.tempPoint.rotateZ(null,chunk.rotate);
         this.tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
@@ -239,13 +347,13 @@ export default class EffectJsonClass extends ProjectEffectClass
         this.vertexes[this.vertexIdx++]=this.tempPoint.y+centerPnt.y;
         this.vertexes[this.vertexIdx++]=this.tempPoint.z+centerPnt.z;
 
-        this.uvs[this.uvIdx++]=u+uSize;
+        this.uvs[this.uvIdx++]=u+chunk.uSize;
         this.uvs[this.uvIdx++]=v;
 
             // bottom right
             
-        this.tempPoint.x=chunk.width;
-        this.tempPoint.y=chunk.height;
+        this.tempPoint.x=-halfWid;
+        this.tempPoint.y=-halfHigh;
         this.tempPoint.z=0.0;
         if (chunk.rotate!==0.0) this.tempPoint.rotateZ(null,chunk.rotate);
         this.tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
@@ -254,13 +362,13 @@ export default class EffectJsonClass extends ProjectEffectClass
         this.vertexes[this.vertexIdx++]=this.tempPoint.y+centerPnt.y;
         this.vertexes[this.vertexIdx++]=this.tempPoint.z+centerPnt.z;
 
-        this.uvs[this.uvIdx++]=u+uSize;
-        this.uvs[this.uvIdx++]=v+vSize;
+        this.uvs[this.uvIdx++]=u+chunk.uSize;
+        this.uvs[this.uvIdx++]=v+chunk.vSize;
 
             // bottom left
             
-        this.tempPoint.x=-chunk.width;
-        this.tempPoint.y=chunk.height;
+        this.tempPoint.x=halfWid;
+        this.tempPoint.y=-halfHigh;
         this.tempPoint.z=0.0;
         if (chunk.rotate!==0.0) this.tempPoint.rotateZ(null,chunk.rotate);
         this.tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
@@ -270,7 +378,7 @@ export default class EffectJsonClass extends ProjectEffectClass
         this.vertexes[this.vertexIdx++]=this.tempPoint.z+centerPnt.z;
 
         this.uvs[this.uvIdx++]=u;
-        this.uvs[this.uvIdx++]=v+vSize;
+        this.uvs[this.uvIdx++]=v+chunk.vSize;
 
             // build the triangles
 
@@ -286,11 +394,6 @@ export default class EffectJsonClass extends ProjectEffectClass
     addTriangleToVertexList(chunk,triangle)
     {
         let elementIdx=Math.trunc(this.vertexIdx/3);
-        
-            // remember offsets
-            
-        chunk.vertexOffset=this.vertexIdx;
-        chunk.indexOffset=this.indexIdx;
         
             // build the triangle
             
@@ -319,29 +422,47 @@ export default class EffectJsonClass extends ProjectEffectClass
         this.indexes[this.indexIdx++]=elementIdx+1;
         this.indexes[this.indexIdx++]=elementIdx+2;
     }
+    
+        //
+        // waves
+        //
+        
+    addWave(chunk)
+    {
+        let n,freq;
+        let vertexCount=chunk.indexCount*3;
+        
+        if (!chunk.wave) return;
+        
+        for (n=0;n!==vertexCount;n++) {
+            freq=(((this.core.timestamp+chunk.wavePeriodicTickOffset[n])%chunk.wavePeriod)/chunk.wavePeriod)*(Math.PI*2);
+            this.vertexes[chunk.vertexOffset+n]+=Math.trunc(Math.sin(freq)*chunk.waveSize);
+        }
+    }
 
         //
         // frame tweening
         //
         
-    tweenFrames(frames,chunk)
+    tweenLightFrames()
     {
-        let n,f,tick,lastTick;
+        let n,f,tick,lastTick,frames;
         let startIdx,endIdx;
         let startFrame,endFrame,frameCount;
+        let r,g,b;
+        
+        if (this.light===null) return;
+        
+        frames=this.json.light.frames;
         
             // if there is only one frame, no tweening
             
         frameCount=frames.length;
         if (frameCount===1) {
             startFrame=frames[0];
-            chunk.width=startFrame.width;
-            chunk.height=startFrame.height;
-            chunk.rotate=startFrame.rotate;
-            chunk.alpha=startFrame.alpha;
-            chunk.color.r=startFrame.color.r;
-            chunk.color.g=startFrame.color.g;
-            chunk.color.b=startFrame.color.b;
+            this.light.color.setFromValues(startFrame.color.r,startFrame.color.g,startFrame.color.b);
+            this.light.exponent=startFrame.exponent;
+            this.light.setIntensity(startFrame.intensity);
             return;
         }
         
@@ -349,7 +470,7 @@ export default class EffectJsonClass extends ProjectEffectClass
             
         lastTick=frames[frameCount-1].tick;
         
-        tick=(this.core.timestamp%lastTick);
+        tick=((this.core.timestamp-this.startTimestamp)%lastTick);
         
             // find the tween points
             
@@ -378,9 +499,76 @@ export default class EffectJsonClass extends ProjectEffectClass
         
             // tween
             
-        chunk.width=startFrame.width+Math.trunc((endFrame.width-startFrame.width)*f);
-        chunk.height=startFrame.height+Math.trunc((endFrame.height-startFrame.height)*f);
-        chunk.rotate=startFrame.rotate+((endFrame.rotate-startFrame.rotate)*f);
+        r=startFrame.color.r+((endFrame.color.r-startFrame.color.r)*f);
+        g=startFrame.color.g+((endFrame.color.g-startFrame.color.g)*f);
+        b=startFrame.color.b+((endFrame.color.b-startFrame.color.b)*f);
+        
+        this.light.color.setFromValues(r,g,b);
+        
+        this.light.exponent=startFrame.exponent+((endFrame.exponent-startFrame.exponent)*f);
+        this.light.setIntensity(startFrame.intensity+((endFrame.intensity-startFrame.intensity)*f));
+    }
+        
+    tweenChunkFrames(frames,chunk)
+    {
+        let n,f,tick,lastTick;
+        let startIdx,endIdx;
+        let startFrame,endFrame,frameCount;
+        
+            // if there is only one frame, no tweening
+            
+        frameCount=frames.length;
+        if (frameCount===1) {
+            startFrame=frames[0];
+            if (startFrame.spread!==undefined) chunk.spread=startFrame.spread;
+            if (startFrame.width!==undefined) chunk.width=startFrame.width;
+            if (startFrame.height!==undefined) chunk.height=startFrame.height;
+            if (startFrame.rotate!==undefined) chunk.rotate=startFrame.rotate;
+            
+            chunk.alpha=startFrame.alpha;
+            chunk.color.r=startFrame.color.r;
+            chunk.color.g=startFrame.color.g;
+            chunk.color.b=startFrame.color.b;
+            return;
+        }
+        
+            // get the last frame and within cycle tick
+            
+        lastTick=frames[frameCount-1].tick;
+        
+        tick=((this.core.timestamp-this.startTimestamp)%lastTick);
+        
+            // find the tween points
+            
+        startIdx=0;
+        endIdx=frameCount-1;
+        
+        for (n=0;n!==frameCount;n++) {
+            if (tick<=frames[n].tick) {
+                endIdx=n;
+                break;
+            }
+            startIdx=n;
+        }
+        
+            // tween factor
+            
+        startFrame=frames[startIdx];
+        endFrame=frames[endIdx];
+         
+        if (startIdx===endIdx) {
+            f=1;
+        }
+        else {
+            f=(tick-startFrame.tick)/(endFrame.tick-startFrame.tick);
+        }
+        
+            // tween
+            
+        if (startFrame.spread!==undefined) chunk.spread=startFrame.spread+((endFrame.spread-startFrame.spread)*f);
+        if (startFrame.width!==undefined) chunk.width=startFrame.width+Math.trunc((endFrame.width-startFrame.width)*f);
+        if (startFrame.height!==undefined) chunk.height=startFrame.height+Math.trunc((endFrame.height-startFrame.height)*f);
+        if (startFrame.rotate!==undefined) chunk.rotate=startFrame.rotate+((endFrame.rotate-startFrame.rotate)*f);
         
         chunk.alpha=startFrame.alpha+((endFrame.alpha-startFrame.alpha)*f);
         chunk.color.r=startFrame.color.r+((endFrame.color.r-startFrame.color.r)*f);
@@ -394,16 +582,26 @@ export default class EffectJsonClass extends ProjectEffectClass
         
     drawSetup()
     {
-        let billboard,triangle;
+        let n,billboard,triangle,particle;
         let chunk,chunkIdx;
-        let glowFreq;
+        let halfWid,halfHigh;
         
-            // any light glow effect
-            
-        if (this.json.light.glow) {
-            glowFreq=(((this.core.timestamp+this.lightPeriodicTickOffset)%this.lightPeriodicTick)/this.lightPeriodicTick)*(Math.PI*2);
-            this.light.setIntensity(this.json.light.intensity-(Math.trunc(Math.sin(glowFreq)*this.lightIntensityGlowDrop)));
+            // effects with life tick
+          
+        if (this.json.lifeTick!==undefined) {
+            if ((this.core.timestamp-this.startTimestamp)>this.json.lifeTick) {
+                this.markDelete=true;
+                return(false);
+            }
         }
+        
+            // light frames
+            
+        this.tweenLightFrames();
+        
+            // no chunks, no draw
+            
+        if (this.chunks.length===0) return(false);
         
             // track the bounds as we look over the chunks
             
@@ -420,25 +618,28 @@ export default class EffectJsonClass extends ProjectEffectClass
             for (billboard of this.json.billboards) {
                 
                 chunk=this.chunks[chunkIdx];
-                this.tweenFrames(billboard.frames,chunk);
+                this.tweenChunkFrames(billboard.frames,chunk);
                 
-                this.xBound.adjust(this.position.x-chunk.width);
-                this.xBound.adjust(this.position.x+chunk.width);
-                this.yBound.adjust(this.position.y-chunk.height);
-                this.yBound.adjust(this.position.y+chunk.height);
-                this.zBound.adjust(this.position.z-chunk.width);
-                this.zBound.adjust(this.position.z+chunk.width);
+                halfWid=Math.trunc(chunk.width*0.5);
+                halfHigh=Math.trunc(chunk.height*0.5);
+                
+                this.xBound.adjust(this.position.x-halfWid);
+                this.xBound.adjust(this.position.x+halfWid);
+                this.yBound.adjust(this.position.y-halfHigh);
+                this.yBound.adjust(this.position.y+halfHigh);
+                this.zBound.adjust(this.position.z-halfWid);
+                this.zBound.adjust(this.position.z+halfWid);
                 
                 chunkIdx++;
             }
         }
         
-        if (this.json.triangles!==triangle) {
+        if (this.json.triangles!==undefined) {
             
             for (triangle of this.json.triangles) {
                 
                 chunk=this.chunks[chunkIdx];
-                this.tweenFrames(triangle.frames,chunk);
+                this.tweenChunkFrames(triangle.frames,chunk);
                 
                 this.xBound.adjust(triangle.v0.x);
                 this.xBound.adjust(triangle.v1.x);
@@ -453,6 +654,33 @@ export default class EffectJsonClass extends ProjectEffectClass
                 chunkIdx++;
             }
         }    
+            
+        if (this.json.particles!==undefined) {
+            
+            for (particle of this.json.particles) {
+                
+                chunk=this.chunks[chunkIdx];
+                this.tweenChunkFrames(particle.frames,chunk);
+                
+                halfWid=Math.trunc(chunk.width*0.5);
+                halfHigh=Math.trunc(chunk.height*0.5);
+                
+                for (n=0;n!==particle.count;n++) {
+                    chunk.drawPoints[n].x=this.position.x+(chunk.motionPoints[n].x*chunk.spread);
+                    chunk.drawPoints[n].y=this.position.y+(chunk.motionPoints[n].y*chunk.spread);
+                    chunk.drawPoints[n].z=this.position.z+(chunk.motionPoints[n].z*chunk.spread);
+                    
+                    this.xBound.adjust(chunk.drawPoints[n].x-halfWid);
+                    this.xBound.adjust(chunk.drawPoints[n].x+halfWid);
+                    this.yBound.adjust(chunk.drawPoints[n].y-halfHigh);
+                    this.yBound.adjust(chunk.drawPoints[n].y+halfHigh);
+                    this.zBound.adjust(chunk.drawPoints[n].z-halfWid);
+                    this.zBound.adjust(chunk.drawPoints[n].z+halfWid);
+                }
+                
+                chunkIdx++;
+            }
+        }
 
             // now determine if we can draw this
             
@@ -461,7 +689,7 @@ export default class EffectJsonClass extends ProjectEffectClass
     
     draw()
     {
-        let billboard,triangle;
+        let n,billboard,triangle,particle;
         let chunk,chunkIdx,currentDrawMode;
         let currentBitmap;
         let gl=this.core.gl;
@@ -480,16 +708,41 @@ export default class EffectJsonClass extends ProjectEffectClass
             
             for (billboard of this.json.billboards) {
                 chunk=this.chunks[chunkIdx];
-                this.addQuadToVertexList(chunk,this.position,0.0,0.0,1.0,1.0);
+                chunk.vertexOffset=this.vertexIdx;
+                chunk.indexOffset=this.indexIdx;
+
+                this.addQuadToVertexList(chunk,this.position);
+                this.addWave(chunk);
+                
                 chunkIdx++;
             }
         }
         
-        if (this.json.triangles!==triangle) {
+        if (this.json.triangles!==undefined) {
             
             for (triangle of this.json.triangles) {
                 chunk=this.chunks[chunkIdx];
+                chunk.vertexOffset=this.vertexIdx;
+                chunk.indexOffset=this.indexIdx;
+                
                 this.addTriangleToVertexList(chunk,triangle);
+                this.addWave(chunk);
+                
+                chunkIdx++;
+            }
+        }    
+        
+        if (this.json.particles!==undefined) {
+            
+            for (particle of this.json.particles) {
+                chunk=this.chunks[chunkIdx];
+                chunk.vertexOffset=this.vertexIdx;
+                chunk.indexOffset=this.indexIdx;
+                
+                for (n=0;n!==particle.count;n++) {
+                    this.addQuadToVertexList(chunk,chunk.drawPoints[n]);
+                }
+                
                 chunkIdx++;
             }
         }    

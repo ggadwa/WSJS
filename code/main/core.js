@@ -553,6 +553,7 @@ export default class CoreClass
             // draw the sky and map
             
         this.map.sky.draw();
+
         if (!this.debugCollisionSurfaces) {
             this.map.meshList.draw(null,false);
             this.map.meshList.draw(null,true);
@@ -560,7 +561,7 @@ export default class CoreClass
         else {
             this.map.meshList.debugDrawCollisionSurfaces();
         }
-        
+
             // path debugging
             
         if (this.debugPaths) this.map.path.debugDrawPath();

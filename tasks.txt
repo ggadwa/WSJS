@@ -1,7 +1,8 @@
 - json must be SHARED
 - load json ahead of time and fail out at map level if compile bad
-
-- KART: update light positions in effects
+- lights are adding strangely (check out kart track with purple)
+- sound play might need position instead of expecting object with .position (as effects call it)
+- wsserver - option to show http log in server (default to off)
 
    - pulse in weapon add ammo
                                     {"type":"pulseInterface","element":"health","tick":500,"expand":5},
@@ -13,10 +14,8 @@
 
 
    ----> current todo
-          - need effects as JSON
-          - need to do effect wave
-          - rest of flame
-          - sound effects (effect_explosion_fire)
+          - index list should be static in effects
+          - remove project_effect
           - finish pistol weapon
           - replace to other weapons
           - put other weapons back in captain chest json

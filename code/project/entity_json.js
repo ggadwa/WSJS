@@ -21,7 +21,6 @@ export default class EntityJsonClass extends ProjectEntityClass
             // variables
           
         this.variables=new Map();
-        this.createVariables();
         
             // compile any calcs
             
@@ -46,9 +45,10 @@ export default class EntityJsonClass extends ProjectEntityClass
         this.handPosition=this.getPointFromJson(this.json.draw.handPosition);
         this.handAngle=this.getPointFromJson(this.json.draw.handAngle);
         
-            // misc
+            // messages
             
-        this.currentMessageContent=null;        // used to track current message content for @content look ups
+        this.messageQueue=new Map();
+        this.currentMessageContent=null;        // used to track current message content for @message look ups
         
         return(true);
     }
@@ -56,21 +56,6 @@ export default class EntityJsonClass extends ProjectEntityClass
     getJson()
     {
         return(null);
-    }
-    
-        //
-        // create variables
-        //
-        
-    createVariables()
-    {
-        let variable;
-                
-        if (this.json.variables===undefined) return;
-        
-        for (variable of this.json.variables) {
-            this.variables.set(variable.name,variable.value);
-        }
     }
     
         //
@@ -102,7 +87,7 @@ export default class EntityJsonClass extends ProjectEntityClass
         for (action of actions) {
             if (action.type==='calc') {
                 if (action.set===undefined) {
-                    console.log('Action calcs require a set attribute');
+                    console.log('Action calcs require a set attribute in: '+this.name);
                     return(false);
                 }
                 
@@ -119,18 +104,16 @@ export default class EntityJsonClass extends ProjectEntityClass
     
     compileCalcs()
     {
-        let event,message;
+        let event;
+        
+        if (this.json.ready!==undefined) {
+            if (!this.compileCalcsActions(this.json.ready.actions)) return(false);
+        }
         
         if (this.json.events!==undefined) {
             for (event of this.json.events) {
                 if (!this.compileCalcsConditions(event.conditions)) return(false);
                 if (!this.compileCalcsActions(event.actions)) return(false);
-            }
-        }
-        if (this.json.messages!==undefined) {
-            for (message of this.json.messages) {
-                if (!this.compileCalcsConditions(message.conditions)) return(false);
-                if (!this.compileCalcsActions(message.actions)) return(false);
             }
         }
         
@@ -161,7 +144,7 @@ export default class EntityJsonClass extends ProjectEntityClass
         if (typeof(value)!=='string') return(value);
         
         if (value==='@timestamp') return(this.core.timestamp);
-        if (value==='@content') return(this.currentMessageContent);
+        if (value==='@message') return(this.currentMessageContent);
         return(value);
     }
     
@@ -260,8 +243,12 @@ export default class EntityJsonClass extends ProjectEntityClass
                 case 'send':
                     entity=this.getEntityFromJson(action.entity);
                     if (entity===null) return(false);
-                    
-                    entity.receiveMessage(action.message,this.jsonContentTranslate(action.content));
+                    if (entity.json.events===undefined) {
+                        console.log('Entity '+entity.name+' can not receive messages, it has no events');
+                        return(false);
+                    }
+                        
+                    entity.messageQueue.set(action.name,this.jsonContentTranslate(action.content));
                     break;
                     
                 case 'calc':
@@ -281,7 +268,7 @@ export default class EntityJsonClass extends ProjectEntityClass
         
     areConditionsMet(conditions)
     {
-        let condition,entity;
+        let condition,entity,messageContent;
         
             // no conditions means always
             
@@ -292,6 +279,14 @@ export default class EntityJsonClass extends ProjectEntityClass
         for (condition of conditions) {
             
             switch(condition.type) {
+                
+                case 'receive':
+                    messageContent=this.messageQueue.get(condition.name);
+                    if (messageContent===undefined) return(false);
+                    
+                    this.currentMessageContent=messageContent;      // to pick up in actions
+                    this.messageQueue.delete(condition.name);
+                    break;
                 
                 case "key":
                     if (!this.isKeyDown(condition.key)) return(false);
@@ -345,33 +340,7 @@ export default class EntityJsonClass extends ProjectEntityClass
         
     receiveMessage(name,content)
     {
-        let message,handled;
-        let messages=this.json.messages;
-        
-        if (messages===undefined) return;
-        
-            // remember what the content is for @content lookups
-            
-        this.currentMessageContent=content;
-        
-            // run through the messages
-            // if we have conditions, we can have the same message
-            // defined and it falls through until hitting one with
-            // a met condition
-            
-        handled=false;
-        
-        for (message of messages) {
-            if (message.message===name) {
-                handled=true;
-                if (this.areConditionsMet(message.conditions)) {
-                    this.runActions(message.actions);
-                    return;
-                }
-            }
-        }
-        
-        if (!handled) console.log('Unhandled message in '+this.name+': '+name);
+        if (this.json.events!==undefined) this.messageQueue.set(name,content);  // if no events, we can't take messages
     }
 
         //
@@ -380,7 +349,7 @@ export default class EntityJsonClass extends ProjectEntityClass
         
     ready()
     {
-        this.runActions(this.json.readyActions);
+        if (this.json.ready!==undefined) this.runActions(this.json.ready.actions);
     }
     
     run()

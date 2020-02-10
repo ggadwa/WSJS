@@ -48,6 +48,8 @@ export default class CalcClass
         
         this.root=null;
         
+        this.simpleCalcValue=null;
+        
         Object.seal(this);
     }
     
@@ -67,7 +69,7 @@ export default class CalcClass
                 return(new CalcItemClass(this.CALC_TYPE_CONSTANT,true));
             case 'false':
                 return(new CalcItemClass(this.CALC_TYPE_CONSTANT,false));
-            case '@content':
+            case '@message':
                 return(new CalcItemClass(this.CALC_TYPE_MESSAGE_CONTENT,null));
             case '@timestamp':
                 return(new CalcItemClass(this.CALC_TYPE_TIMESTAMP,null));
@@ -86,11 +88,6 @@ export default class CalcClass
         if (!isNaN(token)) return(new CalcItemClass(this.CALC_TYPE_CONSTANT,(+token)));     // +token coverts to number
         
             // everything else is a variable
-            
-        if (this.entity.variables.get(token)===undefined) {
-            console.log('Missing variable in \''+this.code+'\': '+token);
-            return(null);
-        }
             
         return(new CalcItemClass(this.CALC_TYPE_VARIABLE,token));
     }
@@ -122,7 +119,7 @@ export default class CalcClass
                 break;
                 
             case this.CALC_TYPE_MESSAGE_CONTENT:
-                str+=('[special]@content');
+                str+=('[special]@message');
                 break;
                 
             case this.CALC_TYPE_TIMESTAMP:
@@ -290,6 +287,24 @@ export default class CalcClass
         let n,ch,cc;
         let tokens,token;
         let isInAlpha,isInNumber,isInSymbol;
+        
+            // make sure we have something to compile
+            
+        if ((this.code===undefined) || (this.code==='')) {
+            console.log('Missing code for '+this.entity.name);
+            return(false);
+        }
+        
+            // special check for simple code, like a number
+            // or true or false
+            
+        this.simpleCalcValue=null;
+        
+        if ((typeof(this.code)==='boolean') || (typeof(this.code)==='number')) {
+            this.simpleCalcValue=this.code;
+            return(true);
+            
+        }    
         
             // tokenize by splitting from changes
             // back and forth to symbols
@@ -488,7 +503,11 @@ export default class CalcClass
         
             // variable, constants, and specials
             
-        if (item.type===this.CALC_TYPE_VARIABLE) return(this.entity.variables.get(item.obj));
+        if (item.type===this.CALC_TYPE_VARIABLE) {
+            value=this.entity.variables.get(item.obj);
+            return((value===undefined)?0:value);
+        }
+        
         if (item.type===this.CALC_TYPE_CONSTANT) return(item.obj);
         if (item.type===this.CALC_TYPE_MESSAGE_CONTENT) return(currentMessageContent);
         if (item.type===this.CALC_TYPE_TIMESTAMP) return(this.core.timestamp);
@@ -500,7 +519,17 @@ export default class CalcClass
     {
         let value;
         
-        value=this.runRecurse(this.root,currentMessageContent);
+            // simple calcs
+            
+        if (this.simpleCalcValue!==null) {
+            value=this.simpleCalcValue;
+        }
+    
+            // run the tree
+        
+        else {
+            value=this.runRecurse(this.root,currentMessageContent);
+        }
         
             // clamp and save
             

@@ -476,7 +476,7 @@ export default class BitmapClass
             // simple, interface, or color bitmaps exit here
             // as they have no other elements like normals, etc
             
-        if ((this.bitmapType===this.BITMAP_SIMPLE_URL) || (this.bitmapType===this.BITMAP_INTERFACE_URL) || (this.bitmapType===this.BITMAP_COLOR)) {
+        if ((this.bitmapType===this.BITMAP_SIMPLE_URL) || (this.bitmapType===this.BITMAP_INTERFACE_URL)) {
             this.loaded=true;
             return(true);
         }
@@ -507,7 +507,7 @@ export default class BitmapClass
         
             // normal bitmap
         
-        if (this.bitmapType!==this.BITMAP_GENERATED) {
+        if ((this.bitmapType!==this.BITMAP_GENERATED) || (this.bitmapType===this.BITMAP_COLOR)) {
             this.normalImage=null;
 
             if (this.normalURL!==null) {
@@ -551,7 +551,7 @@ export default class BitmapClass
 
             // specular bitmap
             
-        if (this.bitmapType!==this.BITMAP_GENERATED) {
+        if ((this.bitmapType!==this.BITMAP_GENERATED) || (this.bitmapType===this.BITMAP_COLOR)) {
             this.specularImage=null;
 
             if (this.specularURL!==null) {
@@ -597,8 +597,7 @@ export default class BitmapClass
             // these do not have to exist, if missing,
             // will use fake glowmap
         
-        
-        if (this.bitmapType!==this.BITMAP_GENERATED) {
+        if ((this.bitmapType!==this.BITMAP_GENERATED) || (this.bitmapType===this.BITMAP_COLOR)) {
             this.glowImage=null;
 
             if (this.glowURL!==null) {
