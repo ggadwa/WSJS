@@ -207,7 +207,7 @@ export default class NetworkClass
     handleEntityEnter(remoteId,dataView)
     {
         let userName,entity;
-        let remoteClass=EntityRemoteClass; // this.core.projectGame.getRemoteClass();  -- TODO deal with this after json
+        let remoteClass=EntityRemoteClass; // this.core.game.getRemoteClass();  -- TODO deal with this after json
         
         userName=this.getStringFromDataView(dataView,4,this.USER_NAME_LENGTH);
         

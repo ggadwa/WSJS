@@ -43,13 +43,13 @@ export default class CoreClass
         this.shaderList=null;
         this.modelList=null;
         
-            // the current map
+            // the game and map
             
-        this.map=new MapClass(this);
+        this.game=null;
+        this.map=null;
         
             // the project game and map
             
-        this.projectGame=null;
         this.projectMap=null;
         
             // input

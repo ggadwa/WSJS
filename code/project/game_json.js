@@ -1,4 +1,5 @@
 import ColorClass from '../utility/color.js';
+import CompileClass from '../project/compile.js';
 
 export default class GameJsonClass
 {
@@ -9,8 +10,14 @@ export default class GameJsonClass
         
         this.json=null;
         this.jsonCache=new Map();
+        
+        this.compile=new CompileClass(this.core);
     }
     
+        //
+        // load json from network
+        //
+        
     async fetchJsonAsText(name)
     {
         let resp;
@@ -26,7 +33,7 @@ export default class GameJsonClass
         }
     }
     
-    parseJsonWithData(name,jsonText,data)
+    parseAndCompileJson(name,jsonText,variables,data)
     {
         let json,v2;
         
@@ -34,10 +41,20 @@ export default class GameJsonClass
          
         try {
             json=JSON.parse(jsonText,
+
                 (key,value) =>
                     {
+                            // compile any code
+                        
+                        if (key==='code') {
+                            if (!this.compile.compile(this.name,this.json,variables)) throw('Unabled to compile code');
+                        }
+                        
+                            // replace any @data
+                            
                         if ((typeof(value)==='string')) {
                             if (value.startsWith('@data.')) {
+                                if (data===null) return(null);
                                 v2=data[value.substring(6)];
                                 if (v2===undefined) throw('Missing data lookup in json key '+key+', value: '+value);
                                 return(v2);
@@ -46,28 +63,41 @@ export default class GameJsonClass
                         return(value);
                     }
                 );
+        
         }
         catch (e) {
-            console.log('Error in json '+name+': '+e);
-            return(false);
+            console.log('Error parsing json '+name+': '+e);
+            return(null);
         }
+        
+            // now compile any parts we can
+            
+        if (!this.compile.compile(name,json,variables)) return(null);
         
         return(json);
     }
     
-    getCachedJson(name,data)
+        //
+        // json caches
+        //
+        
+    getCachedJson(name,variables,data)
     {
         let jsonText;
         
         jsonText=this.jsonCache.get(name);
         if (jsonText===undefined) {
             console.log('Unknown json: '+name);
-            return(false);
+            return(null);
         }
         
-        return(this.parseJsonWithData(name,jsonText,data));
+        return(this.parseAndCompileJson(name,jsonText,variables,data));
     }
 
+        //
+        // run the game
+        //
+        
     async initialize()
     {
         let jsonText;
@@ -93,7 +123,7 @@ export default class GameJsonClass
         
             // translate to json to catch @data.
             
-        this.json=this.parseJsonWithData('game',jsonText,this.data);
+        this.json=this.parseAndCompileJson('game',jsonText,null,this.data);
         
             // now run through and cache all
             // the custom json that runs the project

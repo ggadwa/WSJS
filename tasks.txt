@@ -14,9 +14,11 @@
 
 
    ----> current todo
-          - get rid of projectGame/projectMap (game and map)
-          - this.core.projectGame.getBotClass()
-          - this.core.projectGame.getRemoteClass()
+          - compile action/condition types to lists
+          - @variable. instead of "variable"/"text"?
+          - get rid of projectMap
+          - this.core.game.getBotClass()
+          - this.core.game.getRemoteClass()
           - this.core.projectMap=new this.core.projectGame.json.startMap(this.core);
           - fix the index.html (hard coded map)
           - finish pistol weapon
@@ -33,14 +35,11 @@
 
 
 - KART map fixes
-    - rename all the materials first
-    - rename mountains, then split, then move mountain to middle
-    - one mountain is up too high
-    - delete lights
-    - fix UV on sign (turn ladder around), delete lights
+    - delete street lights
+    - put more trees by new mountains and elsewhere
+    - fix UV on sign (turn ladder around)
     - fix UV on finish gate
-    - move some trees around
-    - put in more power generators        
+    - put in more power generators  (need bigger radius)      
 
 - need to do some optimizations
 

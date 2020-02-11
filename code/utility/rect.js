@@ -1,9 +1,4 @@
 /**
- * @module RectClass
- * @ignore
-*/
-
-/**
  * A utility class to describe a 2D rectangle, with lft, top, rgt, and bot
  * values.
  */

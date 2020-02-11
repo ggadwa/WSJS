@@ -1,9 +1,4 @@
 /**
- * @module PointClass
- * @ignore
-*/
-
-/**
  * A utility point class that contains a 3 point float point or vector xyz.
  */
 export default class PointClass

@@ -1,9 +1,4 @@
 /**
- * @module BoundClass
- * @ignore
-*/
-
-/**
  * A utility class that defines two bounding values, and it keeps
  * them set to min and max.
  */

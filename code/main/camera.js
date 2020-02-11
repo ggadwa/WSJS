@@ -1,19 +1,6 @@
-/**
- * @module CameraClass
- * @ignore
-*/
-
 import PointClass from '../utility/point.js';
 import CollisionClass from '../collision/collisions.js';
 
-/**
- * The camera class for the project, returned from
- * ProjectEntityClass.getCamera(), ProjectGameClass.getCamera(),
- * and ProjectMapClass.getCamera().  You use this to change the
- * camera setup in your project.
- * 
- * @hideconstructor
- */
 export default class CameraClass
 {
     constructor(core)

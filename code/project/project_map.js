@@ -1,8 +1,3 @@
-/**
- * @module ProjectMapClass
- * @ignore
-*/
-
 import ImportMapClass from '../import/import_map.js';
 import GenerateMapClass from '../generate/map/generate_map.js';
 

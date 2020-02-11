@@ -1,5 +1,5 @@
 import PointClass from '../utility/point.js';
-import CalcClass from '../project/calc.js';
+import EntityUtilityClass from '../project/entity_utility.js';
 import ProjectEntityClass from '../project/project_entity.js';
 
 //
@@ -8,6 +8,13 @@ import ProjectEntityClass from '../project/project_entity.js';
 
 export default class EntityJsonClass extends ProjectEntityClass
 {
+    constructor(core,name,position,angle,data)
+    {
+        super(core,name,position,angle,data);
+        
+        this.utility=new EntityUtilityClass(core,this);
+    }
+    
     initialize()
     {
         this.DRAW_TYPE_NORMAL=0;
@@ -16,17 +23,14 @@ export default class EntityJsonClass extends ProjectEntityClass
         
         super.initialize();
         
-        this.json=this.getJson();
-        
             // variables
           
         this.variables=new Map();
         
-            // compile any calcs
+            // load the json
             
-        if (!this.compileCalcs()) {
-            // fail here
-        }
+        this.json=this.core.game.getCachedJson(this.getJsonName(),this.variables,this.data);
+        if (this.json===null) return(false);
         
             // setup
             
@@ -53,92 +57,15 @@ export default class EntityJsonClass extends ProjectEntityClass
         return(true);
     }
     
-    getJson()
+    getJsonName()
     {
         return(null);
     }
-    
-        //
-        // compile calcs
-        //
-    
-    compileCalcsConditions(conditions)
-    {
-        let condition;
         
-        if (conditions===undefined) return(true);
-        
-        for (condition of conditions) {
-            if (condition.type==='calc') {
-                condition.compileCalc=new CalcClass(this.core,this,null,condition.code,null,null);
-                if (!condition.compileCalc.compile()) return(false);        // compile failed
-            }
-        }
-        
-        return(true);
-    }
-    
-    compileCalcsActions(actions)
-    {
-        let action,minClamp,maxClamp;
-        
-        if (actions===undefined) return(true);
-        
-        for (action of actions) {
-            if (action.type==='calc') {
-                if (action.set===undefined) {
-                    console.log('Action calcs require a set attribute in: '+this.name);
-                    return(false);
-                }
-                
-                minClamp=(action.minClamp===undefined)?null:action.minClamp;
-                maxClamp=(action.maxClamp===undefined)?null:action.maxClamp;
-                
-                action.compileCalc=new CalcClass(this.core,this,action.set,action.code,minClamp,maxClamp);
-                if (!action.compileCalc.compile()) return(false);        // compile failed
-            }
-        }
-        
-        return(true);
-    }
-    
-    compileCalcs()
-    {
-        let event;
-        
-        if (this.json.ready!==undefined) {
-            if (!this.compileCalcsActions(this.json.ready.actions)) return(false);
-        }
-        
-        if (this.json.events!==undefined) {
-            for (event of this.json.events) {
-                if (!this.compileCalcsConditions(event.conditions)) return(false);
-                if (!this.compileCalcsActions(event.actions)) return(false);
-            }
-        }
-        
-        return(true);
-    }
-    
         //
         // utilities and lookups
         //
         
-    jsonNameTranslate(name)
-    {
-        if (name.length<1) return(name);
-        if (name.charAt(0)!=='@') return(name);
-        
-            // data lookups
-            
-        if (name.startsWith("@data.")) return(this.data[name.substring(6)]);
-        
-            // otherwise an error
-            
-        console.log('Unknown special name: '+name);
-        return(name);
-    }
-    
     jsonContentTranslate(value)
     {
         if (typeof(value)!=='string') return(value);
@@ -202,7 +129,7 @@ export default class EntityJsonClass extends ProjectEntityClass
         
         for (action of actions) {
             
-            switch(action.type) {
+            switch(action.action) {
                 
                 case 'animationStart':
                     this.startModelAnimationChunkInFrames(null,30,action.startFrame,action.endFrame);
@@ -236,8 +163,15 @@ export default class EntityJsonClass extends ProjectEntityClass
                     break;
                     
                 case 'trigger':
-                    name=this.jsonNameTranslate(action.name);
-                    if (name!==undefined) this.setTrigger(name);
+                    if ((action.name===undefined) || (action.name===null)) break;
+                    this.setTrigger(action.name);
+                    break;
+                    
+                case 'hitScan':
+                    entity=this.getEntityFromJson(action.entity);
+                    if (entity===null) return(false);
+                    
+                    this.utility.hitScan(entity,action.istance,action.hitFilter,action.damage,action.hitEffect);
                     break;
                     
                 case 'send':
@@ -278,7 +212,7 @@ export default class EntityJsonClass extends ProjectEntityClass
             
         for (condition of conditions) {
             
-            switch(condition.type) {
+            switch(condition.condition) {
                 
                 case 'receive':
                     messageContent=this.messageQueue.get(condition.name);

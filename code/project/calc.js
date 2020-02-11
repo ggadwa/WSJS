@@ -12,7 +12,7 @@ class CalcItemClass
 
 export default class CalcClass
 {
-    constructor(core,entity,set,code,minClamp,maxClamp)
+    constructor(core,jsonName,variables,set,code,minClamp,maxClamp)
     {
         this.CALC_TYPE_VARIABLE=0;
         this.CALC_TYPE_CONSTANT=1;
@@ -40,7 +40,8 @@ export default class CalcClass
         this.CALC_OPERATOR_LIST=['=','!=','>','>=','<','<=','+','-','*','/'];
         
         this.core=core;
-        this.entity=entity;
+        this.jsonName=jsonName;
+        this.variables=variables;
         this.set=set;
         this.code=code;
         this.minClamp=minClamp;
@@ -291,7 +292,7 @@ export default class CalcClass
             // make sure we have something to compile
             
         if ((this.code===undefined) || (this.code==='')) {
-            console.log('Missing code for '+this.entity.name);
+            console.log('Missing code for '+this.jsonName);
             return(false);
         }
         
@@ -504,7 +505,7 @@ export default class CalcClass
             // variable, constants, and specials
             
         if (item.type===this.CALC_TYPE_VARIABLE) {
-            value=this.entity.variables.get(item.obj);
+            value=this.variables.get(item.obj);
             return((value===undefined)?0:value);
         }
         
@@ -542,7 +543,7 @@ export default class CalcClass
                 if (value>this.maxClamp) value=this.maxClamp;
             }
 
-            this.entity.variables.set(this.set,value);
+            this.variables.set(this.set,value);
         }
         
             // return value for comparisons

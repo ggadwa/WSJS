@@ -1,8 +1,3 @@
-/**
- * @module ProjectEntityDeveloperClass
- * @ignore
-*/
-
 import PointClass from '../utility/point.js';
 import BoundClass from '../utility/bound.js';
 import CoreClass from '../main/core.js';

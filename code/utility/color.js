@@ -1,9 +1,4 @@
 /**
- * @module ColorClass
- * @ignore
-*/
-
-/**
  * A utility class that contains a single color by three RGB floats,
  * range of 0.0 to 1.0.
  */

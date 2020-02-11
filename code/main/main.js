@@ -1,6 +1,7 @@
 import PointClass from '../utility/point.js';
 import CoreClass from '../main/core.js';
 import GameJsonClass from '../project/game_json.js';
+import MapClass from '../map/map.js';
 
 //
 // main class
@@ -52,11 +53,12 @@ class MainClass
 
     async initGame()
     {
-        this.core.projectGame=new GameJsonClass(this.core,this.data);
-        if (!(await this.core.projectGame.initialize())) return;
+        this.core.game=new GameJsonClass(this.core,this.data);
+        if (!(await this.core.game.initialize())) return;
         
           //TODO all of   
-        //this.core.projectGame=new gameClass(this.core,data);
+        
+        this.core.map=new MapClass(this.core);
         this.core.projectMap=new window.hardCodedMapClassHack(this.core);        // redo this TODO
         if (!this.core.map.initialize()) return;
         
@@ -201,7 +203,7 @@ class MainClass
     {
             // setup the interface
 
-        if (!this.core.projectGame.ready()) return;       // halt on bad ready
+        if (!this.core.game.ready()) return;       // halt on bad ready
         
             // setup draw buffers
 
@@ -317,7 +319,7 @@ function mainLoop(timestamp)
                 core.lastPhysicTimestamp+=PHYSICS_MILLISECONDS;
 
                 map.movementList.run();
-                core.projectGame.run();
+                core.game.run();
                 map.entityList.run();
             }
         }
