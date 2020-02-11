@@ -1,6 +1,6 @@
 import PointClass from '../utility/point.js';
 import CoreClass from '../main/core.js';
-import ProjectEffectClass from '../project/project_effect.js';
+import EffectJsonClass from '../project/effect_json.js';
 
 //
 // map effect list class
@@ -39,10 +39,16 @@ export default class MapEffectListClass
         // effect list
         //
 
-    add(effect)
+    add(jsonName,position,data,show)
     {
+        let effect;
+        
+        effect=new EffectJsonClass(this.core,jsonName,position,data,show);
+        if (!effect.initialize()) return(false);
+        
         this.effects.push(effect);
-        return(effect.initialize());
+        
+        return(true);
     }
     
     cleanUpMarkedAsDeleted()
@@ -102,8 +108,7 @@ export default class MapEffectListClass
             effectShow=true;
             if (effectDef.show!==undefined) effectShow=effectDef.show;
 
-            effect=new effectDef.effect(this.core,effectPosition,effectDef.data,effectShow);
-            if (!this.core.map.effectList.add(effect)) return(false);
+            if (!this.add(effectDef.json,effectPosition,effectDef.data,effectShow)) return(false);
         }
         
         return(true);

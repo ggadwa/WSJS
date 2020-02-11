@@ -444,14 +444,9 @@ export default class ProjectEntityClass
         return(this.core.map.effectList);
     }
     
-    addEffect(effectClass,position,data,show)
+    addEffect(jsonName,position,data,show)
     {
-        let effect;
-        
-        effect=new effectClass(this.core,position,data,show)
-        this.core.map.effectList.add(effect);
-        
-        return(effect);
+        return(this.core.map.effectList.add(jsonName,position,data,show));
     }
     
         //

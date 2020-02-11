@@ -1,12 +1,6 @@
-- fix .bin in KART gltfs
-- fix interface in kart
-- html is bad
-
 - should bitmaps have "/textures" in them or this assumed? (need to work around map textures)
-- in a game json?
 
-- json must be SHARED
-- load json ahead of time and fail out at map level if compile bad
+
 - sound play might need position instead of expecting object with .position (as effects call it)
 - wsserver - option to show http log in server (default to off)
 
@@ -20,11 +14,11 @@
 
 
    ----> current todo
-          - index list should be static in effects
-          - remove project_effect
+          - get rid of projectGame/projectMap (game and map)
           - this.core.projectGame.getBotClass()
           - this.core.projectGame.getRemoteClass()
           - this.core.projectMap=new this.core.projectGame.json.startMap(this.core);
+          - fix the index.html (hard coded map)
           - finish pistol weapon
           - replace to other weapons
           - put other weapons back in captain chest json
@@ -41,6 +35,7 @@
 - KART map fixes
     - rename all the materials first
     - rename mountains, then split, then move mountain to middle
+    - one mountain is up too high
     - delete lights
     - fix UV on sign (turn ladder around), delete lights
     - fix UV on finish gate

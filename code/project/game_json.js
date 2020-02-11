@@ -8,39 +8,118 @@ export default class GameJsonClass
         this.data=data;
         
         this.json=null;
+        this.jsonCache=new Map();
     }
     
-    async loadJson()
+    async fetchJsonAsText(name)
     {
         let resp;
-        let url='../json/game.json';
+        let url='../json/'+name+'.json';
         
         try {
             resp=await fetch(url);
             if (!resp.ok) return(Promise.reject('Unable to load '+url+'; '+resp.statusText));
-            return(await resp.json());
+            return(await resp.text());
         }
         catch (e) {
             return(Promise.reject('Unable to load '+url+'; '+e.message));
         }
     }
+    
+    parseJsonWithData(name,jsonText,data)
+    {
+        let json,v2;
+        
+            // run a reviver to swap any @data.xyz
+         
+        try {
+            json=JSON.parse(jsonText,
+                (key,value) =>
+                    {
+                        if ((typeof(value)==='string')) {
+                            if (value.startsWith('@data.')) {
+                                v2=data[value.substring(6)];
+                                if (v2===undefined) throw('Missing data lookup in json key '+key+', value: '+value);
+                                return(v2);
+                            }
+                        }
+                        return(value);
+                    }
+                );
+        }
+        catch (e) {
+            console.log('Error in json '+name+': '+e);
+            return(false);
+        }
+        
+        return(json);
+    }
+    
+    getCachedJson(name,data)
+    {
+        let jsonText;
+        
+        jsonText=this.jsonCache.get(name);
+        if (jsonText===undefined) {
+            console.log('Unknown json: '+name);
+            return(false);
+        }
+        
+        return(this.parseJsonWithData(name,jsonText,data));
+    }
 
     async initialize()
     {
-        this.json=null;
+        let jsonText;
+        let jsonName;
         
-        await this.loadJson()
+        jsonText=null;
+        
+            // get the main game json
+            // this is the only hard coded json file
+        
+        await this.fetchJsonAsText('game')
             .then
                 (
                     value=>{
-                        this.json=value;
+                        jsonText=value;
                     },
                     value=>{
                         console.log(value);
                     }
                 );
-
-        return(this.json!==null);
+        
+        if (jsonText===null) return(false);
+        
+            // translate to json to catch @data.
+            
+        this.json=this.parseJsonWithData('game',jsonText,this.data);
+        
+            // now run through and cache all
+            // the custom json that runs the project
+            // we don't parse these as we can't handle
+            // the @data into it's in use
+            
+        for (jsonName of this.json.jsons) {
+            jsonText=null;
+            
+            await this.fetchJsonAsText(jsonName)
+            .then
+                (
+                    value=>{
+                        jsonText=value;
+                    },
+                    value=>{
+                        console.log(value);
+                    }
+                );
+        
+            if (jsonText===null) return(false);
+            
+            this.jsonCache.set(jsonName,jsonText);
+        }
+            
+        return(true);
     }
     
     release()
@@ -49,8 +128,24 @@ export default class GameJsonClass
 
     ready()
     {
+        let camera;
         let element,text;
         let bitmap,positionMode,align;
+        
+            // setup camera
+            
+        camera=this.core.camera;
+
+        switch (camera.CAMERA_MODE_LIST.indexOf(this.json.camera.mode)) {
+            case camera.CAMERA_MODE_FIRST_PERSON:
+                camera.gotoFirstPerson();
+                break;
+            case camera.CAMERA_MODE_THIRD_PERSON_BEHIND:
+                camera.gotoThirdPersonBehind(this.json.camera.thirdPersonDistance,this.json.camera.thirdPersonLookDegree);
+                break;
+        }
+
+        camera.setViewDistance(this.json.camera.viewNearZ,this.json.camera.viewFarZ);
         
             // developer mode adds these items
             
@@ -80,6 +175,7 @@ export default class GameJsonClass
                 positionMode=this.core.interface.POSITION_MODE_LIST.indexOf(element.positionMode);
 
                 this.core.interface.addElement(element.id,bitmap,element.width,element.height,positionMode,element.positionOffset,new ColorClass(element.color.r,element.color.g,element.color.b),element.alpha);
+                this.core.interface.showElement(element.id,element.show);
             }
         }
         
@@ -88,6 +184,7 @@ export default class GameJsonClass
                 align=this.core.interface.TEXT_ALIGN_LIST.indexOf(text.textAlign);
                 positionMode=this.core.interface.POSITION_MODE_LIST.indexOf(text.positionMode);
                 this.core.interface.addText(text.id,text.text,positionMode,text.positionOffset,text.textSize,align,new ColorClass(text.color.r,text.color.g,text.color.b),text.alpha);
+                this.core.interface.showText(text.id,text.show);
             }
         }
         

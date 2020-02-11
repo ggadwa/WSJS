@@ -1,7 +1,6 @@
 import PointClass from '../utility/point.js';
 import CoreClass from '../main/core.js';
 import GameJsonClass from '../project/game_json.js';
-import MapDungeonClass from '../../demo/scripts/maps/map_dungeon.js';
 
 //
 // main class
@@ -58,7 +57,7 @@ class MainClass
         
           //TODO all of   
         //this.core.projectGame=new gameClass(this.core,data);
-        this.core.projectMap=new MapDungeonClass(this.core);        // redo this TODO
+        this.core.projectMap=new window.hardCodedMapClassHack(this.core);        // redo this TODO
         if (!this.core.map.initialize()) return;
         
         this.core.loadSetup();          // requires game to be loaded first

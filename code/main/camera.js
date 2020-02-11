@@ -21,6 +21,8 @@ export default class CameraClass
         this.CAMERA_MODE_FIRST_PERSON=0;
         this.CAMERA_MODE_THIRD_PERSON_BEHIND=1;
         
+        this.CAMERA_MODE_LIST=['firstPerson','thirdPersonBehind'];
+        
         this.core=core;
     
         this.mode=this.CAMERA_MODE_FIRST_PERSON;
