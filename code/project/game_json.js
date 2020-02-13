@@ -1,4 +1,5 @@
 import ColorClass from '../utility/color.js';
+import CalcClass from '../project/calc.js';
 import CompileClass from '../project/compile.js';
 
 export default class GameJsonClass
@@ -33,7 +34,7 @@ export default class GameJsonClass
         }
     }
     
-    parseAndCompileJson(name,jsonText,variables,data)
+    parseAndCompileJson(name,jsonText,data)
     {
         let json,v2;
         
@@ -44,11 +45,6 @@ export default class GameJsonClass
 
                 (key,value) =>
                     {
-                            // compile any code
-                        
-                        if (key==='code') {
-                            if (!this.compile.compile(this.name,this.json,variables)) throw('Unabled to compile code');
-                        }
                         
                             // replace any @data
                             
@@ -72,16 +68,16 @@ export default class GameJsonClass
         
             // now compile any parts we can
             
-        if (!this.compile.compile(name,json,variables)) return(null);
+        if (!this.compile.compile(name,json)) return(null);
         
         return(json);
     }
     
         //
-        // json caches
+        // json caches and utilities
         //
         
-    getCachedJson(name,variables,data)
+    getCachedJson(name,data)
     {
         let jsonText;
         
@@ -91,7 +87,14 @@ export default class GameJsonClass
             return(null);
         }
         
-        return(this.parseAndCompileJson(name,jsonText,variables,data));
+        return(this.parseAndCompileJson(name,jsonText,data));
+    }
+    
+    calculateValue(value,variables,data)
+    {
+        if (typeof(value)!=='object') return(value);            // if not an object of CalcClass, then it's a regular constant
+        if (value.constructor.name!=='CalcClass') return(value);
+        return(value.run(variables,data,this.currentMessageContent));          // otherwise run the calc
     }
 
         //
@@ -123,7 +126,7 @@ export default class GameJsonClass
         
             // translate to json to catch @data.
             
-        this.json=this.parseAndCompileJson('game',jsonText,null,this.data);
+        this.json=this.parseAndCompileJson('game',jsonText,this.data);
         
             // now run through and cache all
             // the custom json that runs the project

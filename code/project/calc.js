@@ -12,7 +12,7 @@ class CalcItemClass
 
 export default class CalcClass
 {
-    constructor(core,jsonName,variables,set,code,minClamp,maxClamp)
+    constructor(core,jsonName,code)
     {
         this.CALC_TYPE_VARIABLE=0;
         this.CALC_TYPE_CONSTANT=1;
@@ -20,6 +20,7 @@ export default class CalcClass
         this.CALC_TYPE_OPERATOR=3;
         this.CALC_TYPE_MESSAGE_CONTENT=4;
         this.CALC_TYPE_TIMESTAMP=5;
+        this.CALC_TYPE_DATA=6;
         
         this.CALC_TYPE_CONJUNCTION_AND=0;
         this.CALC_TYPE_CONJUNCTION_OR=1;
@@ -41,15 +42,9 @@ export default class CalcClass
         
         this.core=core;
         this.jsonName=jsonName;
-        this.variables=variables;
-        this.set=set;
         this.code=code;
-        this.minClamp=minClamp;
-        this.maxClamp=maxClamp;
         
         this.root=null;
-        
-        this.simpleCalcValue=null;
         
         Object.seal(this);
     }
@@ -75,6 +70,8 @@ export default class CalcClass
             case '@timestamp':
                 return(new CalcItemClass(this.CALC_TYPE_TIMESTAMP,null));
         }
+        
+        if (token.startsWith('@data.')) return(new CalcItemClass(this.CALC_TYPE_DATA,token.substring(6)));
         
             // conjunctions and operators
          
@@ -125,6 +122,10 @@ export default class CalcClass
                 
             case this.CALC_TYPE_TIMESTAMP:
                 str+=('[special]@timestamp');
+                break;
+                
+            case this.CALC_TYPE_DATA:
+                str+=('[data]'+item.obj);
                 break;
         }
         
@@ -296,17 +297,6 @@ export default class CalcClass
             return(false);
         }
         
-            // special check for simple code, like a number
-            // or true or false
-            
-        this.simpleCalcValue=null;
-        
-        if ((typeof(this.code)==='boolean') || (typeof(this.code)==='number')) {
-            this.simpleCalcValue=this.code;
-            return(true);
-            
-        }    
-        
             // tokenize by splitting from changes
             // back and forth to symbols
         
@@ -428,7 +418,7 @@ export default class CalcClass
         return(0);
     }
     
-    runRecurse(item,currentMessageContent)
+    runRecurse(item,variables,data,currentMessageContent)
     {
         let n;
         let value,curValue;
@@ -437,10 +427,10 @@ export default class CalcClass
             
         if (item.type===this.CALC_TYPE_CONJUNCTION) {
             
-            curValue=this.runRecurse(item.children[0],currentMessageContent);
+            curValue=this.runRecurse(item.children[0],variables,data,currentMessageContent);
 
             for (n=1;n<item.children.length;n++) {
-                value=this.runRecurse(item.children[n],currentMessageContent);
+                value=this.runRecurse(item.children[n],variables,data,currentMessageContent);
                 
                 switch (item.obj) {
                     case this.CALC_TYPE_CONJUNCTION_AND:
@@ -459,10 +449,10 @@ export default class CalcClass
             
         if (item.type===this.CALC_TYPE_OPERATOR) {
             
-            curValue=this.runRecurse(item.children[0],currentMessageContent);
+            curValue=this.runRecurse(item.children[0],variables,data,currentMessageContent);
             
             for (n=1;n<item.children.length;n++) {
-                value=this.runRecurse(item.children[n],currentMessageContent);
+                value=this.runRecurse(item.children[n],variables,data,currentMessageContent);
                 
                 switch (item.obj) {
                     case this.CALC_TYPE_OPERATOR_EQUAL:
@@ -504,50 +494,21 @@ export default class CalcClass
         
             // variable, constants, and specials
             
-        if (item.type===this.CALC_TYPE_VARIABLE) {
-            value=this.variables.get(item.obj);
+        if ((item.type===this.CALC_TYPE_VARIABLE) && (variables!==null)) {
+            value=variables.get(item.obj);
             return((value===undefined)?0:value);
         }
         
         if (item.type===this.CALC_TYPE_CONSTANT) return(item.obj);
         if (item.type===this.CALC_TYPE_MESSAGE_CONTENT) return(currentMessageContent);
         if (item.type===this.CALC_TYPE_TIMESTAMP) return(this.core.timestamp);
+        if ((item.type===this.CALC_TYPE_DATA) && (data!==null)) return(data[item.obj]);
 
         return(0);
     }
     
-    run(currentMessageContent)
+    run(variables,data,currentMessageContent)
     {
-        let value;
-        
-            // simple calcs
-            
-        if (this.simpleCalcValue!==null) {
-            value=this.simpleCalcValue;
-        }
-    
-            // run the tree
-        
-        else {
-            value=this.runRecurse(this.root,currentMessageContent);
-        }
-        
-            // clamp and save
-            
-        if (this.set!==null) {
-            if (this.minClamp!==null) {
-                if (value<this.minClamp) value=this.minClamp;
-            }
-
-            if (this.maxClamp!==null) {
-                if (value>this.maxClamp) value=this.maxClamp;
-            }
-
-            this.variables.set(this.set,value);
-        }
-        
-            // return value for comparisons
-            
-        return(value);
+        return(this.runRecurse(this.root,variables,data,currentMessageContent));
     }
 }

@@ -1,4 +1,5 @@
 import PointClass from '../utility/point.js';
+import CalcClass from '../project/calc.js';
 import EntityUtilityClass from '../project/entity_utility.js';
 import ProjectEntityClass from '../project/project_entity.js';
 
@@ -52,7 +53,9 @@ export default class EntityJsonClass extends ProjectEntityClass
             // messages
             
         this.messageQueue=new Map();
-        this.currentMessageContent=null;        // used to track current message content for @message look ups
+        
+        this.currentMessageName=null;
+        this.currentMessageContent=null;        // used to track current message content for forwards and @message look ups
         
         return(true);
     }
@@ -66,24 +69,6 @@ export default class EntityJsonClass extends ProjectEntityClass
         // utilities and lookups
         //
         
-    jsonContentTranslate(value)
-    {
-        if (typeof(value)!=='string') return(value);
-        
-        if (value==='@timestamp') return(this.core.timestamp);
-        if (value==='@message') return(this.currentMessageContent);
-        return(value);
-    }
-    
-    jsonVariableTranslate(name)
-    {
-        let value=this.variables.get(name);
-        if (value!==undefined) return(value);
-        
-        console.log('Unknown variable name: '+name);
-        return('');
-    }
-    
     getEntityFromJson(name)
     {
         let entity;
@@ -117,13 +102,18 @@ export default class EntityJsonClass extends ProjectEntityClass
         return(new PointClass(jsonPnt.x,jsonPnt.y,jsonPnt.z));
     }
     
+    calculateValue(value)
+    {
+        return(this.core.game.calculateValue(value,this.variables,this.data));
+    }
+    
         //
         // actions
         //
         
     runActions(actions)
     {
-        let action,name,entity;
+        let action,name,value,cmpValue,entity;
         
         if (actions===undefined) return;
         
@@ -131,12 +121,28 @@ export default class EntityJsonClass extends ProjectEntityClass
             
             switch(action.action) {
                 
+                case 'set':
+                    value=this.calculateValue(action.value);
+                    
+                    if (action.minClamp!==undefined) {
+                        cmpValue=this.calculateValue(action.minClamp);
+                        if (value<cmpValue) value=cmpValue;
+                    }
+
+                    if (action.maxClamp!==undefined) {
+                        cmpValue=this.calculateValue(action.maxClamp);
+                        if (value>cmpValue) value=cmpValue;
+                    }
+                    
+                    this.variables.set(action.variable,value);
+                    break;
+                
                 case 'animationStart':
-                    this.startModelAnimationChunkInFrames(null,30,action.startFrame,action.endFrame);
+                    this.startModelAnimationChunkInFrames(null,30,this.calculateValue(action.startFrame),this.calculateValue(action.endFrame));
                     break;
                     
                 case 'animationQueue':
-                    this.queueModelAnimationChunkInFrames(null,30,action.startFrame,action.endFrame);
+                    this.queueModelAnimationChunkInFrames(null,30,this.calculateValue(action.startFrame),this.calculateValue(action.endFrame));
                     break;
                     
                 case 'playSound':
@@ -146,32 +152,27 @@ export default class EntityJsonClass extends ProjectEntityClass
                         if (entity===null) return(false);
                     }
                     
-                    this.core.soundList.play(entity,null,action.name,action.rate,action.loop);
+                    this.core.soundList.play(entity,null,this.calculateValue(action.name),this.calculateValue(action.rate),this.calculateValue(action.loop));
                     break;
                     
                 case 'pulseInterface':
-                    this.core.interface.pulseElement(action.element,action.tick,action.expand);
+                    this.core.interface.pulseElement(this.calculateValue(action.element),this.calculateValue(action.tick),this.calculateValue(action.expand));
                     break;
                     
                 case 'updateInterfaceText':
-                    if (action.text!==undefined) {
-                        this.core.interface.updateText(action.element,action.text);
-                    }
-                    else {
-                        this.core.interface.updateText(action.element,this.jsonVariableTranslate(action.variable));
-                    }
+                    this.core.interface.updateText(this.calculateValue(action.element),this.calculateValue(action.value));
                     break;
                     
                 case 'trigger':
                     if ((action.name===undefined) || (action.name===null)) break;
-                    this.setTrigger(action.name);
+                    this.setTrigger(this.calculateValue(action.name));
                     break;
                     
                 case 'hitScan':
                     entity=this.getEntityFromJson(action.entity);
                     if (entity===null) return(false);
                     
-                    this.utility.hitScan(entity,action.istance,action.hitFilter,action.damage,action.hitEffect);
+                    this.utility.hitScan(entity,this.calculateValue(action.distance),this.calculateValue(action.hitFilter),this.calculateValue(action.damage),this.calculateValue(action.hitEffect));
                     break;
                     
                 case 'send':
@@ -182,11 +183,18 @@ export default class EntityJsonClass extends ProjectEntityClass
                         return(false);
                     }
                         
-                    entity.messageQueue.set(action.name,this.jsonContentTranslate(action.content));
+                    entity.messageQueue.set(this.calculateValue(action.name),this.calculateValue(action.content));
                     break;
                     
-                case 'calc':
-                    action.compileCalc.run(this.currentMessageContent);
+                case 'forward':
+                    entity=this.getEntityFromJson(action.entity);
+                    if (entity===null) return(false);
+                    if (entity.json.events===undefined) {
+                        console.log('Entity '+entity.name+' can not receive messages, it has no events');
+                        return(false);
+                    }
+                        
+                    entity.messageQueue.set(this.currentMessageName,this.currentMessageContent);
                     break;
                     
                 default:
@@ -214,10 +222,15 @@ export default class EntityJsonClass extends ProjectEntityClass
             
             switch(condition.condition) {
                 
+                case 'if':
+                    if (!this.calculateValue(condition.value)) return(false);
+                    break;
+                
                 case 'receive':
                     messageContent=this.messageQueue.get(condition.name);
                     if (messageContent===undefined) return(false);
                     
+                    this.currentMessageName=condition.name;
                     this.currentMessageContent=messageContent;      // to pick up in actions
                     this.messageQueue.delete(condition.name);
                     break;
@@ -231,10 +244,6 @@ export default class EntityJsonClass extends ProjectEntityClass
                     if (entity===null) return(false);
                     
                     if (!this.isEntityInRange(entity,condition.distance)) return(false);
-                    break;
-                    
-                case 'calc':
-                    if (!condition.compileCalc.run(this.currentMessageContent)) return(false);
                     break;
                     
                 default:

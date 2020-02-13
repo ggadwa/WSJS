@@ -14,8 +14,9 @@
 
 
    ----> current todo
+          - calc keeps a list of compiled calcs
+          - stuff like updatetext etc are code instead of variable/etc
           - compile action/condition types to lists
-          - @variable. instead of "variable"/"text"?
           - get rid of projectMap
           - this.core.game.getBotClass()
           - this.core.game.getRemoteClass()

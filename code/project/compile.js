@@ -11,58 +11,54 @@ export default class CompileClass
         // compile calcs
         //
     
-    compileConditions(jsonName,conditions,variables)
+    compileProperties(jsonName,obj)
     {
-        let condition;
+        let prop,value,calc;
         
-        if (conditions===undefined) return(true);
+        if (obj===undefined) return(true);
         
-        for (condition of conditions) {
-            if (condition.condition==='calc') {
-                condition.compileCalc=new CalcClass(this.core,jsonName,variables,null,condition.code,null,null);
-                if (!condition.compileCalc.compile()) return(false);        // compile failed
+        for (prop in obj) {
+            value=obj[prop];
+            
+                // if object (which includes arrays) then go deeper
+                
+            if (typeof(value)==='object') {
+                this.compileProperties(jsonName,value);
+                continue;
             }
+            
+                // otherwise look for a string prop that starts with calc(
+                
+            if (typeof(value)!=='string') continue;
+            
+            value=value.trim();
+            if (!value.startsWith('calc(')) continue;
+            if (!value.endsWith(')')) {
+                console.log('Syntax error in calc, mismatched () in: '+jsonName);
+                return(false);
+            }
+            
+            calc=new CalcClass(this.core,jsonName,value.substring(5,(value.length-1)));
+            if (!calc.compile()) return(false);
+            
+            obj[prop]=calc;
         }
         
         return(true);
     }
     
-    compileActions(jsonName,actions,variables)
-    {
-        let action,minClamp,maxClamp;
-        
-        if (actions===undefined) return(true);
-        
-        for (action of actions) {
-            if (action.action==='calc') {
-                if (action.set===undefined) {
-                    console.log('Action calcs require a set attribute in: '+this.name);
-                    return(false);
-                }
-                
-                minClamp=(action.minClamp===undefined)?null:action.minClamp;
-                maxClamp=(action.maxClamp===undefined)?null:action.maxClamp;
-                
-                action.compileCalc=new CalcClass(this.core,jsonName,variables,action.set,action.code,minClamp,maxClamp);
-                if (!action.compileCalc.compile()) return(false);        // compile failed
-            }
-        }
-        
-        return(true);
-    }
-    
-    compile(jsonName,json,variables)
+    compile(jsonName,json)
     {
         let event;
         
         if (json.ready!==undefined) {
-            if (!this.compileActions(jsonName,json.ready.actions,variables)) return(false);
+            if (!this.compileProperties(jsonName,json.ready.actions)) return(false);
         }
         
         if (json.events!==undefined) {
             for (event of json.events) {
-                if (!this.compileConditions(jsonName,event.conditions,variables)) return(false);
-                if (!this.compileActions(jsonName,event.actions,variables)) return(false);
+                if (!this.compileProperties(jsonName,event.conditions)) return(false);
+                if (!this.compileProperties(jsonName,event.actions)) return(false);
             }
         }
         
