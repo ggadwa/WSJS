@@ -90,11 +90,11 @@ export default class GameJsonClass
         return(this.parseAndCompileJson(name,jsonText,data));
     }
     
-    calculateValue(value,variables,data)
+    calculateValue(value,variables,data,currentMessageContent)
     {
         if (typeof(value)!=='object') return(value);            // if not an object of CalcClass, then it's a regular constant
         if (value.constructor.name!=='CalcClass') return(value);
-        return(value.run(variables,data,this.currentMessageContent));          // otherwise run the calc
+        return(value.run(variables,data,currentMessageContent));          // otherwise run the calc
     }
 
         //

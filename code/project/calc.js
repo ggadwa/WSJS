@@ -71,7 +71,9 @@ export default class CalcClass
                 return(new CalcItemClass(this.CALC_TYPE_TIMESTAMP,null));
         }
         
-        if (token.startsWith('@data.')) return(new CalcItemClass(this.CALC_TYPE_DATA,token.substring(6)));
+            // any other token starting with @ is from data
+            
+        if (token.startsWith('@')) return(new CalcItemClass(this.CALC_TYPE_DATA,token.substring(1)));
         
             // conjunctions and operators
          
@@ -323,9 +325,9 @@ export default class CalcClass
                 continue;
             }
             
-                // 0..9
+                // 0..9 and .
                 
-            if ((cc>47) && (cc<58)) {
+            if (((cc>47) && (cc<58)) || (cc===56)) {
                 if ((isInAlpha) || (isInNumber)) {            // we are still in a variable, just continue on
                     token+=ch;
                     continue;
@@ -347,7 +349,7 @@ export default class CalcClass
                 continue;
             }
             
-                // letter (@ counts as special variables can start with @)
+                // letters and @ (for specials)
                 
             if (((cc>64) && (cc<91)) || ((cc>96) && (cc<123)) || (cc===64)) {
                 if ((isInAlpha) || (isInNumber)) {            // we are still in a variable, just continue on

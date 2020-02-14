@@ -11,7 +11,7 @@ export default class CompileClass
         // compile calcs
         //
     
-    compileProperties(jsonName,obj)
+    compile(jsonName,obj)
     {
         let prop,value,calc;
         
@@ -23,7 +23,7 @@ export default class CompileClass
                 // if object (which includes arrays) then go deeper
                 
             if (typeof(value)==='object') {
-                this.compileProperties(jsonName,value);
+                this.compile(jsonName,value);
                 continue;
             }
             
@@ -47,22 +47,5 @@ export default class CompileClass
         return(true);
     }
     
-    compile(jsonName,json)
-    {
-        let event;
-        
-        if (json.ready!==undefined) {
-            if (!this.compileProperties(jsonName,json.ready.actions)) return(false);
-        }
-        
-        if (json.events!==undefined) {
-            for (event of json.events) {
-                if (!this.compileProperties(jsonName,event.conditions)) return(false);
-                if (!this.compileProperties(jsonName,event.actions)) return(false);
-            }
-        }
-        
-        return(true);
-    }
         
 }

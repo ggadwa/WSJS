@@ -5,29 +5,21 @@ import LightClass from '../light/light.js';
 
 class EffectChunkClass
 {
-    constructor(bitmap,glDrawType,indexCount,drawMode,motionPoints,grid,gridPeriod,gridOffset,wave,waveRandomStart,wavePeriod,waveSize)
+    constructor(chunkType,bitmap,indexCount,drawMode,frames)
     {
-        let n;
-        
+        this.chunkType=chunkType;
         this.bitmap=bitmap;
-        this.glDrawType=glDrawType;
         this.indexCount=indexCount;
         this.drawMode=drawMode;
-        this.motionPoints=motionPoints;
+        this.frames=frames;
         
-            // sprite catalog/grid type setup
+            // sprite catalog/grid defaults
             
-        this.grid=grid;
-        this.gridSquareRoot=Math.trunc(Math.sqrt(this.grid));
-        this.gridPeriod=gridPeriod;
-        this.gridOffset=gridOffset;
-        
-        if (grid===1) {
-            this.uSize=this.vSize=1.0;
-        }
-        else {
-            this.uSize=this.vSize=1.0/this.gridSquareRoot;
-        }
+        this.grid=1;
+        this.gridSquareRoot=1;
+        this.gridPeriod=0;
+        this.gridOffset=0;
+        this.uSize=this.vSize=1.0;
         
             // offsets into gl buffers
             
@@ -43,16 +35,47 @@ class EffectChunkClass
         this.color=new ColorClass(1,1,1);
         this.alpha=1.0;
         
-        this.drawPoints=[];
+            // particles
         
-        if (this.motionPoints!==null) {
-            for (n=0;n!==this.motionPoints.length;n++) {
-                this.drawPoints.push(new PointClass(0,0,0));
-            }
-        }
+        this.particleCount=0;
+        this.drawPoints=[];
+        this.motionPoints=[];
+        
+            // triangles
+            
+        this.trigV0=null;
+        this.trigV1=null;
+        this.trigV2=null;
         
             // waves
             
+        this.wave=false;
+        this.wavePeriod=0;
+        this.waveSize=0;
+        this.wavePeriodicTickOffset=null;
+        
+        Object.seal(this);
+    }
+    
+    setGrid(grid,gridPeriod,gridOffset)
+    {
+        this.grid=grid;
+        this.gridSquareRoot=Math.trunc(Math.sqrt(this.grid));
+        this.gridPeriod=gridPeriod;
+        this.gridOffset=gridOffset;
+        
+        if (grid===1) {
+            this.uSize=this.vSize=1.0;
+        }
+        else {
+            this.uSize=this.vSize=1.0/this.gridSquareRoot;
+        }
+    }
+    
+    setWave(wave,waveRandomStart,wavePeriod,waveSize)
+    {
+        let n;
+        
         this.wave=wave;
         this.wavePeriod=wavePeriod;
         this.waveSize=waveSize;
@@ -63,8 +86,25 @@ class EffectChunkClass
                 this.wavePeriodicTickOffset[n]=Math.random()*wavePeriod;
             }
         }
+    }
+    
+    setTriangle(v0,v1,v2)
+    {
+        this.trigV0=v0;
+        this.trigV1=v1;
+        this.trigV2=v2;
+    }
+    
+    setParticle(motionPoints)
+    {
+        let n;
         
-        Object.seal(this);
+        this.particleCount=motionPoints.length;
+        this.motionPoints=motionPoints;
+        
+        for (n=0;n!==this.particleCount;n++) {
+            this.drawPoints.push(new PointClass(0,0,0));
+        }
     }
 }
 
@@ -76,6 +116,10 @@ export default class EffectJsonClass
 {
     constructor(core,jsonName,position,data,show)
     {
+        this.CHUNK_BILLBOARD=0;
+        this.CHUNK_TRIANGLE=1;
+        this.CHUNK_PARTICLE=2;
+        
         this.core=core;
         this.position=position.copy();
         this.data=data;
@@ -116,20 +160,26 @@ export default class EffectJsonClass
         this.light=null;
     }
     
+    calculateValue(value)
+    {
+        return(this.core.game.calculateValue(value,null,this.data,null));
+    }
+    
     initialize()
     {
-        let n,billboard,triangle,particle;
-        let drawMode,grid,bitmap;
-        let dx,dy,dz,motionPoints;
+        let n,chunk,billboard,triangle,particle,bitmap;
+        let name,mode,drawMode,grid,gridPeriod,gridOffset;
+        let wave,waveRandomStart,wavePeriod,waveSize;
+        let pmx,pmy,pmz,dx,dy,dz,motionPoints;
         let vertexCount,indexCount;
-        let elementIdx,iIdx,chunkIdx;
+        let elementIdx,iIdx;
         let gl=this.core.gl;
         
         this.startTimestamp=this.core.timestamp;
         
             // translate the json with this data
             
-        this.json=this.core.game.getCachedJson(this.jsonName,null,this.data);
+        this.json=this.core.game.getCachedJson(this.jsonName,this.data);
         if (this.json===null) return(false);
         
             // lights
@@ -152,21 +202,35 @@ export default class EffectJsonClass
                 
                     // setup the chunk
 
-                drawMode=this.DRAW_MODE_LIST.indexOf(billboard.mode);
+                mode=this.calculateValue(billboard.mode);
+                drawMode=this.DRAW_MODE_LIST.indexOf(mode);
                 if (drawMode===-1) {
-                    console.log('Unknown effect draw mode: '+billboard.mode);
+                    console.log('Unknown effect draw mode: '+mode);
                     return(false);
                 }
                 
-                grid=(billboard.grid===undefined)?1:billboard.grid;
                 
-                bitmap=this.core.bitmapList.get(billboard.bitmap);
+                name=this.calculateValue(billboard.bitmap);
+                bitmap=this.core.bitmapList.get(name);
                 if (bitmap===undefined) {
-                    console.log('Unknown effect bitmap: '+billboard.bitmap);
+                    console.log('Unknown effect bitmap: '+name);
                     return(false);
                 }
                 
-                this.chunks.push(new EffectChunkClass(bitmap,gl.TRIANGLES,6,drawMode,null,grid,billboard.gridPeriod,billboard.gridOffset,billboard.wave,billboard.waveRandomStart,billboard.wavePeriod,billboard.waveSize));
+                chunk=new EffectChunkClass(this.CHUNK_BILLBOARD,bitmap,6,drawMode,billboard.frames);
+                
+                grid=(billboard.grid===undefined)?1:this.calculateValue(billboard.grid);
+                gridPeriod=this.calculateValue(billboard.gridPeriod);
+                gridOffset=this.calculateValue(billboard.gridOffset);
+                chunk.setGrid(grid,gridPeriod,gridOffset);
+                
+                wave=this.calculateValue(billboard.wave);
+                waveRandomStart=this.calculateValue(billboard.waveRandomStart);
+                wavePeriod=this.calculateValue(billboard.wavePeriod);
+                waveSize=this.calculateValue(billboard.waveSize);
+                chunk.setWave(wave,waveRandomStart,wavePeriod,waveSize);
+                
+                this.chunks.push(chunk);
                 
                     // drawing one quad
                     
@@ -181,19 +245,31 @@ export default class EffectJsonClass
                 
                     // setup the chunk
 
-                drawMode=this.DRAW_MODE_LIST.indexOf(triangle.mode);
+                mode=this.calculateValue(triangle.mode);
+                drawMode=this.DRAW_MODE_LIST.indexOf(mode);
                 if (drawMode===-1) {
-                    console.log('Unknown effect draw mode: '+triangle.mode);
+                    console.log('Unknown effect draw mode: '+mode);
                     return(false);
                 }
                 
-                bitmap=this.core.bitmapList.get(triangle.bitmap);
+                name=this.calculateValue(triangle.bitmap);
+                bitmap=this.core.bitmapList.get(name);
                 if (bitmap===undefined) {
-                    console.log('Unknown effect bitmap: '+triangle.bitmap);
+                    console.log('Unknown effect bitmap: '+name);
                     return(false);
                 }
                 
-                this.chunks.push(new EffectChunkClass(bitmap,gl.TRIANGLES,3,drawMode,null,1,0,0,triangle.wave,triangle.waveRandomStart,triangle.wavePeriod,triangle.waveSize));
+                chunk=new EffectChunkClass(this.CHUNK_TRIANGLE,bitmap,3,drawMode,triangle.frames);
+                
+                wave=this.calculateValue(triangle.wave);
+                waveRandomStart=this.calculateValue(triangle.waveRandomStart);
+                wavePeriod=this.calculateValue(triangle.wavePeriod);
+                waveSize=this.calculateValue(triangle.waveSize);
+                chunk.setWave(wave,waveRandomStart,wavePeriod,waveSize);
+                
+                chunk.setTriangle(this.calculateValue(triangle.v0),this.calculateValue(triangle.v1),this.calculateValue(triangle.v2));
+                
+                this.chunks.push(chunk);
                 
                     // drawing one quad
                     
@@ -208,33 +284,47 @@ export default class EffectJsonClass
                 
                     // setup the chunk
 
-                drawMode=this.DRAW_MODE_LIST.indexOf(particle.mode);
+                mode=this.calculateValue(particle.mode);
+                drawMode=this.DRAW_MODE_LIST.indexOf(mode);
                 if (drawMode===-1) {
-                    console.log('Unknown effect draw mode: '+particle.mode);
+                    console.log('Unknown effect draw mode: '+mode);
                     return(false);
                 }
                 
-                grid=(particle.grid===undefined)?1:particle.grid;
                 
-                bitmap=this.core.bitmapList.get(particle.bitmap);
+                name=this.calculateValue(particle.bitmap);
+                bitmap=this.core.bitmapList.get(name);
                 if (bitmap===undefined) {
-                    console.log('Unknown effect bitmap: '+particle.bitmap);
+                    console.log('Unknown effect bitmap: '+name);
                     return(false);
                 }
+                
+                chunk=new EffectChunkClass(this.CHUNK_PARTICLE,bitmap,(particle.count*6),drawMode,particle.frames);
+                
+                grid=(particle.grid===undefined)?1:this.calculateValue(particle.grid);
+                gridPeriod=this.calculateValue(particle.gridPeriod);
+                gridOffset=this.calculateValue(particle.gridOffset);
+                chunk.setGrid(grid,gridPeriod,gridOffset);
                 
                     // need motion points
                     
                 motionPoints=[];
                 
-                dx=particle.motion.x*2;
-                dy=particle.motion.y*2;
-                dz=particle.motion.z*2;
+                pmx=this.calculateValue(particle.motion.x);
+                pmy=this.calculateValue(particle.motion.y);
+                pmz=this.calculateValue(particle.motion.z);
+                
+                dx=pmx*2;
+                dy=pmy*2;
+                dz=pmz*2;
 
                 for (n=0;n!==particle.count;n++) {
-                    motionPoints.push(new PointClass((((dx*Math.random())-particle.motion.x)*0.5),(((dy*Math.random())-particle.motion.y)*0.5),(((dz*Math.random())-particle.motion.z))*0.5));  // multiply by 0.5 as these are "radius" but listed as "diameter"
+                    motionPoints.push(new PointClass((((dx*Math.random())-pmx)*0.5),(((dy*Math.random())-pmy)*0.5),(((dz*Math.random())-pmz))*0.5));  // multiply by 0.5 as these are "radius" but listed as "diameter"
                 }
                 
-                this.chunks.push(new EffectChunkClass(bitmap,gl.TRIANGLES,(particle.count*6),drawMode,motionPoints,grid,particle.gridPeriod,particle.gridOffset,false,false,0,0));
+                chunk.setParticle(motionPoints);
+                
+                this.chunks.push(chunk);
                     
                     // count quads
                     
@@ -269,59 +359,47 @@ export default class EffectJsonClass
                 
             elementIdx=0;
             iIdx=0;
-            chunkIdx=0;
             
-            if (this.json.billboards!==undefined) {
-                for (billboard of this.json.billboards) {
-                    this.chunks[chunkIdx].vertexOffset=elementIdx*3;
-                    this.chunks[chunkIdx].indexOffset=iIdx;
+            for (chunk of this.chunks) {
+                
+                chunk.vertexOffset=elementIdx*3;
+                chunk.indexOffset=iIdx;
+                
+                switch (chunk.chunkType) {
                     
-                    this.indexes[iIdx++]=elementIdx;     // triangle 1
-                    this.indexes[iIdx++]=elementIdx+1;
-                    this.indexes[iIdx++]=elementIdx+2;
-                    this.indexes[iIdx++]=elementIdx;     // triangle 2
-                    this.indexes[iIdx++]=elementIdx+2;
-                    this.indexes[iIdx++]=elementIdx+3;
-                    
-                    elementIdx+=4;
-                    chunkIdx++;
-                }
-            }
-            
-            if (this.json.triangles!==undefined) {
-                for (triangle of this.json.triangles) {
-                    this.chunks[chunkIdx].vertexOffset=elementIdx*3;
-                    this.chunks[chunkIdx].indexOffset=iIdx;
-                    
-                    this.indexes[iIdx++]=elementIdx;     // triangle 1
-                    this.indexes[iIdx++]=elementIdx+1;
-                    this.indexes[iIdx++]=elementIdx+2;
-                    
-                    elementIdx+=3;
-                    chunkIdx++;
-                }
-            }
-           
-            if (this.json.particles!==undefined) {
-                for (particle of this.json.particles) {
-                    this.chunks[chunkIdx].vertexOffset=elementIdx*3;
-                    this.chunks[chunkIdx].indexOffset=iIdx;
-                    
-                    for (n=0;n!==particle.count;n++) {
+
+                    case this.CHUNK_BILLBOARD:
                         this.indexes[iIdx++]=elementIdx;     // triangle 1
                         this.indexes[iIdx++]=elementIdx+1;
                         this.indexes[iIdx++]=elementIdx+2;
                         this.indexes[iIdx++]=elementIdx;     // triangle 2
                         this.indexes[iIdx++]=elementIdx+2;
                         this.indexes[iIdx++]=elementIdx+3;
-                        
                         elementIdx+=4;
-                    }
-                    
-                    chunkIdx++;
-                }
-            }
+                        break;
 
+                    case this.CHUNK_TRIANGLE:
+                        this.indexes[iIdx++]=elementIdx;     // triangle 1
+                        this.indexes[iIdx++]=elementIdx+1;
+                        this.indexes[iIdx++]=elementIdx+2;
+                        elementIdx+=3;
+                        break;
+
+                    case this.CHUNK_PARTICLE:
+                        for (n=0;n!==chunk.particleCount;n++) {
+                            this.indexes[iIdx++]=elementIdx;     // triangle 1
+                            this.indexes[iIdx++]=elementIdx+1;
+                            this.indexes[iIdx++]=elementIdx+2;
+                            this.indexes[iIdx++]=elementIdx;     // triangle 2
+                            this.indexes[iIdx++]=elementIdx+2;
+                            this.indexes[iIdx++]=elementIdx+3;
+                            elementIdx+=4;
+                        }
+                        break;
+                }
+                
+            }
+            
             this.indexBuffer=gl.createBuffer();
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.indexes,gl.STATIC_DRAW);
@@ -330,7 +408,7 @@ export default class EffectJsonClass
         
             // finally any sound
             
-        if (this.json.sound!==undefined) this.core.soundList.play(this,null,this.json.sound.name,this.json.sound.rate,this.json.sound.loop);
+        if (this.json.sound!==undefined) this.core.soundList.play(this,null,this.calculateValue(this.json.sound.name),this.calculateValue(this.json.sound.rate),this.calculateValue(this.json.sound.loop));
        
         return(true);
     }
@@ -434,30 +512,30 @@ export default class EffectJsonClass
         this.uvs[this.uvIdx++]=v+chunk.vSize;
     }
     
-    addTriangleToVertexList(chunk,triangle)
+    addTriangleToVertexList(chunk)
     {
             // build the triangle
             
-        this.vertexes[this.vertexIdx++]=triangle.v0.x;
-        this.vertexes[this.vertexIdx++]=triangle.v0.y;
-        this.vertexes[this.vertexIdx++]=triangle.v0.z;
+        this.vertexes[this.vertexIdx++]=chunk.trigV0.x;
+        this.vertexes[this.vertexIdx++]=chunk.trigV0.y;
+        this.vertexes[this.vertexIdx++]=chunk.trigV0.z;
 
-        this.uvs[this.uvIdx++]=triangle.v0.u;
-        this.uvs[this.uvIdx++]=triangle.v0.v;
+        this.uvs[this.uvIdx++]=chunk.trigV0.u;
+        this.uvs[this.uvIdx++]=chunk.trigV0.v;
 
-        this.vertexes[this.vertexIdx++]=triangle.v1.x;
-        this.vertexes[this.vertexIdx++]=triangle.v1.y;
-        this.vertexes[this.vertexIdx++]=triangle.v1.z;
+        this.vertexes[this.vertexIdx++]=chunk.trigV1.x;
+        this.vertexes[this.vertexIdx++]=chunk.trigV1.y;
+        this.vertexes[this.vertexIdx++]=chunk.trigV1.z;
 
-        this.uvs[this.uvIdx++]=triangle.v1.u;
-        this.uvs[this.uvIdx++]=triangle.v1.v;
+        this.uvs[this.uvIdx++]=chunk.trigV1.u;
+        this.uvs[this.uvIdx++]=chunk.trigV1.v;
         
-        this.vertexes[this.vertexIdx++]=triangle.v2.x;
-        this.vertexes[this.vertexIdx++]=triangle.v2.y;
-        this.vertexes[this.vertexIdx++]=triangle.v2.z;
+        this.vertexes[this.vertexIdx++]=chunk.trigV2.x;
+        this.vertexes[this.vertexIdx++]=chunk.trigV2.y;
+        this.vertexes[this.vertexIdx++]=chunk.trigV2.z;
 
-        this.uvs[this.uvIdx++]=triangle.v2.u;
-        this.uvs[this.uvIdx++]=triangle.v2.v;
+        this.uvs[this.uvIdx++]=chunk.trigV2.u;
+        this.uvs[this.uvIdx++]=chunk.trigV2.v;
     }
     
         //
@@ -499,7 +577,7 @@ export default class EffectJsonClass
             startFrame=frames[0];
             this.light.color.setFromValues(startFrame.color.r,startFrame.color.g,startFrame.color.b);
             this.light.exponent=startFrame.exponent;
-            this.light.setIntensity(startFrame.intensity);
+            this.light.setIntensity(this.calculateValue(startFrame.intensity));
             return;
         }
         
@@ -543,10 +621,10 @@ export default class EffectJsonClass
         this.light.color.setFromValues(r,g,b);
         
         this.light.exponent=startFrame.exponent+((endFrame.exponent-startFrame.exponent)*f);
-        this.light.setIntensity(startFrame.intensity+((endFrame.intensity-startFrame.intensity)*f));
+        this.light.setIntensity(this.calculateValue(startFrame.intensity)+((this.calculateValue(endFrame.intensity)-this.calculateValue(startFrame.intensity))*f));
     }
         
-    tweenChunkFrames(frames,chunk)
+    tweenChunkFrames(chunk)
     {
         let n,f,tick,lastTick;
         let startIdx,endIdx;
@@ -554,9 +632,9 @@ export default class EffectJsonClass
         
             // if there is only one frame, no tweening
             
-        frameCount=frames.length;
+        frameCount=chunk.frames.length;
         if (frameCount===1) {
-            startFrame=frames[0];
+            startFrame=chunk.frames[0];
             if (startFrame.spread!==undefined) chunk.spread=startFrame.spread;
             if (startFrame.width!==undefined) chunk.width=startFrame.width;
             if (startFrame.height!==undefined) chunk.height=startFrame.height;
@@ -571,7 +649,7 @@ export default class EffectJsonClass
         
             // get the last frame and within cycle tick
             
-        lastTick=frames[frameCount-1].tick;
+        lastTick=chunk.frames[frameCount-1].tick;
         
         tick=((this.core.timestamp-this.startTimestamp)%lastTick);
         
@@ -581,7 +659,7 @@ export default class EffectJsonClass
         endIdx=frameCount-1;
         
         for (n=0;n!==frameCount;n++) {
-            if (tick<=frames[n].tick) {
+            if (tick<=chunk.frames[n].tick) {
                 endIdx=n;
                 break;
             }
@@ -590,8 +668,8 @@ export default class EffectJsonClass
         
             // tween factor
             
-        startFrame=frames[startIdx];
-        endFrame=frames[endIdx];
+        startFrame=chunk.frames[startIdx];
+        endFrame=chunk.frames[endIdx];
          
         if (startIdx===endIdx) {
             f=1;
@@ -648,74 +726,53 @@ export default class EffectJsonClass
         
             // setup any frames
             
-        chunkIdx=0;
-        
-        if (this.json.billboards!==undefined) {
+        for (chunk of this.chunks) {
             
-            for (billboard of this.json.billboards) {
-                
-                chunk=this.chunks[chunkIdx];
-                this.tweenChunkFrames(billboard.frames,chunk);
-                
-                halfWid=Math.trunc(chunk.width*0.5);
-                halfHigh=Math.trunc(chunk.height*0.5);
-                
-                this.xBound.adjust(this.position.x-halfWid);
-                this.xBound.adjust(this.position.x+halfWid);
-                this.yBound.adjust(this.position.y-halfHigh);
-                this.yBound.adjust(this.position.y+halfHigh);
-                this.zBound.adjust(this.position.z-halfWid);
-                this.zBound.adjust(this.position.z+halfWid);
-                
-                chunkIdx++;
-            }
-        }
-        
-        if (this.json.triangles!==undefined) {
+            this.tweenChunkFrames(chunk);
             
-            for (triangle of this.json.triangles) {
+            switch (chunk.chunkType) {
                 
-                chunk=this.chunks[chunkIdx];
-                this.tweenChunkFrames(triangle.frames,chunk);
-                
-                this.xBound.adjust(triangle.v0.x);
-                this.xBound.adjust(triangle.v1.x);
-                this.xBound.adjust(triangle.v2.x);
-                this.yBound.adjust(triangle.v0.y);
-                this.yBound.adjust(triangle.v1.y);
-                this.yBound.adjust(triangle.v2.y);
-                this.zBound.adjust(triangle.v0.z);
-                this.zBound.adjust(triangle.v1.z);
-                this.zBound.adjust(triangle.v2.z);
-                
-                chunkIdx++;
-            }
-        }    
-            
-        if (this.json.particles!==undefined) {
-            
-            for (particle of this.json.particles) {
-                
-                chunk=this.chunks[chunkIdx];
-                this.tweenChunkFrames(particle.frames,chunk);
-                
-                halfWid=Math.trunc(chunk.width*0.5);
-                halfHigh=Math.trunc(chunk.height*0.5);
-                
-                for (n=0;n!==particle.count;n++) {
-                    chunk.drawPoints[n].x=this.position.x+(chunk.motionPoints[n].x*chunk.spread);
-                    chunk.drawPoints[n].y=this.position.y+(chunk.motionPoints[n].y*chunk.spread);
-                    chunk.drawPoints[n].z=this.position.z+(chunk.motionPoints[n].z*chunk.spread);
+                case this.CHUNK_BILLBOARD:
+                    halfWid=Math.trunc(chunk.width*0.5);
+                    halfHigh=Math.trunc(chunk.height*0.5);
+
+                    this.xBound.adjust(this.position.x-halfWid);
+                    this.xBound.adjust(this.position.x+halfWid);
+                    this.yBound.adjust(this.position.y-halfHigh);
+                    this.yBound.adjust(this.position.y+halfHigh);
+                    this.zBound.adjust(this.position.z-halfWid);
+                    this.zBound.adjust(this.position.z+halfWid);
+                    break;
                     
-                    this.xBound.adjust(chunk.drawPoints[n].x-halfWid);
-                    this.xBound.adjust(chunk.drawPoints[n].x+halfWid);
-                    this.yBound.adjust(chunk.drawPoints[n].y-halfHigh);
-                    this.yBound.adjust(chunk.drawPoints[n].y+halfHigh);
-                    this.zBound.adjust(chunk.drawPoints[n].z-halfWid);
-                    this.zBound.adjust(chunk.drawPoints[n].z+halfWid);
-                }
-                
-                chunkIdx++;
+                case this.CHUNK_TRIANGLE:
+                    this.xBound.adjust(chunk.trigV0.x);
+                    this.xBound.adjust(chunk.trigV1.x);
+                    this.xBound.adjust(chunk.trigV2.x);
+                    this.yBound.adjust(chunk.trigV0.y);
+                    this.yBound.adjust(chunk.trigV1.y);
+                    this.yBound.adjust(chunk.trigV2.y);
+                    this.zBound.adjust(chunk.trigV0.z);
+                    this.zBound.adjust(chunk.trigV1.z);
+                    this.zBound.adjust(chunk.trigV2.z);
+                    break;
+                    
+                case this.CHUNK_PARTICLE:
+                    halfWid=Math.trunc(chunk.width*0.5);
+                    halfHigh=Math.trunc(chunk.height*0.5);
+
+                    for (n=0;n!==chunk.particleCount;n++) {
+                        chunk.drawPoints[n].x=this.position.x+(chunk.motionPoints[n].x*chunk.spread);
+                        chunk.drawPoints[n].y=this.position.y+(chunk.motionPoints[n].y*chunk.spread);
+                        chunk.drawPoints[n].z=this.position.z+(chunk.motionPoints[n].z*chunk.spread);
+
+                        this.xBound.adjust(chunk.drawPoints[n].x-halfWid);
+                        this.xBound.adjust(chunk.drawPoints[n].x+halfWid);
+                        this.yBound.adjust(chunk.drawPoints[n].y-halfHigh);
+                        this.yBound.adjust(chunk.drawPoints[n].y+halfHigh);
+                        this.zBound.adjust(chunk.drawPoints[n].z-halfWid);
+                        this.zBound.adjust(chunk.drawPoints[n].z+halfWid);
+                    }
+                    break;
             }
         }
 
@@ -726,8 +783,8 @@ export default class EffectJsonClass
     
     draw()
     {
-        let n,billboard,triangle,particle;
-        let chunk,chunkIdx,currentDrawMode;
+        let n;
+        let chunk,currentDrawMode;
         let currentBitmap;
         let gl=this.core.gl;
         let shader=this.core.shaderList.effectShader;
@@ -739,44 +796,27 @@ export default class EffectJsonClass
         this.uvIdx=0;
         this.indexIdx=0;
         
-        chunkIdx=0;
-        
-        if (this.json.billboards!==undefined) {
+        for (chunk of this.chunks) {
             
-            for (billboard of this.json.billboards) {
-                chunk=this.chunks[chunkIdx];
-
-                this.addQuadToVertexList(chunk,this.position);
-                this.addWave(chunk);
+            switch (chunk.chunkType) {
                 
-                chunkIdx++;
+                case this.CHUNK_BILLBOARD:
+                    this.addQuadToVertexList(chunk,this.position);
+                    this.addWave(chunk);
+                    break;
+                    
+                case this.CHUNK_TRIANGLE:
+                    this.addTriangleToVertexList(chunk);
+                    this.addWave(chunk);
+                    break;
+                    
+                case this.CHUNK_PARTICLE:
+                    for (n=0;n!==chunk.particleCount;n++) {
+                        this.addQuadToVertexList(chunk,chunk.drawPoints[n]);
+                    }
+                    break;
             }
         }
-        
-        if (this.json.triangles!==undefined) {
-            
-            for (triangle of this.json.triangles) {
-                chunk=this.chunks[chunkIdx];
-                
-                this.addTriangleToVertexList(chunk,triangle);
-                this.addWave(chunk);
-                
-                chunkIdx++;
-            }
-        }    
-        
-        if (this.json.particles!==undefined) {
-            
-            for (particle of this.json.particles) {
-                chunk=this.chunks[chunkIdx];
-                
-                for (n=0;n!==particle.count;n++) {
-                    this.addQuadToVertexList(chunk,chunk.drawPoints[n]);
-                }
-                
-                chunkIdx++;
-            }
-        }    
         
             // start the shader
             
@@ -834,7 +874,7 @@ export default class EffectJsonClass
                 // draw the chunk
                 
             gl.uniform4f(shader.colorAlphaUniform,chunk.color.r,chunk.color.g,chunk.color.b,chunk.alpha);
-            gl.drawElements(chunk.glDrawType,chunk.indexCount,gl.UNSIGNED_SHORT,(chunk.indexOffset*2));
+            gl.drawElements(gl.TRIANGLES,chunk.indexCount,gl.UNSIGNED_SHORT,(chunk.indexOffset*2));
         }
         
             // remove the buffers

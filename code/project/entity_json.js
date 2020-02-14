@@ -30,7 +30,7 @@ export default class EntityJsonClass extends ProjectEntityClass
         
             // load the json
             
-        this.json=this.core.game.getCachedJson(this.getJsonName(),this.variables,this.data);
+        this.json=this.core.game.getCachedJson(this.getJsonName(),this.data);
         if (this.json===null) return(false);
         
             // setup
@@ -104,7 +104,7 @@ export default class EntityJsonClass extends ProjectEntityClass
     
     calculateValue(value)
     {
-        return(this.core.game.calculateValue(value,this.variables,this.data));
+        return(this.core.game.calculateValue(value,this.variables,this.data,this.currentMessageContent));
     }
     
         //
