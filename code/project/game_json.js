@@ -1,6 +1,5 @@
 import ColorClass from '../utility/color.js';
 import CalcClass from '../project/calc.js';
-import CompileClass from '../project/compile.js';
 
 export default class GameJsonClass
 {
@@ -11,15 +10,13 @@ export default class GameJsonClass
         
         this.json=null;
         this.jsonCache=new Map();
-        
-        this.compile=new CompileClass(this.core);
     }
     
         //
         // load json from network
         //
         
-    async fetchJsonAsText(name)
+    async fetchJson(name)
     {
         let resp;
         let url='../json/'+name+'.json';
@@ -27,67 +24,68 @@ export default class GameJsonClass
         try {
             resp=await fetch(url);
             if (!resp.ok) return(Promise.reject('Unable to load '+url+'; '+resp.statusText));
-            return(await resp.text());
+            return(await resp.json());
         }
         catch (e) {
             return(Promise.reject('Unable to load '+url+'; '+e.message));
         }
     }
     
-    parseAndCompileJson(name,jsonText,data)
-    {
-        let json,v2;
-        
-            // run a reviver to swap any @data.xyz
-         
-        try {
-            json=JSON.parse(jsonText,
-
-                (key,value) =>
-                    {
-                        
-                            // replace any @data
-                            
-                        if ((typeof(value)==='string')) {
-                            if (value.startsWith('@data.')) {
-                                if (data===null) return(null);
-                                v2=data[value.substring(6)];
-                                if (v2===undefined) throw('Missing data lookup in json key '+key+', value: '+value);
-                                return(v2);
-                            }
-                        }
-                        return(value);
-                    }
-                );
-        
-        }
-        catch (e) {
-            console.log('Error parsing json '+name+': '+e);
-            return(null);
-        }
-        
-            // now compile any parts we can
-            
-        if (!this.compile.compile(name,json)) return(null);
-        
-        return(json);
-    }
+        //
+        // compile calcs
+        //
     
+    compile(jsonName,obj)
+    {
+        let prop,value,calc;
+        
+        if (obj===undefined) return(true);
+        
+        for (prop in obj) {
+            value=obj[prop];
+            
+                // if object (which includes arrays) then go deeper
+                
+            if (typeof(value)==='object') {
+                this.compile(jsonName,value);
+                continue;
+            }
+            
+                // otherwise look for a string prop that starts with calc(
+                
+            if (typeof(value)!=='string') continue;
+            
+            value=value.trim();
+            if (!value.startsWith('calc(')) continue;
+            if (!value.endsWith(')')) {
+                console.log('Syntax error in calc, mismatched () in: '+jsonName);
+                return(false);
+            }
+            
+            calc=new CalcClass(this.core,jsonName,value.substring(5,(value.length-1)));
+            if (!calc.compile()) return(false);
+            
+            obj[prop]=calc;
+        }
+        
+        return(true);
+    }
+ 
         //
         // json caches and utilities
         //
         
     getCachedJson(name,data)
     {
-        let jsonText;
+        let json;
         
-        jsonText=this.jsonCache.get(name);
-        if (jsonText===undefined) {
+        json=this.jsonCache.get(name);
+        if (json===undefined) {
             console.log('Unknown json: '+name);
             return(null);
         }
         
-        return(this.parseAndCompileJson(name,jsonText,data));
+        return(json);
     }
     
     calculateValue(value,variables,data,currentMessageContent)
@@ -103,30 +101,38 @@ export default class GameJsonClass
         
     async initialize()
     {
-        let jsonText;
+        let data;
         let jsonName;
         
-        jsonText=null;
+        data=null;
+        
+        /* testing
+        let calc=new CalcClass(this.core,jsonName,"1.0+(@rnd*0.4)");
+        calc.compile();
+        calc.displayTree();
+         */
         
             // get the main game json
             // this is the only hard coded json file
         
-        await this.fetchJsonAsText('game')
+        await this.fetchJson('game')
             .then
                 (
                     value=>{
-                        jsonText=value;
+                        data=value;
                     },
                     value=>{
                         console.log(value);
                     }
                 );
         
-        if (jsonText===null) return(false);
+        if (data===null) return(false);
         
-            // translate to json to catch @data.
-            
-        this.json=this.parseAndCompileJson('game',jsonText,this.data);
+            // compile
+           
+        this.json=data;
+        
+        if (!this.compile('game',this.json)) return(false);
         
             // now run through and cache all
             // the custom json that runs the project
@@ -134,22 +140,24 @@ export default class GameJsonClass
             // the @data into it's in use
             
         for (jsonName of this.json.jsons) {
-            jsonText=null;
+            data=null;
             
-            await this.fetchJsonAsText(jsonName)
+            await this.fetchJson(jsonName)
             .then
                 (
                     value=>{
-                        jsonText=value;
+                        data=value;
                     },
                     value=>{
                         console.log(value);
                     }
                 );
         
-            if (jsonText===null) return(false);
+            if (data===null) return(false);
             
-            this.jsonCache.set(jsonName,jsonText);
+            if (!this.compile(jsonName,data)) return(false);
+            
+            this.jsonCache.set(jsonName,data);
         }
             
         return(true);

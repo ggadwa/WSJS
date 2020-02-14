@@ -296,6 +296,24 @@ export default class InputClass
         this.mouseChangeY+=event.movementY;
     }
     
+    getMouseMoveX()
+    {
+        let x;
+        
+        x=this.mouseChangeX;
+        this.mouseChangeX=0;
+        return(x);
+    }
+    
+    getMouseMoveY()
+    {
+        let y;
+        
+        y=this.mouseChangeY;
+        this.mouseChangeY=0;
+        return(y);
+    }
+    
         //
         // touch events
         //

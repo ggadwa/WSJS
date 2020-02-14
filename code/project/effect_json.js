@@ -179,7 +179,7 @@ export default class EffectJsonClass
         
             // translate the json with this data
             
-        this.json=this.core.game.getCachedJson(this.jsonName,this.data);
+        this.json=this.core.game.getCachedJson(this.jsonName);
         if (this.json===null) return(false);
         
             // lights

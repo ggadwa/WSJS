@@ -30,7 +30,7 @@ export default class EntityJsonClass extends ProjectEntityClass
         
             // load the json
             
-        this.json=this.core.game.getCachedJson(this.getJsonName(),this.data);
+        this.json=this.core.game.getCachedJson(this.getJsonName());
         if (this.json===null) return(false);
         
             // setup
@@ -38,17 +38,24 @@ export default class EntityJsonClass extends ProjectEntityClass
         this.radius=this.json.setup.radius;
         this.height=this.json.setup.height;
             
-        this.setModel(this.json.model.name);
-        this.scale.setFromValues(this.json.model.scale.x,this.json.model.scale.y,this.json.model.scale.z);
+        if (this.json.model!==undefined) {
+            this.setModel(this.json.model.name);
+            this.scale.setFromValues(this.json.model.scale.x,this.json.model.scale.y,this.json.model.scale.z);
+        }
         
             // get the draw type
             
-        this.drawType=(['normal','player','inHand']).indexOf(this.json.draw.type);
-        if (this.drawType<0) this.drawType=0;
+        if (this.json.draw!==undefined) {
+            this.drawType=(['normal','player','inHand']).indexOf(this.json.draw.type);
+            if (this.drawType===-1) {
+                console.log('Unknown draw type: '+this.json.draw.type);
+                return(false);
+            }
         
-        this.drawAngle=new PointClass(0,0,0);
-        this.handPosition=this.getPointFromJson(this.json.draw.handPosition);
-        this.handAngle=this.getPointFromJson(this.json.draw.handAngle);
+            this.drawAngle=new PointClass(0,0,0);
+            this.handPosition=this.getPointFromJson(this.json.draw.handPosition);
+            this.handAngle=this.getPointFromJson(this.json.draw.handAngle);
+        }
         
             // messages
             
@@ -182,7 +189,7 @@ export default class EntityJsonClass extends ProjectEntityClass
                         console.log('Entity '+entity.name+' can not receive messages, it has no events');
                         return(false);
                     }
-                        
+                    
                     entity.messageQueue.set(this.calculateValue(action.name),this.calculateValue(action.content));
                     break;
                     
@@ -195,6 +202,22 @@ export default class EntityJsonClass extends ProjectEntityClass
                     }
                         
                     entity.messageQueue.set(this.currentMessageName,this.currentMessageContent);
+                    break;
+                    
+                case 'control_fps':
+                    this.utility.controlFPS(action);
+                    break;
+                    
+                case 'control_vehicle':
+                    this.utility.controlVehicle(action);
+                    break;
+                    
+                case 'control_weapon':
+                    this.utility.controlWeapon(action);
+                    break;
+                    
+                case 'control_developer':
+                    this.utility.controlDeveloper(action);
                     break;
                     
                 default:
@@ -306,6 +329,8 @@ export default class EntityJsonClass extends ProjectEntityClass
         
     drawSetup()
     {
+        if (this.model===null) return(false);
+        
         switch (this.drawType) {
             
             case this.DRAW_TYPE_NORMAL:

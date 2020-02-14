@@ -21,6 +21,7 @@ export default class CalcClass
         this.CALC_TYPE_MESSAGE_CONTENT=4;
         this.CALC_TYPE_TIMESTAMP=5;
         this.CALC_TYPE_DATA=6;
+        this.CALC_TYPE_RANDOM=7;
         
         this.CALC_TYPE_CONJUNCTION_AND=0;
         this.CALC_TYPE_CONJUNCTION_OR=1;
@@ -69,6 +70,8 @@ export default class CalcClass
                 return(new CalcItemClass(this.CALC_TYPE_MESSAGE_CONTENT,null));
             case '@timestamp':
                 return(new CalcItemClass(this.CALC_TYPE_TIMESTAMP,null));
+            case '@rnd':
+                return(new CalcItemClass(this.CALC_TYPE_RANDOM,null));
         }
         
             // any other token starting with @ is from data
@@ -128,6 +131,10 @@ export default class CalcClass
                 
             case this.CALC_TYPE_DATA:
                 str+=('[data]'+item.obj);
+                break;
+                
+            case this.CALC_TYPE_RANDOM:
+                str+=('[special]@rnd');
                 break;
         }
         
@@ -327,7 +334,7 @@ export default class CalcClass
             
                 // 0..9 and .
                 
-            if (((cc>47) && (cc<58)) || (cc===56)) {
+            if (((cc>47) && (cc<58)) || (cc===46)) {
                 if ((isInAlpha) || (isInNumber)) {            // we are still in a variable, just continue on
                     token+=ch;
                     continue;
@@ -496,15 +503,32 @@ export default class CalcClass
         
             // variable, constants, and specials
             
-        if ((item.type===this.CALC_TYPE_VARIABLE) && (variables!==null)) {
-            value=variables.get(item.obj);
-            return((value===undefined)?0:value);
+        switch (item.type) {
+            
+            case this.CALC_TYPE_VARIABLE:
+                if (variables===null) return(0);
+                value=variables.get(item.obj);
+                return((value===undefined)?0:value);
+                break;
+                
+            case this.CALC_TYPE_CONSTANT:
+                return(item.obj);
+                
+            case this.CALC_TYPE_MESSAGE_CONTENT:
+                return(currentMessageContent);
+                
+            case this.CALC_TYPE_TIMESTAMP:
+                return(this.core.timestamp);
+                
+            case this.CALC_TYPE_DATA:
+                if (data===null) return(0);
+                value=data[item.obj];
+                if (value===undefined) return(0);
+                return(value);
+                
+            case this.CALC_TYPE_RANDOM:
+                return(Math.random());
         }
-        
-        if (item.type===this.CALC_TYPE_CONSTANT) return(item.obj);
-        if (item.type===this.CALC_TYPE_MESSAGE_CONTENT) return(currentMessageContent);
-        if (item.type===this.CALC_TYPE_TIMESTAMP) return(this.core.timestamp);
-        if ((item.type===this.CALC_TYPE_DATA) && (data!==null)) return(data[item.obj]);
 
         return(0);
     }
