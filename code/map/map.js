@@ -19,7 +19,11 @@ export default class MapClass
     {
         this.core=core;
             
-            // variables
+        this.bumpHeight=0;
+        
+        this.gravityMinValue=0;
+        this.gravityMaxValue=0;
+        this.gravityAcceleration=0;
         
         this.meshList=new MeshListClass(core);
         this.liquidList=new MapLiquidListClass(core);

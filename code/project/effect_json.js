@@ -160,9 +160,9 @@ export default class EffectJsonClass
         this.light=null;
     }
     
-    calculateValue(value)
+    lookupValue(value)
     {
-        return(this.core.game.calculateValue(value,null,this.data,null));
+        return(this.core.game.lookupValue(value,this.data));
     }
     
     initialize()
@@ -202,7 +202,7 @@ export default class EffectJsonClass
                 
                     // setup the chunk
 
-                mode=this.calculateValue(billboard.mode);
+                mode=this.lookupValue(billboard.mode);
                 drawMode=this.DRAW_MODE_LIST.indexOf(mode);
                 if (drawMode===-1) {
                     console.log('Unknown effect draw mode: '+mode);
@@ -210,7 +210,7 @@ export default class EffectJsonClass
                 }
                 
                 
-                name=this.calculateValue(billboard.bitmap);
+                name=this.lookupValue(billboard.bitmap);
                 bitmap=this.core.bitmapList.get(name);
                 if (bitmap===undefined) {
                     console.log('Unknown effect bitmap: '+name);
@@ -219,15 +219,15 @@ export default class EffectJsonClass
                 
                 chunk=new EffectChunkClass(this.CHUNK_BILLBOARD,bitmap,6,drawMode,billboard.frames);
                 
-                grid=(billboard.grid===undefined)?1:this.calculateValue(billboard.grid);
-                gridPeriod=this.calculateValue(billboard.gridPeriod);
-                gridOffset=this.calculateValue(billboard.gridOffset);
+                grid=(billboard.grid===undefined)?1:this.lookupValue(billboard.grid);
+                gridPeriod=this.lookupValue(billboard.gridPeriod);
+                gridOffset=this.lookupValue(billboard.gridOffset);
                 chunk.setGrid(grid,gridPeriod,gridOffset);
                 
-                wave=this.calculateValue(billboard.wave);
-                waveRandomStart=this.calculateValue(billboard.waveRandomStart);
-                wavePeriod=this.calculateValue(billboard.wavePeriod);
-                waveSize=this.calculateValue(billboard.waveSize);
+                wave=this.lookupValue(billboard.wave);
+                waveRandomStart=this.lookupValue(billboard.waveRandomStart);
+                wavePeriod=this.lookupValue(billboard.wavePeriod);
+                waveSize=this.lookupValue(billboard.waveSize);
                 chunk.setWave(wave,waveRandomStart,wavePeriod,waveSize);
                 
                 this.chunks.push(chunk);
@@ -245,14 +245,14 @@ export default class EffectJsonClass
                 
                     // setup the chunk
 
-                mode=this.calculateValue(triangle.mode);
+                mode=this.lookupValue(triangle.mode);
                 drawMode=this.DRAW_MODE_LIST.indexOf(mode);
                 if (drawMode===-1) {
                     console.log('Unknown effect draw mode: '+mode);
                     return(false);
                 }
                 
-                name=this.calculateValue(triangle.bitmap);
+                name=this.lookupValue(triangle.bitmap);
                 bitmap=this.core.bitmapList.get(name);
                 if (bitmap===undefined) {
                     console.log('Unknown effect bitmap: '+name);
@@ -261,13 +261,13 @@ export default class EffectJsonClass
                 
                 chunk=new EffectChunkClass(this.CHUNK_TRIANGLE,bitmap,3,drawMode,triangle.frames);
                 
-                wave=this.calculateValue(triangle.wave);
-                waveRandomStart=this.calculateValue(triangle.waveRandomStart);
-                wavePeriod=this.calculateValue(triangle.wavePeriod);
-                waveSize=this.calculateValue(triangle.waveSize);
+                wave=this.lookupValue(triangle.wave);
+                waveRandomStart=this.lookupValue(triangle.waveRandomStart);
+                wavePeriod=this.lookupValue(triangle.wavePeriod);
+                waveSize=this.lookupValue(triangle.waveSize);
                 chunk.setWave(wave,waveRandomStart,wavePeriod,waveSize);
                 
-                chunk.setTriangle(this.calculateValue(triangle.v0),this.calculateValue(triangle.v1),this.calculateValue(triangle.v2));
+                chunk.setTriangle(this.lookupValue(triangle.v0),this.lookupValue(triangle.v1),this.lookupValue(triangle.v2));
                 
                 this.chunks.push(chunk);
                 
@@ -284,7 +284,7 @@ export default class EffectJsonClass
                 
                     // setup the chunk
 
-                mode=this.calculateValue(particle.mode);
+                mode=this.lookupValue(particle.mode);
                 drawMode=this.DRAW_MODE_LIST.indexOf(mode);
                 if (drawMode===-1) {
                     console.log('Unknown effect draw mode: '+mode);
@@ -292,7 +292,7 @@ export default class EffectJsonClass
                 }
                 
                 
-                name=this.calculateValue(particle.bitmap);
+                name=this.lookupValue(particle.bitmap);
                 bitmap=this.core.bitmapList.get(name);
                 if (bitmap===undefined) {
                     console.log('Unknown effect bitmap: '+name);
@@ -301,18 +301,18 @@ export default class EffectJsonClass
                 
                 chunk=new EffectChunkClass(this.CHUNK_PARTICLE,bitmap,(particle.count*6),drawMode,particle.frames);
                 
-                grid=(particle.grid===undefined)?1:this.calculateValue(particle.grid);
-                gridPeriod=this.calculateValue(particle.gridPeriod);
-                gridOffset=this.calculateValue(particle.gridOffset);
+                grid=(particle.grid===undefined)?1:this.lookupValue(particle.grid);
+                gridPeriod=this.lookupValue(particle.gridPeriod);
+                gridOffset=this.lookupValue(particle.gridOffset);
                 chunk.setGrid(grid,gridPeriod,gridOffset);
                 
                     // need motion points
                     
                 motionPoints=[];
                 
-                pmx=this.calculateValue(particle.motion.x);
-                pmy=this.calculateValue(particle.motion.y);
-                pmz=this.calculateValue(particle.motion.z);
+                pmx=this.lookupValue(particle.motion.x);
+                pmy=this.lookupValue(particle.motion.y);
+                pmz=this.lookupValue(particle.motion.z);
                 
                 dx=pmx*2;
                 dy=pmy*2;
@@ -408,7 +408,7 @@ export default class EffectJsonClass
         
             // finally any sound
             
-        if (this.json.sound!==undefined) this.core.soundList.play(this,null,this.calculateValue(this.json.sound.name),this.calculateValue(this.json.sound.rate),this.calculateValue(this.json.sound.loop));
+        if (this.json.sound!==undefined) this.core.soundList.play(this,null,this.lookupValue(this.json.sound.name),this.lookupValue(this.json.sound.rate),this.lookupValue(this.json.sound.loop));
        
         return(true);
     }
@@ -577,7 +577,7 @@ export default class EffectJsonClass
             startFrame=frames[0];
             this.light.color.setFromValues(startFrame.color.r,startFrame.color.g,startFrame.color.b);
             this.light.exponent=startFrame.exponent;
-            this.light.setIntensity(this.calculateValue(startFrame.intensity));
+            this.light.setIntensity(this.lookupValue(startFrame.intensity));
             return;
         }
         
@@ -621,7 +621,7 @@ export default class EffectJsonClass
         this.light.color.setFromValues(r,g,b);
         
         this.light.exponent=startFrame.exponent+((endFrame.exponent-startFrame.exponent)*f);
-        this.light.setIntensity(this.calculateValue(startFrame.intensity)+((this.calculateValue(endFrame.intensity)-this.calculateValue(startFrame.intensity))*f));
+        this.light.setIntensity(this.lookupValue(startFrame.intensity)+((this.lookupValue(endFrame.intensity)-this.lookupValue(startFrame.intensity))*f));
     }
         
     tweenChunkFrames(chunk)
@@ -697,8 +697,8 @@ export default class EffectJsonClass
         
     drawSetup()
     {
-        let n,billboard,triangle,particle;
-        let chunk,chunkIdx;
+        let n;
+        let chunk;
         let halfWid,halfHigh;
         
             // effects with life tick

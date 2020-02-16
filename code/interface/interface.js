@@ -327,6 +327,47 @@ export default class InterfaceClass
     }
     
         //
+        // add from json
+        // 
+
+    addFromJson(jsonInterface)
+    {
+        let element,text;
+        let bitmap,positionMode,align;
+        
+        if (jsonInterface===undefined) return(true);
+        
+        if (jsonInterface.elements!==undefined) {
+            for (element of jsonInterface.elements) {
+                
+                    // the element bitmap
+                    
+                bitmap=this.core.bitmapList.get(element.bitmap);
+                if (bitmap===undefined) {
+                    console.log('Missing bitmap to add to interface: '+element.bitmap);
+                    return(false);
+                }
+                
+                positionMode=this.POSITION_MODE_LIST.indexOf(element.positionMode);
+
+                this.addElement(element.id,bitmap,element.width,element.height,positionMode,element.positionOffset,new ColorClass(element.color.r,element.color.g,element.color.b),element.alpha);
+                this.showElement(element.id,element.show);
+            }
+        }
+        
+        if (jsonInterface.texts!==undefined) {
+            for (text of jsonInterface.texts) {
+                align=this.core.interface.TEXT_ALIGN_LIST.indexOf(text.textAlign);
+                positionMode=this.POSITION_MODE_LIST.indexOf(text.positionMode);
+                this.addText(text.id,text.text,positionMode,text.positionOffset,text.textSize,align,new ColorClass(text.color.r,text.color.g,text.color.b),text.alpha);
+                this.showText(text.id,text.show);
+            }
+        }
+        
+        return(true);
+    }
+    
+        //
         // drawing
         //
         

@@ -1,210 +1,40 @@
 import PointClass from '../utility/point.js';
-import BoundClass from '../utility/bound.js';
+import ColorClass from '../utility/color.js';
+import BlockClass from '../project/block.js';
 import MapPathNodeClass from '../map/map_path_node.js';
 
-export default class EntityUtilityClass
+export default class BlockDeveloperClass extends BlockClass
 {
-    constructor(core,entity)
+    constructor(core,block)
     {
-        this.core=core;
-        this.entity=entity;
-        
-            // flags
-            
-        this.lastUnderLiquid=false;
-        this.lastInLiquid=false;
-        
-        this.debugPlayerFly=false;
-        this.debugPlayerNoClip=false;
-        this.debugPaths=false;
-        this.debugEntityBounds=false;
-        this.debugSkeletons=false;
-        this.debugCollisionSurfaces=false;
-        this.debugNoDamage=false;
-        
-            // pre-allocates
-        
-        this.rotMovement=new PointClass(0,0,0);    
-        this.firePoint=new PointClass(0,0,0);
-        this.fireVector=new PointClass(0,0,0);
-        this.fireHitPoint=new PointClass(0,0,0);
+        super(core,block);
     }
-    
-    calculateValue(value)
-    {
-        return(this.core.game.calculateValue(value,this.entity.variables,this.entity.data,this.entity.currentMessageContent));
-    }
-    
-        //
-        // control fps
-        //
-        
-    controlFPS(action)
-    {
-        let x,y;
-        let moveForward,moveBackward,moveLeft,moveRight;
-        let liquidIdx,bump;
-        let turnAdd=0;
-        let lookAdd=0;
-        let entity=this.entity;
-        let input=this.core.input;
-        let setup=this.core.setup;
-        let maxTurnSpeed,maxLookSpeed,maxLookAngle;
-        let forwardAcceleration=this.calculateValue(action.forwardAcceleration);
-        let forwardDeceleration=this.calculateValue(action.forwardDeceleration);
-        let forwardMaxSpeed=this.calculateValue(action.forwardMaxSpeed);
-        let sideAcceleration=this.calculateValue(action.sideAcceleration);
-        let sideDeceleration=this.calculateValue(action.sideDeceleration);
-        let sideMaxSpeed=this.calculateValue(action.sideMaxSpeed);
-        
-            // forward and shift controls
-            
-        moveForward=(input.isKeyDown('w')) || (input.isKeyDown('ArrowUp')) || (input.getTouchStickLeftY()<0);
-        moveBackward=(input.isKeyDown('s')) || (input.isKeyDown('ArrowDown')) || (input.getTouchStickLeftY()>0);
-        moveLeft=input.isKeyDown('a') || (input.getTouchStickLeftX()<0);
-        moveRight=input.isKeyDown('d') || (input.getTouchStickLeftX()>0);
-        
-            // turning
-            
-        x=input.getMouseMoveX();
-        if (x!==0) {
-            turnAdd=-(x*setup.mouseXSensitivity);
-            turnAdd+=(turnAdd*setup.mouseXAcceleration);
-            if (setup.mouseXInvert) turnAdd=-turnAdd;
-            
-            maxTurnSpeed=this.calculateValue(action.maxTurnSpeed);
-            if (Math.abs(turnAdd)>maxTurnSpeed) turnAdd=maxTurnSpeed*Math.sign(turnAdd);
-        }
-        
-        turnAdd-=(input.getTouchStickRightX()*(setup.touchStickXSensitivity*20));
-        
-        if (turnAdd!==0) {
-            entity.angle.y+=turnAdd;
-            if (entity.angle.y<0.0) entity.angle.y+=360.0;
-            if (entity.angle.y>=360.00) entity.angle.y-=360.0;
-        }
-        
-            // looking
-            
-        if (this.core.camera.isFirstPerson()) {
-            y=input.getMouseMoveY();
-            if (y!==0) {
-                lookAdd=y*setup.mouseYSensitivity;
-                lookAdd+=(lookAdd*setup.mouseYAcceleration);
-                if (setup.mouseYInvert) lookAdd=-lookAdd;
-                
-                maxLookSpeed=this.calculateValue(action.maxLookSpeed);
-                if (Math.abs(lookAdd)>maxLookSpeed) lookAdd=maxLookSpeed*Math.sign(lookAdd);
-            }
 
-            lookAdd+=(input.getTouchStickRightY()*(setup.touchStickYSensitivity*20));
-
-            if ((setup.snapLook) && (moveForward || moveBackward || moveLeft || moveRight)) {
-                if (lookAdd===0) {
-                    entity.angle.x=entity.angle.x*0.95;
-                    if (Math.abs(entity.angle.x)<0.05) entity.angle.x=0;
-                }
-            }
-        
-            if (lookAdd!==0) {
-                entity.angle.x+=lookAdd;
-                
-                maxLookAngle=this.calculateValue(action.maxLookAngle);
-                if (entity.angle.x<-maxLookAngle) entity.angle.x=-maxLookAngle;
-                if (entity.angle.x>=maxLookAngle) entity.angle.x=maxLookAngle;
-            }
-        }
-        else {
-            entity.angle.x=0;
-        }
-        
-            // liquid changes
-            
-        liquidIdx=this.core.map.liquidList.getLiquidForEyePoint(entity.position,entity.eyeOffset);
-        
-        if (liquidIdx!==-1) {
-            this.lastUnderLiquid=true;
-        }
-        else {
-            if ((this.lastUnderLiquid) && (this.angle.x>0)) {
-                this.gravity=0;
-                this.movement.y-=this.JUMP_WATER_HEIGHT;
-            }
-            
-            this.lastUnderLiquid=false;
-        }
-        
-        liquidIdx=this.core.map.liquidList.getLiquidForPoint(entity.position);
-        
-        if (liquidIdx!==-1) {
-            if (!this.lastInLiquid) this.playSound('splash',1.0,false);
-            this.lastInLiquid=true;
-        }
-        else {
-            if (this.lastInLiquid) this.playSound('splash',0.8,false);
-            this.lastInLiquid=false;
-        }
-        
-            // can only bump if we aren't falling
-            // as otherwise ledges can catch you and
-            // bump you back up, the only exception is
-            // swimming, which always bumps over small obstacles
-            
-        bump=(entity.standOnMeshIdx!==-1)||(this.lastUnderLiquid);
-        
-            // figure out the movement
-         
-        entity.movement.moveZWithAcceleration(moveForward,moveBackward,forwardAcceleration,forwardDeceleration,forwardMaxSpeed,forwardAcceleration,forwardDeceleration,forwardMaxSpeed);
-        entity.movement.moveXWithAcceleration(moveLeft,moveRight,sideAcceleration,sideDeceleration,sideMaxSpeed,sideAcceleration,sideDeceleration,sideMaxSpeed);
-        
-        this.rotMovement.setFromPoint(entity.movement);
-        if ((this.debugPlayerFly) || (this.lastUnderLiquid)) {
-            this.rotMovement.y=0;       // only Y movement comes from X angle rotation
-            this.rotMovement.rotateX(null,entity.angle.x);     // if flying or swimming, add in the X rotation
-            this.rotMovement.y*=this.calculateValue(action.flySwimYReduce);
-        }
-        this.rotMovement.rotateY(null,entity.angle.y);
-
-            // if no clipping is on then
-            // just move directly through map
-            
-        if (this.debugPlayerNoClip) {
-            entity.position.addPoint(this.rotMovement);
-        }
-
-            // move around the map
-        
-        else {
-            entity.movement.y=entity.moveInMapY(this.rotMovement,this.debugPlayerFly);
-            entity.moveInMapXZ(this.rotMovement,bump,true);
-        }
-    }
-    
-        //
-        // vehicle control
-        //
-        
-    controlVehicle(action)
+    initialize(entity)
     {
-    }
-    
-        //
-        // weapon control
-        //
+            // the flags for other blocks
+            // other flags change engine are on core itself
+                    
+        entity.blockData.set('developerPlayerFly',false);
+        entity.blockData.set('developerPlayerNoClip',false);
+        entity.blockData.set('developerNoDamage',false);
         
-    controlWeapon(action)
-    {
-        
+            // developer live output
+            
+        this.core.interface.addText('fps','',this.core.interface.POSITION_MODE_TOP_RIGHT,{"x":-5,"y":23},20,this.core.interface.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1);
+        this.core.interface.addText('meshCount','',this.core.interface.POSITION_MODE_TOP_RIGHT,{"x":-5,"y":46},20,this.core.interface.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1);
+        this.core.interface.addText('trigCount','',this.core.interface.POSITION_MODE_TOP_RIGHT,{"x":-5,"y":69},20,this.core.interface.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1);
+        this.core.interface.addText('modelCount','',this.core.interface.POSITION_MODE_TOP_RIGHT,{"x":-5,"y":92},20,this.core.interface.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1);
+        this.core.interface.addText('effectCount','',this.core.interface.POSITION_MODE_TOP_RIGHT,{"x":-5,"y":115},20,this.core.interface.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1);
     }
     
         //
         // developer tools
         //
         
-    positionInfo()
+    positionInfo(entity)
     {
         let n,nodeIdx,str;
-        let entity=this.entity;
         let nMesh=this.core.map.meshList.meshes.length;
         let xBound=new BoundClass(entity.position.x-100,entity.position.x+100);
         let yBound=new BoundClass(entity.position.y+(entity.eyeOffset+100),entity.position.y+entity.eyeOffset);
@@ -247,11 +77,10 @@ export default class EntityUtilityClass
         return(value);
     }
     
-    pathEditor()
+    pathEditor(entity)
     {
         let n,k,nodeIdx;
         let node,links,str;
-        let entity=this.entity;
         let path=this.core.map.path;
         let input=this.core.input;
         
@@ -422,29 +251,49 @@ export default class EntityUtilityClass
         }
     }
     
-    controlDeveloper()
+    run(entity)
     {
+        let idx,flag;
+        let fpsStr=this.core.fps.toString();
         let input=this.core.input;
+        
+            // debug output
+            
+        idx=fpsStr.indexOf('.');
+        if (idx===-1) {
+            fpsStr+='.0';
+        }
+        else {
+            fpsStr=fpsStr.substring(0,(idx+3));
+        }
+        
+        this.core.interface.updateText('fps',fpsStr);
+        this.core.interface.updateText('meshCount',('mesh:'+this.core.drawMeshCount));
+        this.core.interface.updateText('trigCount',('trig:'+this.core.drawTrigCount));
+        this.core.interface.updateText('modelCount',('model:'+this.core.drawModelCount));
+        this.core.interface.updateText('effectCount',('effect:'+this.core.drawEffectCount));
         
             // backspace prints out position info
             
         if (input.isKeyDownAndClear('Backspace')) {
-            this.positionInfo();
+            this.positionInfo(entity);
             return;
         }
         
             // - for no clip
             
         if (input.isKeyDownAndClear('-')) {
-            this.debugPlayerNoClip=!this.debugPlayerNoClip;
-            console.info('player no clip='+this.debugPlayerNoClip);
+            flag=!entity.blockData.get('developerPlayerNoClip');
+            entity.blockData.set('developerPlayerNoClip',flag);
+            console.info('player no clip='+flag);
         }
         
             // = for fly
         
         if (input.isKeyDownAndClear('=')) {
-            this.debugPlayerFly=!this.debugPlayerFly;
-            console.info('player fly='+this.debugPlayerFly);
+            flag=!entity.blockData.get('developerPlayerFly');
+            entity.blockData.set('developerPlayerFly',flag);
+            console.info('player fly='+flag);
         }
         
             // delete turns on path editor
@@ -452,6 +301,7 @@ export default class EntityUtilityClass
         if (input.isKeyDownAndClear('Delete')) {
             this.core.debugPaths=!this.core.debugPaths;
             console.info('path editor='+this.core.debugPaths);
+            
             if (this.core.debugPaths) {
                 console.info('u add key to nearest node');
                 console.info('i select nearest node');
@@ -487,51 +337,14 @@ export default class EntityUtilityClass
             // home turns off damage
             
         if (input.isKeyDownAndClear('Home')) {
-            this.debugNoDamage=!this.debugNoDamage;
-            console.info('no damage='+this.debugNoDamage);
+            flag=!entity.blockData.get('developerNoDamage');
+            entity.blockData.set('developerNoDamage',flag);
+            console.info('no damage='+flag);
         }
         
             // path editing
             
-        if (this.core.debugPaths) this.pathEditor();
+        if (this.core.debugPaths) this.pathEditor(entity);
     }
 
-        //
-        // weapon type utilities
-        //
-        
-    hitScan(fromEntity,maxDistance,hitFilter,damage,hitEffectName)
-    {
-            // the hit scan, firing point is the eye
-            // and we rotate with the look and then turn
-            
-        this.firePoint.setFromPoint(fromEntity.position);
-        this.firePoint.y+=fromEntity.eyeOffset;
-        
-        this.fireVector.setFromValues(0,0,maxDistance);
-        this.fireVector.rotateX(null,fromEntity.angle.x);
-        this.fireVector.rotateY(null,fromEntity.angle.y);
-        
-        if (fromEntity.rayCollision(this.firePoint,this.fireVector,this.fireHitPoint,hitFilter,null)) {
-            
-                // is this an entity we can hit?
-                
-            if (fromEntity.hitEntity) {
-                if (fromEntity.hitEntity.damage!==undefined) {
-                    fromEntity.hitEntity.damage(fromEntity,damage,this.fireHitPoint);
-                }
-            }
-            
-                // hit effect
-                // push effect point towards entity firing so it shows up better
-
-            if (hitEffectName!==null) {
-                this.fireVector.normalize();
-                this.fireVector.scale(-100);
-                this.fireHitPoint.addPoint(this.fireVector);
-                this.core.map.effectList.add(hitEffectName,this.fireHitPoint,null,true);
-            }
-        }
-
-    }
 }

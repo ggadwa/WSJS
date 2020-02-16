@@ -53,16 +53,12 @@ export default class ProjectEntityClass
         this.modelEntityAlter=null;
         
         this.eyeOffset=0;
-        this.bumpHeight=0;
+        this.weight=0;
 
         this.id=0;
         this.remoteId=-1;       // the network ID
         
-        this.gravityMinValue=10;
-        this.gravityMaxValue=300;
-        this.gravityAcceleration=10;
-        
-        this.gravity=this.gravityMinValue;
+        this.gravity=this.core.map.gravityMinValue;
         
         this.passThrough=false;
         this.touchEntity=null;
@@ -806,21 +802,20 @@ export default class ProjectEntityClass
             // add in gravity
             
         if (noGravity) {
-            this.gravity=this.gravityMinValue;
+            this.gravity=this.core.map.gravityMinValue;
         }
         else {
-            
                 // if there is upwards movement (usually a jump or push)
                 // then reduce it by the current gravity acceleration
   
             if (movePnt.y>0) {
-                movePnt.y-=this.gravityAcceleration;
+                movePnt.y-=(this.weight*this.core.map.gravityAcceleration);
                 if (movePnt.y<=0) {
                     this.gravity=-movePnt.y;
                     movePnt.y=0;
                 }
                 else {
-                    this.gravity=this.gravityMinValue;
+                    this.gravity=this.core.map.gravityMinValue;
                 }
             }
             
@@ -828,8 +823,8 @@ export default class ProjectEntityClass
                 // add it into the movement
 
             else {
-                this.gravity+=this.gravityAcceleration;
-                if (this.gravity>this.gravityMaxValue) this.gravity=this.gravityMaxValue;
+                this.gravity+=(this.weight*this.core.map.gravityAcceleration);
+                if (this.gravity>this.core.map.gravityMaxValue) this.gravity=this.core.map.gravityMaxValue;
             
                 yAdd-=this.gravity;
             }
@@ -845,7 +840,7 @@ export default class ProjectEntityClass
             this.position.addValuesTrunc(0,fallY,0);
         
             if (fallY>=0) {
-                this.gravity=this.gravityMinValue;                  // if we are rising or stopped by a floor, restart gravity
+                this.gravity=this.core.map.gravityMinValue;                  // if we are rising or stopped by a floor, restart gravity
                 return(movePnt.y);
             }
         }
@@ -946,7 +941,7 @@ export default class ProjectEntityClass
     floorHitBounceY(y,bounceFactor,bounceCut)
     {
         y=-Math.trunc((y-this.gravity)*bounceFactor);
-        this.gravity=this.gravityMinValue;
+        this.gravity=this.core.map.gravityMinValue;
         
         if (Math.abs(y)<bounceCut) y=0;
         

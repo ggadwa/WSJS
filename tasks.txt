@@ -1,27 +1,20 @@
 - should bitmaps have "/textures" in them or this assumed? (need to work around map textures)
 
-- KART: get rid of developer player class
-        - make vehicle movement
+- KART: make vehicle movement
 
 - sound play might need position instead of expecting object with .position (as effects call it)
 - wsserver - option to show http log in server (default to off)
 
-{"type":"pulseInterface","element":"health","tick":500,"expand":5},
+NEW BLOCK STUFF
+     - add ammo/health/shield in chest
+     - interface needs ElementCount (put in kart)
+     - fire: primary secondary tertiary
+     - health and armor on player
+     - need to test failures (missing bitmap, missing json, bad json, etc)
+     - get rid of any beretta naming
+     - bot names/classes/remote classes
+     - index.html hack
 
-   ----> current todo
-          - do player, than turn everything off and do map
-          - splash by event
-          - move mouse fire to player json
-          - !open in calc (captain chest)
-          - get rid of beretta name from code
-          - get rid of projectMap
-          - this.core.game.getBotClass()
-          - this.core.game.getRemoteClass()
-          - this.core.projectMap=new this.core.projectGame.json.startMap(this.core);
-          - fix the index.html (hard coded map)
-          - replace to other weapons
-          - put health back in captain chest json
-          - replace entity run() with just runEvents()
 
         switch (this.data.startMap) {
             case "Dual Castles":
@@ -33,7 +26,7 @@
 
 - KART map fixes
     - ladder is off a bit
-    - railing on bridge is off a bit
+    - railing is off in a bunch of places
 
 - need to do some optimizations
 
