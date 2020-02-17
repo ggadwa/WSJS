@@ -23,6 +23,11 @@ export default class BlockClass
     {
     }
     
+    message(entity,action,data)
+    {
+        return(false);
+    }
+    
     run(entity)
     {
     }

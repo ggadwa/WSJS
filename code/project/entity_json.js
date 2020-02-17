@@ -22,6 +22,11 @@ export default class EntityJsonClass extends ProjectEntityClass
         this.overrideJsonName=overrideJsonName;     // supergumba -- hack to get this all to work while translating to blocks
     }
     
+    getJsonName()
+    {
+        return(null);
+    }
+    
     initialize()
     {
         let block,blockCode;
@@ -54,11 +59,6 @@ export default class EntityJsonClass extends ProjectEntityClass
             // add any interface elements
             
         if (!this.core.interface.addFromJson(this.json.interface)) return(false);
-        
-            // block data, specialized internal
-            // data that can be shared between blocks
-
-        this.blockData=new Map();
         
             // setup the blocks
             
@@ -105,9 +105,18 @@ export default class EntityJsonClass extends ProjectEntityClass
         return(true);
     }
     
-    getJsonName()
+    sendMessageToBlock(blockType,action,data)
     {
-        return(null);
+        let blockCode;
+        
+        for (blockCode of this.blockCodes) {
+            if (blockCode.block.type===blockType) {
+                blockCode.message(this,action,data);
+                return;
+            }
+        }
+        
+        console.log('No block '+blockType+' to send message to: '+action);
     }
         
     ready()

@@ -51,7 +51,7 @@ export default class BlockWeaponClass extends BlockClass
     {
         this.ammoCount=this.ammoInitialCount;
         
-        if (this.interfaceAmmoCount!==null) this.core.interface.updateText(this.interfaceAmmoCount,this.ammoCount);
+        
 
                    //     "interfaceAmmoIcon":"grenade",
 
@@ -60,9 +60,11 @@ export default class BlockWeaponClass extends BlockClass
     
     run(entity)
     {
-            // show/hide crosshair
+            // update any UI
             
         if (this.interfaceCrosshair!==null) this.core.interface.showElement(this.interfaceCrosshair,((entity.show)&&(this.core.camera.isFirstPerson())));
+        if (this.interfaceAmmoCount!==null) this.core.interface.updateText(this.interfaceAmmoCount,this.ammoCount);
+        
     }
         
     drawSetup(entity)

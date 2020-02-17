@@ -3,9 +3,14 @@ import BlockClass from '../project/block.js';
 
 export default class BlockFireHitScanClass extends BlockClass
 {
+    constructor(core,block)
+    {
+        super(core,block);
+    }
+    
     initialize(entity)
     {
-        
+         
             
             
             /*
@@ -85,6 +90,8 @@ export default class BlockFireHitScanClass extends BlockClass
     
     run(entity)
     {
+        let fireWeapon;
+        
             // if entity has model but not shown,
             // the assume carousel and skip
             
@@ -92,7 +99,17 @@ export default class BlockFireHitScanClass extends BlockClass
         
             // check for fire
             
+        fireWeapon=this.core.input.mouseButtonFlags[0]||this.core.input.isTouchStickRightClick();
+        
+        if (fireWeapon) {
+        //    this.sendMessageToBlock('weapon','fired',)
+        //    this.weaponBlock.ammoCount--;
+        }
     }
+    
+    
+    
+    
     hitScan(fromEntity,maxDistance,hitFilter,damage,hitEffectName)
     {
             // the hit scan, firing point is the eye

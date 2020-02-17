@@ -12,12 +12,11 @@ export default class BlockDeveloperClass extends BlockClass
 
     initialize(entity)
     {
-            // the flags for other blocks
-            // other flags change engine are on core itself
+            // some developer flags
                     
-        entity.blockData.set('developerPlayerFly',false);
-        entity.blockData.set('developerPlayerNoClip',false);
-        entity.blockData.set('developerNoDamage',false);
+        this.developerPlayerFly=false;
+        this.developerPlayerNoClip=false;
+        this.developerNoDamage=false;
         
             // developer live output
             
@@ -283,17 +282,17 @@ export default class BlockDeveloperClass extends BlockClass
             // - for no clip
             
         if (input.isKeyDownAndClear('-')) {
-            flag=!entity.blockData.get('developerPlayerNoClip');
-            entity.blockData.set('developerPlayerNoClip',flag);
-            console.info('player no clip='+flag);
+            this.developerPlayerNoClip=!this.developerPlayerNoClip;
+            this.sendMessageToBlock('fps_movement','developerPlayerNoClip',this.developerPlayerNoClip);
+            console.info('player no clip='+this.developerPlayerNoClip);
         }
         
             // = for fly
         
         if (input.isKeyDownAndClear('=')) {
-            flag=!entity.blockData.get('developerPlayerFly');
-            entity.blockData.set('developerPlayerFly',flag);
-            console.info('player fly='+flag);
+            this.developerPlayerFly=!this.developerPlayerFly;
+            this.sendMessageToBlock('fps_movement','developerPlayerFly',this.developerPlayerFly);
+            console.info('player fly='+this.developerPlayerFly);
         }
         
             // delete turns on path editor
@@ -337,9 +336,9 @@ export default class BlockDeveloperClass extends BlockClass
             // home turns off damage
             
         if (input.isKeyDownAndClear('Home')) {
-            flag=!entity.blockData.get('developerNoDamage');
-            entity.blockData.set('developerNoDamage',flag);
-            console.info('no damage='+flag);
+            this.developerNoDamage=!this.developerNoDamage;
+            this.sendMessageToBlock('player','developerPlayerFly',this.developerNoDamage);
+            console.info('no damage='+this.developerNoDamage);
         }
         
             // path editing

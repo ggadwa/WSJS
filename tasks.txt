@@ -5,6 +5,9 @@
 - sound play might need position instead of expecting object with .position (as effects call it)
 - wsserver - option to show http log in server (default to off)
 
+NEW WEAPON STUFF
+     - weapons are separate held items?
+
 NEW BLOCK STUFF
      - add ammo/health/shield in chest
      - interface needs ElementCount (put in kart)
@@ -14,6 +17,9 @@ NEW BLOCK STUFF
      - get rid of any beretta naming
      - bot names/classes/remote classes
      - index.html hack
+     - need "required" blocks for other blocks
+     - block data might not be needed, can call children (need message)
+     - no damage flag
 
 
         switch (this.data.startMap) {

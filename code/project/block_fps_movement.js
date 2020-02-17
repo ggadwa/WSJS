@@ -25,6 +25,9 @@ export default class BlockFPSMovementClass extends BlockClass
         this.lastInLiquid=false;
         this.lastUnderLiquid=false;
         
+        this.developerPlayerFly=false;
+        this.developerPlayerNoClip=false;
+        
         this.rotMovement=new PointClass(0,0,0);
     }
         
@@ -54,14 +57,26 @@ export default class BlockFPSMovementClass extends BlockClass
     {
     }
     
+    message(entity,fromEntity,action,data)
+    {
+        switch (action) {
+            case 'developerPlayerFly':
+                this.developerPlayerFly=data;
+                return(true);
+            case 'developerPlayerNoClip':
+                this.developerPlayerNoClip=data;
+                return(true);
+        }
+        
+        return(false);
+    }
+    
     run(entity)
     {
         let x,y;
         let moveForward,moveBackward,moveLeft,moveRight;
         let liquidIdx,bump;
         let turnAdd,lookAdd;
-        let developerPlayerFly=entity.blockData.get('developerPlayerFly');
-        let developerPlayerNoClip=entity.blockData.get('developerPlayerNoClip');
         let input=this.core.input;
         let setup=this.core.setup;
         
@@ -154,7 +169,7 @@ export default class BlockFPSMovementClass extends BlockClass
             // jumping
            
         if (input.isKeyDown(' ')) {
-            if ((entity.standOnMeshIdx!==-1) && (liquidIdx===-1) && (!developerPlayerFly)) {
+            if ((entity.standOnMeshIdx!==-1) && (liquidIdx===-1) && (!this.developerPlayerFly)) {
                 entity.gravity=this.core.map.gravityMinValue;
                 entity.movement.y=this.jumpHeight;
             }
@@ -173,7 +188,7 @@ export default class BlockFPSMovementClass extends BlockClass
         entity.movement.moveXWithAcceleration(moveLeft,moveRight,this.sideAcceleration,this.sideDeceleration,this.sideMaxSpeed,this.sideAcceleration,this.sideDeceleration,this.sideMaxSpeed);
         
         this.rotMovement.setFromPoint(entity.movement);
-        if ((developerPlayerFly) || (this.lastUnderLiquid)) {
+        if ((this.developerPlayerFly) || (this.lastUnderLiquid)) {
             this.rotMovement.y=0;       // only Y movement comes from X angle rotation
             this.rotMovement.rotateX(null,entity.angle.x);     // if flying or swimming, add in the X rotation
             this.rotMovement.y*=this.flySwimYReduce;
@@ -183,14 +198,14 @@ export default class BlockFPSMovementClass extends BlockClass
             // if no clipping is on then
             // just move directly through map
             
-        if (developerPlayerNoClip) {
+        if (this.developerPlayerNoClip) {
             entity.position.addPoint(this.rotMovement);
         }
 
             // move around the map
         
         else {
-            entity.movement.y=entity.moveInMapY(this.rotMovement,developerPlayerFly);
+            entity.movement.y=entity.moveInMapY(this.rotMovement,this.developerPlayerFly);
             entity.moveInMapXZ(this.rotMovement,bump,true);
         }
     }

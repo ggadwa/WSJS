@@ -38,30 +38,32 @@ export default class BlockFPSWeaponsClass extends BlockClass
         return(true);
     }
     
-    resetWeapons(entity)
+    showCarouselWeapon(entity)
     {
-        let n,weapon;
+        let n;
 
         for (n=0;n!==this.carouselWeapons.length;n++) {
-            weapon=this.carouselWeapons[n];
-            
-            weapon.ready();
-            weapon.show=(n===this.currentCarouselWeaponIdx);
+            this.carouselWeapons[n].show=(n===this.currentCarouselWeaponIdx);
+        }
+    }
+    
+    ready(entity)
+    {
+        let n;
+        
+        this.lastWheelClick=0;
+        
+        this.currentCarouselWeaponIdx=this.defaultCarouselWeaponIdx;
+
+        for (n=0;n!==this.carouselWeapons.length;n++) {
+            this.carouselWeapons[n].ready();
         }
         
         for (n=0;n!==this.extraWeapons.length;n++) {
             this.extraWeapons[n].ready();
         }
         
-        //this.blockData.set('currentWeapon',(this.currentWeaponIdx===-1)?nullthis.weapons[0]);
-    }
-    
-    ready(entity)
-    {
-        this.lastWheelClick=0;
-        
-        this.currentCarouselWeaponIdx=this.defaultCarouselWeaponIdx;
-        this.resetWeapons(entity);
+        this.showCarouselWeapon(entity);
     }
     
     run(entity)
@@ -97,14 +99,14 @@ export default class BlockFPSWeaponsClass extends BlockClass
         if ((mouseWheelClick<0) && (this.lastWheelClick===0)) {
             if (this.currentCarouselWeaponIdx>0) {
                 this.currentCarouselWeaponIdx--;
-                this.resetWeapons(entity);
+                this.showCarouselWeapon(entity);
             }
         }
 
         if ((mouseWheelClick>0) && (this.lastWheelClick===0)) {
             if (this.currentCarouselWeaponIdx<this.carouselWeapons.length-1) {
                 this.currentCarouselWeaponIdx++;
-                this.resetWeapons(entity);
+                this.showCarouselWeapon(entity);
             }
         }
         
@@ -115,7 +117,7 @@ export default class BlockFPSWeaponsClass extends BlockClass
         for (n=0;n!==this.carouselWeapons.length;n++) {
             if (this.core.input.isKeyDown(String.fromCharCode(49+n))) {
                 this.currentCarouselWeaponIdx=n;
-                this.resetWeapons(entity);
+                this.showCarouselWeapon(entity);
                 break;
             }
         }
