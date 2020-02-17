@@ -39,11 +39,11 @@ export default class MapEffectListClass
         // effect list
         //
 
-    add(jsonName,position,data,show)
+    add(spawnedBy,jsonName,position,data,show)
     {
         let effect;
         
-        effect=new EffectJsonClass(this.core,jsonName,position,data,show);
+        effect=new EffectJsonClass(this.core,spawnedBy,jsonName,position,data,show);
         if (!effect.initialize()) return(false);
         
         this.effects.push(effect);
@@ -108,7 +108,7 @@ export default class MapEffectListClass
             effectShow=true;
             if (effectDef.show!==undefined) effectShow=effectDef.show;
 
-            if (!this.add(effectDef.json,effectPosition,effectDef.data,effectShow)) return(false);
+            if (!this.add(null,effectDef.json,effectPosition,effectDef.data,effectShow)) return(false);
         }
         
         return(true);

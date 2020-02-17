@@ -1,5 +1,6 @@
 import PointClass from '../utility/point.js';
 import ColorClass from '../utility/color.js';
+import BoundClass from '../utility/bound.js';
 import BlockClass from '../project/block.js';
 import MapPathNodeClass from '../map/map_path_node.js';
 
@@ -14,9 +15,9 @@ export default class BlockDeveloperClass extends BlockClass
     {
             // some developer flags
                     
-        this.developerPlayerFly=false;
-        this.developerPlayerNoClip=false;
-        this.developerNoDamage=false;
+        entity.developerPlayerFly=false;
+        entity.developerPlayerNoClip=false;
+        entity.developerPlayerNoDamage=false;
         
             // developer live output
             
@@ -282,17 +283,15 @@ export default class BlockDeveloperClass extends BlockClass
             // - for no clip
             
         if (input.isKeyDownAndClear('-')) {
-            this.developerPlayerNoClip=!this.developerPlayerNoClip;
-            this.sendMessageToBlock('fps_movement','developerPlayerNoClip',this.developerPlayerNoClip);
-            console.info('player no clip='+this.developerPlayerNoClip);
+            entity.developerPlayerNoClip=!entity.developerPlayerNoClip;
+            console.info('player no clip='+entity.developerPlayerNoClip);
         }
         
             // = for fly
         
         if (input.isKeyDownAndClear('=')) {
-            this.developerPlayerFly=!this.developerPlayerFly;
-            this.sendMessageToBlock('fps_movement','developerPlayerFly',this.developerPlayerFly);
-            console.info('player fly='+this.developerPlayerFly);
+            entity.developerPlayerFly=!entity.developerPlayerFly;
+            console.info('player fly='+entity.developerPlayerFly);
         }
         
             // delete turns on path editor
@@ -336,9 +335,8 @@ export default class BlockDeveloperClass extends BlockClass
             // home turns off damage
             
         if (input.isKeyDownAndClear('Home')) {
-            this.developerNoDamage=!this.developerNoDamage;
-            this.sendMessageToBlock('player','developerPlayerFly',this.developerNoDamage);
-            console.info('no damage='+this.developerNoDamage);
+            entity.developerPlayerNoDamage=!entity.developerPlayerNoDamage;
+            console.info('no damage='+entity.developerPlayerNoDamage);
         }
         
             // path editing

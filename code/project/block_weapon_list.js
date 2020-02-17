@@ -2,7 +2,7 @@ import PointClass from '../utility/point.js';
 import BoundClass from '../utility/bound.js';
 import BlockClass from '../project/block.js';
 
-export default class BlockFPSWeaponsClass extends BlockClass
+export default class BlockWeaponsListClass extends BlockClass
 {
     constructor(core,block)
     {
@@ -13,13 +13,13 @@ export default class BlockFPSWeaponsClass extends BlockClass
         
         this.currentCarouselWeaponIdx=0;
         this.defaultCarouselWeaponIdx=0;
-        
-        this.lastWheelClick=0;
     }
         
     initialize(entity)
     {
         let n,weapon;
+        
+            // setup the weapons
         
         this.defaultCarouselWeaponIdx=-1;
         
@@ -35,7 +35,30 @@ export default class BlockFPSWeaponsClass extends BlockClass
             }
         }
         
+            // variables that all blocks need access to, added
+            // by fps_control but put here in case that block isn't used
+            
+        entity.firePrimary=false;
+        entity.fireSecondary=false;
+        entity.fireTertiary=false;
+        
+        entity.weaponNext=false;
+        entity.weaponPrevious=false;
+        entity.weaponSwitchNumber=-1;
+        
         return(true);
+    }
+    
+    release(entity)
+    {
+        let n;
+        
+        for (n=0;n!==this.carouselWeapons.length;n++) {
+            this.carouselWeapons[n].release();
+        }
+        for (n=0;n!==this.extraWeapons.length;n++) {
+            this.extraWeapons[n].release();
+        }
     }
     
     showCarouselWeapon(entity)
@@ -50,8 +73,6 @@ export default class BlockFPSWeaponsClass extends BlockClass
     ready(entity)
     {
         let n;
-        
-        this.lastWheelClick=0;
         
         this.currentCarouselWeaponIdx=this.defaultCarouselWeaponIdx;
 
@@ -68,58 +89,30 @@ export default class BlockFPSWeaponsClass extends BlockClass
     
     run(entity)
     {
-        let n,mouseWheelClick;
-        let weapon;
-
-        /*
-        fireWeapon=this.isMouseButtonDown(0)||this.isTouchStickRightClick();
-
-        if (fireWeapon) {
-            switch (this.currentWeapon) {
-                case this.WEAPON_BERETTA:
-                    this.beretta.receiveMessage("fire",null);
-                    //this.beretta.fire(this.position,this.angle,this.eyeOffset);
-                    break;
-                case this.WEAPON_M16:
-                    this.m16.receiveMessage("fire",null);
-                    //this.m16.fire(this.position,this.angle,this.eyeOffset);
-                    break;
-            }
-        }
+            // change weapons
         
-            // grenade throw
-        
-        if (this.isMouseButtonDown(2)) this.grenade.receiveMessage("fire",null);
-        //if (this.isMouseButtonDown(2)) this.grenade.fire(this.position,this.angle,this.eyeOffset);
-*/
-            // change weapons with mouse wheel
-        
-        mouseWheelClick=this.core.input.mouseWheelRead();
-        
-        if ((mouseWheelClick<0) && (this.lastWheelClick===0)) {
+        if (entity.weaponPrevious) {
             if (this.currentCarouselWeaponIdx>0) {
                 this.currentCarouselWeaponIdx--;
                 this.showCarouselWeapon(entity);
             }
+            entity.weaponPrevious=false;
         }
 
-        if ((mouseWheelClick>0) && (this.lastWheelClick===0)) {
-            if (this.currentCarouselWeaponIdx<this.carouselWeapons.length-1) {
+        if (entity.weaponNext) {
+            if (this.currentCarouselWeaponIdx<(this.carouselWeapons.length-1)) {
                 this.currentCarouselWeaponIdx++;
                 this.showCarouselWeapon(entity);
             }
+            entity.weaponNext=false;
         }
         
-        this.lastWheelClick=mouseWheelClick;
-        
-            // change weapons by number
-            
-        for (n=0;n!==this.carouselWeapons.length;n++) {
-            if (this.core.input.isKeyDown(String.fromCharCode(49+n))) {
-                this.currentCarouselWeaponIdx=n;
+        if (entity.weaponSwitchNumber!==-1) {
+            if (entity.weaponSwitchNumber<this.carouselWeapons.length) {
+                this.currentCarouselWeaponIdx=entity.weaponSwitchNumber;
                 this.showCarouselWeapon(entity);
-                break;
             }
+            entity.weaponSwitchNumber=-1;
         }
     }
 }

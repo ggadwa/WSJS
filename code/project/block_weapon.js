@@ -7,9 +7,11 @@ export default class BlockWeaponClass extends BlockClass
     {
         super(core,block);
         
-        this.ammoCount=0;
         this.ammoInitialCount=0;
         this.ammoMaxCount=0;
+        
+        this.idleAnimation=null;
+        this.fireAnimation=null;
         
         this.interfaceCrosshair=null;
         this.interfaceAmmoIcon=null;
@@ -23,6 +25,11 @@ export default class BlockWeaponClass extends BlockClass
 
     initialize(entity)
     {
+        entity.ammoCount=0;         // ammo count on entity so other blocks can access it
+        
+        entity.idleAnimation=this.block.idleAnimation;
+        entity.fireAnimation=this.block.fireAnimation;
+        
         this.ammoInitialCount=this.core.game.lookupValue(this.block.ammoInitialCount,entity.data);
         this.ammoMaxCount=this.core.game.lookupValue(this.block.ammoMaxCount,entity.data);
         
@@ -33,15 +40,10 @@ export default class BlockWeaponClass extends BlockClass
             // model setup, skip if no model
             
         if (entity.model!==null) {
-            
-                // set the weapon draw type for in hand
-
             this.handOffset=new PointClass(this.block.handOffset.x,this.block.handOffset.y,this.block.handOffset.z);
             this.handAngle=new PointClass(this.block.handAngle.x,this.block.handAngle.y,this.block.handAngle.z);
 
-                // and start idle animation
-
-            entity.modelEntityAlter.startAnimationChunkInFrames(null,30,this.block.idleAnimation[0],this.block.idleAnimation[1]);
+            entity.modelEntityAlter.startAnimationChunkInFrames(null,30,entity.idleAnimation[0],entity.idleAnimation[1]);
         }
         
         return(true);    
@@ -49,7 +51,7 @@ export default class BlockWeaponClass extends BlockClass
     
     ready(entity)
     {
-        this.ammoCount=this.ammoInitialCount;
+        entity.ammoCount=this.ammoInitialCount;
         
         
 
@@ -63,7 +65,7 @@ export default class BlockWeaponClass extends BlockClass
             // update any UI
             
         if (this.interfaceCrosshair!==null) this.core.interface.showElement(this.interfaceCrosshair,((entity.show)&&(this.core.camera.isFirstPerson())));
-        if (this.interfaceAmmoCount!==null) this.core.interface.updateText(this.interfaceAmmoCount,this.ammoCount);
+        if (this.interfaceAmmoCount!==null) this.core.interface.updateText(this.interfaceAmmoCount,entity.ammoCount);
         
     }
         

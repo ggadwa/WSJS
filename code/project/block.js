@@ -19,13 +19,12 @@ export default class BlockClass
         return(true);
     }
     
-    ready(entity)
+    release(entity)
     {
     }
     
-    message(entity,action,data)
+    ready(entity)
     {
-        return(false);
     }
     
     run(entity)
@@ -52,6 +51,11 @@ export default class BlockClass
         this.core.map.entityList.add(entity);
         
         return(entity);
+    }
+    
+    addEffect(spawnedByEntity,jsonName,position,data,show)
+    {
+        return(this.core.map.effectList.add(spawnedByEntity,jsonName,position,data,show));
     }
         
     runActions(entity,actions)

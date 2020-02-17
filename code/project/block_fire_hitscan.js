@@ -6,143 +6,121 @@ export default class BlockFireHitScanClass extends BlockClass
     constructor(core,block)
     {
         super(core,block);
+        
+        this.fireMethod=null;
+        this.fireWait=0;
+        this.damage=0;
+        this.distance=0;
+        this.hitFilter=null;
+        this.hitEffect=null;
+        this.fireSound=null;
+        
+        this.lastFireTimestamp=0;
+        
+            // pre-allocates
+            
+        this.firePoint=new PointClass(0,0,0);
+        this.fireVector=new PointClass(0,0,0);
+        this.fireHitPoint=new PointClass(0,0,0);
     }
     
     initialize(entity)
     {
-         
-            
-            
-            /*
-        this.DAMAGE=20;
-        this.HIT_FILTER=['player','remote','bot','monster'];
+        this.fireMethod=this.core.game.lookupValue(this.block.fireMethod,entity.data);
+        this.fireWait=this.core.game.lookupValue(this.block.fireWait,entity.data);
         
-            // setup
+        this.damage=this.core.game.lookupValue(this.block.damage,entity.data);
+        this.distance=this.core.game.lookupValue(this.block.distance,entity.data);
+        this.hitFilter=this.block.hitFilter;
+        this.hitEffect=this.core.game.lookupValue(this.block.hitEffect,entity.data);
+        
+        this.fireSound=this.block.fireSound;
             
-        this.radius=5000;
-        this.height=11000;      // this model is based on a humanoid skeleton, so it's taller
-        
-        this.fireWait=900;
-        
-        this.ammoInitialCount=15;
-        this.ammoAddCount=10;
-        this.ammoMaxCount=25;
-        this.interfaceIconName='beretta_bullet';
-        
-
-            // the model
+            // variables that all blocks need access to, added
+            // by fps_control but put here in case that block isn't used
             
-        this.setModel('hand_beretta');
-        this.scale.setFromValues(7000,7000,7000);
-             * 
-             */
+        entity.firePrimary=false;
+        entity.fireSecondary=false;
+        entity.fireTertiary=false;
     }
-    /*
+    
     ready(entity)
     {
-        super.ready(entity);
-        
-        this.startModelAnimationChunkInFrames(null,30,77,127);
+        this.lastFireTimestamp=0;
     }
-    
-        //
-        // fire call
-        //
-    
-    fire(position,angle,eyeOffset)
-    {
-            // the super does the ammo calc
-            // and tells if we can fire
-            
-        if (!super.fire(position,angle,eyeOffset)) return(false);
-        
-            // the sound
-            // played at holder of weapon
-            
-        this.playSoundAtEntity(this.heldBy,'beretta_fire',1.0,false);
-        
-            // the animation
-            
-        this.startModelAnimationChunkInFrames(null,30,128,143);
-        this.queueModelAnimationChunkInFrames(null,30,77,127);
-        
-            // run the hitscan
-            
-        this.hitScan(position,angle,eyeOffset,100000,this.HIT_FILTER,this.DAMAGE,EffectHitClass);
-        
-        return(true);
-    }
-    
-    //
-    // this weapon draws in the camera view
-    // so we have to set some positions and angles
-    //
-            
-    drawSetup()
-    {
-        if (!this.getCamera().isFirstPerson()) return(false);
-        
-        this.setModelDrawPosition(this.handOffset,this.handAngle,this.scale,true);
-        return(true);
-    }
-         * 
-     */
     
     run(entity)
     {
-        let fireWeapon;
+        let parentEntity=entity.heldBy;
         
             // if entity has model but not shown,
             // the assume carousel and skip
             
-        if ((entity.model!==null) && (!entity.show)) return;
-        
-            // check for fire
-            
-        fireWeapon=this.core.input.mouseButtonFlags[0]||this.core.input.isTouchStickRightClick();
-        
-        if (fireWeapon) {
-        //    this.sendMessageToBlock('weapon','fired',)
-        //    this.weaponBlock.ammoCount--;
+        if (entity.model!==null) {
+            if (!entity.show) return;
         }
-    }
-    
-    
-    
-    
-    hitScan(fromEntity,maxDistance,hitFilter,damage,hitEffectName)
-    {
+        
+            // skip if no ammo or not time to fire
+            
+        if (entity.ammoCount===0) return;
+            
+        switch (this.fireMethod) {
+            case 'primary':
+                if (!parentEntity.firePrimary) return;
+                break;
+            case 'secondary':
+                if (!parentEntity.fireSecondary) return;
+                break;
+            case 'tertiary':
+                if (!parentEntity.fireTertiary) return;
+                break;
+            default:
+                return;
+        }
+        
+        if ((this.lastFireTimestamp+this.fireWait)>this.core.timestamp) return;
+        this.lastFireTimestamp=this.core.timestamp;
+        
+            // fire
+            
+        entity.ammoCount--;
+        
+        this.core.soundList.playJson(parentEntity,null,this.fireSound);
+           
+        if (entity.model!==null) {
+            entity.modelEntityAlter.startAnimationChunkInFrames(null,30,entity.fireAnimation[0],entity.fireAnimation[1]);
+            entity.modelEntityAlter.queueAnimationChunkInFrames(null,30,entity.idleAnimation[0],entity.idleAnimation[1]);
+        }
+        
             // the hit scan, firing point is the eye
             // and we rotate with the look and then turn
-            
-        this.firePoint.setFromPoint(fromEntity.position);
-        this.firePoint.y+=fromEntity.eyeOffset;
+          
+        this.firePoint.setFromPoint(parentEntity.position);
+        this.firePoint.y+=parentEntity.eyeOffset;
         
-        this.fireVector.setFromValues(0,0,maxDistance);
-        this.fireVector.rotateX(null,fromEntity.angle.x);
-        this.fireVector.rotateY(null,fromEntity.angle.y);
+        this.fireVector.setFromValues(0,0,this.distance);
+        this.fireVector.rotateX(null,parentEntity.angle.x);
+        this.fireVector.rotateY(null,parentEntity.angle.y);
         
-        if (fromEntity.rayCollision(this.firePoint,this.fireVector,this.fireHitPoint,hitFilter,null)) {
+        if (parentEntity.rayCollision(this.firePoint,this.fireVector,this.fireHitPoint,this.hitFilter,null)) {
             
                 // is this an entity we can hit?
                 
-            if (fromEntity.hitEntity) {
-                if (fromEntity.hitEntity.damage!==undefined) {
-                    fromEntity.hitEntity.damage(fromEntity,damage,this.fireHitPoint);
+            if (parentEntity.hitEntity) {
+                if (parentEntity.hitEntity.damage!==undefined) {
+                    parentEntity.hitEntity.damage(parentEntity,this.damage,this.fireHitPoint);
                 }
             }
             
                 // hit effect
                 // push effect point towards entity firing so it shows up better
 
-            if (hitEffectName!==null) {
+            if (this.hitEffect!=='') {
                 this.fireVector.normalize();
                 this.fireVector.scale(-100);
                 this.fireHitPoint.addPoint(this.fireVector);
-                this.core.map.effectList.add(hitEffectName,this.fireHitPoint,null,true);
+                this.addEffect(entity,this.hitEffect,this.fireHitPoint,null,true);
             }
         }
-
     }
-
 }

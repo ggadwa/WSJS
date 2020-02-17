@@ -215,7 +215,7 @@ export default class MapEntityListClass
     }
     
         //
-        // pushing
+        // multi entity routines
         //
         
     meshPush(meshIdx,movePnt,rotateAng)
@@ -224,6 +224,21 @@ export default class MapEntityListClass
         
         for (entity of this.entities) {
             entity.meshPush(meshIdx,movePnt,rotateAng);
+        }
+    }
+    
+    damageForRadius(hitEntity,damagePosition,maxDistance,maxDamage)
+    {
+        let entity,dist,damage;
+
+        for (entity of this.core.map.entityList.entities) {
+            if (!entity.show) continue;
+            
+            dist=damagePosition.distance(entity.position);
+            if (dist>maxDistance) continue;
+            
+            damage=Math.trunc((1.0-(dist/maxDistance))*maxDamage);
+            entity.damage(hitEntity,damage,damagePosition);
         }
     }
     

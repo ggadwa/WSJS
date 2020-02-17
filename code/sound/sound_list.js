@@ -220,6 +220,19 @@ export default class SoundListClass
         return(idx);
     }
     
+    playJson(entity,mesh,obj)
+    {
+        let rate;
+        
+        if (obj===undefined) return;
+        if ((obj.name===undefined) || (obj.name==='')) return;
+        
+        rate=obj.rate;
+        if (obj.randomRateAdd!==0) rate+=(Math.random()*obj.randomRateAdd);
+        
+        this.play(entity,mesh,obj.name,rate,obj.loop);
+    }
+    
     stop(playIdx)
     {
         let soundPlay=this.soundPlays[playIdx];

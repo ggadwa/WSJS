@@ -437,7 +437,7 @@ export default class ProjectEntityClass
     
     addEffect(jsonName,position,data,show)
     {
-        return(this.core.map.effectList.add(jsonName,position,data,show));
+        return(this.core.map.effectList.add(this,jsonName,position,data,show));
     }
     
         //

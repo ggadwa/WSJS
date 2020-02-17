@@ -114,13 +114,14 @@ class EffectChunkClass
 
 export default class EffectJsonClass
 {
-    constructor(core,jsonName,position,data,show)
+    constructor(core,spawnedBy,jsonName,position,data,show)
     {
         this.CHUNK_BILLBOARD=0;
         this.CHUNK_TRIANGLE=1;
         this.CHUNK_PARTICLE=2;
         
         this.core=core;
+        this.spawnedBy=spawnedBy;
         this.position=position.copy();
         this.data=data;
         this.show=show;
@@ -170,7 +171,7 @@ export default class EffectJsonClass
         let n,chunk,billboard,triangle,particle,bitmap;
         let name,mode,drawMode,grid,gridPeriod,gridOffset;
         let wave,waveRandomStart,wavePeriod,waveSize;
-        let pmx,pmy,pmz,dx,dy,dz,motionPoints;
+        let pmx,pmy,pmz,dx,dy,dz,motionPoints,dist;
         let vertexCount,indexCount;
         let elementIdx,iIdx;
         let gl=this.core.gl;
@@ -406,9 +407,16 @@ export default class EffectJsonClass
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
         }
         
-            // finally any sound
+            // finally any sound, shaking or damage
             
-        if (this.json.sound!==undefined) this.core.soundList.play(this,null,this.lookupValue(this.json.sound.name),this.lookupValue(this.json.sound.rate),this.lookupValue(this.json.sound.loop));
+        this.core.soundList.playJson(this,null,this.json.sound);
+        
+        if (this.json.shake!==undefined) {
+            dist=this.position.distance(this.core.map.entityList.getPlayer().position);
+            if (dist<this.json.shake.distance) this.core.startCameraShake(this.json.shake.lifeTick,Math.trunc((this.json.shake.maxShift*dist)/this.json.shake.distance));
+        }
+        
+        if (this.json.damage!==undefined) this.core.map.entityList.damageForRadius(this.spawnedBy,this.position,this.json.distance,this.json.damage);
        
         return(true);
     }

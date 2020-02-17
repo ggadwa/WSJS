@@ -2,7 +2,7 @@ import PointClass from '../utility/point.js';
 import BoundClass from '../utility/bound.js';
 import BlockClass from '../project/block.js';
 
-export default class BlockFPSMovementClass extends BlockClass
+export default class BlockFPSControlClass extends BlockClass
 {
     constructor(core,block)
     {
@@ -25,8 +25,7 @@ export default class BlockFPSMovementClass extends BlockClass
         this.lastInLiquid=false;
         this.lastUnderLiquid=false;
         
-        this.developerPlayerFly=false;
-        this.developerPlayerNoClip=false;
+        this.lastWheelClick=0;
         
         this.rotMovement=new PointClass(0,0,0);
     }
@@ -44,11 +43,27 @@ export default class BlockFPSMovementClass extends BlockClass
         this.sideMaxSpeed=this.core.game.lookupValue(this.block.sideMaxSpeed,entity.data);
         this.jumpHeight=this.core.game.lookupValue(this.block.jumpHeight,entity.data);
         this.jumpWaterHeight=this.core.game.lookupValue(this.block.jumpWaterHeight,entity.data);
-        this.splashSound=this.core.game.lookupValue(this.block.splashSound,entity.data);
+        this.liquidInSound=this.block.liquidInSound;
+        this.liquidOutSound=this.block.liquidOutSound;
         this.flySwimYReduce=this.core.game.lookupValue(this.block.flySwimYReduce,entity.data);
         
         this.lastInLiquid=false;
         this.lastUnderLiquid=false;
+        
+        this.lastWheelClick=0;
+        
+            // variables that all block need to access
+            
+        entity.firePrimary=false;
+        entity.fireSecondary=false;
+        entity.fireTertiary=false;
+        
+        entity.weaponNext=false;
+        entity.weaponPrevious=false;
+        entity.weaponSwitchNumber=-1;
+            
+        entity.developerPlayerFly=false;
+        entity.developerPlayerNoClip=false;
 
         return(true);
     }
@@ -57,28 +72,39 @@ export default class BlockFPSMovementClass extends BlockClass
     {
     }
     
-    message(entity,fromEntity,action,data)
-    {
-        switch (action) {
-            case 'developerPlayerFly':
-                this.developerPlayerFly=data;
-                return(true);
-            case 'developerPlayerNoClip':
-                this.developerPlayerNoClip=data;
-                return(true);
-        }
-        
-        return(false);
-    }
-    
     run(entity)
     {
-        let x,y;
+        let n,x,y;
         let moveForward,moveBackward,moveLeft,moveRight;
         let liquidIdx,bump;
         let turnAdd,lookAdd;
+        let mouseWheelClick;
         let input=this.core.input;
         let setup=this.core.setup;
+        
+            // weapon switching
+            
+        mouseWheelClick=this.core.input.mouseWheelRead();
+        
+        entity.weaponPrevious=((mouseWheelClick<0) && (this.lastWheelClick===0));
+        entity.weaponNext=((mouseWheelClick>0) && (this.lastWheelClick===0));
+        
+        this.lastWheelClick=mouseWheelClick;
+        
+        entity.weaponSwitchNumber=-1;
+        
+        for (n=0;n!==9;n++) {
+            if (this.core.input.isKeyDown(String.fromCharCode(49+n))) {
+                entity.weaponSwitchNumber=n;
+                break;
+            }
+        }
+        
+            // weapon firing
+            
+        entity.firePrimary=this.core.input.mouseButtonFlags[0]||this.core.input.isTouchStickRightClick();    
+        entity.fireSecondary=this.core.input.mouseButtonFlags[1];
+        entity.fireTertiary=this.core.input.mouseButtonFlags[2];
         
             // forward and shift controls
             
@@ -158,18 +184,18 @@ export default class BlockFPSMovementClass extends BlockClass
         liquidIdx=this.core.map.liquidList.getLiquidForPoint(entity.position);
         
         if (liquidIdx!==-1) {
-            if ((!this.lastInLiquid) && (this.splashSound!==null)) this.core.soundList.play(entity,null,this.splashSound,1.0,false);
+            if ((!this.lastInLiquid) && (this.liquidInSound!==null)) this.core.soundList.playJson(entity,null,this.liquidInSound);
             this.lastInLiquid=true;
         }
         else {
-            if ((this.lastInLiquid) && (this.splashSound!==null)) this.core.soundList.play(entity,null,this.splashSound,0.8,false);
+            if ((this.lastInLiquid) && (this.liquidOutSound!==null)) this.core.soundList.playJson(entity,null,this.liquidOutSound);
             this.lastInLiquid=false;
         }
         
             // jumping
            
         if (input.isKeyDown(' ')) {
-            if ((entity.standOnMeshIdx!==-1) && (liquidIdx===-1) && (!this.developerPlayerFly)) {
+            if ((entity.standOnMeshIdx!==-1) && (liquidIdx===-1) && (!entity.developerPlayerFly)) {
                 entity.gravity=this.core.map.gravityMinValue;
                 entity.movement.y=this.jumpHeight;
             }
@@ -188,7 +214,7 @@ export default class BlockFPSMovementClass extends BlockClass
         entity.movement.moveXWithAcceleration(moveLeft,moveRight,this.sideAcceleration,this.sideDeceleration,this.sideMaxSpeed,this.sideAcceleration,this.sideDeceleration,this.sideMaxSpeed);
         
         this.rotMovement.setFromPoint(entity.movement);
-        if ((this.developerPlayerFly) || (this.lastUnderLiquid)) {
+        if ((entity.developerPlayerFly) || (this.lastUnderLiquid)) {
             this.rotMovement.y=0;       // only Y movement comes from X angle rotation
             this.rotMovement.rotateX(null,entity.angle.x);     // if flying or swimming, add in the X rotation
             this.rotMovement.y*=this.flySwimYReduce;
@@ -198,14 +224,14 @@ export default class BlockFPSMovementClass extends BlockClass
             // if no clipping is on then
             // just move directly through map
             
-        if (this.developerPlayerNoClip) {
+        if (entity.developerPlayerNoClip) {
             entity.position.addPoint(this.rotMovement);
         }
 
             // move around the map
         
         else {
-            entity.movement.y=entity.moveInMapY(this.rotMovement,this.developerPlayerFly);
+            entity.movement.y=entity.moveInMapY(this.rotMovement,entity.developerPlayerFly);
             entity.moveInMapXZ(this.rotMovement,bump,true);
         }
     }

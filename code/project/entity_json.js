@@ -1,12 +1,14 @@
 import PointClass from '../utility/point.js';
-import BlockContainerClass from '../project/block_container.js';
 import BlockPlayerClass from '../project/block_player.js';
-import BlockFPSMovementClass from '../project/block_fps_movement.js';
-import BlockFPSWeaponsClass from '../project/block_fps_weapons.js';
+import BlockHealthClass from '../project/block_health.js';
+import BlockDeveloperClass from '../project/block_developer.js';
+import BlockFPSControlClass from '../project/block_fps_control.js';
+import BlockWeaponListClass from '../project/block_weapon_list.js';
 import BlockWeaponClass from '../project/block_weapon.js';
 import BlockFireHitscanClass from '../project/block_fire_hitscan.js';
 import BlockFireProjectileClass from '../project/block_fire_projectile.js';
-import BlockDeveloperClass from '../project/block_developer.js';
+import BlockProjectileClass from '../project/block_projectile.js';
+import BlockContainerClass from '../project/block_container.js';
 import ProjectEntityClass from '../project/project_entity.js';
 
 //
@@ -68,17 +70,20 @@ export default class EntityJsonClass extends ProjectEntityClass
         
         for (block of this.json.blocks) {
             switch (block.type) {
-                case 'container':
-                    this.blockCodes.push(new BlockContainerClass(this.core,block));
-                    break;
                 case 'player':
                     this.blockCodes.push(new BlockPlayerClass(this.core,block));
                     break;
-                case 'fps_movement':
-                    this.blockCodes.push(new BlockFPSMovementClass(this.core,block));
+                case 'health':
+                    this.blockCodes.push(new BlockHealthClass(this.core,block));
                     break;
-                case 'fps_weapons':
-                    this.blockCodes.push(new BlockFPSWeaponsClass(this.core,block));
+                case 'developer':
+                    this.blockCodes.push(new BlockDeveloperClass(this.core,block));
+                    break;
+                case 'fps_control':
+                    this.blockCodes.push(new BlockFPSControlClass(this.core,block));
+                    break;
+                case 'weapon_list':
+                    this.blockCodes.push(new BlockWeaponListClass(this.core,block));
                     break;
                 case 'weapon':
                     this.blockCodes.push(new BlockWeaponClass(this.core,block));
@@ -89,8 +94,11 @@ export default class EntityJsonClass extends ProjectEntityClass
                 case 'fire_projectile':
                     this.blockCodes.push(new BlockFireProjectileClass(this.core,block));
                     break;
-                case 'developer':
-                    this.blockCodes.push(new BlockDeveloperClass(this.core,block));
+                case 'projectile':
+                    this.blockCodes.push(new BlockProjectileClass(this.core,block));
+                    break;
+                case 'container':
+                    this.blockCodes.push(new BlockContainerClass(this.core,block));
                     break;
                 default:
                     console.log('Unknown block for '+this.name+': '+block.type);
@@ -105,20 +113,15 @@ export default class EntityJsonClass extends ProjectEntityClass
         return(true);
     }
     
-    sendMessageToBlock(blockType,action,data)
+    release()
     {
         let blockCode;
         
         for (blockCode of this.blockCodes) {
-            if (blockCode.block.type===blockType) {
-                blockCode.message(this,action,data);
-                return;
-            }
+            blockCode.release(this);
         }
-        
-        console.log('No block '+blockType+' to send message to: '+action);
     }
-        
+    
     ready()
     {
         let blockCode;
