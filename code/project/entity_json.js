@@ -3,6 +3,7 @@ import BlockPlayerClass from '../project/block_player.js';
 import BlockHealthClass from '../project/block_health.js';
 import BlockDeveloperClass from '../project/block_developer.js';
 import BlockFPSControlClass from '../project/block_fps_control.js';
+import BlockVehicleControlClass from '../project/block_vehicle_control.js';
 import BlockWeaponListClass from '../project/block_weapon_list.js';
 import BlockWeaponClass from '../project/block_weapon.js';
 import BlockFireHitscanClass from '../project/block_fire_hitscan.js';
@@ -81,6 +82,9 @@ export default class EntityJsonClass extends ProjectEntityClass
                     break;
                 case 'fps_control':
                     this.blockCodes.push(new BlockFPSControlClass(this.core,block));
+                    break;
+                case 'vehicle_control':
+                    this.blockCodes.push(new BlockVehicleControlClass(this.core,block));
                     break;
                 case 'weapon_list':
                     this.blockCodes.push(new BlockWeaponListClass(this.core,block));
