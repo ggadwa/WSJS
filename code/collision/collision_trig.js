@@ -3,11 +3,13 @@ import BoundClass from '../utility/bound.js';
 
 export default class CollisionTrigClass
 {
-    constructor(v0,v1,v2)
+    constructor(v0,v1,v2,normal)
     {
         this.v0=v0;
         this.v1=v1;
         this.v2=v2;
+        
+        this.normal=normal;
         
         this.v0.trunc();
         this.v1.trunc();
@@ -125,16 +127,6 @@ export default class CollisionTrigClass
         k=pnt.z+ray.z;
         if ((pnt.z<this.zBound.min) && (k<this.zBound.min)) return(false);
         return(!((pnt.z>this.zBound.max) && (k>this.zBound.max)));
-    }
-    
-    getReflectionVector(vector)
-    {
-        if (this.v0.distance(this.v1)>this.v0.distance(this.v2)) {
-            vector.setFromSubPoint(this.v0,this.v1);
-        }
-        else {
-            vector.setFromSubPoint(this.v0,this.v2);
-        }
     }
     
     rayTrace(pnt,rayVct,hitPnt)

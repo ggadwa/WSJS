@@ -416,7 +416,7 @@ export default class EffectJsonClass
             if (dist<this.json.shake.distance) this.core.startCameraShake(this.json.shake.lifeTick,Math.trunc((this.json.shake.maxShift*dist)/this.json.shake.distance));
         }
         
-        if (this.json.damage!==undefined) this.core.map.entityList.damageForRadius(this.spawnedBy,this.position,this.json.distance,this.json.damage);
+        if (this.json.damage!==undefined) this.core.map.entityList.damageForRadius(this.spawnedBy,this.position,this.json.damage.distance,this.json.damage.damage);
        
         return(true);
     }

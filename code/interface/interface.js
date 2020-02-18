@@ -1,6 +1,7 @@
 import ColorClass from '../utility/color.js';
 import RectClass from '../../../code/utility/rect.js';
 import InterfaceElementClass from '../interface/interface_element.js';
+import InterfaceCountClass from '../interface/interface_count.js';
 import InterfaceTextClass from '../interface/interface_text.js';
 import TouchStickClass from '../interface/interface_touch_stick.js';
 
@@ -244,6 +245,53 @@ export default class InterfaceClass
         }
         
         element.pulse(tick,expand);
+    }
+    
+    addCount(id,bitmap,maxCount,width,height,positionMode,positionOffset,addOffset,onColor,onAlpha,offColor,offAlpha)
+    {
+        let count;
+        let rect=new RectClass(positionOffset.x,positionOffset.y,(positionOffset.x+width),(positionOffset.y+height));
+        
+        switch (positionMode) {
+            case this.POSITION_MODE_TOP_RIGHT:
+                rect.move(this.core.canvas.width,0);
+                break;
+            case this.POSITION_MODE_BOTTOM_LEFT:
+                rect.move(0,this.core.canvas.height);
+                break;
+            case this.POSITION_MODE_BOTTOM_RIGHT:
+                rect.move(this.core.canvas.width,this.core.canvas.height);
+                break;
+            case this.POSITION_MODE_MIDDLE:
+                rect.move(Math.trunc(this.core.canvas.width*0.5),Math.trunc(this.core.canvas.height*0.5));
+                break;
+        }
+            
+        count=new InterfaceCountClass(core,bitmap,maxCount,rect,addOffset,onColor,onAlpha,offColor,offAlpha);
+        count.initialize();
+        this.counts.set(id,count);
+    }
+    
+    showCount(id,show)
+    {
+        let count=this.counts.get(id);
+        if (count===undefined) {
+            console.log('Interface count ID does not exist: '+id);
+            return;
+        }
+        
+        count.show=show;
+    }
+    
+    setCount(id,value)
+    {
+        let count=this.counts.get(id);
+        if (count===undefined) {
+            console.log('Interface count ID does not exist: '+id);
+            return;
+        }
+        
+        count.count=value;
     }
     
     addText(id,str,positionMode,positionOffset,fontSize,align,color,alpha)

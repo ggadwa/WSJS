@@ -9,6 +9,12 @@ export default class BlockProjectileClass extends BlockClass
         
         this.lifeTimestamp=0;
         this.speed=0;
+        this.stopOnHit=true;
+        this.canBounce=false;
+        this.canReflect=false;
+        this.canRoll=false;
+        this.bounceSound=null;
+        this.reflectSound=null;
         this.hitEffect=null;
         
         this.rolling=false;
@@ -28,6 +34,14 @@ export default class BlockProjectileClass extends BlockClass
         this.lifeTimestamp=this.core.timestamp+this.core.game.lookupValue(this.block.lifeTick,entity.data);
         this.speed=this.core.game.lookupValue(this.block.speed,entity.data);
         
+        this.stopOnHit=this.core.game.lookupValue(this.block.stopOnHit,entity.data);
+        this.canBounce=this.core.game.lookupValue(this.block.canBounce,entity.data);
+        this.canReflect=this.core.game.lookupValue(this.block.canReflect,entity.data);
+        this.canRoll=this.core.game.lookupValue(this.block.canRoll,entity.data);
+        
+        this.bounceSound=this.block.bounceSound;
+        this.reflectSound=this.block.reflectSound;
+
         this.hitEffect=this.core.game.lookupValue(this.block.hitEffect,entity.data);
         
         return(true);
@@ -43,7 +57,7 @@ export default class BlockProjectileClass extends BlockClass
         this.motion.rotate(entity.angle);
     }
     
-    explode(entity)
+    finish(entity)
     {
         let parentEntity;
         
@@ -59,23 +73,122 @@ export default class BlockProjectileClass extends BlockClass
             parentEntity=parentEntity.heldBy;
         }
         
-            // explosion effects
+            // any effect
             
         if (this.hitEffect!=='') this.addEffect(parentEntity,this.hitEffect,entity.position,null,true);
     }
     
     run(entity)
     {
+        let len;
+        
             // are we over our life time
  
         if (this.lifeTimestamp<this.core.timestamp) {
-            this.explode(entity);
+            this.finish(entity);
             return;
         }
-
-        entity.moveInMapXZ(this.motion,false,false);
+        
+            // rolling slows down grenade
+            
+        if ((this.rolling) && (!this.stopped)) {
+            this.motion.x*=this.DECELERATION_FACTOR;
+            this.motion.z*=this.DECELERATION_FACTOR;
+            
+            if ((Math.abs(this.motion.x)+Math.abs(this.motion.z))<this.STOP_SPEED) {
+                this.motion.x=0;
+                this.motion.z=0;
+                this.stopped=true;
+            }
+        }
+        
+            // move grenade
+            
+        this.savePoint.setFromPoint(entity.position);
+        
+        if (!this.stopped) entity.moveInMapXZ(this.motion,false,false);
         entity.moveInMapY(this.motion,false);
+       
+            // hitting floor
+            // we can either start rolling, stop, or finish
 
+        if ((entity.standOnMeshIdx!==-1) && (!this.rolling)) {
+            if (this.stopOnHit) {
+                this.finish(entity);
+                return;
+            }
+            
+            if (!this.stopped) this.core.soundList.playJson(entity,null,this.bounceSound);
+            
+            entity.position.setFromPoint(this.savePoint);
+            if (this.canBounce) this.motion.y=this.floorHitBounceY(this.motion.y,this.BOUNCE_FACTOR,this.BOUNCE_CUT);
+            
+            if (this.motion.y===0) {
+                if (this.canRoll) {
+                    this.rolling=true;
+                }
+                else {
+                    this.stopped=true;
+                    if (this.stopOnHit) {
+                        this.finish(entity);
+                        return;
+                    }
+                }
+            }
+            else {
+                this.motion.y=entity.moveInMapY(this.motion,false);
+            }
+            
+            return;
+        }
+        
+            // hitting ceiling
+            
+        if (entity.collideCeilingMeshIdx!==-1) {
+            if (this.stopOnHit) {
+                this.finish(entity);
+                return;
+            }
+            
+            this.core.soundList.playJson(entity,null,this.bounceSound);
+
+            entity.position.setFromPoint(this.savePoint);
+            this.motion.y=0;
+        }
+
+            // hitting wall
+
+        if ((entity.collideWallMeshIdx!==-1) && (this.bouncePause===0)) {
+            if (this.stopOnHit) {
+                this.finish(entity);
+                return;
+            }
+            
+            this.core.soundList.playJson(entity,null,this.reflectSound);
+            
+            entity.position.setFromPoint(this.savePoint);
+            
+            if (this.canReflect) {
+                len=this.motion.length();
+                console.log('before='+this.motion.x+','+this.motion.y+','+this.motion.z);
+                this.motion.normalize();
+                entity.wallHitAngleReflect(this.motion);
+                console.log('after 1='+this.motion.x+','+this.motion.y+','+this.motion.z);
+                this.motion.scale(len);
+                console.log('after 2='+this.motion.x+','+this.motion.y+','+this.motion.z);
+            
+                //this.motion.setFromValues(0,0,);
+                //this.motion.rotate(entity.angle);
+            
+                this.bouncePause=this.BOUNCE_PAUSE_COUNT;
+            }
+            else {
+                this.motion.setFromValues(0,0,0);
+            }
+            return;
+        }
+        
+        if (this.bouncePause!==0) this.bouncePause--;
     }
     
     drawSetup(entity)

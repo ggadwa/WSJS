@@ -8,7 +8,9 @@
 
 
 NEW BLOCK STUFF
-     - interface needs ElementCount (put in kart)
+     - finish reflect, make it work better
+     - interface needs ElementCount (put in kart) --> TEST
+     - finish projectile/bounce and such is flag
      - need to test failures (missing bitmap, missing json, bad json, etc)
      - get rid of any beretta naming
      - bot names/classes/remote classes

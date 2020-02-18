@@ -948,10 +948,32 @@ export default class ProjectEntityClass
         return(y);
     }
     
-    wallHitAngleReflect()
+    wallHitAngleReflect(hitVector)
     {
-        let f,ang;
+        let f,rang,normal;
         let collisionTrig;
+        
+            // get the normal
+            
+        collisionTrig=this.core.map.meshList.meshes[this.collideWallMeshIdx].collisionWallTrigs[this.collideWallTrigIdx];
+        normal=collisionTrig.normal;
+        
+            // the cos between the normal and the hit
+            // vector is (dot(hit,normal))/(len(hit)*len(normal))
+        
+        f=Math.sqrt((hitVector.x*hitVector.x)+(hitVector.z*hitVector.z))*Math.sqrt((normal.x*normal.x)+(normal.z*normal.z));
+        if (f===0) {
+            hitVector.setFromValues(-hitVector.x,hitVector.y,-hitVector.z);
+            return;
+        }
+        
+        rang=Math.acos(((hitVector.x*normal.x)+(hitVector.z*normal.z))/f);
+        
+            // add that to the normal for reflection
+            
+        hitVector.setFromPoint(normal);
+        hitVector.rotateY(null,-(rang*(180.0/Math.PI)));
+        /*
         
             // get the opposite of the movement
             // vector and the collision wall vector
@@ -987,6 +1009,7 @@ export default class ProjectEntityClass
         if (ang>360.0) ang=ang-360.0;
         
         return(ang);
+            */
     }
     
         //
