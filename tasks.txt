@@ -8,9 +8,9 @@
 
 
 NEW BLOCK STUFF
-     - finish reflect, make it work better
      - interface needs ElementCount (put in kart) --> TEST
-     - finish projectile/bounce and such is flag
+     - implement health block
+     - need to go back to captain chest ammo/health
      - need to test failures (missing bitmap, missing json, bad json, etc)
      - get rid of any beretta naming
      - bot names/classes/remote classes

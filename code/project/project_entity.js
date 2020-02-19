@@ -78,8 +78,6 @@ export default class ProjectEntityClass
         this.damageTintStartTick=-1;
 
         this.checkMovePnt=new PointClass(0,0,0);
-        this.reflectMovementVector=new PointClass(0,0,0);
-        this.reflectLineVector=new PointClass(0,0,0);
 
         this.collision=new CollisionClass(core);
         
@@ -948,9 +946,9 @@ export default class ProjectEntityClass
         return(y);
     }
     
-    wallHitAngleReflect(hitVector)
+    wallHitReflect(motion)
     {
-        let f,rang,normal;
+        let sn,cs,x,z,rang,normal;
         let collisionTrig;
         
             // get the normal
@@ -958,58 +956,29 @@ export default class ProjectEntityClass
         collisionTrig=this.core.map.meshList.meshes[this.collideWallMeshIdx].collisionWallTrigs[this.collideWallTrigIdx];
         normal=collisionTrig.normal;
         
-            // the cos between the normal and the hit
-            // vector is (dot(hit,normal))/(len(hit)*len(normal))
-        
-        f=Math.sqrt((hitVector.x*hitVector.x)+(hitVector.z*hitVector.z))*Math.sqrt((normal.x*normal.x)+(normal.z*normal.z));
-        if (f===0) {
-            hitVector.setFromValues(-hitVector.x,hitVector.y,-hitVector.z);
-            return;
-        }
-        
-        rang=Math.acos(((hitVector.x*normal.x)+(hitVector.z*normal.z))/f);
-        
-            // add that to the normal for reflection
+            // get the angle between the normal and
+            // the reversed hit vector (so they both can start
+            // at the same point)
             
-        hitVector.setFromPoint(normal);
-        hitVector.rotateY(null,-(rang*(180.0/Math.PI)));
-        /*
-        
-            // get the opposite of the movement
-            // vector and the collision wall vector
-            // we do the opposite so we start facing
-            // back down the movement vector
-
-        this.reflectMovementVector.setFromValues(0,0,-1);
-        this.reflectMovementVector.rotateY(null,this.angle.y);
-        
-        collisionTrig=this.core.map.meshList.meshes[this.collideWallMeshIdx].collisionWallTrigs[this.collideWallTrigIdx];
-        collisionTrig.getReflectionVector(this.reflectLineVector);
-        
-        this.reflectLineVector.y=0;       // remove y, we are only doing in 2D
-	
-            // now get the angle between the vectors
+        motion.x=-motion.x;
+        motion.z=-motion.z;
             
-        this.reflectMovementVector.normalize();
-        this.reflectLineVector.normalize();
-            
-        f=this.reflectLineVector.dot(this.reflectMovementVector);
-        ang=Math.acos(f)*(180.0/Math.PI);
+        rang=Math.atan2(normal.z,normal.x)-Math.atan2(motion.z,motion.x);
         
-            // calculate the reflection angle
-            
-        if (this.angle.y>=180.0) {
-            ang=(this.angle.y+180.0)+(180.0-(ang*2.0));
-        }
-        else {
-            ang=(this.angle.y+180.0)-(ang*2.0);
-        }
-
-        if (ang<0.0) ang=360.0+ang;
-        if (ang>360.0) ang=ang-360.0;
+            // now rotate double the angle from the normal
+            // to get the reflection motion
+            // note this is based on positive x/counter-clockwise
+            // which is different from out regular rotations
         
-        return(ang);
-            */
+        rang=-(rang*2.0);
+        sn=Math.sin(rang);
+        cs=Math.cos(rang);
+        
+        x=(motion.z*sn)+(motion.x*cs);   // this is based on the positive X, because atan2 is angle from positive x, counter-clockwise
+        z=(motion.z*cs)-(motion.x*sn);
+        
+        motion.x=x;
+        motion.z=z;
     }
     
         //

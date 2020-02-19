@@ -9,23 +9,24 @@ export default class BlockProjectileClass extends BlockClass
         
         this.lifeTimestamp=0;
         this.speed=0;
+        this.spins=false;
         this.stopOnHit=true;
         this.canBounce=false;
         this.canReflect=false;
         this.canRoll=false;
+        this.rollDeceleration=0;
+        this.bounceFactor=0;
         this.bounceSound=null;
         this.reflectSound=null;
         this.hitEffect=null;
         
         this.rolling=false;
         this.stopped=false;
-        this.bouncePause=0;
         
             // pre-allocations
 
         this.motion=new PointClass(0,0,0);
         this.savePoint=new PointClass(0,0,0);
-        this.drawPosition=new PointClass(0,0,0);
         this.drawAngle=new PointClass(0,0,0);
     }
     
@@ -33,12 +34,13 @@ export default class BlockProjectileClass extends BlockClass
     {
         this.lifeTimestamp=this.core.timestamp+this.core.game.lookupValue(this.block.lifeTick,entity.data);
         this.speed=this.core.game.lookupValue(this.block.speed,entity.data);
-        
+        this.spins=this.core.game.lookupValue(this.block.spins,entity.data);
         this.stopOnHit=this.core.game.lookupValue(this.block.stopOnHit,entity.data);
         this.canBounce=this.core.game.lookupValue(this.block.canBounce,entity.data);
         this.canReflect=this.core.game.lookupValue(this.block.canReflect,entity.data);
         this.canRoll=this.core.game.lookupValue(this.block.canRoll,entity.data);
-        
+        this.rollDeceleration=this.core.game.lookupValue(this.block.rollDeceleration,entity.data);
+        this.bounceFactor=this.core.game.lookupValue(this.block.bounceFactor,entity.data);
         this.bounceSound=this.block.bounceSound;
         this.reflectSound=this.block.reflectSound;
 
@@ -51,7 +53,6 @@ export default class BlockProjectileClass extends BlockClass
     {
         this.rolling=false;
         this.stopped=false;
-        this.bouncePause=0;
         
         this.motion.setFromValues(0,0,this.speed);
         this.motion.rotate(entity.angle);
@@ -78,10 +79,51 @@ export default class BlockProjectileClass extends BlockClass
         if (this.hitEffect!=='') this.addEffect(parentEntity,this.hitEffect,entity.position,null,true);
     }
     
+    floorBounce(entity)
+    {
+        this.motion.y=-((this.motion.y+entity.gravity)*this.bounceFactor);
+        entity.gravity=this.core.map.gravityMinValue;
+        
+        if (Math.abs(this.motion.y)<entity.weight) this.motion.y=0;
+    }
+    
+    wallReflect(entity)
+    {
+        let sn,cs,x,z,rang,normal;
+        let collisionTrig;
+        
+            // get the normal
+            
+        collisionTrig=this.core.map.meshList.meshes[entity.collideWallMeshIdx].collisionWallTrigs[entity.collideWallTrigIdx];
+        normal=collisionTrig.normal;
+        
+            // get the angle between the normal and
+            // the reversed hit vector (so they both can start
+            // at the same point)
+            
+        this.motion.x=-this.motion.x;
+        this.motion.z=-this.motion.z;
+            
+        rang=Math.atan2(normal.z,normal.x)-Math.atan2(this.motion.z,this.motion.x);
+        
+            // now rotate double the angle from the normal
+            // to get the reflection motion
+            // note this is based on positive x/counter-clockwise
+            // which is different from out regular rotations
+        
+        rang=-(rang*2.0);
+        sn=Math.sin(rang);
+        cs=Math.cos(rang);
+        
+        x=(this.motion.z*sn)+(this.motion.x*cs);   // this is based on the positive X, because atan2 is angle from positive x, counter-clockwise
+        z=(this.motion.z*cs)-(this.motion.x*sn);
+        
+        this.motion.x=x;
+        this.motion.z=z;
+    }
+    
     run(entity)
     {
-        let len;
-        
             // are we over our life time
  
         if (this.lifeTimestamp<this.core.timestamp) {
@@ -92,10 +134,10 @@ export default class BlockProjectileClass extends BlockClass
             // rolling slows down grenade
             
         if ((this.rolling) && (!this.stopped)) {
-            this.motion.x*=this.DECELERATION_FACTOR;
-            this.motion.z*=this.DECELERATION_FACTOR;
+            this.motion.x*=this.rollDeceleration;
+            this.motion.z*=this.rollDeceleration;
             
-            if ((Math.abs(this.motion.x)+Math.abs(this.motion.z))<this.STOP_SPEED) {
+            if ((Math.abs(this.motion.x)+Math.abs(this.motion.z))<1) {
                 this.motion.x=0;
                 this.motion.z=0;
                 this.stopped=true;
@@ -121,7 +163,7 @@ export default class BlockProjectileClass extends BlockClass
             if (!this.stopped) this.core.soundList.playJson(entity,null,this.bounceSound);
             
             entity.position.setFromPoint(this.savePoint);
-            if (this.canBounce) this.motion.y=this.floorHitBounceY(this.motion.y,this.BOUNCE_FACTOR,this.BOUNCE_CUT);
+            if (this.canBounce) this.floorBounce(entity);
             
             if (this.motion.y===0) {
                 if (this.canRoll) {
@@ -158,7 +200,7 @@ export default class BlockProjectileClass extends BlockClass
 
             // hitting wall
 
-        if ((entity.collideWallMeshIdx!==-1) && (this.bouncePause===0)) {
+        if (entity.collideWallMeshIdx!==-1) {
             if (this.stopOnHit) {
                 this.finish(entity);
                 return;
@@ -169,198 +211,62 @@ export default class BlockProjectileClass extends BlockClass
             entity.position.setFromPoint(this.savePoint);
             
             if (this.canReflect) {
-                len=this.motion.length();
-                console.log('before='+this.motion.x+','+this.motion.y+','+this.motion.z);
-                this.motion.normalize();
-                entity.wallHitAngleReflect(this.motion);
-                console.log('after 1='+this.motion.x+','+this.motion.y+','+this.motion.z);
-                this.motion.scale(len);
-                console.log('after 2='+this.motion.x+','+this.motion.y+','+this.motion.z);
-            
-                //this.motion.setFromValues(0,0,);
-                //this.motion.rotate(entity.angle);
-            
-                this.bouncePause=this.BOUNCE_PAUSE_COUNT;
+                this.wallReflect(entity);
             }
             else {
                 this.motion.setFromValues(0,0,0);
             }
             return;
         }
-        
-        if (this.bouncePause!==0) this.bouncePause--;
     }
     
     drawSetup(entity)
     {
         if (entity.model===null) return(false);
         
-        entity.modelEntityAlter.position.setFromPoint(entity.position);
-        entity.modelEntityAlter.angle.setFromPoint(entity.angle);
+        if (this.spins) {
+
+                // spinning
+
+            if (!this.stopped) {
+                if (!this.rolling) {
+                    this.drawAngle.x=this.core.getPeriodicLinear(4000,360);
+                }
+                else {
+                    if (this.drawAngle.x!==90) {
+                        if (this.drawAngle.x>90) {
+                            this.drawAngle.x-=2;
+                            if (this.drawAngle.x<90) this.drawAngle.x=90;
+                        }
+                        else {
+                            this.drawAngle.x+=2;
+                            if (this.drawAngle.x>90) this.drawAngle.x=90;
+                        }
+                    }
+                    this.drawAngle.z=this.core.getPeriodicLinear(4000,360);
+                }
+
+                this.drawAngle.y=this.core.getPeriodicLinear(3000,360);
+            }
+
+                // model is centered on Y so it needs
+                // to be moved up to draw (when need to rotate from
+                // center to roll)
+
+            entity.modelEntityAlter.position.setFromPoint(entity.position);
+            entity.modelEntityAlter.position.y+=Math.trunc(entity.height*0.5);
+            
+            entity.modelEntityAlter.angle.setFromPoint(this.drawAngle);
+        }
+        else {
+            entity.modelEntityAlter.position.setFromPoint(entity.position);
+            entity.modelEntityAlter.angle.setFromPoint(entity.angle);
+        }
+        
         entity.modelEntityAlter.scale.setFromPoint(entity.scale);
         entity.modelEntityAlter.inCameraSpace=false;
 
         return(true);
     }
-    
-    /*
-     *     initialize()
-    {
-        super.initialize();
-        
-        this.LIFE_TICK=3000;
-        this.SPEED=450;
-        this.BOUNCE_FACTOR=0.95;
-        this.BOUNCE_CUT=50;
-        this.DECELERATION_FACTOR=0.95;
-        this.STOP_SPEED=10;
-        this.BOUNCE_PAUSE_COUNT=5;
-        this.DAMAGE=100;
-        this.DAMAGE_DISTANCE=20000;
-        this.SHAKE_DISTANCE=30000;
-        this.SHAKE_MAX_SHIFT=40;
-        this.SHAKE_TICK=2000;
-        
-            // setup
-            
-        this.startTick=this.getTimestamp();
-            
-        this.radius=500;
-        this.height=500;
-        
-        this.gravityMinValue=10;
-        this.gravityMaxValue=320;
-        this.gravityAcceleration=15;
-            
-        this.motion=new PointClass(0,0,0);      // some pre-allocates
-        this.savePoint=new PointClass(0,0,0);
-        this.drawPosition=new PointClass(0,0,0);
-        this.drawAngle=new PointClass(0,0,0);
-        
-            // setup motion
-            
-        this.show=true;
-        this.rolling=false;
-        this.stopped=false;
-        this.bouncePause=0;
-            
-        this.motion.setFromValues(0,0,this.SPEED);
-        this.motion.rotate(this.angle);
-        
-            // the model
-            
-        this.setModel('grenade');
-        this.scale.setFromValues(100,100,100);
-        
-        return(true);
-    }
-    
-        //
-        // run
-        //
-    
-    
-    run()
-    {
-            // time for grenade to end?
-            
-        if (this.getTimestamp()>(this.startTick+this.LIFE_TICK)) {
-            this.explode();
-            return;
-        }
-        
-            // rolling slows down grenade
-            
-        if ((this.rolling) && (!this.stopped)) {
-            this.motion.x*=this.DECELERATION_FACTOR;
-            this.motion.z*=this.DECELERATION_FACTOR;
-            
-            if ((Math.abs(this.motion.x)+Math.abs(this.motion.z))<this.STOP_SPEED) {
-                this.motion.x=0;
-                this.motion.z=0;
-                this.stopped=true;
-            }
-        }
-        
-            // move grenade
-            
-        this.savePoint.setFromPoint(this.position);
-        
-        if (!this.stopped) this.moveInMapXZ(this.motion,false,false);
-        this.moveInMapY(this.motion,false);
-       
-            // hitting floor
-
-        if ((this.standOnMeshIdx!==-1) && (!this.rolling)) {
-            this.playSound('grenade_bounce',1.0,false);
-            
-            this.position.setFromPoint(this.savePoint);
-            this.motion.y=this.floorHitBounceY(this.motion.y,this.BOUNCE_FACTOR,this.BOUNCE_CUT);
-            
-            if (this.motion.y===0) {
-                this.rolling=true;
-            }
-            else {
-                this.motion.y=this.moveInMapY(this.motion,false);
-            }
-            
-            return;
-        }
-
-            // hitting wall
-
-        if ((this.collideWallMeshIdx!==-1) && (this.bouncePause===0)) {
-            this.playSound('grenade_bounce',1.0,false);
-            
-            this.position.setFromPoint(this.savePoint);
-            this.angle.y=this.wallHitAngleReflect();
-            
-            this.motion.setFromValues(0,0,this.motion.length());
-            this.motion.rotate(this.angle);
-            
-            this.bouncePause=this.BOUNCE_PAUSE_COUNT;
-            return;
-        }
-        
-        if (this.bouncePause!==0) this.bouncePause--;
-    }
-    
-    drawSetup()
-    {
-            // spinning
-
-        if (!this.stopped) {
-            if (!this.rolling) {
-                this.drawAngle.x=this.getPeriodicLinear(4000,360);
-            }
-            else {
-                if (this.drawAngle.x!==90) {
-                    if (this.drawAngle.x>90) {
-                        this.drawAngle.x-=2;
-                        if (this.drawAngle.x<90) this.drawAngle.x=90;
-                    }
-                    else {
-                        this.drawAngle.x+=2;
-                        if (this.drawAngle.x>90) this.drawAngle.x=90;
-                    }
-                }
-                this.drawAngle.z=this.getPeriodicLinear(4000,360);
-            }
-            
-            this.drawAngle.y=this.getPeriodicLinear(3000,360);
-        }
-        
-            // model is centered on Y so it needs
-            // to be moved up to draw (when need to rotate from
-            // center to roll)
-                
-        this.drawPosition.setFromPoint(this.position);
-        this.drawPosition.y+=300;
-        
-        this.setModelDrawPosition(this.drawPosition,this.drawAngle,this.scale,false);
-        return(true);
-    }
-
-     */
 }
 
