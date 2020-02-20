@@ -63,10 +63,25 @@ export default class BlockWeaponsListClass extends BlockClass
     
     showCarouselWeapon(entity)
     {
-        let n;
+        let n,weapon,meshName;
 
         for (n=0;n!==this.carouselWeapons.length;n++) {
-            this.carouselWeapons[n].show=(n===this.currentCarouselWeaponIdx);
+            weapon=this.carouselWeapons[n];
+            
+            if (n===this.currentCarouselWeaponIdx) {
+                weapon.show=true;
+                
+                for (meshName of this.block.weapons[n].meshes) {
+                    entity.modelEntityAlter.show(meshName,true);
+                }
+            }
+            else {
+                weapon.show=false;
+                
+                for (meshName of this.block.weapons[n].meshes) {
+                    entity.modelEntityAlter.show(meshName,false);
+                }
+            }
         }
     }
     

@@ -431,6 +431,33 @@ export default class ModelEntityAlterClass
         return(true);
     }
     
+    interuptAnimationChunkInFrames(name,framesPerSecond,loopStartFrame,loopEndFrame)
+    {
+        let oldIdx,oldStartTick,oldEndTick,len;
+        
+            // current animation comes back when this is finished
+            
+        oldIdx=this.currentAnimationIdx;
+        oldStartTick=this.currentAnimationLoopStartTick;
+        oldEndTick=this.currentAnimationLoopEndTick;
+        
+            // start new one
+            
+        this.startAnimationChunkInFrames(name,framesPerSecond,loopStartFrame,loopEndFrame);
+        
+            // re-queue old one
+            
+        if (oldIdx===-1) {
+            len=this.currentAnimationLoopEndTick-this.currentAnimationLoopStartTick;
+            len-=Math.trunc((this.core.timestamp-this.currentAnimationStartTimestamp)%len);
+        
+            this.queuedAnimationIdx=oldIdx;
+            this.queuedAnimationStartTimestamp=this.core.timestamp+len;
+            this.queuedAnimationLoopStartTick=oldStartTick;
+            this.queuedAnimationLoopEndTick=oldEndTick;
+        }
+    }
+    
     isAnimationRunning()
     {
         return(this.currentAnimationIdx!==-1);

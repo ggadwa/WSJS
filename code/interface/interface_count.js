@@ -72,11 +72,11 @@ export default class InterfaceCountClass
             
         this.vertexBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.vertexArray,gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER,vertexArray,gl.STATIC_DRAW);
         
         this.uvBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,this.uvBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.uvArray,gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER,uvArray,gl.STATIC_DRAW);
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
         
         this.indexBuffer=gl.createBuffer();
