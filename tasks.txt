@@ -9,6 +9,9 @@
 
 NEW BLOCK STUFF
      - interface needs ElementCount (put in kart) --> TEST
+         - gl bug in code, fix
+     - finish animations in fps_player
+     - block vehicle needs settings in json
      - implement health block
      - need to go back to captain chest ammo/health
      - need to test failures (missing bitmap, missing json, bad json, etc)

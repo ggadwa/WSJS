@@ -225,7 +225,7 @@ export default class BlockProjectileClass extends BlockClass
         if (entity.model===null) return(false);
         
         if (this.spins) {
-
+            
                 // spinning
 
             if (!this.stopped) {

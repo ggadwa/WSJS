@@ -2,7 +2,7 @@ import PointClass from '../utility/point.js';
 import BoundClass from '../utility/bound.js';
 import BlockClass from '../project/block.js';
 
-export default class BlockPlayerClass extends BlockClass
+export default class BlockFPSPlayerClass extends BlockClass
 {
     constructor(core,block)
     {

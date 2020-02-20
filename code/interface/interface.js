@@ -38,6 +38,7 @@ export default class InterfaceClass
         this.core=core;
         
         this.elements=new Map();
+        this.counts=new Map();
         this.texts=new Map();
             
         this.uiTextColor=new ColorClass(1,1,0);
@@ -66,6 +67,7 @@ export default class InterfaceClass
             // clear all current elements and texts
             
         this.elements.clear();
+        this.counts.clear();
         this.texts.clear();
         
             // create the font texture
@@ -107,7 +109,7 @@ export default class InterfaceClass
 
     release()
     {
-        let element,text;
+        let element,count,text;
         
             // release touch sticks
             
@@ -118,10 +120,14 @@ export default class InterfaceClass
             
         this.core.gl.deleteBuffer(this.tintVertexBuffer);
         
-            // release all elements and texts
+            // release all elements, counts, and texts
             
         for (element of this.elements) {
             element.release();
+        }
+        
+        for (count of this.counts) {
+            count.release();
         }
         
         for (text of this.texts) {
@@ -267,7 +273,7 @@ export default class InterfaceClass
                 break;
         }
             
-        count=new InterfaceCountClass(core,bitmap,maxCount,rect,addOffset,onColor,onAlpha,offColor,offAlpha);
+        count=new InterfaceCountClass(this.core,bitmap,maxCount,rect,addOffset,onColor,onAlpha,offColor,offAlpha);
         count.initialize();
         this.counts.set(id,count);
     }
@@ -380,7 +386,7 @@ export default class InterfaceClass
 
     addFromJson(jsonInterface)
     {
-        let element,text;
+        let element,count,text;
         let bitmap,positionMode,align;
         
         if (jsonInterface===undefined) return(true);
@@ -400,6 +406,24 @@ export default class InterfaceClass
 
                 this.addElement(element.id,bitmap,element.width,element.height,positionMode,element.positionOffset,new ColorClass(element.color.r,element.color.g,element.color.b),element.alpha);
                 this.showElement(element.id,element.show);
+            }
+        }
+        
+        if (jsonInterface.counts!==undefined) {
+            for (count of jsonInterface.counts) {
+                
+                    // the element bitmap
+                    
+                bitmap=this.core.bitmapList.get(count.bitmap);
+                if (bitmap===undefined) {
+                    console.log('Missing bitmap to add to interface: '+count.bitmap);
+                    return(false);
+                }
+                
+                positionMode=this.POSITION_MODE_LIST.indexOf(count.positionMode);
+
+                this.addCount(count.id,bitmap,count.count,count.width,count.height,positionMode,count.positionOffset,count.addOffset,new ColorClass(count.onColor.r,count.onColor.g,count.onColor.b),count.onAlpha,new ColorClass(count.offColor.r,count.offColor.g,count.offColor.b),count.offAlpha);
+                this.showCount(count.id,count.show);
             }
         }
         

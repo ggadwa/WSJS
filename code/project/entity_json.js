@@ -1,5 +1,6 @@
 import PointClass from '../utility/point.js';
-import BlockPlayerClass from '../project/block_player.js';
+import BlockFPSPlayerClass from '../project/block_fps_player.js';
+import BlockVehicleClass from '../project/block_vehicle.js';
 import BlockHealthClass from '../project/block_health.js';
 import BlockDeveloperClass from '../project/block_developer.js';
 import BlockFPSControlClass from '../project/block_fps_control.js';
@@ -21,6 +22,11 @@ export default class EntityJsonClass extends ProjectEntityClass
     constructor(core,name,position,angle,data,overrideJsonName)
     {
         super(core,name,position,angle,data);
+        
+        this.MODEL_ROTATION_ORDER_XYZ=0;
+        this.MODEL_ROTATION_ORDER_XZY=1;
+        
+        this.MODEL_ROTATION_ORDER_LIST=['XYZ','XZY'];
         
         this.overrideJsonName=overrideJsonName;     // supergumba -- hack to get this all to work while translating to blocks
     }
@@ -50,6 +56,7 @@ export default class EntityJsonClass extends ProjectEntityClass
             
         if ((this.json.setup.model!==null) && (this.json.setup.model!==undefined)) {
             this.setModel(this.json.setup.model);
+            this.modelEntityAlter.rotationOrder=this.MODEL_ROTATION_ORDER_LIST.indexOf(this.json.setup.rotationOrder);
             this.scale.setFromValues(this.json.setup.scale.x,this.json.setup.scale.y,this.json.setup.scale.z);
         }
             
@@ -71,8 +78,11 @@ export default class EntityJsonClass extends ProjectEntityClass
         
         for (block of this.json.blocks) {
             switch (block.type) {
-                case 'player':
-                    this.blockCodes.push(new BlockPlayerClass(this.core,block));
+                case 'fps_player':
+                    this.blockCodes.push(new BlockFPSPlayerClass(this.core,block));
+                    break;
+                case 'vehicle':
+                    this.blockCodes.push(new BlockVehicleClass(this.core,block));
                     break;
                 case 'health':
                     this.blockCodes.push(new BlockHealthClass(this.core,block));
