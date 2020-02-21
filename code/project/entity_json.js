@@ -1,16 +1,4 @@
 import PointClass from '../utility/point.js';
-import BlockFPSPlayerClass from '../project/block_fps_player.js';
-import BlockVehicleClass from '../project/block_vehicle.js';
-import BlockHealthClass from '../project/block_health.js';
-import BlockDeveloperClass from '../project/block_developer.js';
-import BlockFPSControlClass from '../project/block_fps_control.js';
-import BlockVehicleControlClass from '../project/block_vehicle_control.js';
-import BlockWeaponListClass from '../project/block_weapon_list.js';
-import BlockWeaponClass from '../project/block_weapon.js';
-import BlockFireHitscanClass from '../project/block_fire_hitscan.js';
-import BlockFireProjectileClass from '../project/block_fire_projectile.js';
-import BlockProjectileClass from '../project/block_projectile.js';
-import BlockContainerClass from '../project/block_container.js';
 import ProjectEntityClass from '../project/project_entity.js';
 
 //
@@ -75,7 +63,7 @@ export default class EntityJsonClass extends ProjectEntityClass
         this.blockCodes=[];
         
         if (this.json.blocks===undefined) return(true);
-        
+        /*
         for (block of this.json.blocks) {
             switch (block.type) {
                 case 'fps_player':
@@ -123,7 +111,7 @@ export default class EntityJsonClass extends ProjectEntityClass
         for (blockCode of this.blockCodes) {
             if (!blockCode.initialize(this)) return(false);
         }
-        
+        */
         return(true);
     }
     

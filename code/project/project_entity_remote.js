@@ -13,14 +13,14 @@ import MapPathNodeClass from '../map/map_path_node.js';
  * @hideconstructor
  * @extends ProjectEntityClass
  */
-export default class ProjectEntityRemoteClass extends ProjectEntityClass
+export default class ProjectEntityRemoteClass
 {
     constructor(core,remoteId,name)
     {
             // remotes have no position, angle, etc until their first
             // update
             
-        super(core,name,new PointClass(0,0,0),new PointClass(0,0,0),null);
+        //super(core,name,new PointClass(0,0,0),new PointClass(0,0,0),null);
         
         this.remoteId=remoteId;
         this.filter='remote';

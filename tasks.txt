@@ -8,9 +8,12 @@
 
 
 NEW BLOCK STUFF
+     - need hidemesh for jetpack
+     - change weapon fire stuff to primary/secondary blocks
+     - go back to using entity APIs instead of direct calls
+     - block to entity types (sigh another change)
      - interface needs ElementCount (put in kart) --> TEST
          - gl bug in code, fix
-     - finish animations in fps_player (weapon fire?  How?)
      - block vehicle needs settings in json
      - implement health block
      - need to go back to captain chest ammo/health
@@ -18,7 +21,6 @@ NEW BLOCK STUFF
      - get rid of any beretta naming
      - bot names/classes/remote classes
      - index.html hack
-     - need "required" blocks for other blocks
      - no damage flag
 
 

@@ -17,22 +17,41 @@ export default class BlockWeaponsListClass extends BlockClass
         
     initialize(entity)
     {
-        let n,weapon;
+        let n,weaponBlock,weapon;
+        
+            // we attach a current weapon idle/fire animation
+            // to player so we can change animations based on
+            // choosen weapons
+        
+        entity.forceAnimationUpdate=false;
+        entity.currentWeaponIdleAnimation=null;
+        entity.currentWeaponRunAnimation=null;
         
             // setup the weapons
         
         this.defaultCarouselWeaponIdx=-1;
         
         for (n=0;n!==this.block.weapons.length;n++) {
-            weapon=this.block.weapons[n];
+            weaponBlock=this.block.weapons[n];
             
-            if (weapon.inCarousel) {
-                this.carouselWeapons.push(this.addEntity(entity,weapon.json,weapon.name,new PointClass(0,0,0),new PointClass(0,0,0),null,true,true));
-                if ((weapon.default) && (this.defaultCarouselWeaponIdx===-1)) this.defaultCarouselWeaponIdx=n;
+                // add the weapon in the correct array
+                
+            if (weaponBlock.inCarousel) {
+                weapon=this.addEntity(entity,weaponBlock.json,weaponBlock.name,new PointClass(0,0,0),new PointClass(0,0,0),null,true,true);
+                this.carouselWeapons.push(weapon);
+                if ((weaponBlock.default) && (this.defaultCarouselWeaponIdx===-1)) this.defaultCarouselWeaponIdx=n;
             }
             else {
-                this.extraWeapons.push(this.addEntity(entity,weapon.json,weapon.name,new PointClass(0,0,0),new PointClass(0,0,0),null,true,true));
+                weapon=this.addEntity(entity,weaponBlock.json,weaponBlock.name,new PointClass(0,0,0),new PointClass(0,0,0),null,true,true);
+                this.extraWeapons.push(weapon);
             }
+            
+                // now pass firing animations to weapon
+                
+            weapon.parentIdleAnimation=weaponBlock.parentIdleAnimation;
+            weapon.parentRunAnimation=weaponBlock.parentRunAnimation;
+            weapon.parentFireIdleAnimation=weaponBlock.parentFireIdleAnimation;
+            weapon.parentFireRunAnimation=weaponBlock.parentFireRunAnimation;
         }
         
             // variables that all blocks need access to, added
@@ -70,6 +89,10 @@ export default class BlockWeaponsListClass extends BlockClass
             
             if (n===this.currentCarouselWeaponIdx) {
                 weapon.show=true;
+                
+                entity.forceAnimationUpdate=true;
+                entity.currentWeaponIdleAnimation=weapon.parentIdleAnimation;     // move the current animation so weapon holder can use it
+                entity.currentWeaponRunAnimation=weapon.parentRunAnimation;
                 
                 for (meshName of this.block.weapons[n].meshes) {
                     entity.modelEntityAlter.show(meshName,true);

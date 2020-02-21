@@ -87,9 +87,22 @@ export default class BlockFireHitScanClass extends BlockClass
         
         this.core.soundList.playJson(parentEntity,null,this.fireSound);
            
+           // weapon animation
+           
         if (entity.model!==null) {
             entity.modelEntityAlter.startAnimationChunkInFrames(null,30,entity.fireAnimation[0],entity.fireAnimation[1]);
             entity.modelEntityAlter.queueAnimationChunkInFrames(null,30,entity.idleAnimation[0],entity.idleAnimation[1]);
+        }
+        
+            // parent animation
+            
+        if (parentEntity.model!==null) {
+            if ((parentEntity.movement.x!==0) || (parentEntity.movement.z!==0)) {
+                if (entity.parentFireRunAnimation!==null) parentEntity.modelEntityAlter.interuptAnimationChunkInFrames(null,30,entity.parentFireRunAnimation[0],entity.parentFireRunAnimation[1]);
+            }
+            else {
+                if (entity.parentFireIdleAnimation!==null) parentEntity.modelEntityAlter.interuptAnimationChunkInFrames(null,30,entity.parentFireIdleAnimation[0],entity.parentFireIdleAnimation[1]);
+            }
         }
         
             // the hit scan, firing point is the eye

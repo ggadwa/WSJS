@@ -1,4 +1,7 @@
 import PointClass from '../utility/point.js';
+import EntityFPSPlayerClass from '../../../code/project/entity_fps_player.js';
+import EntityWeaponClass from '../../../code/project/entity_weapon.js';
+import EntityProjectileClass from '../../../code/project/entity_projectile.js';
 
 //
 // map class
@@ -47,6 +50,25 @@ export default class MapEntityListClass
         for (entity of this.entities) {
             entity.hadRemoteUpdate=false;
         }
+    }
+    
+        //
+        // entity types
+        //
+        
+    getEntityClassForType(typeName)
+    {
+        switch (typeName) {
+            case 'fps_player':
+                return(EntityFPSPlayerClass);
+            case 'weapon':
+                return(EntityWeaponClass);
+            case 'projectile':
+                return(EntityProjectileClass);
+        }
+        
+        console.log('Unknown entity type: '+typeName);
+        return(null);
     }
 
         //
@@ -116,7 +138,7 @@ export default class MapEntityListClass
     {
         let importSettings=this.core.projectMap.getImportSettings();
         let entityList=importSettings.entities;
-        let n,entityDef;
+        let n,entityDef,json,entityClass;
         let entity,entityName,entityPosition,entityAngle,entityData;
         let botClass;
 
@@ -149,14 +171,22 @@ export default class MapEntityListClass
             
             entityData=(entityDef.data===undefined)?null:entityDef.data;
             
+                // get the json
+                
+            json=this.core.game.getCachedJson(entityDef.json);
+            if (json===null) return(false);
+            
+            entityClass=this.getEntityClassForType(json.type);
+            if (entityClass===null) return(false);
+            
                 // first entity is always assumed to be the player, anything
                 // else is a map entity
 
             if (n===0) {
-                if (!this.setPlayer(new entityDef.entity(this.core,entityName,entityPosition,entityAngle,entityData))) return(false);
+                if (!this.setPlayer(new entityClass(this.core,entityName,json,entityPosition,entityAngle,entityData))) return(false);
             }
             else {
-                entity=new entityDef.entity(this.core,entityName,entityPosition,entityAngle,entityData);
+                entity=new entityClass(this.core,entityName,json,entityPosition,entityAngle,entityData);
                 if (!this.add(entity)) return(false);
             }
         }

@@ -363,6 +363,7 @@ export default class ModelEntityAlterClass
                     this.currentAnimationStartTimestamp=this.queuedAnimationStartTimestamp;
                     this.currentAnimationLoopStartTick=this.queuedAnimationLoopStartTick;
                     this.currentAnimationLoopEndTick=this.queuedAnimationLoopEndTick;
+                    this.queuedAnimationIdx=-1;
                 }
             }
             
@@ -447,7 +448,7 @@ export default class ModelEntityAlterClass
         
             // re-queue old one
             
-        if (oldIdx===-1) {
+        if (oldIdx!==-1) {
             len=this.currentAnimationLoopEndTick-this.currentAnimationLoopStartTick;
             len-=Math.trunc((this.core.timestamp-this.currentAnimationStartTimestamp)%len);
         
@@ -461,6 +462,11 @@ export default class ModelEntityAlterClass
     isAnimationRunning()
     {
         return(this.currentAnimationIdx!==-1);
+    }
+    
+    isAnimationQueued()
+    {
+        return(this.queuedAnimationIdx!==-1);
     }
     
         //

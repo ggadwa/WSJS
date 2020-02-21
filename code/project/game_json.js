@@ -34,7 +34,7 @@ export default class GameJsonClass
         // json caches and utilities
         //
         
-    getCachedJson(name,data)
+    getCachedJson(name)
     {
         let json;
         
