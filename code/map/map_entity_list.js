@@ -1,10 +1,17 @@
 import PointClass from '../utility/point.js';
-import EntityFPSPlayerClass from '../../../code/project/entity_fps_player.js';
-import EntityWeaponClass from '../../../code/project/entity_weapon.js';
-import EntityProjectileClass from '../../../code/project/entity_projectile.js';
+import EntityFPSPlayerClass from '../project/entity_fps_player.js';
+import EntityFPSBotClass from '../project/entity_fps_bot.js';
+import EntityFPSMonsterClass from '../project/entity_fps_monster.js';
+import EntityKartPlayerClass from '../project/entity_kart_player.js';
+import EntityKartBotClass from '../project/entity_kart_bot.js';
+import EntityWeaponClass from '../project/entity_weapon.js';
+import EntityProjectileClass from '../project/entity_projectile.js';
+import EntityContainerClass from '../project/entity_container.js';
+import EntityPickupClass from '../project/entity_pickup.js';
+import EntityDecorationClass from '../project/entity_decoration.js';
 
 //
-// map class
+// map entity list class
 //
 
 export default class MapEntityListClass
@@ -13,7 +20,8 @@ export default class MapEntityListClass
     {
         this.core=core;
         
-        this.entityCurrentId=1;     // 0 is always the player
+        this.entityPlayerIdx=-1;
+        
         this.entities=[];
 
         Object.seal(this);
@@ -25,11 +33,8 @@ export default class MapEntityListClass
 
     initialize()
     {
-            // first entity is always the player
-            // so lock that off
-
+        this.entityPlayerIdx=-1;
         this.entities=[];
-        this.entities.push(null);
         
         return(true);
     }
@@ -53,42 +58,75 @@ export default class MapEntityListClass
     }
     
         //
-        // entity types
-        //
-        
-    getEntityClassForType(typeName)
-    {
-        switch (typeName) {
-            case 'fps_player':
-                return(EntityFPSPlayerClass);
-            case 'weapon':
-                return(EntityWeaponClass);
-            case 'projectile':
-                return(EntityProjectileClass);
-        }
-        
-        console.log('Unknown entity type: '+typeName);
-        return(null);
-    }
-
-        //
         // list items
         //
         
-    setPlayer(entity)
+    add(spawnedByEntity,jsonName,name,position,angle,data,show,hold)
     {
-        entity.id=0;
-        this.entities[0]=entity;
+        let json,entity,entityClass;
         
-        return(entity.initialize());
-    }
+            // load the json
+            
+        json=this.core.game.getCachedJson(jsonName);
+        if (json===null) return(null);
 
-    add(entity)
-    {
-        entity.id=this.entityCurrentId++;
+            // get the correct entity
+            
+        entityClass=null;
+        
+        switch (json.type) {
+            case 'fps_player':
+                entityClass=EntityFPSPlayerClass;
+                break;
+            case 'fps_bot':
+                entityClass=EntityFPSBotClass;
+                break;
+            case 'fps_monster':
+                entityClass=EntityFPSMonsterClass;
+                break;
+            case 'kart_player':
+                entityClass=EntityKartPlayerClass;
+                break;
+            case 'kart_bot':
+                entityClass=EntityKartBotClass;
+                break;
+            case 'weapon':
+                entityClass=EntityWeaponClass;
+                break;
+            case 'projectile':
+                entityClass=EntityProjectileClass;
+                break;
+            case 'container':
+                entityClass=EntityContainerClass;
+                break;
+            case 'pickup':
+                entityClass=EntityPickupClass;
+                break;
+            case 'decoration':
+                entityClass=EntityDecorationClass;
+                break;
+        }
+        
+        if (entityClass===null) {
+            console.log('Unknown entity type: '+json.type);
+            return(null);
+        }
+        
+            // create the entity
+            
+        entity=new entityClass(this.core,name,json,position,angle,data);
+        
+        entity.spawnedBy=spawnedByEntity;
+        if (hold) entity.heldBy=spawnedByEntity;
+        entity.show=show;
+        
         this.entities.push(entity);
         
-        return(entity.initialize());
+            // finally initialize it
+        
+        if (!entity.initialize()) return(null);
+        
+        return(entity);
     }
     
     clear()
@@ -114,7 +152,7 @@ export default class MapEntityListClass
     
     getPlayer()
     {
-        return(this.entities[0]);
+        return(this.entities[this.entityPlayerIdx]);
     }
         
     cleanUpMarkedAsDeleted()
@@ -138,7 +176,7 @@ export default class MapEntityListClass
     {
         let importSettings=this.core.projectMap.getImportSettings();
         let entityList=importSettings.entities;
-        let n,entityDef,json,entityClass;
+        let n,entityDef;
         let entity,entityName,entityPosition,entityAngle,entityData;
         let botClass;
 
@@ -171,24 +209,21 @@ export default class MapEntityListClass
             
             entityData=(entityDef.data===undefined)?null:entityDef.data;
             
-                // get the json
+                // mark if the player
                 
-            json=this.core.game.getCachedJson(entityDef.json);
-            if (json===null) return(false);
+            if (entityDef.player) this.entityPlayerIdx=this.entities.length;
             
-            entityClass=this.getEntityClassForType(json.type);
-            if (entityClass===null) return(false);
+                // add the entity
+                
+            entity=this.add(null,entityDef.json,entityName,entityPosition,entityAngle,entityData,true,false);
+            if (entity===null) return(false);
+        }
+        
+            // player is required
             
-                // first entity is always assumed to be the player, anything
-                // else is a map entity
-
-            if (n===0) {
-                if (!this.setPlayer(new entityClass(this.core,entityName,json,entityPosition,entityAngle,entityData))) return(false);
-            }
-            else {
-                entity=new entityClass(this.core,entityName,json,entityPosition,entityAngle,entityData);
-                if (!this.add(entity)) return(false);
-            }
+        if (this.entityPlayerIdx===-1) {
+            console.log('No player entity in this map');
+            return(false);
         }
             
             // load any bots if it's a local multiplayer game

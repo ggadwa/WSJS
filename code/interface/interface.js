@@ -480,7 +480,7 @@ export default class InterfaceClass
 
     draw()
     {
-        let key,element,text;
+        let key,element,count,text;
         let gl=this.core.gl;
         
         gl.disable(gl.DEPTH_TEST);
@@ -490,7 +490,7 @@ export default class InterfaceClass
         
         this.drawTint();
             
-            // elements
+            // elements and counts
             
         gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
             
@@ -498,6 +498,10 @@ export default class InterfaceClass
         
         for ([key,element] of this.elements) {
             element.draw();
+        }
+        
+        for ([key,count] of this.counts) {
+            count.draw();
         }
         
         this.core.shaderList.interfaceShader.drawEnd();

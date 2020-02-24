@@ -661,7 +661,7 @@ export default class CollisionClass
         // mostly for hit scans
         //
         
-    rayCollision(entity,pnt,vector,hitPnt,hitFilter,skipFilter)
+    rayCollision(entity,pnt,vector,hitPnt)
     {
         let n,k;
         let mesh,checkEntity;
@@ -750,15 +750,6 @@ export default class CollisionClass
             if (checkEntity===entity) continue;
             if (checkEntity===entity.heldBy) continue;         // skip source entity and anything holding source entity
             if ((!checkEntity.show) || (checkEntity.passThrough) || (checkEntity.heldBy!==null)) continue;
-            
-                // filtering
-            
-            if (hitFilter!==null) {
-                if (hitFilter.indexOf(checkEntity.filter)===-1) continue;
-            }    
-            if (skipFilter!==null) {
-                if (skipFilter.indexOf(checkEntity.filter)!==-1) continue;
-            }
             
                 // run the collision
                 

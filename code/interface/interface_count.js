@@ -25,7 +25,7 @@ export default class InterfaceCountClass
     
     initialize()
     {
-        let n,vIdx,uvIdx;
+        let n,vIdx,uvIdx,iIdx,elemIdx;
         let vertexArray,uvArray,indexArray;
         let r;
         let gl=this.core.gl;
@@ -34,13 +34,17 @@ export default class InterfaceCountClass
          
         vertexArray=new Float32Array((2*4)*this.maxCount);
         uvArray=new Float32Array((2*4)*this.maxCount);
+        indexArray=new Uint16Array(6*this.maxCount);
         
         vIdx=0;
         uvIdx=0;
+        iIdx=0;
         
         r=this.rect.copy();
         
         for (n=0;n!==this.maxCount;n++) {
+            elemIdx=Math.trunc(vIdx/2);
+            
             vertexArray[vIdx++]=r.lft;
             vertexArray[vIdx++]=r.top;
             vertexArray[vIdx++]=r.rgt;
@@ -59,13 +63,14 @@ export default class InterfaceCountClass
             uvArray[uvIdx++]=0;
             uvArray[uvIdx++]=1;
             
+            indexArray[iIdx++]=elemIdx;
+            indexArray[iIdx++]=elemIdx+1;
+            indexArray[iIdx++]=elemIdx+2;
+            indexArray[iIdx++]=elemIdx;
+            indexArray[iIdx++]=elemIdx+2;
+            indexArray[iIdx++]=elemIdx+3;
+            
             r.move(this.addOffset.x,this.addOffset.y);
-        }
-        
-        indexArray=new Uint16Array(6*this.maxCount);
-        
-        for (n=0;n!==(6*this.maxCount);n++) {
-            indexArray[n]=n;
         }
         
             // this is all statically drawn
@@ -139,9 +144,9 @@ export default class InterfaceCountClass
                 gl.uniform4f(shader.colorUniform,this.offColor.r,this.offColor.g,this.offColor.b,this.offAlpha);
             }
         
-            gl.drawElements(gl.TRIANGLES,((this.maxCount-this.count)*6),gl.UNSIGNED_SHORT,(this.count*6));
+            gl.drawElements(gl.TRIANGLES,((this.maxCount-this.count)*6),gl.UNSIGNED_SHORT,((this.count*6)*2));
         }
-        
+
             // remove the buffers
 
         gl.bindBuffer(gl.ARRAY_BUFFER,null);

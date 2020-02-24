@@ -1,4 +1,5 @@
 import PointClass from '../utility/point.js';
+import ColorClass from '../utility/color.js';
 import BoundClass from '../utility/bound.js';
 import QuaternionClass from '../utility/quaternion.js';
 import MeshClass from '../mesh/mesh.js';
@@ -48,8 +49,9 @@ export default class ProjectEntityClass
         
         this.show=true;
         this.heldBy=null;
+        this.fighter=false;
+        this.pickup=false;
         this.spawnedBy=null;
-        this.filter=null;
         this.markDelete=false;
         
         this.model=null;
@@ -58,7 +60,6 @@ export default class ProjectEntityClass
         this.eyeOffset=0;
         this.weight=0;
 
-        this.id=0;
         this.remoteId=-1;       // the network ID
         
         this.gravity=this.core.map.gravityMinValue;
@@ -109,6 +110,8 @@ export default class ProjectEntityClass
         
     initialize()
     {
+        let n;
+        
             // setup
             
         this.model=null;
@@ -117,6 +120,10 @@ export default class ProjectEntityClass
             this.setModel(this.json.setup.model);
             this.modelEntityAlter.rotationOrder=this.MODEL_ROTATION_ORDER_LIST.indexOf(this.json.setup.rotationOrder);
             this.scale.setFromValues(this.json.setup.scale.x,this.json.setup.scale.y,this.json.setup.scale.z);
+            
+            for (n=0;n!==this.json.setup.hideMeshes.length;n++) {
+                this.modelEntityAlter.show(this.json.setup.hideMeshes[n],false);
+            }
         }
             
         this.radius=this.json.setup.radius;
@@ -370,23 +377,7 @@ export default class ProjectEntityClass
     
     addEntity(spawnedByEntity,jsonName,name,position,angle,data,show,hold)
     {
-        let entity,json,entityClass;
-        
-        json=this.core.game.getCachedJson(jsonName);
-        if (json===null) return(false);
-            
-        entityClass=this.core.map.entityList.getEntityClassForType(json.type);
-        if (entityClass===null) return(false);
-            
-        entity=new entityClass(this.core,name,json,position,angle,data,jsonName);
-        
-        entity.spawnedBy=spawnedByEntity;
-        if (hold) entity.heldBy=spawnedByEntity;
-        entity.show=show;
-        
-        this.core.map.entityList.add(entity);
-        
-        return(entity);
+        return(this.core.map.entityList.add(spawnedByEntity,jsonName,name,position,angle,data,show,hold));
     }
     
     removeEntity(entity)
@@ -496,6 +487,38 @@ export default class ProjectEntityClass
     getInterfaceHeight()
     {
         return(this.core.high);
+    }
+    
+        //
+        // actions
+        //
+        
+    runActions(entity,actions)
+    {
+        let action;
+        
+        for (action of actions) {
+            
+            switch (action.action) {
+                case 'trigger':
+                    this.core.setTrigger(this.core.game.lookupValue(action.name,this.data));
+                    break;
+                case 'addWeapon':
+                    entity.addWeapon(this.core.game.lookupValue(action.name,this.data));
+                    break;
+                case 'addAmmo':
+                    entity.addAmmo(this.core.game.lookupValue(action.name,this.data),this.core.game.lookupValue(action.value,this.data));
+                    break;
+                case 'addHealth':
+                    entity.addHealth(this.core.game.lookupValue(action.value,this.data));
+                    break;
+                case 'addArmor':
+                    entity.addArmor(this.core.game.lookupValue(action.value,this.data));
+                    break;
+            }
+            
+            
+        }
     }
     
         //
@@ -983,9 +1006,9 @@ export default class ProjectEntityClass
         // collision utilities
         //
         
-    rayCollision(pnt,vector,hitPnt,hitFilter,skipFilter)
+    rayCollision(pnt,vector,hitPnt)
     {
-        return(this.collision.rayCollision(this,pnt,vector,hitPnt,hitFilter,skipFilter));
+        return(this.collision.rayCollision(this,pnt,vector,hitPnt));
     }
     
     getRigidBodyAngle(rigidAngle,maxDrop,maxAngle)

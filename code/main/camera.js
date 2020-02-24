@@ -119,7 +119,7 @@ export default class CameraClass
                 // put the camera is 10% of the distance back
                 // from the hit point
                 
-            if (this.collision.rayCollision(entity,this.position,this.rayVector,this.rayHitPosition,null,null)) {
+            if (this.collision.rayCollision(entity,this.position,this.rayVector,this.rayHitPosition)) {
                 dist=this.position.distance(this.rayHitPosition)-Math.trunc(this.thirdPersonDistance*0.1);
             }
             else {

@@ -1,7 +1,6 @@
 import PointClass from '../utility/point.js';
 import ColorClass from '../utility/color.js';
 import BoundClass from '../utility/bound.js';
-import MapPathNodeClass from '../map/map_path_node.js';
 import ProjectEntityClass from '../project/project_entity.js';
 
 export default class EntityFPSPlayerClass extends ProjectEntityClass
@@ -9,6 +8,22 @@ export default class EntityFPSPlayerClass extends ProjectEntityClass
     constructor(core,name,json,position,angle,data)
     {
         super(core,name,json,position,angle,data);
+        
+        this.fighter=true;
+        this.pickup=true;
+        
+        this.health=0;
+        this.healthInitialCount=0;
+        this.healthMaxCount=0;
+        
+        this.armor=0;
+        this.armorInitialCount=0;
+        this.armorMaxCount=0;
+        
+        this.interfaceHealthIcon=null;
+        this.interfaceHealthCount=null;
+        this.interfaceArmorIcon=null;
+        this.interfaceArmorCount=null;
         
         this.idleAnimation=null;
         this.runAnimation=null;
@@ -18,7 +33,7 @@ export default class EntityFPSPlayerClass extends ProjectEntityClass
         this.maxTurnSpeed=0;
         this.maxLookSpeed=0;
         this.maxLookAngle=0;
-        this.orwardAcceleration=0;
+        this.forwardAcceleration=0;
         this.forwardDeceleration=0;
         this.forwardMaxSpeed=0;
         this.sideAcceleration=0;
@@ -26,7 +41,8 @@ export default class EntityFPSPlayerClass extends ProjectEntityClass
         this.sideMaxSpeed=0;
         this.jumpHeight=0;
         this.jumpWaterHeight=0;
-        this.splashSound=null;
+        this.liquidInSound=null;
+        this.liquidOutSound=null;
         this.flySwimYReduce=0;
         
         this.lastInLiquid=false;
@@ -56,25 +72,33 @@ export default class EntityFPSPlayerClass extends ProjectEntityClass
         
         if (!super.initialize()) return(false);
         
-        this.block=this.json.blocks[0];
+        this.idleAnimation=this.json.config.idleAnimation;
+        this.runAnimation=this.json.config.runAnimation;
         
-        this.idleAnimation=this.block.idleAnimation;
-        this.runAnimation=this.block.runAnimation;
+        this.healthInitialCount=this.core.game.lookupValue(this.json.config.healthInitialCount,this.data);
+        this.healthMaxCount=this.core.game.lookupValue(this.json.config.healthMaxCount,this.data);
+        this.armorInitialCount=this.core.game.lookupValue(this.json.config.armorInitialCount,this.data);
+        this.armorMaxCount=this.core.game.lookupValue(this.json.config.armorMaxCount,this.data);
         
-        this.maxTurnSpeed=this.core.game.lookupValue(this.block.maxTurnSpeed,this.data);
-        this.maxLookSpeed=this.core.game.lookupValue(this.block.maxLookSpeed,this.data);
-        this.maxLookAngle=this.core.game.lookupValue(this.block.maxLookAngle,this.data);
-        this.forwardAcceleration=this.core.game.lookupValue(this.block.forwardAcceleration,this.data);
-        this.forwardDeceleration=this.core.game.lookupValue(this.block.forwardDeceleration,this.data);
-        this.forwardMaxSpeed=this.core.game.lookupValue(this.block.forwardMaxSpeed,this.data);
-        this.sideAcceleration=this.core.game.lookupValue(this.block.sideAcceleration,this.data);
-        this.sideDeceleration=this.core.game.lookupValue(this.block.sideDeceleration,this.data);
-        this.sideMaxSpeed=this.core.game.lookupValue(this.block.sideMaxSpeed,this.data);
-        this.jumpHeight=this.core.game.lookupValue(this.block.jumpHeight,this.data);
-        this.jumpWaterHeight=this.core.game.lookupValue(this.block.jumpWaterHeight,this.data);
-        this.liquidInSound=this.block.liquidInSound;
-        this.liquidOutSound=this.block.liquidOutSound;
-        this.flySwimYReduce=this.core.game.lookupValue(this.block.flySwimYReduce,this.data);
+        this.interfaceHealthIcon=this.core.game.lookupValue(this.json.config.interfaceHealthIcon,this.data);
+        this.interfaceHealthCount=this.core.game.lookupValue(this.json.config.interfaceHealthCount,this.data);
+        this.interfaceArmorIcon=this.core.game.lookupValue(this.json.config.interfaceArmorIcon,this.data);
+        this.interfaceArmorCount=this.core.game.lookupValue(this.json.config.interfaceArmorCount,this.data);
+        
+        this.maxTurnSpeed=this.core.game.lookupValue(this.json.config.maxTurnSpeed,this.data);
+        this.maxLookSpeed=this.core.game.lookupValue(this.json.config.maxLookSpeed,this.data);
+        this.maxLookAngle=this.core.game.lookupValue(this.json.config.maxLookAngle,this.data);
+        this.forwardAcceleration=this.core.game.lookupValue(this.json.config.forwardAcceleration,this.data);
+        this.forwardDeceleration=this.core.game.lookupValue(this.json.config.forwardDeceleration,this.data);
+        this.forwardMaxSpeed=this.core.game.lookupValue(this.json.config.forwardMaxSpeed,this.data);
+        this.sideAcceleration=this.core.game.lookupValue(this.json.config.sideAcceleration,this.data);
+        this.sideDeceleration=this.core.game.lookupValue(this.json.config.sideDeceleration,this.data);
+        this.sideMaxSpeed=this.core.game.lookupValue(this.json.config.sideMaxSpeed,this.data);
+        this.jumpHeight=this.core.game.lookupValue(this.json.config.jumpHeight,this.data);
+        this.jumpWaterHeight=this.core.game.lookupValue(this.json.config.jumpWaterHeight,this.data);
+        this.liquidInSound=this.json.config.liquidInSound;
+        this.liquidOutSound=this.json.config.liquidOutSound;
+        this.flySwimYReduce=this.core.game.lookupValue(this.json.config.flySwimYReduce,this.data);
         
         this.lastInLiquid=false;
         this.lastUnderLiquid=false;
@@ -178,6 +202,11 @@ export default class EntityFPSPlayerClass extends ProjectEntityClass
         
         super.ready();
         
+            // health
+            
+        this.health=this.healthInitialCount;
+        this.armor=this.armorInitialCount;
+        
             // some animation defaults
             
         this.currentIdleAnimation=this.idleAnimation;
@@ -203,6 +232,56 @@ export default class EntityFPSPlayerClass extends ProjectEntityClass
         this.setCurrentAnimation();
     }
     
+        //
+        // action messages
+        //
+        
+    findWeaponByName(weaponName)
+    {
+        let n;
+        
+        for (n=0;n!==this.carouselWeapons.length;n++) {
+            if (this.carouselWeapons[n].name===weaponName) return(this.carouselWeapons[n]);
+        }
+        
+        for (n=0;n!==this.extraWeapons.length;n++) {
+            if (this.extraWeapons[n].name===weaponName) return(this.extraWeapons[n]);
+        }
+
+        console.log('Unknown weapon: '+weaponName);
+        return(null);
+    }
+    
+    addWeapon(weaponName)
+    {
+        let weapon=this.findWeaponByName(weaponName);
+        if (weapon===null) return;
+    }
+    
+    addAmmo(weaponName,value)
+    {
+        let weapon=this.findWeaponByName(weaponName);
+        if (weapon===null) return;
+        
+        weapon.addAmmo(value);
+    }
+    
+    addHealth(value)
+    {
+        if (this.interfaceHealthIcon!==null) this.core.interface.pulseElement(this.interfaceHealthIcon,500,10);
+        
+        this.health+=value;
+        if (this.health>this.healthMaxCount) this.health=this.healthMaxCount;
+    }
+    
+    addArmor(value)
+    {
+        if (this.interfaceArmorIcon!==null) this.core.interface.pulseElement(this.interfaceArmorIcon,500,10);
+        
+        this.armor+=value;
+        if (this.armor>this.armorMaxCount) this.armor=this.armorMaxCount;
+    }
+    
     run()
     {
         let n,x,y;
@@ -215,6 +294,11 @@ export default class EntityFPSPlayerClass extends ProjectEntityClass
         
         super.run();
         
+            // update any UI
+            
+        if (this.interfaceHealthCount!==null) this.core.interface.updateText(this.interfaceHealthCount,this.health);
+        if (this.interfaceArmorCount!==null) this.core.interface.updateText(this.interfaceArmorCount,this.armor);
+        
             // weapon switching
             
         mouseWheelClick=this.core.input.mouseWheelRead();
@@ -224,7 +308,6 @@ export default class EntityFPSPlayerClass extends ProjectEntityClass
                 this.currentCarouselWeaponIdx--;
                 this.showCarouselWeapon();
             }
-            this.weaponPrevious=false;
         }
 
         if ((mouseWheelClick>0) && (this.lastWheelClick===0)) {
@@ -232,7 +315,6 @@ export default class EntityFPSPlayerClass extends ProjectEntityClass
                 this.currentCarouselWeaponIdx++;
                 this.showCarouselWeapon();
             }
-            this.weaponNext=false;
         }
         
         for (n=0;n<this.carouselWeapons.length;n++) {
@@ -246,7 +328,7 @@ export default class EntityFPSPlayerClass extends ProjectEntityClass
         
             // weapon firing
             
-        this.firePrimary=this.core.input.mouseButtonFlags[0]||this.core.input.isTouchStickRightClick();    
+        this.firePrimary=this.core.input.mouseButtonFlags[0]||this.core.input.isTouchStickRightClick();
         this.fireSecondary=this.core.input.mouseButtonFlags[1];
         this.fireTertiary=this.core.input.mouseButtonFlags[2];
         
@@ -381,7 +463,7 @@ export default class EntityFPSPlayerClass extends ProjectEntityClass
 
             // camera swap button
             
-        if (this.block.multiCamera) {
+        if (this.json.config.multiCamera) {
             if (this.core.input.isKeyDownAndClear('`')) {
                 if (this.core.camera.isFirstPerson()) {
                     this.core.camera.gotoThirdPersonBehind(10000,-10);

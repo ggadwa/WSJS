@@ -1,7 +1,7 @@
 import PointClass from '../utility/point.js';
 import ProjectEntityClass from '../project/project_entity.js';
 
-export default class BlockProjectileClass extends ProjectEntityClass
+export default class EntityProjectileClass extends ProjectEntityClass
 {
     constructor(core,name,json,position,angle,data)
     {
@@ -9,7 +9,9 @@ export default class BlockProjectileClass extends ProjectEntityClass
         
         this.lifeTimestamp=0;
         this.speed=0;
-        this.spins=false;
+        this.spinY=false;
+        this.spinRate=0;
+        this.tumbles=false;
         this.stopOnHit=true;
         this.canBounce=false;
         this.canReflect=false;
@@ -34,21 +36,21 @@ export default class BlockProjectileClass extends ProjectEntityClass
     {
         if (!super.initialize()) return(false);
         
-        this.block=this.json.blocks[0];
+        this.lifeTimestamp=this.core.timestamp+this.core.game.lookupValue(this.json.config.lifeTick,this.data);
+        this.speed=this.core.game.lookupValue(this.json.config.speed,this.data);
+        this.spinY=this.core.game.lookupValue(this.json.config.spinY,this.data);
+        this.spinRate=this.core.game.lookupValue(this.json.config.spinRate,this.data);
+        this.tumbles=this.core.game.lookupValue(this.json.config.tumbles,this.data);
+        this.stopOnHit=this.core.game.lookupValue(this.json.config.stopOnHit,this.data);
+        this.canBounce=this.core.game.lookupValue(this.json.config.canBounce,this.data);
+        this.canReflect=this.core.game.lookupValue(this.json.config.canReflect,this.data);
+        this.canRoll=this.core.game.lookupValue(this.json.config.canRoll,this.data);
+        this.rollDeceleration=this.core.game.lookupValue(this.json.config.rollDeceleration,this.data);
+        this.bounceFactor=this.core.game.lookupValue(this.json.config.bounceFactor,this.data);
+        this.bounceSound=this.json.config.bounceSound;
+        this.reflectSound=this.json.config.reflectSound;
 
-        this.lifeTimestamp=this.core.timestamp+this.core.game.lookupValue(this.block.lifeTick,this.data);
-        this.speed=this.core.game.lookupValue(this.block.speed,this.data);
-        this.spins=this.core.game.lookupValue(this.block.spins,this.data);
-        this.stopOnHit=this.core.game.lookupValue(this.block.stopOnHit,this.data);
-        this.canBounce=this.core.game.lookupValue(this.block.canBounce,this.data);
-        this.canReflect=this.core.game.lookupValue(this.block.canReflect,this.data);
-        this.canRoll=this.core.game.lookupValue(this.block.canRoll,this.data);
-        this.rollDeceleration=this.core.game.lookupValue(this.block.rollDeceleration,this.data);
-        this.bounceFactor=this.core.game.lookupValue(this.block.bounceFactor,this.data);
-        this.bounceSound=this.block.bounceSound;
-        this.reflectSound=this.block.reflectSound;
-
-        this.hitEffect=this.core.game.lookupValue(this.block.hitEffect,this.data);
+        this.hitEffect=this.core.game.lookupValue(this.json.config.hitEffect,this.data);
         
         return(true);
     }
@@ -75,7 +77,7 @@ export default class BlockProjectileClass extends ProjectEntityClass
             // find the final parent
             // so any damage is attributed to them
             
-        parentEntity=entity;
+        parentEntity=this;
         while (parentEntity.heldBy!==null) {
             parentEntity=parentEntity.heldBy;
         }
@@ -128,7 +130,7 @@ export default class BlockProjectileClass extends ProjectEntityClass
             if (!this.stopped) this.core.soundList.playJson(this,null,this.bounceSound);
             
             this.position.setFromPoint(this.savePoint);
-            if (this.canBounce) this.floorBounce(motion);
+            if (this.canBounce) this.floorBounce(this.motion);
             
             if (this.motion.y===0) {
                 if (this.canRoll) {
@@ -176,7 +178,7 @@ export default class BlockProjectileClass extends ProjectEntityClass
             this.position.setFromPoint(this.savePoint);
             
             if (this.canReflect) {
-                this.wallReflect(motion);
+                this.wallReflect(this.motion);
             }
             else {
                 this.motion.setFromValues(0,0,0);
@@ -189,9 +191,9 @@ export default class BlockProjectileClass extends ProjectEntityClass
     {
         if (this.model===null) return(false);
         
-        if (this.spins) {
+        if (this.tumbles) {
             
-                // spinning
+                // tumble spin
 
             if (!this.stopped) {
                 if (!this.rolling) {
@@ -225,7 +227,12 @@ export default class BlockProjectileClass extends ProjectEntityClass
         }
         else {
             this.modelEntityAlter.position.setFromPoint(this.position);
-            this.modelEntityAlter.angle.setFromPoint(this.angle);
+            if (this.spins) {
+                this.modelEntityAlter.angle.setFromValues(this.angle.x,this.core.getPeriodicLinear(this.spinRate,360),this.angle.z);
+            }
+            else {
+                this.modelEntityAlter.angle.setFromPoint(this.angle);
+            }
         }
         
         this.modelEntityAlter.scale.setFromPoint(this.scale);

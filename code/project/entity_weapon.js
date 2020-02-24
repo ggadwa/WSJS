@@ -1,5 +1,4 @@
 import PointClass from '../utility/point.js';
-import BlockClass from '../project/block.js';
 import ProjectEntityClass from '../project/project_entity.js';
 
 export default class EntityWeaponClass extends ProjectEntityClass
@@ -13,7 +12,7 @@ export default class EntityWeaponClass extends ProjectEntityClass
         
         this.FIRE_TYPE_LIST=['hit_scan','projectile'];
         
-        this.ammoCount=0;
+        this.ammo=0;
         this.ammoInitialCount=0;
         this.ammoMaxCount=0;
         
@@ -22,6 +21,7 @@ export default class EntityWeaponClass extends ProjectEntityClass
         
         this.interfaceCrosshair=null;
         this.interfaceAmmoIcon=null;
+        this.interfaceAmmoText=null;
         this.interfaceAmmoCount=null;
         
         this.fireType=0;
@@ -30,7 +30,6 @@ export default class EntityWeaponClass extends ProjectEntityClass
         this.fireStartRadius;
         this.damage=0;
         this.distance=0;
-        this.hitFilter=null;
         this.hitEffect=null;
         this.fireSound=null;
         
@@ -50,41 +49,39 @@ export default class EntityWeaponClass extends ProjectEntityClass
     {
         if (!super.initialize()) return(false);
         
-        this.block=this.json.blocks[0];
+        this.ammo=0;
+        this.ammoInitialCount=this.core.game.lookupValue(this.json.config.ammoInitialCount,this.data);
+        this.ammoMaxCount=this.core.game.lookupValue(this.json.config.ammoMaxCount,this.data);
         
-        this.ammoCount=0;
-        this.ammoInitialCount=this.core.game.lookupValue(this.block.ammoInitialCount,this.data);
-        this.ammoMaxCount=this.core.game.lookupValue(this.block.ammoMaxCount,this.data);
+        this.idleAnimation=this.json.config.idleAnimation;
+        this.fireAnimation=this.json.config.fireAnimation;
         
-        this.idleAnimation=this.block.idleAnimation;
-        this.fireAnimation=this.block.fireAnimation;
-        
-        this.interfaceCrosshair=this.core.game.lookupValue(this.block.interfaceCrosshair,this.data);
-        this.interfaceAmmoIcon=this.core.game.lookupValue(this.block.interfaceAmmoIcon,this.data);
-        this.interfaceAmmoCount=this.core.game.lookupValue(this.block.interfaceAmmoCount,this.data);
+        this.interfaceCrosshair=this.core.game.lookupValue(this.json.config.interfaceCrosshair,this.data);
+        this.interfaceAmmoIcon=this.core.game.lookupValue(this.json.config.interfaceAmmoIcon,this.data);
+        this.interfaceAmmoText=this.core.game.lookupValue(this.json.config.interfaceAmmoText,this.data);
+        this.interfaceAmmoCount=this.core.game.lookupValue(this.json.config.interfaceAmmoCount,this.data);
        
             // model setup, skip if no model
             
         if (this.model!==null) {
-            this.handOffset=new PointClass(this.block.handOffset.x,this.block.handOffset.y,this.block.handOffset.z);
-            this.handAngle=new PointClass(this.block.handAngle.x,this.block.handAngle.y,this.block.handAngle.z);
+            this.handOffset=new PointClass(this.json.config.handOffset.x,this.json.config.handOffset.y,this.json.config.handOffset.z);
+            this.handAngle=new PointClass(this.json.config.handAngle.x,this.json.config.handAngle.y,this.json.config.handAngle.z);
 
             this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.idleAnimation[0],this.idleAnimation[1]);
         }
         
             // fire setup
             
-        this.fireType=this.FIRE_TYPE_LIST.indexOf(this.block.fireType);
-        this.fireMethod=this.core.game.lookupValue(this.block.fireMethod,this.data);
-        this.fireWait=this.core.game.lookupValue(this.block.fireWait,this.data);
-        this.fireStartRadius=this.core.game.lookupValue(this.block.fireStartRadius,this.data);
+        this.fireType=this.FIRE_TYPE_LIST.indexOf(this.json.config.fireType);
+        this.fireMethod=this.core.game.lookupValue(this.json.config.fireMethod,this.data);
+        this.fireWait=this.core.game.lookupValue(this.json.config.fireWait,this.data);
+        this.fireStartRadius=this.core.game.lookupValue(this.json.config.fireStartRadius,this.data);
         
-        this.damage=this.core.game.lookupValue(this.block.damage,this.data);
-        this.distance=this.core.game.lookupValue(this.block.distance,this.data);
-        this.hitFilter=this.block.hitFilter;
-        this.hitEffect=this.core.game.lookupValue(this.block.hitEffect,this.data);
+        this.damage=this.core.game.lookupValue(this.json.config.damage,this.data);
+        this.distance=this.core.game.lookupValue(this.json.config.distance,this.data);
+        this.hitEffect=this.core.game.lookupValue(this.json.config.hitEffect,this.data);
         
-        this.fireSound=this.block.fireSound;
+        this.fireSound=this.json.config.fireSound;
         
             // some items added to entity so fire methods
             // can have access to parent animations
@@ -101,7 +98,7 @@ export default class EntityWeaponClass extends ProjectEntityClass
     {
         super.ready();
         
-        this.ammoCount=this.ammoInitialCount;
+        this.ammo=this.ammoInitialCount;
         
         this.lastFireTimestamp=0;
         
@@ -112,6 +109,22 @@ export default class EntityWeaponClass extends ProjectEntityClass
 
     }
     
+        //
+        // ammo
+        //
+        
+    addAmmo(value)
+    {
+        if (this.interfaceAmmoIcon!==null) this.core.interface.pulseElement(this.interfaceAmmoIcon,500,10);
+        
+        this.ammo+=value;
+        if (this.ammo>this.ammoMaxCount) this.ammo=this.ammoMaxCount;
+    }
+    
+        //
+        // hit scans
+        //
+        
     hitScan(parentEntity)
     {
             // the hit scan, firing point is the eye
@@ -124,7 +137,7 @@ export default class EntityWeaponClass extends ProjectEntityClass
         this.fireVector.rotateX(null,parentEntity.angle.x);
         this.fireVector.rotateY(null,parentEntity.angle.y);
         
-        if (parentEntity.rayCollision(this.firePoint,this.fireVector,this.fireHitPoint,this.hitFilter,null)) {
+        if (parentEntity.rayCollision(this.firePoint,this.fireVector,this.fireHitPoint)) {
             
                 // is this an entity we can hit?
                 
@@ -146,6 +159,10 @@ export default class EntityWeaponClass extends ProjectEntityClass
         }
     }
     
+        //
+        // projectiles
+        //
+        
     projectile(parentEntity)
     {
         let projEntity;
@@ -160,10 +177,14 @@ export default class EntityWeaponClass extends ProjectEntityClass
             // spawn from whatever is holding this weapon
             // so it counts as the spawnBy for any damage calculations, etc
 
-        projEntity=this.addEntity(parentEntity,this.block.json,('projectile_'+this.name),this.firePoint,parentEntity.angle,null,true,false);
+        projEntity=this.addEntity(parentEntity,this.json.config.json,('projectile_'+this.name),this.firePoint,parentEntity.angle,null,true,false);
         if (projEntity!==null) projEntity.ready();
     }
     
+        //
+        // main run
+        //
+        
     run()
     {
         let parentEntity=this.heldBy;
@@ -173,7 +194,8 @@ export default class EntityWeaponClass extends ProjectEntityClass
             // update any UI
             
         if (this.interfaceCrosshair!==null) this.core.interface.showElement(this.interfaceCrosshair,((this.show)&&(this.core.camera.isFirstPerson())));
-        if (this.interfaceAmmoCount!==null) this.core.interface.updateText(this.interfaceAmmoCount,this.ammoCount);
+        if (this.interfaceAmmoText!==null) this.core.interface.updateText(this.interfaceAmmoText,this.ammo);
+        if (this.interfaceAmmoCount!==null) this.core.interface.setCount(this.interfaceAmmoCount,this.ammo);
         
             // if entity has model but not shown,
             // the assume carousel and skip
@@ -184,7 +206,7 @@ export default class EntityWeaponClass extends ProjectEntityClass
         
             // skip if no ammo or not time to fire
             
-        if (this.ammoCount===0) return;
+        if (this.ammo===0) return;
             
         switch (this.fireMethod) {
             case 'primary':
@@ -205,7 +227,7 @@ export default class EntityWeaponClass extends ProjectEntityClass
         
             // fire
             
-        this.ammoCount--;
+        this.ammo--;
         
         this.core.soundList.playJson(parentEntity,null,this.fireSound);
            
