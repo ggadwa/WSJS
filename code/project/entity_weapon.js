@@ -33,6 +33,10 @@ export default class EntityWeaponClass extends ProjectEntityClass
         this.hitEffect=null;
         this.fireSound=null;
         
+        this.initiallyAvailable=false;
+        this.available=false;
+        this.inCarousel=false;
+        
         this.lastFireTimestamp=0;
         
             // pre-allocates
@@ -98,15 +102,11 @@ export default class EntityWeaponClass extends ProjectEntityClass
     {
         super.ready();
         
+        this.available=this.initiallyAvailable;
+        
         this.ammo=this.ammoInitialCount;
         
         this.lastFireTimestamp=0;
-        
-        
-
-                   //     "interfaceAmmoIcon":"grenade",
-
-
     }
     
         //

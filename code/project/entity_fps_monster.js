@@ -93,6 +93,8 @@ export default class EntityFPSMonsterClass extends ProjectEntityClass
         this.maxTurnSpeed=this.core.game.lookupValue(this.json.config.maxTurnSpeed,this.data);
         this.forwardAcceleration=this.core.game.lookupValue(this.json.config.forwardAcceleration,this.data);
         this.forwardMaxSpeed=this.core.game.lookupValue(this.json.config.forwardMaxSpeed,this.data);
+        this.jumpWaitTick=this.core.game.lookupValue(this.json.config.jumpWaitTick,this.data);
+        this.jumpHeight=this.core.game.lookupValue(this.json.config.jumpHeight,this.data);
         this.angleYProjectileRange=this.core.game.lookupValue(this.json.config.angleYProjectileRange,this.data);
         this.angleYMeleeRange=this.core.game.lookupValue(this.json.config.angleYMeleeRange,this.data);
         this.damageFlinchWaitTick=this.core.game.lookupValue(this.json.config.damageFlinchWaitTick,this.data);

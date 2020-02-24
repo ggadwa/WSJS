@@ -27,6 +27,7 @@ export default class EntityFPSPlayerClass extends ProjectEntityClass
         
         this.idleAnimation=null;
         this.runAnimation=null;
+        this.dieAnimation=null;
         
         this.inStandingAnimation=true;
         
@@ -41,10 +42,17 @@ export default class EntityFPSPlayerClass extends ProjectEntityClass
         this.sideMaxSpeed=0;
         this.jumpHeight=0;
         this.jumpWaterHeight=0;
+        this.flySwimYReduce=0;
+        this.damageFlinchWaitTick=0;
+        this.respawnWaitTick=0;
+        
         this.liquidInSound=null;
         this.liquidOutSound=null;
-        this.flySwimYReduce=0;
+        this.hurtSound=null;
+        this.dieSound=null;
         
+        this.nextDamageTick=0;
+        this.death
         this.lastInLiquid=false;
         this.lastUnderLiquid=false;
         
@@ -74,6 +82,7 @@ export default class EntityFPSPlayerClass extends ProjectEntityClass
         
         this.idleAnimation=this.json.config.idleAnimation;
         this.runAnimation=this.json.config.runAnimation;
+        this.dieAnimation=this.json.config.dieAnimation;
         
         this.healthInitialCount=this.core.game.lookupValue(this.json.config.healthInitialCount,this.data);
         this.healthMaxCount=this.core.game.lookupValue(this.json.config.healthMaxCount,this.data);
@@ -96,10 +105,16 @@ export default class EntityFPSPlayerClass extends ProjectEntityClass
         this.sideMaxSpeed=this.core.game.lookupValue(this.json.config.sideMaxSpeed,this.data);
         this.jumpHeight=this.core.game.lookupValue(this.json.config.jumpHeight,this.data);
         this.jumpWaterHeight=this.core.game.lookupValue(this.json.config.jumpWaterHeight,this.data);
+        this.flySwimYReduce=this.core.game.lookupValue(this.json.config.flySwimYReduce,this.data);
+        this.damageFlinchWaitTick=this.core.game.lookupValue(this.json.config.damageFlinchWaitTick,this.data);
+        this.respawnWaitTick=this.core.game.lookupValue(this.json.config.respawnWaitTick,this.data);
+        
         this.liquidInSound=this.json.config.liquidInSound;
         this.liquidOutSound=this.json.config.liquidOutSound;
-        this.flySwimYReduce=this.core.game.lookupValue(this.json.config.flySwimYReduce,this.data);
+        this.hurtSound=this.json.config.hurtSound;
+        this.dieSound=this.json.config.dieSound;
         
+        this.nextDamageTick=0;
         this.lastInLiquid=false;
         this.lastUnderLiquid=false;
         
@@ -116,13 +131,19 @@ export default class EntityFPSPlayerClass extends ProjectEntityClass
                 
             if (weaponBlock.inCarousel) {
                 weaponEntity=this.addEntity(this,weaponBlock.json,weaponBlock.name,new PointClass(0,0,0),new PointClass(0,0,0),null,true,true);
+                weaponEntity.inCarousel=true;
                 this.carouselWeapons.push(weaponEntity);
                 if ((weaponBlock.default) && (this.defaultCarouselWeaponIdx===-1)) this.defaultCarouselWeaponIdx=n;
             }
             else {
                 weaponEntity=this.addEntity(this,weaponBlock.json,weaponBlock.name,new PointClass(0,0,0),new PointClass(0,0,0),null,true,true);
+                weaponEntity.inCarousel=false;
                 this.extraWeapons.push(weaponEntity);
             }
+            
+                // available to entity?
+                
+            weaponEntity.initiallyAvailable=this.core.game.lookupValue(weaponBlock.initiallyAvailable,this.data);
             
                 // push the parent animations to the weapons
                 // so we can pick them up later
@@ -207,6 +228,8 @@ export default class EntityFPSPlayerClass extends ProjectEntityClass
         this.health=this.healthInitialCount;
         this.armor=this.armorInitialCount;
         
+        this.passThrough=false;
+        
             // some animation defaults
             
         this.currentIdleAnimation=this.idleAnimation;
@@ -254,8 +277,24 @@ export default class EntityFPSPlayerClass extends ProjectEntityClass
     
     addWeapon(weaponName)
     {
+        let n;
+        
         let weapon=this.findWeaponByName(weaponName);
         if (weapon===null) return;
+        
+            // make weapon available
+            
+        weapon.available=true;
+        
+            // select weapon if in carousel
+            
+        for (n=0;n!==this.carouselWeapons.length;n++) {
+            if (this.carouselWeapons[n].name===weaponName) {
+                this.currentCarouselWeaponIdx=n;
+                this.showCarouselWeapon();
+                break;
+            }
+        }
     }
     
     addAmmo(weaponName,value)
@@ -282,12 +321,76 @@ export default class EntityFPSPlayerClass extends ProjectEntityClass
         if (this.armor>this.armorMaxCount) this.armor=this.armorMaxCount;
     }
     
+        //
+        // health
+        //
+        
+    damage(fromEntity,damage,hitPoint)
+    {
+            // already dead, can't take damage
+            
+        if (this.health<=0) return;
+        
+            // pulse and take the damage
+            
+        if (!this.developerNoDamage) {
+            this.armor-=damage;
+            if (this.armor<0) {
+                if (this.interfaceHealthIcon!==null) this.core.interface.pulseElement(this.interfaceHealthIcon,500,5);
+                this.health+=this.armor;
+                this.armor=0;
+            }
+            else {
+                if (this.interfaceArmorIcon!==null) this.core.interface.pulseElement(this.interfaceArmorIcon,500,5);
+            }
+        }
+        else {
+            if (this.interfaceHealthIcon!==null) this.core.interface.pulseElement(this.interfaceHealthIcon,500,5);
+        }
+        
+            // dead?
+        
+        if (this.health<=0) {
+            this.respawnTick=this.core.timestamp+this.respawnWaitTick;
+            this.passThrough=true;
+            this.core.soundList.playJson(this,null,this.dieSound);
+            
+            if (this.isMultiplayer()) {
+                if (fromEntity!==null) {
+                    if (fromEntity!==this) {
+                        this.addScore(fromEntity.name,1);
+                        this.updateInterfaceTemporaryText('multiplayer_message',(fromEntity.name+' killed '+this.name),5000);
+                    }
+                    else {
+                        this.addScore(fromEntity.name,-1);
+                        this.updateInterfaceTemporaryText('multiplayer_message',(this.name+' committed suicide'),5000);
+                    }
+                }
+                this.displayScore(true);
+            }
+            
+            this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.dieAnimation[0],this.dieAnimation[1]);            
+            return;
+        }
+        
+            // hurt sound
+            
+        if (this.core.timestamp>this.nextDamageTick) {
+            this.nextDamageTick=this.core.timestamp+this.damageFlinchWaitTick;
+            this.core.soundList.playJson(this,null,this.hurtSound);
+        }
+    }
+
+        //
+        // run
+        //
+    
     run()
     {
         let n,x,y;
         let moveForward,moveBackward,moveLeft,moveRight;
         let liquidIdx,bump;
-        let turnAdd,lookAdd;
+        let turnAdd,lookAdd,startWeaponIdx;
         let mouseWheelClick;
         let input=this.core.input;
         let setup=this.core.setup;
@@ -304,23 +407,43 @@ export default class EntityFPSPlayerClass extends ProjectEntityClass
         mouseWheelClick=this.core.input.mouseWheelRead();
         
         if ((mouseWheelClick<0) && (this.lastWheelClick===0)) {
-            if (this.currentCarouselWeaponIdx>0) {
+            this.startWeaponIdx=this.currentCarouselWeaponIdx;
+            
+            while (true) {
                 this.currentCarouselWeaponIdx--;
-                this.showCarouselWeapon();
+                if (this.currentCarouselWeaponIdx<0) this.currentCarouselWeaponIdx=this.carouselWeapons.length-1;
+                
+                if (this.currentCarouselWeaponIdx===startWeaponIdx) break;
+                
+                if (this.carouselWeapons[this.currentCarouselWeaponIdx].available) {
+                    this.showCarouselWeapon();
+                    break;
+                }
             }
         }
 
         if ((mouseWheelClick>0) && (this.lastWheelClick===0)) {
-            if (this.currentCarouselWeaponIdx<(this.carouselWeapons.length-1)) {
+            this.startWeaponIdx=this.currentCarouselWeaponIdx;
+            
+            while (true) {
                 this.currentCarouselWeaponIdx++;
-                this.showCarouselWeapon();
+                if (this.currentCarouselWeaponIdx>=(this.carouselWeapons.length-1)) this.currentCarouselWeaponIdx=0;
+                
+                if (this.currentCarouselWeaponIdx===startWeaponIdx) break;
+                
+                if (this.carouselWeapons[this.currentCarouselWeaponIdx].available) {
+                    this.showCarouselWeapon();
+                    break;
+                }
             }
         }
         
         for (n=0;n<this.carouselWeapons.length;n++) {
             if (this.core.input.isKeyDown(String.fromCharCode(49+n))) {
-                this.currentCarouselWeaponIdx=n;
-                this.showCarouselWeapon();
+                if (this.carouselWeapons[n].available) {
+                    this.currentCarouselWeaponIdx=n;
+                    this.showCarouselWeapon();
+                }
             }
         }
         

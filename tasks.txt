@@ -12,6 +12,7 @@ NEW BLOCK STUFF
      - project_entity -> entity_base
      - effect_json -> effect
      - implement health
+     - network scores (somewhere other than player?)
      - need to test failures (missing bitmap, missing json, bad json, etc)
      - get rid of any beretta naming
      - bot names/classes/remote classes
