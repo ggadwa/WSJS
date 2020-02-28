@@ -507,7 +507,7 @@ export default class ProjectEntityClass
                     entity.addWeapon(this.core.game.lookupValue(action.name,this.data));
                     break;
                 case 'addAmmo':
-                    entity.addAmmo(this.core.game.lookupValue(action.name,this.data),this.core.game.lookupValue(action.value,this.data));
+                    entity.addAmmo(this.core.game.lookupValue(action.name,this.data),this.core.game.lookupValue(action.subName,this.data),this.core.game.lookupValue(action.value,this.data));
                     break;
                 case 'addHealth':
                     entity.addHealth(this.core.game.lookupValue(action.value,this.data));

@@ -151,7 +151,9 @@ export default class EntityFPSPlayerClass extends ProjectEntityClass
             weaponEntity.parentIdleAnimation=weaponBlock.parentIdleAnimation;
             weaponEntity.parentRunAnimation=weaponBlock.parentRunAnimation;
             weaponEntity.parentFireIdleAnimation=weaponBlock.parentFireIdleAnimation;
-            weaponEntity.parentFireRunAnimation=weaponBlock.parentFireRunAnimation;
+            weaponEntity.parentPrimaryFireRunAnimation=weaponBlock.parentPrimaryFireRunAnimation;
+            weaponEntity.parentSecondaryFireRunAnimation=weaponBlock.parentSecondaryFireRunAnimation;
+            weaponEntity.parentTertiaryFireRunAnimation=weaponBlock.parentTertiaryFireRunAnimation;
         }
         
         return(true);
@@ -297,12 +299,12 @@ export default class EntityFPSPlayerClass extends ProjectEntityClass
         }
     }
     
-    addAmmo(weaponName,value)
+    addAmmo(weaponName,fireMethod,value)
     {
         let weapon=this.findWeaponByName(weaponName);
         if (weapon===null) return;
         
-        weapon.addAmmo(value);
+        weapon.addAmmo(fireMethod,value);
     }
     
     addHealth(value)

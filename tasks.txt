@@ -6,7 +6,7 @@
 
 
 NEW BLOCK STUFF
-     - change weapon fire stuff to primary/secondary blocks
+     - change weapon fire stuff to primary/secondary blocks (working on)
      - kart mines is weapon/projectile
      - eventually delete most stuff out of project_entity, do direct calls
      - project_entity -> entity_base
