@@ -144,8 +144,7 @@ export default class BitmapListClass
         
     async loadAllBitmaps()
     {
-        let importSettings=this.core.projectMap.getImportSettings();
-        let loadBitmapList=importSettings.bitmaps;
+        let loadBitmapList=this.core.map.json.bitmaps;
         let bitmapDef;
         let keyIter,rtn,bitmap;
         let success,promises;

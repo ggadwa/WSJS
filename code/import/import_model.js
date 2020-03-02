@@ -13,20 +13,11 @@ export default class ImportModelClass
         Object.seal(this);
     }
     
-    async load(importSettings)
+    async load(json)
     {
         let importMesh;
         
-            // scale is illegal in models, so flag and break
-            
-        if (importSettings.scale!==undefined) {
-            console.log('scale is per entity, it can not be set on a model load: '+importSettings.name);
-            return(false);
-        }
-        
-            // import the model
-        
-        importMesh=new ImportGLTFClass(this.core,importSettings);
+        importMesh=new ImportGLTFClass(this.core,json);
         return(await importMesh.import(this.model.meshList,this.model.skeleton));
     }
 

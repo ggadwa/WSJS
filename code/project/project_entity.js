@@ -658,19 +658,15 @@ export default class ProjectEntityClass
         this.position.setFromPoint(this.core.map.path.nodes[nodeIdx].position);
     }
     
-    moveToRandomNode(failCount)
+    moveToRandomNode()
     {
         let nodes=this.core.map.path.nodes;
         let idx;
         
-        while (failCount>0) {
-            idx=Math.trunc(nodes.length*Math.random());
-            this.position.setFromPoint(nodes[idx].position);
-            
-            if (this.collision.checkEntityCollision(this)===null) return;
-            
-            failCount--;
-        }
+        idx=Math.trunc(nodes.length*Math.random());
+        this.position.setFromPoint(nodes[idx].position);
+
+        //if (this.collision.checkEntityCollision(this)===null) return; // telefrag
     }
     
     getRandomKeyNodeIndex()

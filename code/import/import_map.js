@@ -18,7 +18,7 @@ export default class ImportMapClass
         Object.seal(this);
     }
     
-    async load(importSettings)
+    async load(json)
     {
         let n,k,scale,idx;
         let light,lightDef,lightAmbient;
@@ -32,35 +32,35 @@ export default class ImportMapClass
         
             // import the map itself
           
-        importMesh=new ImportGLTFClass(this.core,importSettings);
+        importMesh=new ImportGLTFClass(this.core,json);
         if (!(await importMesh.import(this.core.map.meshList,null))) return(false);
         
             // some misc setup
             
-        this.core.map.bumpHeight=importSettings.bumpHeight;
-        this.core.map.gravityMinValue=importSettings.gravity.min;
-        this.core.map.gravityMaxValue=importSettings.gravity.max;
-        this.core.map.gravityAcceleration=importSettings.gravity.acceleration;
+        this.core.map.bumpHeight=json.bumpHeight;
+        this.core.map.gravityMinValue=json.gravity.min;
+        this.core.map.gravityMaxValue=json.gravity.max;
+        this.core.map.gravityAcceleration=json.gravity.acceleration;
         
             // maps don't have rigging, so we need to recalculate
             // all the node matrixes and TRS and then scale to
             // the size we want (animations cover that for rigged
             // models)
             
-        scale=importSettings.scale;
+        scale=json.scale;
         if (scale===undefined) scale=1;
         
         this.core.map.meshList.scaleMeshes(scale);
         
             // the lights
             
-        if (importSettings.lightMin!==undefined) this.core.map.lightList.lightMin.setFromValues(importSettings.lightMin.r,importSettings.lightMin.g,importSettings.lightMin.b);
-        if (importSettings.lightMax!==undefined) this.core.map.lightList.lightMax.setFromValues(importSettings.lightMax.r,importSettings.lightMax.g,importSettings.lightMax.b);
+        if (json.lightMin!==undefined) this.core.map.lightList.lightMin.setFromValues(json.lightMin.r,json.lightMin.g,json.lightMin.b);
+        if (json.lightMax!==undefined) this.core.map.lightList.lightMax.setFromValues(json.lightMax.r,json.lightMax.g,json.lightMax.b);
             
-        if (importSettings.lights!==undefined) {
+        if (json.lights!==undefined) {
             
-            for (n=0;n!==importSettings.lights.length;n++) {
-                lightDef=importSettings.lights[n];
+            for (n=0;n!==json.lights.length;n++) {
+                lightDef=json.lights[n];
                 
                 lightAmbient=false;
                 if (lightDef.ambient!==undefined) lightAmbient=lightDef.ambient;
@@ -88,9 +88,9 @@ export default class ImportMapClass
         
             // the liquids
             
-        if (importSettings.liquids!==undefined) {
-            for (n=0;n!==importSettings.liquids.length;n++) {
-                liquidDef=importSettings.liquids[n];
+        if (json.liquids!==undefined) {
+            for (n=0;n!==json.liquids.length;n++) {
+                liquidDef=json.liquids[n];
                 
                 liquidBitmap=this.core.bitmapList.addSimple(liquidDef.bitmap);
                 liquid=new MapLiquidClass(this.core,liquidBitmap,liquidDef.waveSize,liquidDef.wavePeriod,liquidDef.waveHeight,liquidDef.waveUVStamp,liquidDef.uShift,liquidDef.vShift,new ColorClass(liquidDef.tint.r,liquidDef.tint.g,liquidDef.tint.b),new BoundClass(liquidDef.xBound.min,liquidDef.xBound.max),new BoundClass(liquidDef.yBound.min,liquidDef.yBound.max),new BoundClass(liquidDef.zBound.min,liquidDef.zBound.max))
@@ -100,10 +100,10 @@ export default class ImportMapClass
        
             // the movements
             
-        if (importSettings.movements!==undefined) {
+        if (json.movements!==undefined) {
 
-            for (n=0;n!==importSettings.movements.length;n++) {
-                movementDef=importSettings.movements[n];
+            for (n=0;n!==json.movements.length;n++) {
+                movementDef=json.movements[n];
 
                 meshIdxList=[];
                 
@@ -157,20 +157,20 @@ export default class ImportMapClass
         
             // the sky
             
-        if (importSettings.skyBox===undefined) {
+        if (json.skyBox===undefined) {
             this.core.map.sky.on=false;
         }
         else {
             this.core.map.sky.on=true;
-            this.core.map.sky.size=importSettings.skyBox.size;
-            this.core.map.sky.bitmap=this.core.bitmapList.addSimple(importSettings.skyBox.bitmap);
+            this.core.map.sky.size=json.skyBox.size;
+            this.core.map.sky.bitmap=this.core.bitmapList.addSimple(json.skyBox.bitmap);
         }
         
             // paths
             
-        if (importSettings.paths!==undefined) {
-            for (n=0;n!==importSettings.paths.length;n++) {
-                pathDef=importSettings.paths[n];
+        if (json.paths!==undefined) {
+            for (n=0;n!==json.paths.length;n++) {
+                pathDef=json.paths[n];
                 
                 altPosition=null;
                 if (pathDef.altPosition!==undefined) altPosition=new PointClass(pathDef.altPosition.x,pathDef.altPosition.y,pathDef.altPosition.z);
@@ -184,9 +184,9 @@ export default class ImportMapClass
         
             // cubes
             
-        if (importSettings.cubes!==undefined) {
-            for (n=0;n!==importSettings.cubes.length;n++) {
-                cubeDef=importSettings.cubes[n];
+        if (json.cubes!==undefined) {
+            for (n=0;n!==json.cubes.length;n++) {
+                cubeDef=json.cubes[n];
                 
                 cube=new MapCubeClass(new BoundClass(cubeDef.xBound.min,cubeDef.xBound.max),new BoundClass(cubeDef.yBound.min,cubeDef.yBound.max),new BoundClass(cubeDef.zBound.min,cubeDef.zBound.max),cubeDef.key,cubeDef.data);
                 this.core.map.cubeList.add(cube);
@@ -195,19 +195,19 @@ export default class ImportMapClass
         
             // some physics settings
             
-        if (importSettings.maxFloorCeilingDetectionFactor!==undefined) {
-            this.core.map.meshList.maxFloorCeilingDetectionFactor=1.0-importSettings.maxFloorCeilingDetectionFactor;     // 0 = walls facing straight up only, to 1 which is pretty much anything
+        if (json.maxFloorCeilingDetectionFactor!==undefined) {
+            this.core.map.meshList.maxFloorCeilingDetectionFactor=1.0-json.maxFloorCeilingDetectionFactor;     // 0 = walls facing straight up only, to 1 which is pretty much anything
         }
 
             // and finally a number of mesh specific settings,
             // based either on bitmap associated or a prefix to a mesh name
             
-        if (importSettings.noCollideBitmaps!==undefined) {
-            for (n=0;n!==importSettings.noCollideBitmaps.length;n++) {
+        if (json.noCollideBitmaps!==undefined) {
+            for (n=0;n!==json.noCollideBitmaps.length;n++) {
                 
-                bitmap=this.core.bitmapList.getSimpleName(importSettings.noCollideBitmaps[n]);                
+                bitmap=this.core.bitmapList.getSimpleName(json.noCollideBitmaps[n]);                
                 if (bitmap===null) {
-                    console.log('Missing bitmap to set no collisions to: '+importSettings.noCollideBitmaps[n]);
+                    console.log('Missing bitmap to set no collisions to: '+json.noCollideBitmaps[n]);
                     return(false);
                 }
                 
@@ -215,18 +215,18 @@ export default class ImportMapClass
             }
         }
         
-        if (importSettings.noCollideMeshes!==undefined) {
-            for (n=0;n!==importSettings.noCollideMeshes.length;n++) {
-                this.core.map.meshList.setNoCollisionsForBitmap(importSettings.noCollideMeshes[n]);
+        if (json.noCollideMeshes!==undefined) {
+            for (n=0;n!==json.noCollideMeshes.length;n++) {
+                this.core.map.meshList.setNoCollisionsForBitmap(json.noCollideMeshes[n]);
             }
         }
         
-        if (importSettings.simpleCollideBitmaps!==undefined) {
-            for (n=0;n!==importSettings.simpleCollideBitmaps.length;n++) {
+        if (json.simpleCollideBitmaps!==undefined) {
+            for (n=0;n!==json.simpleCollideBitmaps.length;n++) {
                 
-                bitmap=this.core.bitmapList.getSimpleName(importSettings.simpleCollideBitmaps[n]);                
+                bitmap=this.core.bitmapList.getSimpleName(json.simpleCollideBitmaps[n]);                
                 if (bitmap===null) {
-                    console.log('Missing bitmap to set no collisions to: '+importSettings.simpleCollideBitmaps[n]);
+                    console.log('Missing bitmap to set no collisions to: '+json.simpleCollideBitmaps[n]);
                     return(false);
                 }
                 
@@ -234,24 +234,24 @@ export default class ImportMapClass
             }
         }
             
-        if (importSettings.simpleCollideMeshes!==undefined) {
-            for (n=0;n!==importSettings.simpleCollideMeshes.length;n++) {
-                this.core.map.meshList.setSimpleCollisionsForMeshes(importSettings.simpleCollideMeshes[n]);
+        if (json.simpleCollideMeshes!==undefined) {
+            for (n=0;n!==json.simpleCollideMeshes.length;n++) {
+                this.core.map.meshList.setSimpleCollisionsForMeshes(json.simpleCollideMeshes[n]);
             }
         }
         
-        if (importSettings.meshNoBumpMeshes!==undefined) {
-            for (n=0;n!==importSettings.meshNoBumpMeshes.length;n++) {
-                this.core.map.meshList.setNoBumpForMeshes(importSettings.meshNoBumpMeshes[n]);
+        if (json.meshNoBumpMeshes!==undefined) {
+            for (n=0;n!==json.meshNoBumpMeshes.length;n++) {
+                this.core.map.meshList.setNoBumpForMeshes(json.meshNoBumpMeshes[n]);
             }
         }
         
-        if (importSettings.decalBitmaps!==undefined) {
-            for (n=0;n!==importSettings.decalBitmaps.length;n++) {
+        if (json.decalBitmaps!==undefined) {
+            for (n=0;n!==json.decalBitmaps.length;n++) {
                 
-                bitmap=this.core.bitmapList.getSimpleName(importSettings.decalBitmaps[n]);                
+                bitmap=this.core.bitmapList.getSimpleName(json.decalBitmaps[n]);                
                 if (bitmap===null) {
-                    console.log('Missing bitmap to set as decal to: '+importSettings.decalBitmaps[n]);
+                    console.log('Missing bitmap to set as decal to: '+json.decalBitmaps[n]);
                     return(false);
                 }
                 

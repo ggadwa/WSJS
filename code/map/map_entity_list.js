@@ -174,11 +174,9 @@ export default class MapEntityListClass
         
     loadMapEntities()
     {
-        let importSettings=this.core.projectMap.getImportSettings();
-        let entityList=importSettings.entities;
+        let entityList=this.core.map.json.entities;
         let n,entityDef;
         let entity,entityName,entityPosition,entityAngle,entityData;
-        let botClass;
 
             // at least a player entity is required
             
@@ -222,21 +220,19 @@ export default class MapEntityListClass
             // player is required
             
         if (this.entityPlayerIdx===-1) {
-            console.log('No player entity in this map');
+            console.log('no player entity in this map');
             return(false);
         }
             
             // load any bots if it's a local multiplayer game
             
         if (!((this.core.isMultiplayer) && (this.core.setup.localGame))) return(true);
-/*
-        botClass=EntityMultiplayerBotClass; // this.core.game.getBotClass();  - TODO DEAL WITH THIS AFTER JSON
 
         for (n=0;n!==this.core.setup.botCount;n++) {
-            entity=new botClass(this.core,this.core.game.json.bot.names[n],new PointClass(0,0,0),new PointClass(0,0,0),null);
-            if (!this.add(entity)) return(false);
+            entity=this.add(null,this.core.game.json.bot.json,this.core.game.json.bot.names[n],new PointClass(0,0,0),new PointClass(0,0,0),null,true,false);
+            if (entity===null) return(false);
         }
-*/        
+
         return(true);
     }
     

@@ -48,10 +48,6 @@ export default class CoreClass
         this.game=null;
         this.map=null;
         
-            // the project game and map
-            
-        this.projectMap=null;
-        
             // input
             
         this.input=new InputClass(this);

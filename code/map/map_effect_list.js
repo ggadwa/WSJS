@@ -70,9 +70,8 @@ export default class MapEffectListClass
         
     loadMapEffects()
     {
-        let importSettings=this.core.projectMap.getImportSettings();
-        let effectList=importSettings.effects;
-        let n,effect,effectDef,effectPosition,effectShow,meshIdx;
+        let effectList=this.core.map.json.effects;
+        let n,effectDef,effectPosition,effectShow,meshIdx;
         
         if (effectList===undefined) return(true);
         

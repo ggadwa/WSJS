@@ -265,7 +265,7 @@ export default class GenerateMapClass
         // build a map
         //
         
-    build(importSettings)
+    build(json)
     {
         let n,k,seed;
         let genPiece,genMesh,genBitmap;
@@ -277,7 +277,7 @@ export default class GenerateMapClass
         
             // see the random number generator
             
-        seed=(importSettings.autoGenerate.randomSeed===undefined)?Date.now():importSettings.autoGenerate.randomSeed;
+        seed=(json.autoGenerate.randomSeed===undefined)?Date.now():json.autoGenerate.randomSeed;
         console.info('Random Seed: '+seed);
         
         this.core.setRandomSeed(seed);
@@ -290,8 +290,8 @@ export default class GenerateMapClass
         
             // some global settings
             
-        roomCount=importSettings.autoGenerate.roomCount;
-        segmentSize=importSettings.autoGenerate.segmentSize;
+        roomCount=json.autoGenerate.roomCount;
+        segmentSize=json.autoGenerate.segmentSize;
         
             // first room in center of map
             
@@ -429,13 +429,13 @@ export default class GenerateMapClass
 
             // the sky
             
-        if (importSettings.skyBox===undefined) {
+        if (json.skyBox===undefined) {
             this.core.map.sky.on=false;
         }
         else {
             this.core.map.sky.on=true;
-            this.core.map.sky.size=importSettings.skyBox.size;
-            this.core.map.sky.bitmap=this.core.bitmapList.addSimple(importSettings.skyBox.bitmap);
+            this.core.map.sky.size=json.skyBox.size;
+            this.core.map.sky.bitmap=this.core.bitmapList.addSimple(json.skyBox.bitmap);
         }
         
         return(true);

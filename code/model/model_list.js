@@ -43,8 +43,7 @@ export default class ModelListClass
         
     async loadAllModels()
     {
-        let importSettings=this.core.projectMap.getImportSettings();
-        let loadModelList=importSettings.models;
+        let loadModelList=this.core.map.json.models;
         let modelDef,model;
         let success,promises;
         

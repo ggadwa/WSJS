@@ -6,30 +6,22 @@
 
 
 NEW BLOCK STUFF
-     - maps as json
      - monsters better at navigating around corners (try to move X only or Z only if stuck)
+     - death is broken for player
+     - fall damage
+     - put reaper back in demo / add monsters
+     - bots/remotes (no need for game json for remotes)
+     - moveToRandomNode needs to do telefragging
+     - network scores (somewhere other than player?)
 
-     - get rid of project_map/game_json extra stuff like ready() etc
+     - get rid of game_json extra stuff like ready() etc
 
-     - kart mines is weapon/projectile
+
      - eventually delete most stuff out of project_entity, do direct calls
      - project_entity -> entity_base
      - effect_json -> effect
-     - implement health
-     - network scores (somewhere other than player?)
      - need to test failures (missing bitmap, missing json, bad json, etc)
      - get rid of any beretta naming
-     - bot names/classes/remote classes
-     - index.html hack
-     - no damage flag
-
-
-        switch (this.data.startMap) {
-            case "Dual Castles":
-                return(this.createMap(MapDualCastlesClass));
-            case "Dungeon":
-                return(this.createMap(MapDungeonClass));
-        }
 
 EVENTUALLY
     - add kart to demo

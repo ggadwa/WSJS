@@ -53,16 +53,23 @@ class MainClass
 
     async initGame()
     {
+        let startMap;
+        
+            // initialize the game
+            
         this.core.game=new GameJsonClass(this.core,this.data);
         if (!(await this.core.game.initialize())) return;
         
-          //TODO all of   
+          // initialize the map
+          
+        startMap=this.core.game.lookupValue(this.core.game.json.startMap,this.data);
         
-        this.core.map=new MapClass(this.core);
-        this.core.projectMap=new window.hardCodedMapClassHack(this.core);        // redo this TODO
+        this.core.map=new MapClass(this.core,this.core.game.getCachedJson(startMap));
         if (!this.core.map.initialize()) return;
         
-        this.core.loadSetup();          // requires game to be loaded first
+            // finish the core loading
+            
+        this.core.loadSetup();
 
             // next step
 
@@ -124,8 +131,7 @@ class MainClass
     
     async initLoadMap()
     {
-        this.core.projectMap.initialize();
-        if (!(await this.core.projectMap.loadMap())) return;
+        if (!(await this.core.map.loadMap())) return;
         
         this.core.loadingScreenUpdate();
         this.core.loadingScreenAddString('Building Collision Geometry');
@@ -180,9 +186,9 @@ class MainClass
     
     initLoadEntities()
     {
-            // call the map ready as it can load entities
+            // call the map ready
         
-        this.core.projectMap.ready();
+        this.core.map.ready();
         
             // load any map effects
             

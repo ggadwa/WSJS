@@ -104,8 +104,7 @@ export default class SoundListClass
         
     async loadAllSounds()
     {
-        let importSettings=this.core.projectMap.getImportSettings();
-        let loadSoundList=importSettings.sounds;
+        let loadSoundList=this.core.map.json.sounds;
         let soundDef,sound;
         let success,promises;
         

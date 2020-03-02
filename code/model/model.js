@@ -11,17 +11,15 @@ import ImportModelClass from '../import/import_model.js';
 
 export default class ModelClass
 {
-    constructor(core,importSettings)
+    constructor(core,json)
     {
         this.core=core;
-        this.importSettings=importSettings;
+        this.json=json;
         
         this.loaded=false;
         
         this.meshList=new MeshListClass(core);
         this.skeleton=new ModelSkeletonClass(core);
-        
-        this.scale=new PointClass(1,1,1);
         
         Object.seal(this);
     }
@@ -56,14 +54,13 @@ export default class ModelClass
         
             // no import settings, nothing to load
             
-        if (this.importSettings==null) return(true);
+        if (this.json==null) return(true);
         
             // the model
             
         importModel=new ImportModelClass(this.core,this);
-        if (!(await importModel.load(this.importSettings))) return(false);
+        if (!(await importModel.load(this.json))) return(false);
 
-        this.scale.setFromValues(this.importSettings.scale,this.importSettings.scale,this.importSettings.scale);
         this.setupBuffers();
         
         this.loaded=true;

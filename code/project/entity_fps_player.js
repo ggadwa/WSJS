@@ -255,6 +255,11 @@ export default class EntityFPSPlayerClass extends ProjectEntityClass
             
         this.inStandingAnimation=true;
         this.setCurrentAnimation();
+        
+            // move to random node
+            // if multiplayer
+            
+        if (this.core.isMultiplayer) this.moveToRandomNode();
     }
     
         //
@@ -353,6 +358,7 @@ export default class EntityFPSPlayerClass extends ProjectEntityClass
             // dead?
         
         if (this.health<=0) {
+            console.info('DEAD');
             this.respawnTick=this.core.timestamp+this.respawnWaitTick;
             this.passThrough=true;
             this.core.soundList.playJson(this,null,this.dieSound);

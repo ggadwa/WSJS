@@ -13,10 +13,10 @@ import ModelSkeletonClass from '../model/model_skeleton.js';
 
 export default class ImportGLTFClass
 {
-    constructor(core,importSettings)
+    constructor(core,json)
     {
         this.core=core;
-        this.importSettings=importSettings;
+        this.json=json;
         
         this.jsonData=null;
         this.binData=null;
@@ -31,7 +31,7 @@ export default class ImportGLTFClass
     async loadGLTFJson()
     {
         let resp;
-        let url='../models/'+this.importSettings.name+'/scene.gltf';
+        let url='../models/'+this.json.name+'/scene.gltf';
         
         try {
             resp=await fetch(url);
@@ -46,7 +46,7 @@ export default class ImportGLTFClass
     async loadGLTFBin()
     {
         let resp;
-        let url='../models/'+this.importSettings.name+'/'+this.jsonData.buffers[0].uri;     // right now assume a single buffer, this isn't necessarly true though TODO on this
+        let url='../models/'+this.json.name+'/'+this.jsonData.buffers[0].uri;     // right now assume a single buffer, this isn't necessarly true though TODO on this
         
         try {
             resp=await fetch(url);
@@ -518,7 +518,7 @@ export default class ImportGLTFClass
                 joints=skin.joints;
 
                 if (joints.length>this.core.MAX_SKELETON_JOINT) {
-                    console.log('too many joints in skeleton ('+joints.length+' out of '+this.core.MAX_SKELETON_JOINT+' in model '+this.importSettings.name);
+                    console.log('too many joints in skeleton ('+joints.length+' out of '+this.core.MAX_SKELETON_JOINT+' in model '+this.json.name);
                     return(false);
                 }
 
@@ -551,7 +551,7 @@ export default class ImportGLTFClass
         let specularURL=null;
         let specularFactor=null;
         let scale=null;
-        let prefixURL='models/'+this.importSettings.name+'/';
+        let prefixURL='models/'+this.json.name+'/';
         let materialNode=this.jsonData.materials[primitiveNode.material];
         
             // first find any normal texture
@@ -643,16 +643,16 @@ export default class ImportGLTFClass
                 bitmap=this.core.bitmapList.addColor(colorBase);        // this is meant as a fallback, games should use real PBR materials
             }
             else {
-                console.log('Could not find texture for mesh '+meshNode.name+' in material '+materialNode.name+' in '+this.importSettings.name);
+                console.log('Could not find texture for mesh '+meshNode.name+' in material '+materialNode.name+' in '+this.json.name);
                 return(null);
             }
         }
         
             // any glow subsitutions?
         
-        if (this.importSettings.glows!==undefined) {
-            for (n=0;n!==this.importSettings.glows.length;n++) {
-                glowDef=this.importSettings.glows[n];
+        if (this.json.glows!==undefined) {
+            for (n=0;n!==this.json.glows.length;n++) {
+                glowDef=this.json.glows[n];
                 
                 if (bitmap.simpleName===glowDef.bitmap) {
                     bitmap.glowURL=glowDef.url;
@@ -690,7 +690,7 @@ export default class ImportGLTFClass
             // get rebuild if tangents in file are wrong
             
         forceTangentRebuild=false;
-        if (this.importSettings.forceTangentRebuild!==undefined) forceTangentRebuild=this.importSettings.forceTangentRebuild;
+        if (this.json.forceTangentRebuild!==undefined) forceTangentRebuild=this.json.forceTangentRebuild;
         
             // run through the meshes
             
@@ -701,8 +701,8 @@ export default class ImportGLTFClass
             
                 // mesh skipping
                
-            if (this.importSettings.meshSkip!==undefined) {
-                if (this.importSettings.meshSkip.includes(meshNode.name)) continue;
+            if (this.json.meshSkip!==undefined) {
+                if (this.json.meshSkip.includes(meshNode.name)) continue;
             }
             
                 // always store a matrix for each mesh
@@ -735,12 +735,12 @@ export default class ImportGLTFClass
                 
                     // is it in the skip list?
                     
-                if (this.importSettings.meshSkipMeshes!==undefined) {
-                    if (this.importSettings.meshSkipMeshes.indexOf(meshNode.name)!==-1) continue;
+                if (this.json.meshSkipMeshes!==undefined) {
+                    if (this.json.meshSkipMeshes.indexOf(meshNode.name)!==-1) continue;
                 }
                     
-                if (this.importSettings.meshSkipBitmaps!==undefined) {
-                    if (this.importSettings.meshSkipBitmaps.indexOf(bitmap.simpleName)!==-1) continue;
+                if (this.json.meshSkipBitmaps!==undefined) {
+                    if (this.json.meshSkipBitmaps.indexOf(bitmap.simpleName)!==-1) continue;
                 }
                 
                     // get all the arrays
