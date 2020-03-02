@@ -32,7 +32,7 @@ export default class EntityFPSMonsterClass extends ProjectEntityClass
         this.projectileFireTick=0;
         this.nextProjectileTick=0;
         this.projectileStartTick=-1;
-        this.projectileClass=null;
+        this.projectileJson=null;
         this.projectileData=null;
         this.projectileRequiresSight=true;
         this.maxTurnSpeed=0;
@@ -62,7 +62,9 @@ export default class EntityFPSMonsterClass extends ProjectEntityClass
         this.liquidInSound=null;
         this.liquidOutSound=null;
         this.fallSound=null;
-        this.fallSoundWaitCount=0;
+        this.fallSoundWaitTick=0;
+        
+        this.fallSoundNextTick=0;
         
         this.lastInLiquid=false;
         
@@ -86,10 +88,19 @@ export default class EntityFPSMonsterClass extends ProjectEntityClass
         this.startHealth=this.core.game.lookupValue(this.json.config.startHealth,this.data);
         this.wakeUpDistance=this.core.game.lookupValue(this.json.config.wakeUpDistance,this.data);
         this.fallAsleepDistance=this.core.game.lookupValue(this.json.config.fallAsleepDistance,this.data);
+        
         this.meleeDistance=this.core.game.lookupValue(this.json.config.meleeDistance,this.data);
         this.meleeWaitTick=this.core.game.lookupValue(this.json.config.meleeWaitTick,this.data);
         this.meleeDamageTick=this.core.game.lookupValue(this.json.config.meleeDamageTick,this.data);
         this.meleeDamage=this.core.game.lookupValue(this.json.config.meleeDamage,this.data);
+        
+        this.projectileDistance=this.core.game.lookupValue(this.json.config.projectileDistance,this.data);
+        this.projectileWaitTick=this.core.game.lookupValue(this.json.config.projectileWaitTick,this.data);
+        this.projectileFireTick=this.core.game.lookupValue(this.json.config.projectileFireTick,this.data);
+        this.projectileJson=this.json.config.projectileJson;
+        this.projectileData=this.json.config.projectileData;
+        this.projectileRequiresSight=this.core.game.lookupValue(this.json.config.projectileRequiresSight,this.data);
+        
         this.maxTurnSpeed=this.core.game.lookupValue(this.json.config.maxTurnSpeed,this.data);
         this.forwardAcceleration=this.core.game.lookupValue(this.json.config.forwardAcceleration,this.data);
         this.forwardMaxSpeed=this.core.game.lookupValue(this.json.config.forwardMaxSpeed,this.data);
@@ -113,11 +124,11 @@ export default class EntityFPSMonsterClass extends ProjectEntityClass
         this.liquidInSound=this.json.config.liquidInSound;
         this.liquidOutSound=this.json.config.liquidOutSound;
         this.fallSound=this.json.config.fallSound;
-        this.fallSoundWaitCount=this.core.game.lookupValue(this.json.config.fallSoundWaitCount,this.data);
-            
-            // non-gc stuff
+        this.fallSoundWaitTick=this.core.game.lookupValue(this.json.config.fallSoundWaitTick,this.data);
         
-        
+        this.trapMeshName=this.json.config.trapMeshName;
+        this.trapMeshShrink=this.json.config.trapMeshShrink;
+
         return(true);
     }
     
@@ -160,20 +171,18 @@ export default class EntityFPSMonsterClass extends ProjectEntityClass
     
     wakeUp()
     {
-        let timestamp=this.getTimestamp();
-        
         this.awoke=true;
         this.movement.setFromValues(0,0,0);
         
-        this.nextProjectileTick=timestamp;
+        this.nextProjectileTick=this.core.timestamp;
         this.projectileStartTick=-1;
         
-        this.nextMeleeTick=timestamp;
+        this.nextMeleeTick=this.core.timestamp;
         this.meleeStartTick=-1;
         
-        this.nextJumpTick=timestamp+this.jumpWaitTick;
+        this.nextJumpTick=this.core.timestamp+this.jumpWaitTick;
         
-        this.nextDamageTick=timestamp;
+        this.nextDamageTick=this.core.timestamp;
         
         this.core.soundList.playJson(this,null,this.wakeUpSound);
         this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.walkAnimation[0],this.walkAnimation[1]);
@@ -190,8 +199,6 @@ export default class EntityFPSMonsterClass extends ProjectEntityClass
     
     damage(fromEntity,damage,hitPoint)
     {
-        let timestamp;
-        
         if (this.dead) return;
         
         this.health-=damage;
@@ -200,9 +207,8 @@ export default class EntityFPSMonsterClass extends ProjectEntityClass
             // just damage
             
         if (this.health>0) {
-            timestamp=this.getTimestamp();
-            if (timestamp>this.nextDamageTick) {
-                this.nextDamageTick=timestamp+this.damageFlinchWaitTick;
+            if (this.core.timestamp>this.nextDamageTick) {
+                this.nextDamageTick=this.core.timestamp+this.damageFlinchWaitTick;
 
                 this.core.soundList.playJson(this,null,this.hurtSound);
                 this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.hitAnimation[0],this.hitAnimation[1]);
@@ -219,6 +225,8 @@ export default class EntityFPSMonsterClass extends ProjectEntityClass
         this.queueAnimationStop();
         
         this.core.soundList.playJson(this,null,this.deathSound);
+        
+        this.fallSoundNextTick=this.core.timestamp+this.fallSoundWaitTick;
     }
     
     jump()
@@ -229,11 +237,11 @@ export default class EntityFPSMonsterClass extends ProjectEntityClass
         this.core.soundList.playJson(this,null,this.wakeUpSound);
     }
     
-    meleeStart(distToPlayer,timestamp)
+    meleeStart(distToPlayer)
     {
-        if ((distToPlayer>this.meleeDistance) || (timestamp<this.nextMeleeTick)) return;
+        if ((distToPlayer>this.meleeDistance) || (this.core.timestamp<this.nextMeleeTick)) return;
         
-        this.nextMeleeTick=this.getTimestamp()+this.meleeWaitTick;
+        this.nextMeleeTick=this.core.timestamp+this.meleeWaitTick;
         
             // melee animation
             
@@ -247,7 +255,7 @@ export default class EntityFPSMonsterClass extends ProjectEntityClass
         
             // pause to start actual melee
             
-        this.meleeStartTick=this.getTimestamp()+this.meleeDamageTick;
+        this.meleeStartTick=this.core.timestamp+this.meleeDamageTick;
     }
     
     meleeHit(player)
@@ -270,9 +278,9 @@ export default class EntityFPSMonsterClass extends ProjectEntityClass
         this.fireAngle.x=this.position.getLookAngleTo(player.position);
     }
     
-    projectileStart(player,distToPlayer,timestamp)
+    projectileStart(player,distToPlayer)
     {
-        if ((distToPlayer<this.projectileDistance) || (timestamp<this.nextProjectileTick)) return;
+        if ((distToPlayer>this.projectileDistance) || (this.core.timestamp<this.nextProjectileTick)) return;
         
             // does it sight the player?
             
@@ -289,7 +297,7 @@ export default class EntityFPSMonsterClass extends ProjectEntityClass
         
             // we can fire
             
-        this.nextProjectileTick=this.getTimestamp()+this.projectileWaitTick;
+        this.nextProjectileTick=this.core.timestamp+this.projectileWaitTick;
 
             // fire animaton
             
@@ -298,18 +306,22 @@ export default class EntityFPSMonsterClass extends ProjectEntityClass
         
             // pause for fire animation
             
-        this.projectileStartTick=this.getTimestamp()+this.projectileFireTick;
+        this.projectileStartTick=this.core.timestamp+this.projectileFireTick;
     }
     
     projectileFire(player)
     {
+        let projEntity;
+        
         this.projectileSetupFire(player);
-        this.addEntityFromEntity(this,this.projectileClass,'monster_projectile',this.firePosition,this.fireAngle,this.projectileData,true,false);
+        
+        projEntity=this.addEntity(this,this.projectileJson,('projectile_'+this.name),this.firePosition,this.fireAngle,this.projectileData,true,false);
+        if (projEntity!==null) projEntity.ready();
     }
     
     run()
     {
-        let timestamp,angleDif;
+        let angleDif;
         let player,distToPlayer,liquidIdx;
         
             // if dead, only fall and play
@@ -317,10 +329,10 @@ export default class EntityFPSMonsterClass extends ProjectEntityClass
             
         if (this.dead) {
             
-            if (this.fallSound!==null) {
-                if (this.fallSoundWaitCount>0) {
-                    this.fallSoundWaitCount--;
-                    if (this.fallSoundWaitCount===0) this.core.soundList.playJson(this,null,this.fallSound);
+            if ((this.fallSound!==null) && (this.fallSoundNextTick!==0)) {
+                if (this.core.timestamp>this.fallSoundNextTick) {
+                    this.core.soundList.playJson(this,null,this.fallSound);
+                    this.fallSoundNextTick=0;
                 }
             }
             
@@ -329,10 +341,8 @@ export default class EntityFPSMonsterClass extends ProjectEntityClass
             return;
         }
         
-            // get player and timestamp
+            // get player
             
-        timestamp=this.getTimestamp();
-        
         player=this.getPlayerEntity();
         distToPlayer=this.position.distance(player.position);
         
@@ -340,7 +350,7 @@ export default class EntityFPSMonsterClass extends ProjectEntityClass
             // wait to fire
             
         if (this.projectileStartTick!==-1) {
-            if (timestamp>this.projectileStartTick) {
+            if (this.core.timestamp>this.projectileStartTick) {
                 this.projectileStartTick=-1;
                 this.projectileFire(player);
             }
@@ -350,7 +360,7 @@ export default class EntityFPSMonsterClass extends ProjectEntityClass
             // wait for damage
             
         if (this.meleeStartTick!==-1) {
-            if (timestamp>this.meleeStartTick) {
+            if (this.core.timestamp>this.meleeStartTick) {
                 this.meleeStartTick=-1;
                 if (distToPlayer<this.meleeDistance) this.meleeHit(player);
             }
@@ -393,26 +403,28 @@ export default class EntityFPSMonsterClass extends ProjectEntityClass
         
             // projectiles and melee starts
         
-        if ((this.projectileClass!=null) && (Math.abs(angleDif)<=this.angleYProjectileRange)) this.projectileStart(player,distToPlayer,timestamp);
-        if (Math.abs(angleDif)<=this.angleYMeleeRange) this.meleeStart(distToPlayer,timestamp);
+        if ((this.projectileJson!=null) && (Math.abs(angleDif)<=this.angleYProjectileRange)) this.projectileStart(player,distToPlayer);
+        if (Math.abs(angleDif)<=this.angleYMeleeRange) this.meleeStart(distToPlayer);
         
             // time to jump?
             
         if (this.jumpHeight!==0) {
-            if (timestamp>this.nextJumpTick) {
-                this.nextJumpTick=timestamp+this.jumpWaitTick;
+            if (this.core.timestamp>this.nextJumpTick) {
+                this.nextJumpTick=this.core.timestamp+this.jumpWaitTick;
                 this.jump();
             }
         }
         
-            // chase player
+            // chase player (don't move if in flinch)
 
-        this.movement.moveZWithAcceleration(true,false,this.forwardAcceleration,0,this.forwardMaxSpeed,this.forwardAcceleration,0,this.forwardMaxSpeed);        
-        this.rotMovement.setFromPoint(this.movement);
-        this.rotMovement.rotateY(null,this.angle.y);
-        
-        this.movement.y=this.moveInMapY(this.rotMovement,false);
-        this.moveInMapXZ(this.rotMovement,true,true);
+        if (this.core.timestamp>this.nextDamageTick) {
+            this.movement.moveZWithAcceleration(true,false,this.forwardAcceleration,0,this.forwardMaxSpeed,this.forwardAcceleration,0,this.forwardMaxSpeed);        
+            this.rotMovement.setFromPoint(this.movement);
+            this.rotMovement.rotateY(null,this.angle.y);
+
+            this.movement.y=this.moveInMapY(this.rotMovement,false);
+            this.moveInMapXZ(this.rotMovement,true,true);
+        }
         
             // any bounding?
             

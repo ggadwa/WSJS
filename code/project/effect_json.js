@@ -658,8 +658,26 @@ export default class EffectJsonClass
             // get the last frame and within cycle tick
             
         lastTick=chunk.frames[frameCount-1].tick;
-        
         tick=((this.core.timestamp-this.startTimestamp)%lastTick);
+        
+            // if there is a life tick and we are equal
+            // or over, just pick the last frame
+            
+        if (this.json.lifeTick!==undefined) {
+            if ((this.core.timestamp-this.startTimestamp)>=this.json.lifeTick) {
+                startFrame=chunk.frames[frameCount-1];
+                if (startFrame.spread!==undefined) chunk.spread=startFrame.spread;
+                if (startFrame.width!==undefined) chunk.width=startFrame.width;
+                if (startFrame.height!==undefined) chunk.height=startFrame.height;
+                if (startFrame.rotate!==undefined) chunk.rotate=startFrame.rotate;
+
+                chunk.alpha=startFrame.alpha;
+                chunk.color.r=startFrame.color.r;
+                chunk.color.g=startFrame.color.g;
+                chunk.color.b=startFrame.color.b;
+                return;
+            }
+        }
         
             // find the tween points
             

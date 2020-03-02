@@ -6,7 +6,11 @@
 
 
 NEW BLOCK STUFF
-     - change weapon fire stuff to primary/secondary blocks (working on)
+     - maps as json
+     - monsters better at navigating around corners (try to move X only or Z only if stuck)
+
+     - get rid of project_map/game_json extra stuff like ready() etc
+
      - kart mines is weapon/projectile
      - eventually delete most stuff out of project_entity, do direct calls
      - project_entity -> entity_base

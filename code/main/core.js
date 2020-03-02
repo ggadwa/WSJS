@@ -331,11 +331,12 @@ export default class CoreClass
         
     setTrigger(triggerName)
     {
-        this.triggers.set(triggerName,true);
+        if (triggerName!==null) this.triggers.set(triggerName,true);
     }
     
-    clearTrigger(triggerName) {
-        this.triggers.set(triggerName,false);
+    clearTrigger(triggerName)
+    {
+        if (triggerName!==null) this.triggers.set(triggerName,false);
     }
     
     checkTrigger(triggerName)

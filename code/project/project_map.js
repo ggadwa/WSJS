@@ -116,5 +116,23 @@ export default class ProjectMapClass
      */
     ready()
     {
+        let camera;
+        this.json=this.getImportSettings();
+        
+            // setup camera
+            
+        camera=this.core.camera;
+
+        switch (camera.CAMERA_MODE_LIST.indexOf(this.json.camera.mode)) {
+            case camera.CAMERA_MODE_FIRST_PERSON:
+                camera.gotoFirstPerson();
+                break;
+            case camera.CAMERA_MODE_THIRD_PERSON_BEHIND:
+                camera.gotoThirdPersonBehind(this.json.camera.thirdPersonDistance,this.json.camera.thirdPersonLookDegree);
+                break;
+        }
+
+        camera.setViewDistance(this.json.camera.viewNearZ,this.json.camera.viewFarZ);
+        
     }
 }

@@ -299,27 +299,27 @@ export default class EntityFPSPlayerClass extends ProjectEntityClass
         }
     }
     
-    addAmmo(weaponName,fireMethod,value)
+    addAmmo(weaponName,fireMethod,count)
     {
         let weapon=this.findWeaponByName(weaponName);
         if (weapon===null) return;
         
-        weapon.addAmmo(fireMethod,value);
+        weapon.addAmmo(fireMethod,count);
     }
     
-    addHealth(value)
+    addHealth(count)
     {
         if (this.interfaceHealthIcon!==null) this.core.interface.pulseElement(this.interfaceHealthIcon,500,10);
         
-        this.health+=value;
+        this.health+=count;
         if (this.health>this.healthMaxCount) this.health=this.healthMaxCount;
     }
     
-    addArmor(value)
+    addArmor(count)
     {
         if (this.interfaceArmorIcon!==null) this.core.interface.pulseElement(this.interfaceArmorIcon,500,10);
         
-        this.armor+=value;
+        this.armor+=count;
         if (this.armor>this.armorMaxCount) this.armor=this.armorMaxCount;
     }
     

@@ -9,6 +9,10 @@ export default class EntityProjectileClass extends ProjectEntityClass
         
         this.lifeTimestamp=0;
         this.speed=0;
+        this.hitDamage=0;
+        
+        this.floats=false;
+        this.followsFloor=false;
         this.spinY=false;
         this.spinRate=0;
         this.tumbles=false;
@@ -20,7 +24,12 @@ export default class EntityProjectileClass extends ProjectEntityClass
         this.bounceFactor=0;
         this.bounceSound=null;
         this.reflectSound=null;
+        this.spawnSound=null;
+        
         this.hitEffect=null;
+        
+        this.trailEffect=null;
+        this.trailSpawnTick=null;
         
         this.rolling=false;
         this.stopped=false;
@@ -38,6 +47,10 @@ export default class EntityProjectileClass extends ProjectEntityClass
         
         this.lifeTimestamp=this.core.timestamp+this.core.game.lookupValue(this.json.config.lifeTick,this.data);
         this.speed=this.core.game.lookupValue(this.json.config.speed,this.data);
+        this.hitDamage=this.core.game.lookupValue(this.json.config.damage,this.data);
+        
+        this.floats=this.core.game.lookupValue(this.json.config.floats,this.data);
+        this.followsFloor=this.core.game.lookupValue(this.json.config.followsFloor,this.data);
         this.spinY=this.core.game.lookupValue(this.json.config.spinY,this.data);
         this.spinRate=this.core.game.lookupValue(this.json.config.spinRate,this.data);
         this.tumbles=this.core.game.lookupValue(this.json.config.tumbles,this.data);
@@ -49,8 +62,12 @@ export default class EntityProjectileClass extends ProjectEntityClass
         this.bounceFactor=this.core.game.lookupValue(this.json.config.bounceFactor,this.data);
         this.bounceSound=this.json.config.bounceSound;
         this.reflectSound=this.json.config.reflectSound;
+        this.spawnSound=this.json.config.spawnSound;
 
         this.hitEffect=this.core.game.lookupValue(this.json.config.hitEffect,this.data);
+        
+        this.trailEffect=this.core.game.lookupValue(this.json.config.trailEffect,this.data);
+        this.trailSpawnTick=this.core.game.lookupValue(this.json.config.trailSpawnTick,this.data);
         
         return(true);
     }
@@ -64,6 +81,10 @@ export default class EntityProjectileClass extends ProjectEntityClass
         
         this.motion.setFromValues(0,0,this.speed);
         this.motion.rotate(this.angle);
+        
+        if (this.spawnSound!==null) this.core.soundList.playJson(this,null,this.spawnSound);
+        
+        this.nextTrailTick=this.core.timestamp;
     }
     
     finish()
@@ -82,9 +103,15 @@ export default class EntityProjectileClass extends ProjectEntityClass
             parentEntity=parentEntity.heldBy;
         }
         
+            // contact damage
+            
+        if (this.touchEntity!==null) {
+            if (this.hitDamage!==0) this.touchEntity.damage(parentEntity,this.hitDamage,this.position);
+        }
+        
             // any effect
             
-        if (this.hitEffect!=='') this.addEffect(parentEntity,this.hitEffect,this.position,null,true);
+        if (this.hitEffect!==null) this.addEffect(parentEntity,this.hitEffect,this.position,null,true);
     }
         
     run()
@@ -96,6 +123,16 @@ export default class EntityProjectileClass extends ProjectEntityClass
         if (this.lifeTimestamp<this.core.timestamp) {
             this.finish();
             return;
+        }
+        
+            // trails
+
+        if (this.trailEffect!==null) {
+            if (this.core.timestamp>=this.nextTrailTick) {
+                this.nextTrailTick+=this.trailSpawnTick;
+
+                this.addEffect(this,this.trailEffect,this.position,null,true);
+            }
         }
         
             // rolling slows down grenade
@@ -116,7 +153,7 @@ export default class EntityProjectileClass extends ProjectEntityClass
         this.savePoint.setFromPoint(this.position);
         
         if (!this.stopped) this.moveInMapXZ(this.motion,false,false);
-        this.moveInMapY(this.motion,false);
+        this.moveInMapY(this.motion,this.floats);
        
             // hitting floor
             // we can either start rolling, stop, or finish
@@ -183,6 +220,27 @@ export default class EntityProjectileClass extends ProjectEntityClass
             else {
                 this.motion.setFromValues(0,0,0);
             }
+            return;
+        }
+        
+            // touching object
+            
+        if (this.touchEntity!==null) {
+            if (this.stopOnHit) {
+                this.finish();
+                return;
+            }
+            
+            if (!this.stopped) {
+                this.core.soundList.playJson(this,null,this.reflectSound);
+
+                this.position.setFromPoint(this.savePoint);
+                this.motion.x=0;
+                this.motion.z=0;
+                
+                this.stopped=true;
+            }
+
             return;
         }
     }

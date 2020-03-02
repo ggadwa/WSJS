@@ -24,6 +24,8 @@ class EntityWeaponFireClass
         this.distance=this.core.game.lookupValue(fireObj.distance,weapon.data);
         this.hitEffect=this.core.game.lookupValue(fireObj.hitEffect,weapon.data);
         
+        this.projectileJson=fireObj.projectileJson;
+        
         this.sound=fireObj.sound;
         this.animation=fireObj.animation;
         
@@ -37,17 +39,16 @@ class EntityWeaponFireClass
         this.lastFireTimestamp=0;
     }
     
-    addAmmo(value)
+    addAmmo(count)
     {
         if (this.interfaceAmmoIcon!==null) this.core.interface.pulseElement(this.interfaceAmmoIcon,500,10);
         
-        this.ammo+=value;
+        this.ammo+=count;
         if (this.ammo>this.ammoMaxCount) this.ammo=this.ammoMaxCount;
     }
     
     updateUI()
-    {
-                
+    {   
         if (this.interfaceAmmoText!==null) this.core.interface.updateText(this.interfaceAmmoText,this.ammo);
         if (this.interfaceAmmoCount!==null) this.core.interface.setCount(this.interfaceAmmoCount,this.ammo);
     }
@@ -139,17 +140,17 @@ export default class EntityWeaponClass extends ProjectEntityClass
         // ammo
         //
         
-    addAmmo(fireMethod,value)
+    addAmmo(fireMethod,count)
     {
         switch (fireMethod) {
             case 'primary':
-                if (this.primary!==null) this.primary.addAmmo(value);
+                if (this.primary!==null) this.primary.addAmmo(count);
                 break;
             case 'secondary':
-                if (this.secondary!==null) this.secondary.addAmmo(value);
+                if (this.secondary!==null) this.secondary.addAmmo(count);
                 break;
             case 'tertiary':
-                if (this.tertiary!==null) this.tertiary.addAmmo(value);
+                if (this.tertiary!==null) this.tertiary.addAmmo(count);
                 break;
         }
     }
@@ -210,7 +211,7 @@ export default class EntityWeaponClass extends ProjectEntityClass
             // spawn from whatever is holding this weapon
             // so it counts as the spawnBy for any damage calculations, etc
 
-        projEntity=this.addEntity(parentEntity,fire.json,('projectile_'+this.name),this.firePoint,parentEntity.angle,null,true,false);
+        projEntity=this.addEntity(parentEntity,fire.projectileJson,('projectile_'+this.name),this.firePoint,parentEntity.angle,null,true,false);
         if (projEntity!==null) projEntity.ready();
     }
     
@@ -253,7 +254,7 @@ export default class EntityWeaponClass extends ProjectEntityClass
         
             // and the fire method
             
-        switch (this.fireType) {
+        switch (fire.type) {
             case this.FIRE_TYPE_HIT_SCAN:
                 this.hitScan(parentEntity,fire);
                 return;
