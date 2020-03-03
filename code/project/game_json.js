@@ -1,3 +1,4 @@
+import PointClass from '../utility/point.js';
 import ColorClass from '../utility/color.js';
 
 export default class GameJsonClass

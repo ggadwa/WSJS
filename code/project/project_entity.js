@@ -43,8 +43,16 @@ export default class ProjectEntityClass
         this.radius=1;
         this.height=1;
         this.scale=new PointClass(1,1,1);
-        this.position=position.copy();
-        this.angle=angle.copy();
+        
+        if (position!==null) {
+            this.position=position.copy();
+            this.angle=angle.copy();
+        }
+        else {
+            this.position=new PointClass(0,0,0);
+            this.angle=new PointClass(0,0,0);
+            this.moveToRandomNode(true);
+        }
         this.data=data;
         
         this.show=true;
@@ -658,15 +666,49 @@ export default class ProjectEntityClass
         this.position.setFromPoint(this.core.map.path.nodes[nodeIdx].position);
     }
     
-    moveToRandomNode()
+    moveToRandomNode(avoidTelefrag)
     {
+        let node;
         let nodes=this.core.map.path.nodes;
-        let idx;
+        let idx,origIdx,hitEntity;
         
+            // random node
+            
         idx=Math.trunc(nodes.length*Math.random());
-        this.position.setFromPoint(nodes[idx].position);
 
-        //if (this.collision.checkEntityCollision(this)===null) return; // telefrag
+            // check for collisions
+            
+        origIdx=idx;
+        
+        while (true) {
+            node=nodes[idx];
+            
+                // set the position
+                
+            this.position.setFromPoint(node.position);
+            
+            this.angle.setFromValues(0,0,0);
+            if (node.links.length>0) this.angle.y=this.position.angleYTo(nodes[node.links[0]].position);
+            
+                // check for hitting other entities
+                
+            hitEntity=this.collision.checkEntityCollision(this);
+            if (hitEntity===null) return;
+            
+                // telefrag
+                
+            if (!avoidTelefrag) {
+                hitEntity.telefrag(this);
+                return;
+            }
+            
+                // find a different spot
+                
+            idx++;
+            if (idx>=nodes.length) idx=0;
+            
+            if (idx===origIdx) return;      // ran out of spots, nothing we can do
+        }
     }
     
     getRandomKeyNodeIndex()
@@ -1563,6 +1605,10 @@ export default class ProjectEntityClass
      * @param {PointClass} hitPoint The hit position (in world space)
      */    
     damage(fromEntity,damage,hitPoint)
+    {
+    }
+    
+    telefrag(fromEntity)
     {
     }
     

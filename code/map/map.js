@@ -137,6 +137,13 @@ export default class MapClass
         }
 
         camera.setViewDistance(this.json.camera.viewNearZ,this.json.camera.viewFarZ);
+        
+            // bump and gravity
+            
+        this.core.map.bumpHeight=this.json.bumpHeight;
+        this.core.map.gravityMinValue=this.json.gravity.min;
+        this.core.map.gravityMaxValue=this.json.gravity.max;
+        this.core.map.gravityAcceleration=this.json.gravity.acceleration;
     }
     
 }

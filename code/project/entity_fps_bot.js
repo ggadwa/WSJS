@@ -188,7 +188,7 @@ export default class EntityFPSBotClass extends ProjectEntityClass
         
             // move to random node
             
-        this.moveToRandomNode();
+        this.moveToRandomNode(false);
 
             // get seek node
             

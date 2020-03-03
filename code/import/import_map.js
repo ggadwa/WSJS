@@ -35,13 +35,6 @@ export default class ImportMapClass
         importMesh=new ImportGLTFClass(this.core,json);
         if (!(await importMesh.import(this.core.map.meshList,null))) return(false);
         
-            // some misc setup
-            
-        this.core.map.bumpHeight=json.bumpHeight;
-        this.core.map.gravityMinValue=json.gravity.min;
-        this.core.map.gravityMaxValue=json.gravity.max;
-        this.core.map.gravityAcceleration=json.gravity.acceleration;
-        
             // maps don't have rigging, so we need to recalculate
             // all the node matrixes and TRS and then scale to
             // the size we want (animations cover that for rigged

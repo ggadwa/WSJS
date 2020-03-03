@@ -324,6 +324,8 @@ export default class EntityFPSMonsterClass extends ProjectEntityClass
         let angleDif;
         let player,distToPlayer,liquidIdx;
         
+        return;     // testing
+        
             // if dead, only fall and play
             // and fall sound
             

@@ -439,7 +439,7 @@ export default class CollisionClass
         let n,k,i,y,nCollisionTrig;
         let mesh,collisionTrig;
         let nEntity,checkEntity,entityTop,entityBot,checkEntityTop;
-
+        
             // the rough collide boxes
             // FLOOR_RISE_HEIGHT is the farthest
             // we can move up and down a floor segment
@@ -474,7 +474,7 @@ export default class CollisionClass
             mesh=this.core.map.meshList.meshes[n];
 
                 // skip any mesh we don't collide with
-
+                
             if (!mesh.boxBoundCollision(this.objXBound,this.objYBound,this.objZBound)) continue;
 
                 // check the collide triangles
@@ -504,7 +504,7 @@ export default class CollisionClass
         
             // run through colliding entities
             // unless we are currently in passthrough
-            
+    
         if (!entity.passThrough) {
             nEntity=this.core.map.entityList.entities.length;
 
@@ -534,7 +534,7 @@ export default class CollisionClass
                 }
             }
         }
-        
+
             // get how far we've fallen (negative, y is up)
 
         if ((entity.standOnMeshIdx!==-1) || (entity.standOnEntity!==null)) return(y-entity.position.y);
