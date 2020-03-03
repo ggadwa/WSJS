@@ -53,7 +53,7 @@ class MainClass
 
     async initGame()
     {
-        let startMap;
+        let startMap,mapJson;
         
             // initialize the game
             
@@ -63,8 +63,10 @@ class MainClass
           // initialize the map
           
         startMap=this.core.game.lookupValue(this.core.game.json.startMap,this.data);
+        mapJson=this.core.game.getCachedJson(startMap);
+        if (mapJson===null) return;
         
-        this.core.map=new MapClass(this.core,this.core.game.getCachedJson(startMap));
+        this.core.map=new MapClass(this.core,mapJson);
         if (!this.core.map.initialize()) return;
         
             // finish the core loading
