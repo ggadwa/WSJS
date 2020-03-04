@@ -175,7 +175,7 @@ export default class MapEntityListClass
     loadMapEntities()
     {
         let entityList=this.core.map.json.entities;
-        let n,entityDef;
+        let n,nameIdx,entityDef;
         let entity,entityName,entityPosition,entityAngle,entityData;
 
             // at least a player entity is required
@@ -191,20 +191,8 @@ export default class MapEntityListClass
             entityDef=entityList[n];
             
             entityName=(entityDef.name===undefined)?'':entityDef.name;
-            
-            if (entityDef.position!==undefined) {
-                entityPosition=new PointClass(entityDef.position.x,entityDef.position.y,entityDef.position.z);
-            }
-            else {
-                entityPosition=new PointClass(0,0,0);
-            }
-            if (entityDef.angle!==undefined) {
-                entityAngle=new PointClass(entityDef.angle.x,entityDef.angle.y,entityDef.angle.z);
-            }
-            else {
-                entityAngle=new PointClass(0,0,0);
-            }
-            
+            entityPosition=new PointClass(entityDef.position.x,entityDef.position.y,entityDef.position.z);
+            entityAngle=new PointClass(entityDef.angle.x,entityDef.angle.y,entityDef.angle.z);
             entityData=(entityDef.data===undefined)?null:entityDef.data;
             
                 // mark if the player
@@ -215,6 +203,10 @@ export default class MapEntityListClass
                 
             entity=this.add(null,entityDef.json,entityName,entityPosition,entityAngle,entityData,true,false);
             if (entity===null) return(false);
+            
+                // random positions
+                
+            if (entityDef.randomStart) entity.moveToRandomNode(false);
         }
         
             // player is required
@@ -229,7 +221,8 @@ export default class MapEntityListClass
         if (!((this.core.isMultiplayer) && (this.core.setup.localGame))) return(true);
 
         for (n=0;n!==this.core.setup.botCount;n++) {
-            entity=this.add(null,this.core.game.json.bot.json,this.core.game.json.bot.names[n],new PointClass(0,0,0),new PointClass(0,0,0),null,true,false);
+            nameIdx=n%this.core.game.json.bot.names.length;
+            entity=this.add(null,this.core.game.json.bot.json,this.core.game.json.bot.names[nameIdx],new PointClass(0,0,0),new PointClass(0,0,0),null,true,false);
             if (entity===null) return(false);
         }
 

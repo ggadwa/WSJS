@@ -109,10 +109,10 @@ class EffectChunkClass
 }
 
 //
-// json entity class
+// effect class
 //
 
-export default class EffectJsonClass
+export default class EffectClass
 {
     constructor(core,spawnedBy,jsonName,position,data,show)
     {

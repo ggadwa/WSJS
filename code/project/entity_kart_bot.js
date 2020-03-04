@@ -1,7 +1,7 @@
 import PointClass from '../utility/point.js';
-import ProjectEntityClass from '../project/project_entity.js';
+import EntityClass from '../project/entity.js';
 
-export default class EntityKartBotClass extends ProjectEntityClass
+export default class EntityKartBotClass extends EntityClass
 {
     constructor(core,name,json,position,angle,data)
     {

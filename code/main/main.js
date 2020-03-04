@@ -1,6 +1,6 @@
 import PointClass from '../utility/point.js';
 import CoreClass from '../main/core.js';
-import GameJsonClass from '../project/game_json.js';
+import GameClass from '../project/game.js';
 import MapClass from '../map/map.js';
 
 //
@@ -57,7 +57,7 @@ class MainClass
         
             // initialize the game
             
-        this.core.game=new GameJsonClass(this.core,this.data);
+        this.core.game=new GameClass(this.core,this.data);
         if (!(await this.core.game.initialize())) return;
         
           // initialize the map

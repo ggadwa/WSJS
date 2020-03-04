@@ -1,18 +1,11 @@
 import PointClass from '../utility/point.js';
 import BoundClass from '../utility/bound.js';
 import CoreClass from '../main/core.js';
-import ProjectEntityClass from '../project/project_entity.js';
+import EntityClass from '../project/entity.js';
 import ModelClass from '../model/model.js';
 import ImportModelClass from '../import/import_model.js';
 import MapPathNodeClass from '../map/map_path_node.js';
 
-/**
- * Default class for remote entities, entities that represent
- * a network player on another client.
- * 
- * @hideconstructor
- * @extends ProjectEntityClass
- */
 export default class ProjectEntityRemoteClass
 {
     constructor(core,remoteId,name)

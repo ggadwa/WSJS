@@ -1,13 +1,13 @@
 import PointClass from '../utility/point.js';
 import ColorClass from '../utility/color.js';
 import BoundClass from '../utility/bound.js';
-import ProjectEntityClass from '../project/project_entity.js';
+import EntityClass from '../project/entity.js';
 
 //
 // monster class
 //
 
-export default class EntityFPSMonsterClass extends ProjectEntityClass
+export default class EntityFPSMonsterClass extends EntityClass
 {
     constructor(core,name,json,position,angle,data)
     {
@@ -324,7 +324,9 @@ export default class EntityFPSMonsterClass extends ProjectEntityClass
         let angleDif;
         let player,distToPlayer,liquidIdx;
         
-        return;     // testing
+            // the developer freeze
+            
+        if (this.core.game.developer.freezeBotMonsters) return;
         
             // if dead, only fall and play
             // and fall sound
@@ -343,7 +345,7 @@ export default class EntityFPSMonsterClass extends ProjectEntityClass
             return;
         }
         
-            // get player
+            // distance to player
             
         player=this.getPlayerEntity();
         distToPlayer=this.position.distance(player.position);

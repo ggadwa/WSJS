@@ -216,7 +216,7 @@ export default class NetworkClass
         entity=new remoteClass(this.core,remoteId,userName);
         this.core.map.entityList.add(entity);
         
-        this.core.map.entityList.getPlayer().remoteEntering(userName);
+        this.core.game.remoteEntering(userName);
     }
     
     handleEntityLeave(remoteId,dataView)
@@ -228,7 +228,7 @@ export default class NetworkClass
         entity=this.core.map.entityList.findRemoteById(remoteId);
         if (entity!==null) entity.markDelete=true;
         
-        this.core.map.entityList.getPlayer().remoteLeaving(entity.name);
+        this.core.game.remoteLeaving(entity.name);
     }
     
     handleEntityUpdate(remoteId,dataView)

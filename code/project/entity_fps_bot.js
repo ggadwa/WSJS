@@ -1,7 +1,7 @@
 import PointClass from '../utility/point.js';
-import ProjectEntityClass from '../project/project_entity.js';
+import EntityClass from '../project/entity.js';
 
-export default class EntityFPSBotClass extends ProjectEntityClass
+export default class EntityFPSBotClass extends EntityClass
 {
     constructor(core,name,json,position,angle,data)
     {
@@ -73,6 +73,7 @@ export default class EntityFPSBotClass extends ProjectEntityClass
         this.targetEntity=null;
         this.lastTargetAngleDif=360;
 
+        this.telefragTriggerEntity=null;
         
             // pre-allocates
             
@@ -188,6 +189,8 @@ export default class EntityFPSBotClass extends ProjectEntityClass
         
             // move to random node
             
+        this.telefragTriggerEntity=null;
+        
         this.moveToRandomNode(false);
 
             // get seek node
@@ -213,10 +216,56 @@ export default class EntityFPSBotClass extends ProjectEntityClass
             
         this.startModelAnimationChunkInFrames(null,30,960,996);
     }
+    
+    die(fromEntity,isTelefrag)
+    {
+        this.respawnTick=this.core.timestamp+this.respawnWaitTick;
+        this.passThrough=true;
+        this.core.soundList.playJson(this,null,this.dieSound);
+
+        this.core.game.multiplayerAddScore(fromEntity,this,isTelefrag);
+
+        this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.dieAnimation[0],this.dieAnimation[1]);
+        this.modelEntityAlter.queueAnimationStop();
+    }
+    
+    damage(fromEntity,damage,hitPoint)
+    {
+        if (this.deadCount!==-1) return;
+        
+        this.armor-=damage;
+        if (this.armor<0) {
+            this.health+=this.armor;
+            this.armor=0;
+        }
+
+        if (this.health<=0) {
+            this.die(fromEntity,false);
+            return;
+        }
+        
+        if (fromEntity!==null) this.targetEntity=fromEntity;
+    }
+    
+    telefrag(fromEntity)
+    {
+        this.telefragTriggerEntity=fromEntity;
+    }
         
     run()
     {
-        super.run();
+            // the developer freeze
+            
+        if (this.core.game.developer.freezeBotMonsters) return;
+        
+            // the telefrag trigger
+            // we defer this because it can happen during a spawn
+            
+        if (this.telefragTriggerEntity!==null) {
+            this.die(this.telefragTriggerEntity,true);
+            this.telefragTriggerEntity=null;
+            return;
+        }
         
     }
     

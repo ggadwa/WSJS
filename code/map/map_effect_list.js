@@ -1,6 +1,6 @@
 import PointClass from '../utility/point.js';
 import CoreClass from '../main/core.js';
-import EffectJsonClass from '../project/effect_json.js';
+import EffectClass from '../project/effect.js';
 
 //
 // map effect list class
@@ -43,7 +43,7 @@ export default class MapEffectListClass
     {
         let effect;
         
-        effect=new EffectJsonClass(this.core,spawnedBy,jsonName,position,data,show);
+        effect=new EffectClass(this.core,spawnedBy,jsonName,position,data,show);
         if (!effect.initialize()) return(false);
         
         this.effects.push(effect);

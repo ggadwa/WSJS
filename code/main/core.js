@@ -153,13 +153,6 @@ export default class CoreClass
         this.loadingStrings=[];
         this.loadingLastAddMsec=0;
         
-            // debug
-            
-        this.debugEntityBounds=false;
-        this.debugPaths=false;
-        this.debugSkeletons=false;
-        this.debugCollisionSurfaces=false;
-        
         Object.seal(this);
     }
     
@@ -559,7 +552,7 @@ export default class CoreClass
             
         this.map.sky.draw();
 
-        if (!this.debugCollisionSurfaces) {
+        if (!this.game.developer.collisionSurfaces) {
             this.map.meshList.draw(null,false);
             this.map.meshList.draw(null,true);
         }
@@ -569,7 +562,7 @@ export default class CoreClass
 
             // path debugging
             
-        if (this.debugPaths) this.map.path.debugDrawPath();
+        if (this.game.developer.paths) this.map.path.debugDrawPath();
         
             // draw any non held entities
             
@@ -577,11 +570,11 @@ export default class CoreClass
         
             // liquids
             
-        if (!this.debugCollisionSurfaces) this.map.liquidList.draw();
+        if (!this.game.developer.collisionSurfaces) this.map.liquidList.draw();
         
             // effects
             
-        if (!this.debugCollisionSurfaces) this.map.effectList.draw();
+        if (!this.game.developer.collisionSurfaces) this.map.effectList.draw();
         
             // and finally held entities,
             // clearing the z buffer first

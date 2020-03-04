@@ -8,16 +8,7 @@ import ModelEntityAlterClass from '../model/model_entity_alter.js';
 import CollisionClass from '../collision/collisions.js';
 import NetworkClass from '../main/network.js';
 
-/**
- * This is the main entity class, most all entities (objects that move
- * around in the map with their own logic and usually have a model)
- * should extend from.  There are special classes like ProjectEntityRemote
- * (for remote entities) and ProjectEntityDeveloper (which has some
- * extra development options.)
- * 
- *  @hideconstructor 
- */
-export default class ProjectEntityClass
+export default class EntityClass
 {
     constructor(core,name,json,position,angle,data)
     {
@@ -44,15 +35,8 @@ export default class ProjectEntityClass
         this.height=1;
         this.scale=new PointClass(1,1,1);
         
-        if (position!==null) {
-            this.position=position.copy();
-            this.angle=angle.copy();
-        }
-        else {
-            this.position=new PointClass(0,0,0);
-            this.angle=new PointClass(0,0,0);
-            this.moveToRandomNode(true);
-        }
+        this.position=position.copy();
+        this.angle=angle.copy();
         this.data=data;
         
         this.show=true;
@@ -102,13 +86,6 @@ export default class ProjectEntityClass
         this.remoteAngleChange=new PointClass(0,0,0);
         this.remoteScaleChange=new PointClass(0,0,0);
         
-            // some developer flags
-              
-        this.developer=false;
-        this.developerPlayerFly=false;
-        this.developerPlayerNoClip=false;
-        this.developerPlayerNoDamage=false;
-        
         // no seal, as this object is extended
     }
     
@@ -143,18 +120,6 @@ export default class ProjectEntityClass
             // add any interface elements
             
         if (!this.core.interface.addFromJson(this.json.interface)) return(false);
-        
-            // developer mode adds some interface elements
-            
-        this.developer=this.json.developer;
-        
-        if (this.developer) {
-            this.core.interface.addText('fps','',this.core.interface.POSITION_MODE_TOP_RIGHT,{"x":-5,"y":23},20,this.core.interface.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1);
-            this.core.interface.addText('meshCount','',this.core.interface.POSITION_MODE_TOP_RIGHT,{"x":-5,"y":46},20,this.core.interface.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1);
-            this.core.interface.addText('trigCount','',this.core.interface.POSITION_MODE_TOP_RIGHT,{"x":-5,"y":69},20,this.core.interface.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1);
-            this.core.interface.addText('modelCount','',this.core.interface.POSITION_MODE_TOP_RIGHT,{"x":-5,"y":92},20,this.core.interface.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1);
-            this.core.interface.addText('effectCount','',this.core.interface.POSITION_MODE_TOP_RIGHT,{"x":-5,"y":115},20,this.core.interface.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1);
-        }
         
         return(true);
     }
@@ -1109,7 +1074,7 @@ export default class ProjectEntityClass
      * Plays a sound, the sound is positioned at the entity in
      * the parameter entity.
      * 
-     * @param {ProjectEntityClass} entity Entity that positions sound
+     * @param {EntityClass} entity Entity that positions sound
      * @param {string} name Name of sound to play
      * @param {number} rate Rate of sound (1.0 = natural rate)
      * @param {boolean} loop TRUE if sound should loop until stopped
@@ -1263,228 +1228,6 @@ export default class ProjectEntityClass
     {
     }
     
-        //
-        // developer tools
-        //
-        
-    positionInfo()
-    {
-        let n,nodeIdx,str;
-        let nMesh=this.core.map.meshList.meshes.length;
-        let xBound=new BoundClass(this.position.x-100,this.position.x+100);
-        let yBound=new BoundClass(this.position.y+(this.eyeOffset+100),this.position.y+this.eyeOffset);
-        let zBound=new BoundClass(this.position.z-100,this.position.z+100);
-
-            // position and angle
-            
-        console.info('pos='+Math.trunc(this.position.x)+','+Math.trunc(this.position.y)+','+Math.trunc(this.position.z));
-        console.info('ang='+Math.trunc(this.angle.x)+','+Math.trunc(this.angle.y)+','+Math.trunc(this.angle.z));
-
-            // nodes
-            
-        nodeIdx=this.findNearestPathNode(5000);
-        if (nodeIdx!==-1) console.info('node='+this.core.map.path.nodes[nodeIdx].nodeIdx);
-            
-            // meshes
-            
-        str='';
-
-        for (n=0;n!==nMesh;n++) {
-            if (this.core.map.meshList.meshes[n].boxBoundCollision(xBound,yBound,zBound)) {
-                if (str!=='') str+='|';
-                str+=this.core.map.meshList.meshes[n].name;
-            }
-        }
-        
-        if (str!=='') console.info('hit mesh='+str);
-        
-        if (this.standOnMeshIdx!==-1) console.info('stand mesh='+this.core.map.meshList.meshes[this.standOnMeshIdx].name);
-    }
-    
-    pathJSONReplacer(key,value)
-    {
-        if (key==='nodeIdx') return(undefined);
-        if (key==='pathHints') return(undefined);
-        if (key==='pathHintCounts') return(undefined);
-        if ((key==='altPosition') && (value===null)) return(undefined);
-        if ((key==='key') && (value===null)) return(undefined);
-        if ((key==='data') && (value===null)) return(undefined);
-        return(value);
-    }
-    
-    pathEditor()
-    {
-        let n,k,nodeIdx;
-        let node,links,str;
-        let path=this.core.map.path;
-        let input=this.core.input;
-        
-            // i key picks a new parent from closest node
-            
-        if (input.isKeyDownAndClear('i')) {
-            nodeIdx=this.findNearestPathNode(1000000);
-            if (nodeIdx===-1) return;
-            
-            path.editorParentNodeIdx=nodeIdx;
-            
-            console.info('Reset to parent node '+nodeIdx);
-            return;
-        }
-        
-            // o splits a path at two nodes,
-            // hit o on each node, then o for new node
-            
-        if (input.isKeyDownAndClear('o')) {
-            nodeIdx=this.findNearestPathNode(1000000);
-            if (nodeIdx===-1) return;
-            
-            if (path.editorSplitStartNodeIdx===-1) {
-                path.editorSplitStartNodeIdx=nodeIdx;
-                console.info('starting split at '+nodeIdx+' > now select second node');
-                return;
-            }
-            
-            if (path.editorSplitEndNodeIdx===-1) {
-                path.editorSplitEndNodeIdx=nodeIdx;
-                console.info('second node selected '+nodeIdx+' > now add split node');
-                return;
-            }
-            
-            nodeIdx=path.nodes.length;
-            path.nodes.push(new MapPathNodeClass(nodeIdx,this.position.copy(),null,[path.editorSplitStartNodeIdx,path.editorSplitEndNodeIdx],null,null));
-            
-            links=path.nodes[path.editorSplitStartNodeIdx].links;
-            links[links.indexOf(path.editorSplitEndNodeIdx)]=nodeIdx;
-            
-            links=path.nodes[path.editorSplitEndNodeIdx].links;
-            links[links.indexOf(path.editorSplitStartNodeIdx)]=nodeIdx;
-            
-            path.editorParentNodeIdx=nodeIdx;
-            path.editorSplitStartNodeIdx=-1;
-            path.editorSplitEndNodeIdx=-1;
-
-            return;
-        }
-        
-            // p key adds to path
-            
-        if (input.isKeyDownAndClear('p')) {
-            
-                // is there a close node?
-                // if so connect to that
-                
-            nodeIdx=this.findNearestPathNode(5000);
-            if (nodeIdx!==-1) {
-                if (path.editorParentNodeIdx!==-1) {
-                    path.nodes[nodeIdx].links.push(path.editorParentNodeIdx);
-                    path.nodes[path.editorParentNodeIdx].links.push(nodeIdx);
-                    
-                    path.editorParentNodeIdx=nodeIdx;
-                    
-                    console.info('Connected node '+nodeIdx);
-                }
-                
-                return;
-            }
-            
-                // otherwise create a new node
-                
-            nodeIdx=path.nodes.length;
-            
-            links=[];
-            if (path.editorParentNodeIdx!==-1) {
-                links.push(path.editorParentNodeIdx);
-                path.nodes[path.editorParentNodeIdx].links.push(nodeIdx);
-            }
-            
-            path.nodes.push(new MapPathNodeClass(nodeIdx,this.position.copy(),null,links,null,null));
-            
-            path.editorParentNodeIdx=nodeIdx;
-            
-            console.info('Added node '+nodeIdx);
-            return;
-        }
-        
-            // u key adds a key to nearest node
-            
-        if (input.isKeyDownAndClear('u')) {
-            nodeIdx=this.this.findNearestPathNode(5000);
-            if (nodeIdx!==-1) {
-                path.editorParentNodeIdx=nodeIdx;
-                
-                if (path.nodes[nodeIdx].key!==null) {
-                    console.info('Node already has a key='+path.nodes[nodeIdx].key);
-                    return;
-                }
-                
-                path.nodes[nodeIdx].key='KEY_'+nodeIdx;
-                
-                console.info('Added temp key '+nodeIdx);
-                return;
-            }
-        }
-        
-            // [ key deletes selected node
-            
-        if (input.isKeyDownAndClear('[')) {
-            input.keyFlags[219]=false;
-            
-            if (path.editorParentNodeIdx!==-1) {
-                
-                    // fix any links
-                    
-                for (n=0;n!=path.nodes.length;n++) {
-                    if (n===path.editorParentNodeIdx) continue;
-                    node=path.nodes[n];
-                    
-                    k=0;
-                    while (k<node.links.length) {
-                        if (node.links[k]===path.editorParentNodeIdx) {
-                            node.links.splice(k,1);
-                            continue;
-                        }
-                        if (node.links[k]>path.editorParentNodeIdx) node.links[k]=node.links[k]-1;
-                        k++;
-                    }
-                }
-                
-                    // and delete the node
-                    
-                path.nodes.splice(path.editorParentNodeIdx,1);
-                
-                console.info('Deleted node '+path.editorParentNodeIdx);
-                
-                path.editorParentNodeIdx=-1;
-            }
-        }
-        
-            // ] key moves selected node to player
-
-        if (input.isKeyDownAndClear(']')) {
-            if (path.editorParentNodeIdx!==-1) {
-                path.nodes[path.editorParentNodeIdx].position.setFromPoint(this.position);
-                console.info('Moved node '+path.editorParentNodeIdx);
-            }
-        }
-        
-            // \ key displays json of path
-            
-        if (input.isKeyDownAndClear('\\')) {            
-            str='                "paths":\n';
-            str+='                    [\n';
-            
-            for (n=0;n!==path.nodes.length;n++) {
-                str+='                        ';
-                str+=JSON.stringify(path.nodes[n],this.pathJSONReplacer.bind(this));
-                if (n!==(path.nodes.length-1)) str+=',';
-                str+='\n';
-            }
-            
-            str+='                    ]\n';
-            
-            console.info(str);
-        }
-    }
 
     /**
      * Override to deal with final entity setup.  This is the first call
@@ -1502,99 +1245,6 @@ export default class ProjectEntityClass
      */    
     run()
     {
-        let idx;
-        let fpsStr=this.core.fps.toString();
-        let input=this.core.input;
-        
-            // rest is developer stuff, skip if no developer flag
-            
-        if (!this.developer) return;
-        
-            // debug output
-            
-        idx=fpsStr.indexOf('.');
-        if (idx===-1) {
-            fpsStr+='.0';
-        }
-        else {
-            fpsStr=fpsStr.substring(0,(idx+3));
-        }
-        
-        this.core.interface.updateText('fps',fpsStr);
-        this.core.interface.updateText('meshCount',('mesh:'+this.core.drawMeshCount));
-        this.core.interface.updateText('trigCount',('trig:'+this.core.drawTrigCount));
-        this.core.interface.updateText('modelCount',('model:'+this.core.drawModelCount));
-        this.core.interface.updateText('effectCount',('effect:'+this.core.drawEffectCount));
-        
-            // backspace prints out position info
-            
-        if (input.isKeyDownAndClear('Backspace')) {
-            this.positionInfo();
-            return;
-        }
-        
-            // - for no clip
-            
-        if (input.isKeyDownAndClear('-')) {
-            this.developerPlayerNoClip=!this.developerPlayerNoClip;
-            console.info('player no clip='+this.developerPlayerNoClip);
-        }
-        
-            // = for fly
-        
-        if (input.isKeyDownAndClear('=')) {
-            this.developerPlayerFly=!this.developerPlayerFly;
-            console.info('player fly='+this.developerPlayerFly);
-        }
-        
-            // delete turns on path editor
-            
-        if (input.isKeyDownAndClear('Delete')) {
-            this.core.debugPaths=!this.core.debugPaths;
-            console.info('path editor='+this.core.debugPaths);
-            
-            if (this.core.debugPaths) {
-                console.info('u add key to nearest node');
-                console.info('i select nearest node');
-                console.info('o start path splitting');
-                console.info('p adds new node to path');
-                console.info('[ deleted selected node');
-                console.info('] moves selected node to player');
-                console.info('\\ output new path JSON');
-            }
-        }
-        
-            // end turns on entity bounds
-            
-        if (input.isKeyDownAndClear('End')) {
-            this.core.debugEntityBounds=!this.core.debugEntityBounds;
-            console.info('draw entity bounds='+this.core.debugEntityBounds);
-        }
-        
-            // page down turns on entity skeletons
-        
-        if (input.isKeyDownAndClear('PageDown')) {
-            this.core.debugSkeletons=!this.core.debugSkeletons;
-            console.info('draw entity skeletons='+this.core.debugSkeletons);
-        }
-        
-            // page up turns on collision surfaces
-            
-        if (input.isKeyDownAndClear('PageUp')) {
-            this.core.debugCollisionSurfaces=!this.core.debugCollisionSurfaces;
-            console.info('draw collision surfaces='+this.core.debugCollisionSurfaces);
-        }
-        
-            // home turns off damage
-            
-        if (input.isKeyDownAndClear('Home')) {
-            this.developerPlayerNoDamage=!this.developerPlayerNoDamage;
-            console.info('no damage='+this.developerPlayerNoDamage);
-        }
-        
-            // path editing
-            
-        if (this.core.debugPaths) this.pathEditor();
     }
     
     /**

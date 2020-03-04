@@ -1,7 +1,7 @@
 import PointClass from '../utility/point.js';
-import ProjectEntityClass from '../project/project_entity.js';
+import EntityClass from '../project/entity.js';
 
-export default class EntityDecorationClass extends ProjectEntityClass
+export default class EntityDecorationClass extends EntityClass
 {
     constructor(core,name,json,position,angle,data)
     {

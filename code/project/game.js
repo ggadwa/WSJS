@@ -1,0 +1,353 @@
+import PointClass from '../utility/point.js';
+import ColorClass from '../utility/color.js';
+import DeveloperClass from '../project/developer.js';
+
+export default class GameClass
+{
+    constructor(core,data)
+    {
+        this.MAX_SCORE_COUNT=10;
+        
+        this.core=core;
+        this.data=data;
+        
+        this.developer=new DeveloperClass(core);
+        
+        this.json=null;
+        this.jsonCache=new Map();
+        
+        this.scores=null;
+        this.scoreColor=new ColorClass(0,1,0.2);
+    }
+    
+        //
+        // load json from network
+        //
+        
+    async fetchJson(name)
+    {
+        let resp;
+        let url='../json/'+name+'.json';
+        
+        try {
+            resp=await fetch(url);
+            if (!resp.ok) return(Promise.reject('Unable to load '+url+'; '+resp.statusText));
+            return(await resp.json());
+        }
+        catch (e) {
+            return(Promise.reject('Unable to load '+url+'; '+e.message));
+        }
+    }
+ 
+        //
+        // json caches and utilities
+        //
+        
+    getCachedJson(name)
+    {
+        let json;
+        
+        json=this.jsonCache.get(name);
+        if (json===undefined) {
+            console.log('Unknown json: '+name);
+            return(null);
+        }
+        
+        return(json);
+    }
+    
+    lookupValue(value,data)
+    {
+        if (value===null) return(value);
+        if (typeof(value)!=='string') return(value);
+        if (value.length<2) return(value);
+        if (value.charAt(0)!=='@') return(value);
+        
+        return(data[value.substring(1)]);
+    }
+
+        //
+        // game initialize/release
+        //
+        
+    async initialize()
+    {
+        let data;
+        let jsonName;
+        
+        data=null;
+        
+            // get the main game json
+            // this is the only hard coded json file
+        
+        await this.fetchJson('game')
+            .then
+                (
+                    value=>{
+                        data=value;
+                    },
+                    value=>{
+                        console.log(value);
+                    }
+                );
+        
+        if (data===null) return(false);
+           
+        this.json=data;
+        
+            // now run through and cache all
+            // the custom json for the project
+            
+        for (jsonName of this.json.jsons) {
+            data=null;
+            
+            await this.fetchJson(jsonName)
+            .then
+                (
+                    value=>{
+                        data=value;
+                    },
+                    value=>{
+                        console.log(value);
+                    }
+                );
+        
+            if (data===null) return(false);
+            
+            this.jsonCache.set(jsonName,data);
+        }
+            
+        return(true);
+    }
+    
+    release()
+    {
+        if (this.json.developer) this.developer.release();
+    }
+
+        //
+        // game ready
+        //
+        
+    ready()
+    {
+        let n,y;
+        let entity;
+        
+            // json interface
+            
+        if (!this.core.interface.addFromJson(this.json.interface)) return(false);
+        
+            // multiplayer scores
+            
+        if (this.core.isMultiplayer) {
+            
+                // current scores
+                
+            this.scores=new Map();
+
+            for (entity of this.core.map.entityList.entities) {
+                if (entity.fighter) this.scores.set(entity.name,0);
+            }
+            
+                // max number of scores to display
+                
+            y=-Math.trunc((35*(this.MAX_SCORE_COUNT-1))*0.5);
+            
+            for (n=0;n!==this.MAX_SCORE_COUNT;n++) {
+                this.core.interface.addText(('score_name_'+n),'',this.core.interface.POSITION_MODE_MIDDLE,{"x":0,"y":y},30,this.core.interface.TEXT_ALIGN_RIGHT,this.scoreColor,1);
+                this.core.interface.addText(('score_point_'+n),'',this.core.interface.POSITION_MODE_MIDDLE,{"x":10,"y":y},30,this.core.interface.TEXT_ALIGN_LEFT,this.scoreColor,1);
+                y+=35;
+            }
+        }
+                
+            // developer mode initialization
+        
+        if (this.json.developer) {
+            if (!this.developer.initialize()) return(false);
+        }
+        
+        return(true);
+    }
+    
+        //
+        // multiplayer/networking
+        //
+        
+    multiplayerAddScore(fromEntity,killedEntity,isTelefrag)
+    {
+        let n;
+        let score,points,scoreCount;
+        let scoreEntity=null;
+        let iter,rtn,name,insertIdx;
+        let sortedNames=[];
+        
+        if (!this.core.isMultiplayer) return;
+        
+            // any messages
+            
+        points=0;
+            
+        if (fromEntity!==null) {
+            if (isTelefrag) {
+                scoreEntity=fromEntity;
+                points=1;
+                if (this.json.config.multiplayerMessageText!==null) this.core.interface.updateTemporaryText(this.json.config.multiplayerMessageText,(fromEntity.name+' telefragged '+killedEntity.name),this.json.config.multiplayerMessageWaitTick);
+            }
+            else {
+                if (fromEntity!==this) {
+                    scoreEntity=fromEntity;
+                    points=1;
+                    if (this.json.config.multiplayerMessageText!==null) this.core.interface.updateTemporaryText(this.json.config.multiplayerMessageText,(fromEntity.name+' killed '+killedEntity.name),this.json.config.multiplayerMessageWaitTick);
+                }
+                else {
+                    scoreEntity=killedEntity;
+                    points=-1;
+                    if (this.json.config.multiplayerMessageText!==null) this.core.interface.updateTemporaryText(this.json.config.multiplayerMessageText,(killedEntity.name+' committed suicide'),this.json.config.multiplayerMessageWaitTick);
+                }
+            }
+        }
+        
+            // add the points
+            
+        if (scoreEntity!==null) {
+            score=this.scores.get(scoreEntity.name);
+            if (score===undefined) score=0;
+
+            this.scores.set(scoreEntity.name,(score+points));
+        }
+        
+            // update scores
+             
+        iter=this.scores.keys();
+        
+        while (true) {
+            rtn=iter.next();
+            if (rtn.done) break;
+            
+            name=rtn.value;
+            points=this.scores.get(name);
+            
+            if (sortedNames.length===0) {
+                sortedNames.push(name);
+            }
+            else {
+                insertIdx=0;
+
+                for (n=(sortedNames.length-1);n>=0;n--) {
+                    if (points<this.scores.get(sortedNames[n])) {
+                        insertIdx=n+1;
+                        break;
+                    }
+                }
+
+                sortedNames.splice(insertIdx,0,name);
+            }
+        }
+        
+        scoreCount=Math.min(this.MAX_SCORE_COUNT,sortedNames.length);
+        
+        for (n=0;n!=this.MAX_SCORE_COUNT;n++) {
+            if (n<sortedNames.length) {
+                this.core.interface.updateText(('score_name_'+n),sortedNames[n]);
+                this.core.interface.showText(('score_name_'+n),true);
+                
+                this.core.interface.updateText(('score_point_'+n),this.scores.get(sortedNames[n]));
+                this.core.interface.showText(('score_point_'+n),true);
+            }
+            else {
+                this.core.interface.showText(('score_name_'+n),false);
+                this.core.interface.showText(('score_point_'+n),false);
+            }
+        }
+    }
+    
+    showScoreDisplay(show)
+    {
+        /*
+        let n,y;
+        let iter,rtn,name,points,insertIdx;
+        let sortedNames=[];
+        
+            // if no show, remove all items
+            // if they exist
+            
+        if (!show) {
+            for (n=0;n!==this.lastScoreCount;n++) {
+                this.removeInterfaceText('score_name_'+n);
+                this.removeInterfaceText('score_point_'+n);
+            }
+            
+            this.lastScoreCount=0;
+            return;
+        }
+        
+            // sort the scores
+             
+        iter=this.scores.keys();
+        
+        while (true) {
+            rtn=iter.next();
+            if (rtn.done) break;
+            
+            name=rtn.value;
+            points=this.scores.get(name);
+            
+            if (sortedNames.length===0) {
+                sortedNames.push(name);
+            }
+            else {
+                insertIdx=0;
+
+                for (n=(sortedNames.length-1);n>=0;n--) {
+                    if (points<this.scores.get(sortedNames[n])) {
+                        insertIdx=n+1;
+                        break;
+                    }
+                }
+
+                sortedNames.splice(insertIdx,0,name);
+            }
+        }
+        
+            // add the items
+            
+        y=-Math.trunc((35*sortedNames.length)*0.5);
+        
+        for (n=0;n!=sortedNames.length;n++) {
+            this.addInterfaceText(('score_name_'+n),sortedNames[n],'middle',{"x":0,"y":y},30,this.TEXT_ALIGN_RIGHT,this.scoreColor,1);
+            this.addInterfaceText(('score_point_'+n),this.scores.get(sortedNames[n]),'middle',{"x":10,"y":y},30,this.TEXT_ALIGN_LEFT,this.scoreColor,1);
+            
+            y+=35;
+        }
+        
+        this.lastScoreCount=sortedNames.length;
+             * 
+         */
+    }
+    
+        //
+        // remote changes
+        //
+        
+    remoteEntering(name)
+    {
+        this.scores.set(name,0);
+        if (this.json.config.multiplayerMessageText!==null) this.core.interface.updateTemporaryText(this.json.config.multiplayerMessageText,(name+' has joined'),5000);
+    }
+    
+    remoteLeaving(name)
+    {
+        this.scores.delete(name);
+        if (this.json.config.multiplayerMessageText!==null) this.core.interface.updateTemporaryText(this.json.config.multiplayerMessageText,(name+' has left'),5000);
+    }
+
+        //
+        // game run
+        //
+        
+    run()
+    {
+        if (this.json.developer) this.developer.run();
+    }
+}

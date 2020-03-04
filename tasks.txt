@@ -6,29 +6,21 @@
 
 
 ---> REDO HOW RANDOM SETUPS WORK
-     - moveToRandomNode needs to do telefragging
-        - those functions probably need to be on node list
-        - make a debug for turning off bot/monster movement
+    - death messages by game with json setup
 
-NEW BLOCK STUFF
-     - monsters better at navigating around corners (try to move X only or Z only if stuck)
-     - death is broken for player
-     - fall damage
-     - put reaper back in demo / add monsters
-     - bots/remotes (no need for game json for remotes)
-     - network scores (somewhere other than player?)
-     - move node stuff to map.nodeList
-
-     - get rid of game_json extra stuff like ready() etc
+    - monsters better at navigating around corners (try to move X only or Z only if stuck)
+    - death is broken for player
+    - fall damage
+    - finish fps_bot
+    - bots/remotes (no need for game json for remotes)
+    - network scores (somewhere other than player?)
 
 
-     - eventually delete most stuff out of project_entity, do direct calls
-     - project_entity -> entity_base
-     - effect_json -> effect
-     - need to test failures (missing bitmap, missing json, bad json, etc)
-     - get rid of any beretta naming
+    - eventually clean up entity and unecessary pass through APIs
+    - need to test failures (missing bitmap, missing json, bad json, etc)
+    - get rid of any beretta naming
 
-     - need to go over all the auto generate options
+    - need to go over all the auto generate options
 
 EVENTUALLY
     - add kart to demo

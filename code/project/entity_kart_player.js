@@ -3,9 +3,9 @@ import QuaternionClass from '../utility/quaternion.js';
 import BoundClass from '../utility/bound.js';
 import ColorClass from '../utility/color.js';
 import ModelClass from '../model/model.js';
-import ProjectEntityClass from '../project/project_entity.js';
+import EntityClass from '../project/entity.js';
 
-export default class EntityKartPlayerClass extends ProjectEntityClass
+export default class EntityKartPlayerClass extends EntityClass
 {
     initialize()
     {
@@ -405,7 +405,7 @@ export default class EntityKartPlayerClass extends ProjectEntityClass
             }
 
             this.rotMovement.setFromPoint(this.movement);
-            if (this.developerPlayerFly) {
+            if (this.core.game.developer.playerFly) {
                 this.rotMovement.y=0;       // only Y movement comes from X angle rotation
                 this.rotMovement.rotateX(null,this.angle.x);
                 this.rotMovement.y*=0.5;
@@ -419,7 +419,7 @@ export default class EntityKartPlayerClass extends ProjectEntityClass
         
             // move around the map
         
-        if ((!this.developerPlayerNoClip) || (!isPlayer)) {
+        if ((!this.core.game.developer.playerNoClip) || (!isPlayer)) {
             this.movement.y=this.moveInMapY(this.rotMovement,false);
             this.moveInMapXZ(this.rotMovement,true,true);
         }
@@ -585,8 +585,6 @@ export default class EntityKartPlayerClass extends ProjectEntityClass
         let rate,textLap;
         let setup=this.getSetup();
         
-        super.run();
-        
             // keys
             
         forward=this.isKeyDown('w');
@@ -608,7 +606,7 @@ export default class EntityKartPlayerClass extends ProjectEntityClass
         
             // looking (mostly for developer flying)
         
-        if (this.developerPlayerFly) {    
+        if (this.core.game.developer.playerFly) {    
             y=this.getMouseMoveY();
             if (y!==0) {
                 lookAdd=y*setup.mouseYSensitivity;

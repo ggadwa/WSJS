@@ -1,5 +1,5 @@
 import PointClass from '../utility/point.js';
-import ProjectEntityClass from '../project/project_entity.js';
+import EntityClass from '../project/entity.js';
 
 class EntityWeaponFireClass
 {
@@ -54,7 +54,7 @@ class EntityWeaponFireClass
     }
 }
 
-export default class EntityWeaponClass extends ProjectEntityClass
+export default class EntityWeaponClass extends EntityClass
 {
     constructor(core,name,json,position,angle,data)
     {

@@ -99,11 +99,11 @@ export default class ModelClass
             // debug skeleton and/or bounds drawing
             // note this can't draw held stuff
             
-        if (((this.core.debugSkeletons) || (this.core.debugEntityBounds)) && (entity.heldBy===null)) {
+        if (((this.core.game.developer.skeletons) || (this.core.game.developer.entityBounds)) && (entity.heldBy===null)) {
             modelEntityAlter.setupModelMatrix(false);
 
-            if (this.core.debugSkeletons) modelEntityAlter.debugDrawSkeleton();
-            if (this.core.debugEntityBounds) modelEntityAlter.debugDrawBounds();
+            if (this.core.game.developer.skeletons) modelEntityAlter.debugDrawSkeleton();
+            if (this.core.game.developer.entityBounds) modelEntityAlter.debugDrawBounds();
         }
         
             // add up model draws for stats

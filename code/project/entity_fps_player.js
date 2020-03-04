@@ -1,9 +1,9 @@
 import PointClass from '../utility/point.js';
 import ColorClass from '../utility/color.js';
 import BoundClass from '../utility/bound.js';
-import ProjectEntityClass from '../project/project_entity.js';
+import EntityClass from '../project/entity.js';
 
-export default class EntityFPSPlayerClass extends ProjectEntityClass
+export default class EntityFPSPlayerClass extends EntityClass
 {
     constructor(core,name,json,position,angle,data)
     {
@@ -67,6 +67,8 @@ export default class EntityFPSPlayerClass extends ProjectEntityClass
         this.forceAnimationUpdate=false;
         this.currentIdleAnimation=null;
         this.currentRunAnimation=null;
+        
+        this.telefragTriggerEntity=null;
         
             // pre-allocates
             
@@ -259,7 +261,13 @@ export default class EntityFPSPlayerClass extends ProjectEntityClass
             // move to random node
             // if multiplayer
             
+        this.telefragTriggerEntity=null;
+            
         if (this.core.isMultiplayer) this.moveToRandomNode(false);
+        
+            // turn off any score display
+            
+        this.core.game.showScoreDisplay(true);
     }
     
         //
@@ -332,6 +340,20 @@ export default class EntityFPSPlayerClass extends ProjectEntityClass
         // health
         //
         
+    die(fromEntity,isTelefrag)
+    {
+        this.respawnTick=this.core.timestamp+this.respawnWaitTick;
+        this.passThrough=true;
+        this.core.soundList.playJson(this,null,this.dieSound);
+        
+        this.core.game.multiplayerAddScore(fromEntity,this,isTelefrag);
+
+        this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.dieAnimation[0],this.dieAnimation[1]);
+        this.modelEntityAlter.queueAnimationStop();
+        
+        this.core.game.showScoreDisplay(true);
+    }
+    
     damage(fromEntity,damage,hitPoint)
     {
             // already dead, can't take damage
@@ -340,7 +362,7 @@ export default class EntityFPSPlayerClass extends ProjectEntityClass
         
             // pulse and take the damage
             
-        if (!this.developerNoDamage) {
+        if (!this.core.game.developer.playerNoDamage) {
             this.armor-=damage;
             if (this.armor<0) {
                 if (this.interfaceHealthIcon!==null) this.core.interface.pulseElement(this.interfaceHealthIcon,500,5);
@@ -358,25 +380,7 @@ export default class EntityFPSPlayerClass extends ProjectEntityClass
             // dead?
         
         if (this.health<=0) {
-            this.respawnTick=this.core.timestamp+this.respawnWaitTick;
-            this.passThrough=true;
-            this.core.soundList.playJson(this,null,this.dieSound);
-            
-            if (this.isMultiplayer()) {
-                if (fromEntity!==null) {
-                    if (fromEntity!==this) {
-                        this.addScore(fromEntity.name,1);
-                        this.updateInterfaceTemporaryText('multiplayer_message',(fromEntity.name+' killed '+this.name),5000);
-                    }
-                    else {
-                        this.addScore(fromEntity.name,-1);
-                        this.updateInterfaceTemporaryText('multiplayer_message',(this.name+' committed suicide'),5000);
-                    }
-                }
-                this.displayScore(true);
-            }
-            
-            this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.dieAnimation[0],this.dieAnimation[1]);            
+            this.die(fromEntity,false);
             return;
         }
         
@@ -386,6 +390,11 @@ export default class EntityFPSPlayerClass extends ProjectEntityClass
             this.nextDamageTick=this.core.timestamp+this.damageFlinchWaitTick;
             this.core.soundList.playJson(this,null,this.hurtSound);
         }
+    }
+    
+    telefrag(fromEntity)
+    {
+        this.telefragTriggerEntity=fromEntity;
     }
 
         //
@@ -402,12 +411,19 @@ export default class EntityFPSPlayerClass extends ProjectEntityClass
         let input=this.core.input;
         let setup=this.core.setup;
         
-        super.run();
-        
             // update any UI
             
         if (this.interfaceHealthCount!==null) this.core.interface.updateText(this.interfaceHealthCount,this.health);
         if (this.interfaceArmorCount!==null) this.core.interface.updateText(this.interfaceArmorCount,this.armor);
+        
+            // the telefrag trigger
+            // we defer this because it can happen during a spawn
+            
+        if (this.telefragTriggerEntity!==null) {
+            this.die(this.telefragTriggerEntity,true);
+            this.telefragTriggerEntity=null;
+            return;
+        }
         
             // weapon switching
             
@@ -551,7 +567,7 @@ export default class EntityFPSPlayerClass extends ProjectEntityClass
             // jumping
            
         if (input.isKeyDown(' ')) {
-            if ((this.standOnMeshIdx!==-1) && (liquidIdx===-1) && (!this.developerPlayerFly)) {
+            if ((this.standOnMeshIdx!==-1) && (liquidIdx===-1) && (!this.core.game.developer.playerFly)) {
                 this.gravity=this.core.map.gravityMinValue;
                 this.movement.y=this.jumpHeight;
             }
@@ -570,7 +586,7 @@ export default class EntityFPSPlayerClass extends ProjectEntityClass
         this.movement.moveXWithAcceleration(moveLeft,moveRight,this.sideAcceleration,this.sideDeceleration,this.sideMaxSpeed,this.sideAcceleration,this.sideDeceleration,this.sideMaxSpeed);
         
         this.rotMovement.setFromPoint(this.movement);
-        if ((this.developerPlayerFly) || (this.lastUnderLiquid)) {
+        if ((this.core.game.developer.playerFly) || (this.lastUnderLiquid)) {
             this.rotMovement.y=0;       // only Y movement comes from X angle rotation
             this.rotMovement.rotateX(null,this.angle.x);     // if flying or swimming, add in the X rotation
             this.rotMovement.y*=this.flySwimYReduce;
@@ -580,14 +596,14 @@ export default class EntityFPSPlayerClass extends ProjectEntityClass
             // if no clipping is on then
             // just move directly through map
             
-        if (this.developerPlayerNoClip) {
+        if (this.core.game.developer.playerNoClip) {
             this.position.addPoint(this.rotMovement);
         }
 
             // move around the map
         
         else {
-            this.movement.y=this.moveInMapY(this.rotMovement,this.developerPlayerFly);
+            this.movement.y=this.moveInMapY(this.rotMovement,this.core.game.developer.playerFly);
             this.moveInMapXZ(this.rotMovement,bump,true);
         }
 
