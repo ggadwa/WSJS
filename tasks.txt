@@ -4,16 +4,24 @@
 - wsserver - option to show http log in server (default to off)
 
 
+- finish fps_bot first
 
----> REDO HOW RANDOM SETUPS WORK
+- fallDamageMinDistance
+- fallDamagePercentage
+(in bots, too)
+
     - death messages by game with json setup
 
     - monsters better at navigating around corners (try to move X only or Z only if stuck)
     - death is broken for player
     - fall damage
-    - finish fps_bot
+    
     - bots/remotes (no need for game json for remotes)
-    - network scores (somewhere other than player?)
+
+    - implement bot skill
+    - mouse wheel broken chrome/windows
+    - fix swimming
+
 
 
     - eventually clean up entity and unecessary pass through APIs
@@ -54,16 +62,6 @@ EVENTUALLY
        - better uv for pillars
        - control panel decorations
        - connectors for pipes
-
-- demo
-    - implement bot skill
-    - mouse wheel broken chrome/windows
-    - fix swimming
-
-- reaper
-    - random node start
-
-- kart
 
 - js doc: [got to wsjs directory] jsdoc -c "docs_config.json"
 

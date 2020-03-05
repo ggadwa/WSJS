@@ -42,6 +42,8 @@ export default class EntityFPSBotClass extends EntityClass
         this.jumpWaterHeight=0;
         this.flySwimYReduce=0;
         this.damageFlinchWaitTick=0;
+        this.fallDamageMinDistance=0;
+        this.fallDamagePercentage=0;
         this.respawnWaitTick=0;
         
         this.liquidInSound=null;
@@ -50,7 +52,7 @@ export default class EntityFPSBotClass extends EntityClass
         this.dieSound=null;
         
         this.nextDamageTick=0;
-        this.death
+        this.currentFallDistance=0;
         this.lastInLiquid=false;
         this.lastUnderLiquid=false;
         
@@ -111,6 +113,8 @@ export default class EntityFPSBotClass extends EntityClass
         this.jumpWaterHeight=this.core.game.lookupValue(this.json.config.jumpWaterHeight,this.data);
         this.flySwimYReduce=this.core.game.lookupValue(this.json.config.flySwimYReduce,this.data);
         this.damageFlinchWaitTick=this.core.game.lookupValue(this.json.config.damageFlinchWaitTick,this.data);
+        this.fallDamageMinDistance=this.core.game.lookupValue(this.json.config.fallDamageMinDistance,this.data);
+        this.fallDamagePercentage=this.core.game.lookupValue(this.json.config.fallDamagePercentage,this.data);
         this.respawnWaitTick=this.core.game.lookupValue(this.json.config.respawnWaitTick,this.data);
         
         this.liquidInSound=this.json.config.liquidInSound;
@@ -170,6 +174,8 @@ export default class EntityFPSBotClass extends EntityClass
         this.deadCount=-1;
         this.stuckCount=0;
         this.passThrough=false;         // reset if this is being called after bot died
+        
+        this.currentFallDistance=0;
         
             // start with beretta
             

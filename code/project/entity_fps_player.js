@@ -44,6 +44,8 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.jumpWaterHeight=0;
         this.flySwimYReduce=0;
         this.damageFlinchWaitTick=0;
+        this.fallDamageMinDistance=0;
+        this.fallDamagePercentage=0;
         this.respawnWaitTick=0;
         
         this.liquidInSound=null;
@@ -52,7 +54,7 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.dieSound=null;
         
         this.nextDamageTick=0;
-        this.death
+        this.currentFallDistance=0;
         this.lastInLiquid=false;
         this.lastUnderLiquid=false;
         
@@ -109,6 +111,8 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.jumpWaterHeight=this.core.game.lookupValue(this.json.config.jumpWaterHeight,this.data);
         this.flySwimYReduce=this.core.game.lookupValue(this.json.config.flySwimYReduce,this.data);
         this.damageFlinchWaitTick=this.core.game.lookupValue(this.json.config.damageFlinchWaitTick,this.data);
+        this.fallDamageMinDistance=this.core.game.lookupValue(this.json.config.fallDamageMinDistance,this.data);
+        this.fallDamagePercentage=this.core.game.lookupValue(this.json.config.fallDamagePercentage,this.data);
         this.respawnWaitTick=this.core.game.lookupValue(this.json.config.respawnWaitTick,this.data);
         
         this.liquidInSound=this.json.config.liquidInSound;
@@ -234,6 +238,8 @@ export default class EntityFPSPlayerClass extends EntityClass
         
         this.passThrough=false;
         
+        this.currentFallDistance=0;
+        
             // some animation defaults
             
         this.currentIdleAnimation=this.idleAnimation;
@@ -267,7 +273,7 @@ export default class EntityFPSPlayerClass extends EntityClass
         
             // turn off any score display
             
-        this.core.game.showScoreDisplay(true);
+        this.core.game.showScoreDisplay(false);
     }
     
         //

@@ -99,6 +99,8 @@ export default class EntityProjectileClass extends EntityClass
             // so any damage is attributed to them
             
         parentEntity=this;
+        if (this.spawnedBy!==null) parentEntity=this.spawnedBy;
+        
         while (parentEntity.heldBy!==null) {
             parentEntity=parentEntity.heldBy;
         }

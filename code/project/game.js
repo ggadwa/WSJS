@@ -17,6 +17,8 @@ export default class GameClass
         this.jsonCache=new Map();
         
         this.scores=null;
+        this.scoreShow=false;
+        this.scoreLastItemCount=0;
         this.scoreColor=new ColorClass(0,1,0.2);
     }
     
@@ -159,6 +161,11 @@ export default class GameClass
                 this.core.interface.addText(('score_point_'+n),'',this.core.interface.POSITION_MODE_MIDDLE,{"x":10,"y":y},30,this.core.interface.TEXT_ALIGN_LEFT,this.scoreColor,1);
                 y+=35;
             }
+            
+                // no scores yet
+                
+            this.scoreShow=false;
+            this.scoreLastItemCount=0;
         }
                 
             // developer mode initialization
@@ -177,7 +184,7 @@ export default class GameClass
     multiplayerAddScore(fromEntity,killedEntity,isTelefrag)
     {
         let n;
-        let score,points,scoreCount;
+        let score,points;
         let scoreEntity=null;
         let iter,rtn,name,insertIdx;
         let sortedNames=[];
@@ -188,14 +195,14 @@ export default class GameClass
             
         points=0;
             
-        if (fromEntity!==null) {
+        if ((fromEntity!==null) && (fromEntity.fighter)) {
             if (isTelefrag) {
                 scoreEntity=fromEntity;
                 points=1;
                 if (this.json.config.multiplayerMessageText!==null) this.core.interface.updateTemporaryText(this.json.config.multiplayerMessageText,(fromEntity.name+' telefragged '+killedEntity.name),this.json.config.multiplayerMessageWaitTick);
             }
             else {
-                if (fromEntity!==this) {
+                if (fromEntity!==killedEntity) {
                     scoreEntity=fromEntity;
                     points=1;
                     if (this.json.config.multiplayerMessageText!==null) this.core.interface.updateTemporaryText(this.json.config.multiplayerMessageText,(fromEntity.name+' killed '+killedEntity.name),this.json.config.multiplayerMessageWaitTick);
@@ -245,15 +252,15 @@ export default class GameClass
             }
         }
         
-        scoreCount=Math.min(this.MAX_SCORE_COUNT,sortedNames.length);
+        this.scoreLastItemCount=sortedNames.length;
         
         for (n=0;n!=this.MAX_SCORE_COUNT;n++) {
-            if (n<sortedNames.length) {
+            if (n<this.scoreLastItemCount) {
                 this.core.interface.updateText(('score_name_'+n),sortedNames[n]);
-                this.core.interface.showText(('score_name_'+n),true);
+                this.core.interface.showText(('score_name_'+n),this.scoreShow);
                 
                 this.core.interface.updateText(('score_point_'+n),this.scores.get(sortedNames[n]));
-                this.core.interface.showText(('score_point_'+n),true);
+                this.core.interface.showText(('score_point_'+n),this.scoreShow);
             }
             else {
                 this.core.interface.showText(('score_name_'+n),false);
@@ -264,66 +271,22 @@ export default class GameClass
     
     showScoreDisplay(show)
     {
-        /*
-        let n,y;
-        let iter,rtn,name,points,insertIdx;
-        let sortedNames=[];
+        let n;
         
-            // if no show, remove all items
-            // if they exist
-            
-        if (!show) {
-            for (n=0;n!==this.lastScoreCount;n++) {
-                this.removeInterfaceText('score_name_'+n);
-                this.removeInterfaceText('score_point_'+n);
-            }
-            
-            this.lastScoreCount=0;
-            return;
-        }
+        if (!this.core.isMultiplayer) return;
         
-            // sort the scores
-             
-        iter=this.scores.keys();
+        this.scoreShow=show;
         
-        while (true) {
-            rtn=iter.next();
-            if (rtn.done) break;
-            
-            name=rtn.value;
-            points=this.scores.get(name);
-            
-            if (sortedNames.length===0) {
-                sortedNames.push(name);
+        for (n=0;n!=this.MAX_SCORE_COUNT;n++) {
+            if (n<this.scoreLastItemCount) {
+                this.core.interface.showText(('score_name_'+n),this.scoreShow);
+                this.core.interface.showText(('score_point_'+n),this.scoreShow);
             }
             else {
-                insertIdx=0;
-
-                for (n=(sortedNames.length-1);n>=0;n--) {
-                    if (points<this.scores.get(sortedNames[n])) {
-                        insertIdx=n+1;
-                        break;
-                    }
-                }
-
-                sortedNames.splice(insertIdx,0,name);
+                this.core.interface.showText(('score_name_'+n),false);
+                this.core.interface.showText(('score_point_'+n),false);
             }
         }
-        
-            // add the items
-            
-        y=-Math.trunc((35*sortedNames.length)*0.5);
-        
-        for (n=0;n!=sortedNames.length;n++) {
-            this.addInterfaceText(('score_name_'+n),sortedNames[n],'middle',{"x":0,"y":y},30,this.TEXT_ALIGN_RIGHT,this.scoreColor,1);
-            this.addInterfaceText(('score_point_'+n),this.scores.get(sortedNames[n]),'middle',{"x":10,"y":y},30,this.TEXT_ALIGN_LEFT,this.scoreColor,1);
-            
-            y+=35;
-        }
-        
-        this.lastScoreCount=sortedNames.length;
-             * 
-         */
     }
     
         //
@@ -348,6 +311,14 @@ export default class GameClass
         
     run()
     {
+            // score functions
+
+        if (this.core.isMultiplayer) {
+            if (this.core.input.isKeyDownAndClear('/')) this.showScoreDisplay(!this.scoreShow);
+        }
+        
+            // developer functions
+            
         if (this.json.developer) this.developer.run();
     }
 }
