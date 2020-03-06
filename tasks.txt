@@ -4,11 +4,14 @@
 - wsserver - option to show http log in server (default to off)
 
 
+- flash side when hurt (setting - need bitmap)
 - finish fps_bot first
 
 - fallDamageMinDistance
 - fallDamagePercentage
 (in bots, too)
+
+    - grenades not bounce off of pickups
 
     - death messages by game with json setup
 

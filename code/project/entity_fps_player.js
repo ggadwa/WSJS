@@ -48,6 +48,9 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.fallDamagePercentage=0;
         this.respawnWaitTick=0;
         
+        this.thirdPersonCameraDistance=0;
+        this.thirdPersonCameraLookAngle=0;
+        
         this.liquidInSound=null;
         this.liquidOutSound=null;
         this.hurtSound=null;
@@ -70,6 +73,8 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.currentIdleAnimation=null;
         this.currentRunAnimation=null;
         
+        this.respawnTick=0;
+        this.respawnCameraFirstPerson=true;
         this.telefragTriggerEntity=null;
         
             // pre-allocates
@@ -115,6 +120,9 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.fallDamagePercentage=this.core.game.lookupValue(this.json.config.fallDamagePercentage,this.data);
         this.respawnWaitTick=this.core.game.lookupValue(this.json.config.respawnWaitTick,this.data);
         
+        this.thirdPersonCameraDistance=this.core.game.lookupValue(this.json.config.thirdPersonCameraDistance,this.data);
+        this.thirdPersonCameraLookAngle=this.core.game.lookupValue(this.json.config.thirdPersonCameraLookAngle,this.data);
+        
         this.liquidInSound=this.json.config.liquidInSound;
         this.liquidOutSound=this.json.config.liquidOutSound;
         this.hurtSound=this.json.config.hurtSound;
@@ -125,6 +133,10 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.lastUnderLiquid=false;
         
         this.lastWheelClick=0;
+        
+            // initial camera
+            
+        this.respawnCameraFirstPerson=this.core.game.lookupValue(this.json.config.cameraFirstPerson,this.data);
 
             // setup the weapons
         
@@ -238,6 +250,7 @@ export default class EntityFPSPlayerClass extends EntityClass
         
         this.passThrough=false;
         
+        this.respawnTick=0;
         this.currentFallDistance=0;
         
             // some animation defaults
@@ -274,6 +287,10 @@ export default class EntityFPSPlayerClass extends EntityClass
             // turn off any score display
             
         this.core.game.showScoreDisplay(false);
+        
+            // restore the camera
+            
+        if (this.respawnCameraFirstPerson) this.core.camera.gotoFirstPerson();
     }
     
         //
@@ -349,14 +366,16 @@ export default class EntityFPSPlayerClass extends EntityClass
     die(fromEntity,isTelefrag)
     {
         this.respawnTick=this.core.timestamp+this.respawnWaitTick;
+        this.respawnCameraFirstPerson=this.core.camera.isFirstPerson();
         this.passThrough=true;
-        this.core.soundList.playJson(this,null,this.dieSound);
         
-        this.core.game.multiplayerAddScore(fromEntity,this,isTelefrag);
+        this.core.camera.gotoThirdPersonBehind(this.thirdPersonCameraDistance,this.thirdPersonCameraLookAngle);
 
+        this.core.soundList.playJson(this,null,this.dieSound);
         this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.dieAnimation[0],this.dieAnimation[1]);
         this.modelEntityAlter.queueAnimationStop();
         
+        this.core.game.multiplayerAddScore(fromEntity,this,isTelefrag);
         this.core.game.showScoreDisplay(true);
     }
     
@@ -416,6 +435,24 @@ export default class EntityFPSPlayerClass extends EntityClass
         let mouseWheelClick;
         let input=this.core.input;
         let setup=this.core.setup;
+        
+            // dead
+            
+        if (this.respawnTick!==0) {
+            
+                // keep falling
+                
+            this.rotMovement.setFromValues(0,0,0);
+            this.moveInMapY(this.rotMovement,false);
+            
+                // only recover in multiplayer
+                
+            if (this.isMultiplayer()) {
+                if (this.core.timestamp>this.respawnTick)  this.ready();
+            }
+            
+            return;
+        }
         
             // update any UI
             
@@ -618,7 +655,7 @@ export default class EntityFPSPlayerClass extends EntityClass
         if (this.json.config.multiCamera) {
             if (this.core.input.isKeyDownAndClear('`')) {
                 if (this.core.camera.isFirstPerson()) {
-                    this.core.camera.gotoThirdPersonBehind(10000,-10);
+                    this.core.camera.gotoThirdPersonBehind(this.thirdPersonCameraDistance,this.thirdPersonCameraLookAngle);
                 }
                 else {
                     this.core.camera.gotoFirstPerson();

@@ -74,13 +74,20 @@ export default class EntityFPSBotClass extends EntityClass
         this.pausedTriggerName=null;
         this.targetEntity=null;
         this.lastTargetAngleDif=360;
+        this.currentLookIdx=0;
 
+        this.respawnTick=0;
         this.telefragTriggerEntity=null;
+        
+        this.seekNodeDistanceSlop=0;
+        this.seekNodeAngleSlop=0;
+        this.targetScanYRange=0;
         
             // pre-allocates
             
         this.movement=new PointClass(0,0,0);
         this.rotMovement=new PointClass(0,0,0);
+        this.stuckPoint=new PointClass(0,0,0);
         
         this.drawAngle=new PointClass(0,0,0);
     }
@@ -125,6 +132,10 @@ export default class EntityFPSBotClass extends EntityClass
         this.nextDamageTick=0;
         this.lastInLiquid=false;
         this.lastUnderLiquid=false;
+        
+        this.seekNodeDistanceSlop=this.core.game.lookupValue(this.json.config.seekNodeDistanceSlop,this.data);
+        this.seekNodeAngleSlop=this.core.game.lookupValue(this.json.config.seekNodeAngleSlop,this.data);
+        this.targetScanYRange=this.core.game.lookupValue(this.json.config.targetScanYRange,this.data);
 
             // setup the weapons
         
@@ -177,6 +188,11 @@ export default class EntityFPSBotClass extends EntityClass
         
         this.currentFallDistance=0;
         
+        this.respawnTick=0;
+        this.telefragTriggerEntity=null;
+        
+        
+        
             // start with beretta
             
         //this.currentWeapon=-1;
@@ -191,12 +207,10 @@ export default class EntityFPSBotClass extends EntityClass
         
             // start scanning in middle
             
-        //this.currentLookIdx=Math.trunc(this.TARGET_SCAN_Y_ANGLES.length*0.5);
+        this.currentLookIdx=0;
         
             // move to random node
             
-        this.telefragTriggerEntity=null;
-        
         this.moveToRandomNode(false);
 
             // get seek node
@@ -227,17 +241,17 @@ export default class EntityFPSBotClass extends EntityClass
     {
         this.respawnTick=this.core.timestamp+this.respawnWaitTick;
         this.passThrough=true;
+        
         this.core.soundList.playJson(this,null,this.dieSound);
-
-        this.core.game.multiplayerAddScore(fromEntity,this,isTelefrag);
-
         this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.dieAnimation[0],this.dieAnimation[1]);
         this.modelEntityAlter.queueAnimationStop();
+
+        this.core.game.multiplayerAddScore(fromEntity,this,isTelefrag);
     }
     
     damage(fromEntity,damage,hitPoint)
     {
-        if (this.deadCount!==-1) return;
+        if (this.health<=0) return;
         
         this.armor-=damage;
         if (this.armor<0) {
@@ -260,9 +274,28 @@ export default class EntityFPSBotClass extends EntityClass
         
     run()
     {
+        let nodeIdx,prevNodeIdx,moveForward;
+        let turnDiff,slideLeft,liquidIdx;
+        
             // the developer freeze
             
         if (this.core.game.developer.freezeBotMonsters) return;
+        
+            // dead
+            
+        if (this.respawnTick!==0) {
+            
+                // keep falling
+                
+            this.rotMovement.setFromValues(0,0,0);
+            this.moveInMapY(this.rotMovement,false);
+            
+                // bots always recover
+                
+            if (this.core.timestamp>this.respawnTick)  this.ready();
+            
+            return;
+        }
         
             // the telefrag trigger
             // we defer this because it can happen during a spawn
@@ -273,6 +306,149 @@ export default class EntityFPSBotClass extends EntityClass
             return;
         }
         
+            // if no node, just skip out
+            
+        if (this.nextNodeIdx===-1) return;
+        
+            // pick best weapon
+            
+        if ((this.hasM16) && (this.m16.ammoCount>0)) {
+        //    this.switchWeapon(this.WEAPON_M16);
+        }
+        else {
+        //    this.switchWeapon(this.WEAPON_BERETTA);
+        }
+        
+            // look for things to shoot
+            
+        //this.findEntityToFight();
+        
+        //if (this.targetEntity!==null) this.fireWeapon();
+        
+            // always start by moving
+            
+        moveForward=true;
+       
+            // if we are waiting for a trigger,
+            // then do nothing until trigger
+            
+        if (this.pausedTriggerName!==null) {
+            if (!this.core.checkTrigger(this.pausedTriggerName)) {
+                moveForward=false;
+            }
+            else {
+                this.pausedTriggerName=null;
+                this.startModelAnimationChunkInFrames(null,30,960,996);
+            }
+        }
+        
+            // if we aren't paused, see if we hit
+            // next node or goal
+            
+        else {
+
+                // have we hit goal node?
+                // we only chase goals if we aren't targetting another entity
+
+            if (this.targetEntity===null) {
+                if (this.hitPathNode(this.goalNodeIdx,this.seekNodeDistanceSlop)) {
+                    nodeIdx=this.goalNodeIdx;
+                    this.goalNodeIdx=this.getRandomKeyNodeIndex();
+                    this.nextNodeIdx=this.nextNodeInPath(nodeIdx,this.goalNodeIdx);
+                }
+            }
+            
+                // have we hit the next node?
+                // if we are targetting an entity, go to the next nearest
+                // linked node closest to the entity, otherwise path to the goal
+
+            if (this.hitPathNode(this.nextNodeIdx,this.seekNodeDistanceSlop)) {
+                prevNodeIdx=this.nextNodeIdx;
+                
+                if (this.targetEntity===null) {
+                    this.nextNodeIdx=this.nextNodeInPath(this.nextNodeIdx,this.goalNodeIdx);
+                }
+                else {
+                    this.nextNodeIdx=this.nextNodeTowardsEntity(this.nextNodeIdx,this.targetEntity);
+                }
+                
+                    // is this a node we should pause at?
+
+                this.pausedTriggerName=this.isNodeATriggerPauseNode(prevNodeIdx,this.nextNodeIdx);
+                if (this.pausedTriggerName!==null) {
+                    this.startModelAnimationChunkInFrames(null,30,92,177);
+                    return;
+                }
+            }
+        }
+        
+            // if we are touching an entity, try to slide out
+            // of the way
+            
+        slideLeft=false;
+        
+        if ((this.touchEntity!==null) && (moveForward)) {
+            slideLeft=true;
+        }
+        
+            // turn towards the node
+            // if we aren't paused
+        
+        if (this.pausedTriggerName===null) {
+            turnDiff=this.turnYTowardsNode(this.nextNodeIdx,this.maxTurnSpeed);
+            if (turnDiff>this.seekNodeAngleSlop) moveForward=false;
+        }
+        
+            // changing angles based on if we are
+            // walking nodes or targetting
+            
+        if (this.targetEntity===null) {
+            this.drawAngle.turnYTowards(this.angle.y,this.maxTurnSpeed);
+        }
+        else {
+            this.lastTargetAngleDif=this.drawAngle.turnYTowards(this.position.angleYTo(this.targetEntity.position),this.maxTurnSpeed);
+        }
+        
+        return;
+        
+            // move
+            
+        this.movement.moveZWithAcceleration(moveForward,false,this.FORWARD_ACCELERATION,this.FORWARD_DECELERATION,this.FORWARD_MAX_SPEED,this.FORWARD_ACCELERATION,this.FORWARD_DECELERATION,this.FORWARD_MAX_SPEED);        
+        this.movement.moveXWithAcceleration(slideLeft,false,this.SIDE_ACCELERATION,this.SIDE_DECELERATION,this.SIDE_MAX_SPEED,this.SIDE_ACCELERATION,this.SIDE_DECELERATION,this.SIDE_MAX_SPEED);
+
+        this.rotMovement.setFromPoint(this.movement);
+        this.rotMovement.rotateY(null,this.angle.y);
+        
+        this.movement.y=this.moveInMapY(this.rotMovement,false);
+        this.moveInMapXZ(this.rotMovement,true,true);
+        
+            // detect stuck
+            // if we get stuck, then head towards the nearest node and
+            // then onto a new random goal
+            
+        if ((this.position.equals(this.stuckPoint)) && (this.pausedTriggerName===null)) {
+            this.stuckCount++;
+            if (this.stuckCount>=this.MAX_STUCK_COUNT) {
+                this.stuckCount=0;
+                this.goalNodeIdx=this.getRandomKeyNodeIndex();
+                this.nextNodeIdx=this.findNearestPathNode(-1);
+            }
+        }
+        
+        this.stuckPoint.setFromPoint(this.position);
+        
+            // liquids
+            
+        liquidIdx=this.core.map.liquidList.getLiquidForPoint(this.position);
+        
+        if (liquidIdx!==-1) {
+            if ((!this.lastInLiquid) && (this.liquidInSound!==null)) this.core.soundList.playJson(this,null,this.liquidInSound);
+            this.lastInLiquid=true;
+        }
+        else {
+            if ((this.lastInLiquid) && (this.liquidOutSound!==null)) this.core.soundList.playJson(this,null,this.liquidOutSound);
+            this.lastInLiquid=false;
+        }
     }
     
     drawSetup()

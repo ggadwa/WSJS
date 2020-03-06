@@ -1,5 +1,7 @@
 import ColorClass from '../utility/color.js';
 import RectClass from '../../../code/utility/rect.js';
+import InterfaceLiquidClass from '../interface/interface_liquid.js';
+import InterfaceHitClass from '../interface/interface_hit.js';
 import InterfaceElementClass from '../interface/interface_element.js';
 import InterfaceCountClass from '../interface/interface_count.js';
 import InterfaceTextClass from '../interface/interface_text.js';
@@ -43,12 +45,15 @@ export default class InterfaceClass
             
         this.uiTextColor=new ColorClass(1,1,0);
         
-        this.tintVertexArray=new Float32Array(2*6);     // 2D, only 2 vertex coordinates
-        this.tintVertexBuffer=null;
-        this.tintColor=new ColorClass(0,0,0);
-        
         this.fontTexture=null;
         this.fontCharWidths=new Float32Array(128);
+        
+        this.liquid=null;
+        
+        this.hitLeft=null;
+        this.hitRight=null;
+        this.hitTop=null;
+        this.hitBottom=null;
         
         this.touchStickLeft=null;
         this.touchStickRight=null;
@@ -62,7 +67,7 @@ export default class InterfaceClass
 
     initialize()
     {
-        let gl=this.core.gl;
+        let hitSize;
         
             // clear all current elements and texts
             
@@ -74,35 +79,34 @@ export default class InterfaceClass
             
         this.createFontTexture();
         
-            // tint vertexes
-            // (two triangles)
+            // liquid tinting
             
-        this.tintVertexArray[0]=0;
-        this.tintVertexArray[1]=0;
-        this.tintVertexArray[2]=this.core.wid;
-        this.tintVertexArray[3]=0;
-        this.tintVertexArray[4]=this.core.wid;
-        this.tintVertexArray[5]=this.core.high;
+        this.liquid=new InterfaceLiquidClass(this.core);
+        if (!this.liquid.initialize()) return(false);
         
-        this.tintVertexArray[6]=0;
-        this.tintVertexArray[7]=0;
-        this.tintVertexArray[8]=this.core.wid;
-        this.tintVertexArray[9]=this.core.high;
-        this.tintVertexArray[10]=0;
-        this.tintVertexArray[11]=this.core.high;
+            // hit elements
             
-        this.tintVertexBuffer=gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.tintVertexBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.tintVertexArray,gl.STATIC_DRAW);
-        gl.bindBuffer(gl.ARRAY_BUFFER,null);
+        hitSize=Math.trunc(this.core.canvas.width*0.1);
         
+        this.hitLeft=new InterfaceHitClass(this.core,new RectClass((this.core.canvas.width-hitSize),0,this.core.canvas.width,this.core.canvas.height),[[0,0],[1,0],[1,1],[0,1]]);
+        if (!this.hitLeft.initialize()) return(false);
+        
+        this.hitRight=new InterfaceHitClass(this.core,new RectClass(0,0,hitSize,this.core.canvas.height),[[0,0],[1,0],[1,1],[0,1]]);
+        if (!this.hitRight.initialize()) return(false);
+        
+        this.hitTop=new InterfaceHitClass(this.core,new RectClass(0,0,this.core.canvas.width,hitSize),[[0,0],[1,0],[1,1],[0,1]]);
+        if (!this.hitTop.initialize()) return(false);
+        
+        this.hitBottom=new InterfaceHitClass(this.core,new RectClass(0,(this.core.canvas.height-hitSize),this.core.canvas.width,this.core.canvas.height),[[0,0],[1,0],[1,1],[0,1]]);
+        if (!this.hitBottom.initialize()) return(false);
+
             // touch sticks
             
         this.touchStickLeft=new TouchStickClass(this.core);
-        this.touchStickLeft.initialize();
+        if (!this.touchStickLeft.initialize()) return(false);
         
         this.touchStickRight=new TouchStickClass(this.core);
-        this.touchStickRight.initialize();
+        if (!this.touchStickRight.initialize()) return(false);
 
         return(true);
     }
@@ -111,14 +115,15 @@ export default class InterfaceClass
     {
         let element,count,text;
         
-            // release touch sticks
-            
+        this.liquid.release();
+        
+        this.hitLeft.release();
+        this.hitRight.release();
+        this.hitTop.release();
+        this.hitBottom.release();
+        
         this.touchStickLeft.release();
         this.touchStickRight.release();
-        
-            // release tint
-            
-        this.core.gl.deleteBuffer(this.tintVertexBuffer);
         
             // release all elements, counts, and texts
             
@@ -438,46 +443,11 @@ export default class InterfaceClass
         
         return(true);
     }
-    
+        
         //
         // drawing
         //
         
-    drawTint()
-    {
-        let player=this.core.map.entityList.getPlayer();
-        let shader=this.core.shaderList.tintShader;
-        let gl=this.core.gl;
-        
-            // setup tint
-            
-        if (!player.getScreenTint(this.tintColor)) return;
-        
-            // draw tint
-            
-        gl.blendFunc(gl.ONE,gl.SRC_COLOR);
-        
-        shader.drawStart();
-        
-        this.tintColor.fixOverflow();
-        gl.uniform4f(shader.colorUniform,this.tintColor.r,this.tintColor.g,this.tintColor.b,1.0);
-        
-            // setup the buffers
-
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.tintVertexBuffer);
-        gl.vertexAttribPointer(shader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
-        
-            // draw the quad
-            
-        gl.drawArrays(gl.TRIANGLES,0,6);
-
-            // remove the buffers
-
-        gl.bindBuffer(gl.ARRAY_BUFFER,null);
-        
-        shader.drawEnd();
-    }
-
     draw()
     {
         let key,element,count,text;
@@ -486,9 +456,14 @@ export default class InterfaceClass
         gl.disable(gl.DEPTH_TEST);
         gl.enable(gl.BLEND);
         
-            // tinting
+            // liquid and hits
         
-        this.drawTint();
+        this.liquid.draw();
+
+        this.hitLeft.draw();
+        this.hitRight.draw();
+        this.hitTop.draw();
+        this.hitBottom.draw();
             
             // elements and counts
             
