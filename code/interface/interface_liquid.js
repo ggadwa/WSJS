@@ -16,8 +16,7 @@ export default class InterfaceLiquidClass
     {
         this.core=core;
         
-        this.liquidTintVertexArray=new Float32Array(2*6);     // 2D, only 2 vertex coordinates
-        this.liquidTintVertexBuffer=null;
+        this.vertexBuffer=null;
         
         Object.seal(this);
     }
@@ -28,28 +27,31 @@ export default class InterfaceLiquidClass
 
     initialize()
     {
+        let vertexArray;
         let gl=this.core.gl;
         
             // liquid tint vertexes
             // (two triangles so we can array draw)
             
-        this.liquidTintVertexArray[0]=0;
-        this.liquidTintVertexArray[1]=0;
-        this.liquidTintVertexArray[2]=this.core.wid;
-        this.liquidTintVertexArray[3]=0;
-        this.liquidTintVertexArray[4]=this.core.wid;
-        this.liquidTintVertexArray[5]=this.core.high;
-        
-        this.liquidTintVertexArray[6]=0;
-        this.liquidTintVertexArray[7]=0;
-        this.liquidTintVertexArray[8]=this.core.wid;
-        this.liquidTintVertexArray[9]=this.core.high;
-        this.liquidTintVertexArray[10]=0;
-        this.liquidTintVertexArray[11]=this.core.high;
+        vertexArray=new Float32Array(2*6);
             
-        this.liquidTintVertexBuffer=gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.liquidTintVertexBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.liquidTintVertexArray,gl.STATIC_DRAW);
+        vertexArray[0]=0;
+        vertexArray[1]=0;
+        vertexArray[2]=this.core.wid;
+        vertexArray[3]=0;
+        vertexArray[4]=this.core.wid;
+        vertexArray[5]=this.core.high;
+        
+        vertexArray[6]=0;
+        vertexArray[7]=0;
+        vertexArray[8]=this.core.wid;
+        vertexArray[9]=this.core.high;
+        vertexArray[10]=0;
+        vertexArray[11]=this.core.high;
+            
+        this.vertexBuffer=gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,vertexArray,gl.STATIC_DRAW);
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
 
         return(true);
@@ -57,7 +59,7 @@ export default class InterfaceLiquidClass
 
     release()
     {
-        this.core.gl.deleteBuffer(this.liquidTintVertexBuffer);
+        this.core.gl.deleteBuffer(this.vertexBuffer);
     }
     
         //
@@ -80,15 +82,14 @@ export default class InterfaceLiquidClass
         
             // draw tint
             
-        gl.blendFunc(gl.ONE,gl.SRC_COLOR);
-        
         shader.drawStart();
+        gl.blendFunc(gl.ONE,gl.SRC_COLOR);
         
         gl.uniform4f(shader.colorUniform,liquid.tint.r,liquid.tint.g,liquid.tint.b,1.0);
         
             // setup the buffers
 
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.liquidTintVertexBuffer);
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
         gl.vertexAttribPointer(shader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
         
             // draw the quad

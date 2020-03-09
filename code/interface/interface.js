@@ -88,16 +88,16 @@ export default class InterfaceClass
             
         hitSize=Math.trunc(this.core.canvas.width*0.1);
         
-        this.hitLeft=new InterfaceHitClass(this.core,new RectClass((this.core.canvas.width-hitSize),0,this.core.canvas.width,this.core.canvas.height),[[0,0],[1,0],[1,1],[0,1]]);
+        this.hitLeft=new InterfaceHitClass(this.core,new RectClass(0,0,hitSize,this.core.canvas.height),[[1,0],[1,1],[0,1],[0,0]]);
         if (!this.hitLeft.initialize()) return(false);
         
-        this.hitRight=new InterfaceHitClass(this.core,new RectClass(0,0,hitSize,this.core.canvas.height),[[0,0],[1,0],[1,1],[0,1]]);
+        this.hitRight=new InterfaceHitClass(this.core,new RectClass((this.core.canvas.width-hitSize),0,this.core.canvas.width,this.core.canvas.height),[[1,1],[1,0],[0,0],[0,1]]);
         if (!this.hitRight.initialize()) return(false);
         
         this.hitTop=new InterfaceHitClass(this.core,new RectClass(0,0,this.core.canvas.width,hitSize),[[0,0],[1,0],[1,1],[0,1]]);
         if (!this.hitTop.initialize()) return(false);
         
-        this.hitBottom=new InterfaceHitClass(this.core,new RectClass(0,(this.core.canvas.height-hitSize),this.core.canvas.width,this.core.canvas.height),[[0,0],[1,0],[1,1],[0,1]]);
+        this.hitBottom=new InterfaceHitClass(this.core,new RectClass(0,(this.core.canvas.height-hitSize),this.core.canvas.width,this.core.canvas.height),[[1,1],[0,1],[0,0],[1,0]]);
         if (!this.hitBottom.initialize()) return(false);
 
             // touch sticks
@@ -455,11 +455,11 @@ export default class InterfaceClass
         
         gl.disable(gl.DEPTH_TEST);
         gl.enable(gl.BLEND);
-        
+                    
             // liquid and hits
         
         this.liquid.draw();
-
+        
         this.hitLeft.draw();
         this.hitRight.draw();
         this.hitTop.draw();
@@ -467,9 +467,9 @@ export default class InterfaceClass
             
             // elements and counts
             
-        gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
-            
         this.core.shaderList.interfaceShader.drawStart();
+        
+        gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
         
         for ([key,element] of this.elements) {
             element.draw();
