@@ -7,9 +7,8 @@ export default class InterfaceHitClass
         this.rect=rect;
         this.uvs=uvs;
         
-        this.pulseStartTick=0;
-        this.pulseTick=-1;
-        this.pulseExpand=0;
+        this.flashStartTick=0;
+        this.flashTick=0;
         
         this.vertexBuffer=null;
         this.uvBuffer=null;
@@ -74,13 +73,32 @@ export default class InterfaceHitClass
         gl.deleteBuffer(this.uvBuffer);
     }
     
+    flash(flashTick)
+    {
+        this.flashStartTick=this.core.timestamp;
+        this.flashTick=flashTick;
+    }
+    
     draw()
     {
+        let alpha,tick;
         let bitmap;
         let shader=this.core.shaderList.interfaceShader;
         let gl=this.core.gl;
         
-        return;
+            // flash on?
+            
+        if (this.flashStartTick===0) return;
+        
+        tick=this.core.timestamp-this.flashStartTick;
+        if (tick>this.flashTick) {
+            this.flashStartTick=0;
+            return;
+        }
+        
+        alpha=Math.sin((tick/this.flashTick)*Math.PI);
+        
+            // draw
         
         shader.drawStart();
         gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
@@ -89,7 +107,7 @@ export default class InterfaceHitClass
             
         bitmap=this.core.bitmapList.get('textures/interface_hit.png');
         bitmap.attachAsInterface();
-        gl.uniform4f(shader.colorUniform,1,1,1,1);
+        gl.uniform4f(shader.colorUniform,1,1,1,alpha);
         
             // setup the buffers
 

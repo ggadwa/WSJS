@@ -261,7 +261,7 @@ export default class EntityFPSMonsterClass extends EntityClass
     meleeHit(player)
     {
         this.core.soundList.playJson(this,null,this.meleeSound);
-        player.damage(this,this.meleeDamage,null);
+        player.damage(this,this.meleeDamage,this.position);
     }
     
     projectileSetupFire(player)

@@ -86,13 +86,15 @@ export default class InterfaceClass
         
             // hit elements
             
-        hitSize=Math.trunc(this.core.canvas.width*0.1);
+        hitSize=Math.trunc(this.core.canvas.width*0.08);
         
         this.hitLeft=new InterfaceHitClass(this.core,new RectClass(0,0,hitSize,this.core.canvas.height),[[1,0],[1,1],[0,1],[0,0]]);
         if (!this.hitLeft.initialize()) return(false);
         
         this.hitRight=new InterfaceHitClass(this.core,new RectClass((this.core.canvas.width-hitSize),0,this.core.canvas.width,this.core.canvas.height),[[1,1],[1,0],[0,0],[0,1]]);
         if (!this.hitRight.initialize()) return(false);
+        
+        hitSize=Math.trunc(this.core.canvas.height*0.08);
         
         this.hitTop=new InterfaceHitClass(this.core,new RectClass(0,0,this.core.canvas.width,hitSize),[[0,0],[1,0],[1,1],[0,1]]);
         if (!this.hitTop.initialize()) return(false);
@@ -464,7 +466,7 @@ export default class InterfaceClass
         this.hitRight.draw();
         this.hitTop.draw();
         this.hitBottom.draw();
-            
+        
             // elements and counts
             
         this.core.shaderList.interfaceShader.drawStart();

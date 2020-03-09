@@ -3,8 +3,10 @@
 - sound play might need position instead of expecting object with .position (as effects call it)
 - wsserver - option to show http log in server (default to off)
 
+- change flash to have less transparency in it
 
-- flash side when hurt (setting - need bitmap)
+- bot config BY SKILL
+- trigger pause nodes part of node
 - finish fps_bot first
 
 - fallDamageMinDistance

@@ -18,11 +18,6 @@ export default class EntityFPSBotClass extends EntityClass
         this.armorInitialCount=0;
         this.armorMaxCount=0;
         
-        this.interfaceHealthIcon=null;
-        this.interfaceHealthCount=null;
-        this.interfaceArmorIcon=null;
-        this.interfaceArmorCount=null;
-        
         this.idleAnimation=null;
         this.runAnimation=null;
         this.dieAnimation=null;
@@ -82,6 +77,7 @@ export default class EntityFPSBotClass extends EntityClass
         this.seekNodeDistanceSlop=0;
         this.seekNodeAngleSlop=0;
         this.targetScanYRange=0;
+        this.targetForgetDistance=0;
         
             // pre-allocates
             
@@ -95,47 +91,55 @@ export default class EntityFPSBotClass extends EntityClass
     initialize()
     {
         let n,weaponBlock,weaponEntity;
+        let skill,skillIdx=0;
         
         if (!super.initialize()) return(false);
         
+            // regular config
+            
         this.idleAnimation=this.json.config.idleAnimation;
         this.runAnimation=this.json.config.runAnimation;
         this.dieAnimation=this.json.config.dieAnimation;
-        
-        this.healthInitialCount=this.core.game.lookupValue(this.json.config.healthInitialCount,this.data);
-        this.healthMaxCount=this.core.game.lookupValue(this.json.config.healthMaxCount,this.data);
-        this.armorInitialCount=this.core.game.lookupValue(this.json.config.armorInitialCount,this.data);
-        this.armorMaxCount=this.core.game.lookupValue(this.json.config.armorMaxCount,this.data);
-        
-        this.maxTurnSpeed=this.core.game.lookupValue(this.json.config.maxTurnSpeed,this.data);
-        this.maxLookSpeed=this.core.game.lookupValue(this.json.config.maxLookSpeed,this.data);
-        this.maxLookAngle=this.core.game.lookupValue(this.json.config.maxLookAngle,this.data);
-        this.forwardAcceleration=this.core.game.lookupValue(this.json.config.forwardAcceleration,this.data);
-        this.forwardDeceleration=this.core.game.lookupValue(this.json.config.forwardDeceleration,this.data);
-        this.forwardMaxSpeed=this.core.game.lookupValue(this.json.config.forwardMaxSpeed,this.data);
-        this.sideAcceleration=this.core.game.lookupValue(this.json.config.sideAcceleration,this.data);
-        this.sideDeceleration=this.core.game.lookupValue(this.json.config.sideDeceleration,this.data);
-        this.sideMaxSpeed=this.core.game.lookupValue(this.json.config.sideMaxSpeed,this.data);
-        this.jumpHeight=this.core.game.lookupValue(this.json.config.jumpHeight,this.data);
-        this.jumpWaterHeight=this.core.game.lookupValue(this.json.config.jumpWaterHeight,this.data);
-        this.flySwimYReduce=this.core.game.lookupValue(this.json.config.flySwimYReduce,this.data);
-        this.damageFlinchWaitTick=this.core.game.lookupValue(this.json.config.damageFlinchWaitTick,this.data);
-        this.fallDamageMinDistance=this.core.game.lookupValue(this.json.config.fallDamageMinDistance,this.data);
-        this.fallDamagePercentage=this.core.game.lookupValue(this.json.config.fallDamagePercentage,this.data);
-        this.respawnWaitTick=this.core.game.lookupValue(this.json.config.respawnWaitTick,this.data);
         
         this.liquidInSound=this.json.config.liquidInSound;
         this.liquidOutSound=this.json.config.liquidOutSound;
         this.hurtSound=this.json.config.hurtSound;
         this.dieSound=this.json.config.dieSound;
+
+            // skill based config
+            
+        skill=this.json.config.skills[skillIdx];
+        
+        this.healthInitialCount=this.core.game.lookupValue(skill.healthInitialCount,this.data);
+        this.healthMaxCount=this.core.game.lookupValue(skill.healthMaxCount,this.data);
+        this.armorInitialCount=this.core.game.lookupValue(skill.armorInitialCount,this.data);
+        this.armorMaxCount=this.core.game.lookupValue(skill.armorMaxCount,this.data);
+        
+        this.maxTurnSpeed=this.core.game.lookupValue(skill.maxTurnSpeed,this.data);
+        this.maxLookSpeed=this.core.game.lookupValue(skill.maxLookSpeed,this.data);
+        this.maxLookAngle=this.core.game.lookupValue(skill.maxLookAngle,this.data);
+        this.forwardAcceleration=this.core.game.lookupValue(skill.forwardAcceleration,this.data);
+        this.forwardDeceleration=this.core.game.lookupValue(skill.forwardDeceleration,this.data);
+        this.forwardMaxSpeed=this.core.game.lookupValue(skill.forwardMaxSpeed,this.data);
+        this.sideAcceleration=this.core.game.lookupValue(skill.sideAcceleration,this.data);
+        this.sideDeceleration=this.core.game.lookupValue(skill.sideDeceleration,this.data);
+        this.sideMaxSpeed=this.core.game.lookupValue(skill.sideMaxSpeed,this.data);
+        this.jumpHeight=this.core.game.lookupValue(skill.jumpHeight,this.data);
+        this.jumpWaterHeight=this.core.game.lookupValue(skill.jumpWaterHeight,this.data);
+        this.flySwimYReduce=this.core.game.lookupValue(skill.flySwimYReduce,this.data);
+        this.damageFlinchWaitTick=this.core.game.lookupValue(skill.damageFlinchWaitTick,this.data);
+        this.fallDamageMinDistance=this.core.game.lookupValue(skill.fallDamageMinDistance,this.data);
+        this.fallDamagePercentage=this.core.game.lookupValue(skill.fallDamagePercentage,this.data);
+        this.respawnWaitTick=this.core.game.lookupValue(skill.respawnWaitTick,this.data);
+        
+        this.seekNodeDistanceSlop=this.core.game.lookupValue(skill.seekNodeDistanceSlop,this.data);
+        this.seekNodeAngleSlop=this.core.game.lookupValue(skill.seekNodeAngleSlop,this.data);
+        this.targetScanYRange=this.core.game.lookupValue(skill.targetScanYRange,this.data);
+        this.targetForgetDistance=this.core.game.lookupValue(skill.targetForgetDistance,this.data);
         
         this.nextDamageTick=0;
         this.lastInLiquid=false;
         this.lastUnderLiquid=false;
-        
-        this.seekNodeDistanceSlop=this.core.game.lookupValue(this.json.config.seekNodeDistanceSlop,this.data);
-        this.seekNodeAngleSlop=this.core.game.lookupValue(this.json.config.seekNodeAngleSlop,this.data);
-        this.targetScanYRange=this.core.game.lookupValue(this.json.config.targetScanYRange,this.data);
 
             // setup the weapons
         
@@ -180,9 +184,8 @@ export default class EntityFPSBotClass extends EntityClass
         
             // full health
             
-        this.health=100;
-        this.armor=0;
-        this.deadCount=-1;
+        this.health=this.healthInitialCount;
+        this.armor=this.armorInitialCount;
         this.stuckCount=0;
         this.passThrough=false;         // reset if this is being called after bot died
         
@@ -191,19 +194,10 @@ export default class EntityFPSBotClass extends EntityClass
         this.respawnTick=0;
         this.telefragTriggerEntity=null;
         
-        
-        
-            // start with beretta
+            // start with best weapon
             
-        //this.currentWeapon=-1;
-        //this.switchWeapon(this.WEAPON_BERETTA);
-        
-        //this.hasM16=false;
-        //this.grenadePauseTick=this.getTimestamp()+this.GRENADE_PAUSE_TICK;
-        
-        //this.beretta.ready();
-        //this.m16.ready();
-        //this.grenade.ready();
+        this.currentCarouselWeaponIdx=-1;
+        this.pickBestWeapon();
         
             // start scanning in middle
             
@@ -234,9 +228,13 @@ export default class EntityFPSBotClass extends EntityClass
 
             // start animation
             
-        this.startModelAnimationChunkInFrames(null,30,960,996);
+        this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.runAnimation[0],this.runAnimation[1]);
     }
     
+        //
+        // health
+        //
+        
     die(fromEntity,isTelefrag)
     {
         this.respawnTick=this.core.timestamp+this.respawnWaitTick;
@@ -271,11 +269,168 @@ export default class EntityFPSBotClass extends EntityClass
     {
         this.telefragTriggerEntity=fromEntity;
     }
+    
+        //
+        // action messages
+        //
+        
+    findWeaponByName(weaponName)
+    {
+        let n;
+        
+        for (n=0;n!==this.carouselWeapons.length;n++) {
+            if (this.carouselWeapons[n].name===weaponName) return(this.carouselWeapons[n]);
+        }
+        
+        for (n=0;n!==this.extraWeapons.length;n++) {
+            if (this.extraWeapons[n].name===weaponName) return(this.extraWeapons[n]);
+        }
+
+        console.log('Unknown weapon: '+weaponName);
+        return(null);
+    }
+    
+    addWeapon(weaponName)
+    {
+        let weapon=this.findWeaponByName(weaponName);
+        if (weapon===null) return;
+        
+            // make weapon available
+            
+        weapon.available=true;
+    }
+    
+    addAmmo(weaponName,fireMethod,count)
+    {
+        let weapon=this.findWeaponByName(weaponName);
+        if (weapon===null) return;
+        
+        weapon.addAmmo(fireMethod,count);
+    }
+    
+    addHealth(count)
+    {
+        this.health+=count;
+        if (this.health>this.healthMaxCount) this.health=this.healthMaxCount;
+    }
+    
+    addArmor(count)
+    {
+        this.armor+=count;
+        if (this.armor>this.armorMaxCount) this.armor=this.armorMaxCount;
+    }
+    
+        //
+        // determine if we are at a node that is a pause node.  This is not
+        // built in but we specify data that says at this node wait for a certain
+        // trigger before going on to another node
+        //
+    
+    isNodeATriggerPauseNode(nodeIdx,nextNodeIdx)
+    {
+        let n,data;
+        
+        data=this.getNodeData(nodeIdx);
+        if (data===null) return(null);
+        
+        for (n=0;n!=data.length;n++) {
+            if (data[n].link===nextNodeIdx) return(data[n].trigger);
+        }
+        
+        return(null); 
+    }
+    
+        //
+        // fighting
+        //
+        
+    pickBestWeapon()
+    {
+        let n,idx,weaponEntity,meshName;
+        
+            // find best weapon
+            
+        idx=-1;
+
+        for (n=0;n!==this.carouselWeapons.length;n++) {
+            if (this.carouselWeapons[n].available) idx=n;
+        }
+
+        if (idx===this.currentCarouselWeaponIdx) return;
+        
+            // switch weapon
+            
+        this.currentCarouselWeaponIdx=idx;
+        
+        for (n=0;n!==this.carouselWeapons.length;n++) {
+            weaponEntity=this.carouselWeapons[n];
+            
+            if (n===this.currentCarouselWeaponIdx) {
+                this.forceAnimationUpdate=true;
+                this.currentIdleAnimation=weaponEntity.parentIdleAnimation;
+                this.currentRunAnimation=weaponEntity.parentRunAnimation;
+                
+                for (meshName of this.json.weapons[n].meshes) {
+                    this.modelEntityAlter.show(meshName,true);
+                }
+            }
+            else {
+                weaponEntity.show=false;
+                
+                for (meshName of this.json.weapons[n].meshes) {
+                    this.modelEntityAlter.show(meshName,false);
+                }
+            }
+        }
+    }
+    /*
+    findEntityToFight()
+    {
+            // already fighting?
+            // if so, see if we are past the forget
+            // distance or the target has no health
+            
+        if (this.targetEntity!=null) {
+            if (this.targetEntity.health<=0) {
+                this.targetEntity=null;
+                return;
+            }
+            if (this.position.distance(this.targetEntity.position)>this.targetForgetDistance) {
+                this.targetEntity=null;
+                return;
+            }
+            
+            return;
+        }
+        
+            // ray trace for entities
+            // we do one look angle per tick
+            
+        this.lookPoint.setFromPoint(this.position);
+        this.lookPoint.y+=Math.trunc(this.height*0.5);      // use middle instead of eye position in case other stuff is smaller
+        
+        this.lookVector.setFromValues(0,0,this.targetForgetDistance);
+        this.lookVector.rotateY(null,this.TARGET_SCAN_Y_ANGLES[this.currentLookIdx]);
+        
+        this.currentLookIdx++;
+        if (this.currentLookIdx>=this.TARGET_SCAN_Y_ANGLES.length) this.currentLookIdx=0;
+        
+        if (this.rayCollision(this.lookPoint,this.lookVector,this.lookHitPoint)) {
+            if (this.hitEntity!==null) {
+                if (this.hitEntity.fighter) this.targetEntity=this.hitEntity;
+            }
+        }
+    }
+        */
+        //
+        // mainline bot run
+        //
         
     run()
     {
         let nodeIdx,prevNodeIdx,moveForward;
         let turnDiff,slideLeft,liquidIdx;
+        let idleAnimation;
         
             // the developer freeze
             
@@ -312,12 +467,7 @@ export default class EntityFPSBotClass extends EntityClass
         
             // pick best weapon
             
-        if ((this.hasM16) && (this.m16.ammoCount>0)) {
-        //    this.switchWeapon(this.WEAPON_M16);
-        }
-        else {
-        //    this.switchWeapon(this.WEAPON_BERETTA);
-        }
+        this.pickBestWeapon();
         
             // look for things to shoot
             
@@ -376,7 +526,8 @@ export default class EntityFPSBotClass extends EntityClass
 
                 this.pausedTriggerName=this.isNodeATriggerPauseNode(prevNodeIdx,this.nextNodeIdx);
                 if (this.pausedTriggerName!==null) {
-                    this.startModelAnimationChunkInFrames(null,30,92,177);
+                    idleAnimation=this.carouselWeapons[this.currentCarouselWeaponIdx].parentIdleAnimation;
+                    this.modelEntityAlter.startAnimationChunkInFrames(null,30,idleAnimation[0],idleAnimation[1]);
                     return;
                 }
             }
@@ -409,12 +560,10 @@ export default class EntityFPSBotClass extends EntityClass
             this.lastTargetAngleDif=this.drawAngle.turnYTowards(this.position.angleYTo(this.targetEntity.position),this.maxTurnSpeed);
         }
         
-        return;
-        
             // move
             
-        this.movement.moveZWithAcceleration(moveForward,false,this.FORWARD_ACCELERATION,this.FORWARD_DECELERATION,this.FORWARD_MAX_SPEED,this.FORWARD_ACCELERATION,this.FORWARD_DECELERATION,this.FORWARD_MAX_SPEED);        
-        this.movement.moveXWithAcceleration(slideLeft,false,this.SIDE_ACCELERATION,this.SIDE_DECELERATION,this.SIDE_MAX_SPEED,this.SIDE_ACCELERATION,this.SIDE_DECELERATION,this.SIDE_MAX_SPEED);
+        this.movement.moveZWithAcceleration(moveForward,false,this.forwardAcceleration,this.forwardDeceleration,this.forwardMaxSpeed,this.forwardAcceleration,this.forwardDeceleration,this.forwardMaxSpeed);
+        this.movement.moveXWithAcceleration(slideLeft,false,this.sideAcceleration,this.sideDeceleration,this.sideMaxSpeed,this.sideAcceleration,this.sideDeceleration,this.sideMaxSpeed);
 
         this.rotMovement.setFromPoint(this.movement);
         this.rotMovement.rotateY(null,this.angle.y);

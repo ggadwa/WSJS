@@ -51,6 +51,9 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.thirdPersonCameraDistance=0;
         this.thirdPersonCameraLookAngle=0;
         
+        this.hitIndicator=false;
+        this.hitIndicatorFlashTick=0;
+        
         this.liquidInSound=null;
         this.liquidOutSound=null;
         this.hurtSound=null;
@@ -122,6 +125,9 @@ export default class EntityFPSPlayerClass extends EntityClass
         
         this.thirdPersonCameraDistance=this.core.game.lookupValue(this.json.config.thirdPersonCameraDistance,this.data);
         this.thirdPersonCameraLookAngle=this.core.game.lookupValue(this.json.config.thirdPersonCameraLookAngle,this.data);
+        
+        this.hitIndicator=this.core.game.lookupValue(this.json.config.hitIndicator,this.data);
+        this.hitIndicatorFlashTick=this.core.game.lookupValue(this.json.config.hitIndicatorFlashTick,this.data);
         
         this.liquidInSound=this.json.config.liquidInSound;
         this.liquidOutSound=this.json.config.liquidOutSound;
@@ -381,11 +387,52 @@ export default class EntityFPSPlayerClass extends EntityClass
     
     damage(fromEntity,damage,hitPoint)
     {
+        let y,addway,subway;
+
             // already dead, can't take damage
             
         if (this.health<=0) return;
         
-            // pulse and take the damage
+            // apply the hit indicator
+            
+        if ((hitPoint!==null) && (this.hitIndicator)) {
+            
+                // get position of hit from view direction
+                
+            y=this.position.angleYTo(hitPoint);
+            
+            if (this.angle.y>y) {
+                addway=360.0-(this.angle.y-y);
+                subway=this.angle.y-y;
+            }
+            else {
+                addway=y-this.angle.y;
+                subway=360.0-(y-this.angle.y);
+            }
+            
+            y=(addway<subway)?addway:-subway;
+
+                // get hit spot
+
+            if ((y<=-45) && (y>=-135)) {
+                this.core.interface.hitRight.flash(this.hitIndicatorFlashTick);
+            }
+            else {
+                if ((y>=45) && (y<=135)) {
+                    this.core.interface.hitLeft.flash(this.hitIndicatorFlashTick);
+                }
+                else {
+                    if ((y>-45) && (y<45)) {
+                        this.core.interface.hitTop.flash(this.hitIndicatorFlashTick);
+                    }
+                    else {
+                        this.core.interface.hitBottom.flash(this.hitIndicatorFlashTick);
+                    }
+                }
+            }
+        }
+        
+            // apply the damage
             
         if (!this.core.game.developer.playerNoDamage) {
             this.armor-=damage;
