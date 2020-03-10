@@ -67,7 +67,7 @@ export default class InterfaceClass
 
     initialize()
     {
-        let hitSize;
+        let hitSize,hitMargin;
         
             // clear all current elements and texts
             
@@ -87,19 +87,21 @@ export default class InterfaceClass
             // hit elements
             
         hitSize=Math.trunc(this.core.canvas.width*0.08);
+        hitMargin=Math.trunc(this.core.canvas.height*0.25);
         
-        this.hitLeft=new InterfaceHitClass(this.core,new RectClass(0,0,hitSize,this.core.canvas.height),[[1,0],[1,1],[0,1],[0,0]]);
+        this.hitLeft=new InterfaceHitClass(this.core,new RectClass(0,hitMargin,hitSize,this.core.canvas.height-hitMargin),[[1,0],[1,1],[0,1],[0,0]]);
         if (!this.hitLeft.initialize()) return(false);
         
-        this.hitRight=new InterfaceHitClass(this.core,new RectClass((this.core.canvas.width-hitSize),0,this.core.canvas.width,this.core.canvas.height),[[1,1],[1,0],[0,0],[0,1]]);
+        this.hitRight=new InterfaceHitClass(this.core,new RectClass((this.core.canvas.width-hitSize),hitMargin,this.core.canvas.width,(this.core.canvas.height-hitMargin)),[[1,1],[1,0],[0,0],[0,1]]);
         if (!this.hitRight.initialize()) return(false);
         
         hitSize=Math.trunc(this.core.canvas.height*0.08);
+        hitMargin=Math.trunc(this.core.canvas.width*0.25);
         
-        this.hitTop=new InterfaceHitClass(this.core,new RectClass(0,0,this.core.canvas.width,hitSize),[[0,0],[1,0],[1,1],[0,1]]);
+        this.hitTop=new InterfaceHitClass(this.core,new RectClass(hitMargin,0,(this.core.canvas.width-hitMargin),hitSize),[[0,0],[1,0],[1,1],[0,1]]);
         if (!this.hitTop.initialize()) return(false);
         
-        this.hitBottom=new InterfaceHitClass(this.core,new RectClass(0,(this.core.canvas.height-hitSize),this.core.canvas.width,this.core.canvas.height),[[1,1],[0,1],[0,0],[1,0]]);
+        this.hitBottom=new InterfaceHitClass(this.core,new RectClass(hitMargin,(this.core.canvas.height-hitSize),(this.core.canvas.width-hitMargin),this.core.canvas.height),[[1,1],[0,1],[0,0],[1,0]]);
         if (!this.hitBottom.initialize()) return(false);
 
             // touch sticks

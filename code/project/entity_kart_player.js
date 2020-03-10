@@ -88,7 +88,7 @@ export default class EntityKartPlayerClass extends EntityClass
         this.starSpeedIncrease=50;
         this.forwardBrakeDeceleration=50;
         this.reverseBrakeDeceleration=50;
-        this.jumpHeight=2000;
+        this.jumpHeight=1000;
         this.bounceWaitCount=20;
         this.spinOutSpeed=6;
         this.driftDecelerationFactor=0.99;
@@ -168,7 +168,7 @@ export default class EntityKartPlayerClass extends EntityClass
         this.smokePosition.rotateY(null,((this.angle.y+offsetAngleY)%360));
         this.smokePosition.addPoint(this.position);
 
-        this.addEffect('effect_tire_smoke',this.smokePosition,null,true);
+        this.addEffect(this,'effect_tire_smoke',this.smokePosition,null,true);
     }
     
         //
