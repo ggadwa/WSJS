@@ -9,26 +9,26 @@ class EntityWeaponFireClass
         this.weapon=weapon;
         
         this.ammo=0;
-        this.ammoInitialCount=this.core.game.lookupValue(fireObj.ammoInitialCount,weapon.data);
-        this.ammoMaxCount=this.core.game.lookupValue(fireObj.ammoMaxCount,weapon.data);
+        this.ammoInitialCount=this.core.game.lookupValue(fireObj.ammoInitialCount,weapon.data,0);
+        this.ammoMaxCount=this.core.game.lookupValue(fireObj.ammoMaxCount,weapon.data,0);
         
-        this.interfaceAmmoIcon=this.core.game.lookupValue(fireObj.interfaceAmmoIcon,weapon.data);
-        this.interfaceAmmoText=this.core.game.lookupValue(fireObj.interfaceAmmoText,weapon.data);
-        this.interfaceAmmoCount=this.core.game.lookupValue(fireObj.interfaceAmmoCount,weapon.data);
+        this.interfaceAmmoIcon=this.core.game.lookupValue(fireObj.interfaceAmmoIcon,weapon.data,null);
+        this.interfaceAmmoText=this.core.game.lookupValue(fireObj.interfaceAmmoText,weapon.data,null);
+        this.interfaceAmmoCount=this.core.game.lookupValue(fireObj.interfaceAmmoCount,weapon.data,null);
                 
-        this.type=weapon.FIRE_TYPE_LIST.indexOf(fireObj.type);
-        this.waitTick=this.core.game.lookupValue(fireObj.waitTick,weapon.data);
-        this.startRadius=this.core.game.lookupValue(fireObj.startRadius,weapon.data);
+        this.type=weapon.FIRE_TYPE_LIST.indexOf(this.core.game.lookupValue(fireObj.type,weapon.data,null));
+        this.waitTick=this.core.game.lookupValue(fireObj.waitTick,weapon.data,0);
+        this.startRadius=this.core.game.lookupValue(fireObj.startRadius,weapon.data,0);
         
-        this.damage=this.core.game.lookupValue(fireObj.damage,weapon.data);
-        this.distance=this.core.game.lookupValue(fireObj.distance,weapon.data);
-        this.hitEffect=this.core.game.lookupValue(fireObj.hitEffect,weapon.data);
+        this.damage=this.core.game.lookupValue(fireObj.damage,weapon.data,0);
+        this.distance=this.core.game.lookupValue(fireObj.distance,weapon.data,0);
+        this.hitEffect=this.core.game.lookupValue(fireObj.hitEffect,weapon.data,null);
         
-        this.projectileJson=fireObj.projectileJson;
+        this.projectileJson=this.core.game.lookupValue(fireObj.projectileJson,weapon.data,null);
         
-        this.sound=fireObj.sound;
-        this.animation=fireObj.animation;
-        
+        this.animation=this.core.game.lookupAnimationValue(fireObj.animation);
+        this.sound=this.core.game.lookupSoundValue(fireObj.sound);
+       
         this.lastFireTimestamp=0;
     }
     
@@ -274,16 +274,18 @@ export default class EntityWeaponClass extends EntityClass
       
         super.run();
         
-            // update any UI
+            // update any UI in player
             
-        if (this.interfaceCrosshair!==null) this.core.interface.showElement(this.interfaceCrosshair,((this.show)&&(this.core.camera.isFirstPerson())));
-        if (this.primary!==null) this.primary.updateUI();
-        if (this.secondary!==null) this.secondary.updateUI();
-        if (this.tertiary!==null) this.tertiary.updateUI();
-        
+        if (parentEntity===this.core.map.entityList.getPlayer()) {
+            if (this.interfaceCrosshair!==null) this.core.interface.showElement(this.interfaceCrosshair,((this.show)&&(this.core.camera.isFirstPerson())));
+            if (this.primary!==null) this.primary.updateUI();
+            if (this.secondary!==null) this.secondary.updateUI();
+            if (this.tertiary!==null) this.tertiary.updateUI();
+        }
+
             // if entity has model but not shown,
             // the assume carousel and skip
-            
+
         if (this.model!==null) {
             if (!this.show) return;
         }

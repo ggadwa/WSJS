@@ -3,9 +3,8 @@
 - sound play might need position instead of expecting object with .position (as effects call it)
 - wsserver - option to show http log in server (default to off)
 
-- change flash to have less transparency in it
+- bot config BY SKILL (finish - test)
 
-- bot config BY SKILL
 - trigger pause nodes part of node
 - finish fps_bot first
 
@@ -13,21 +12,17 @@
 - fallDamagePercentage
 (in bots, too)
 
-    - grenades not bounce off of pickups
+- kart move out the weapons, clean up entity_kart_player from weapons, implement follow floor projectile
 
     - death messages by game with json setup
 
-    - monsters better at navigating around corners (try to move X only or Z only if stuck)
     - death is broken for player
     - fall damage
     
     - bots/remotes (no need for game json for remotes)
 
-    - implement bot skill
     - mouse wheel broken chrome/windows
     - fix swimming
-
-
 
     - eventually clean up entity and unecessary pass through APIs
     - need to test failures (missing bitmap, missing json, bad json, etc)

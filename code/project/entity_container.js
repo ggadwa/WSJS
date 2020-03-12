@@ -28,19 +28,19 @@ export default class EntityContainerClass extends EntityClass
     {
         if (!super.initialize()) return(false);
         
-        this.openAnimation=this.json.config.openAnimation;
-        this.openingAnimation=this.json.config.openingAnimation;
-        this.closedAnimation=this.json.config.closedAnimation;
-        this.closingAnimation=this.json.config.closingAnimation;
+        this.openAnimation=this.core.game.lookupAnimationValue(this.json.config.openAnimation);
+        this.openingAnimation=this.core.game.lookupAnimationValue(this.json.config.openingAnimation);
+        this.closedAnimation=this.core.game.lookupAnimationValue(this.json.config.closedAnimation);
+        this.closingAnimation=this.core.game.lookupAnimationValue(this.json.config.closingAnimation);
         
-        this.opened=this.core.game.lookupValue(this.json.config.startOpened,this.data);
-        this.openOnce=this.core.game.lookupValue(this.json.config.openOnce,this.data);
-        this.openOnActionKey=this.core.game.lookupValue(this.json.config.openOnActionKey,this.data);
-        this.openDistance=this.core.game.lookupValue(this.json.config.openDistance,this.data);
-        this.openPause=this.core.game.lookupValue(this.json.config.openPause,this.data);
+        this.opened=this.core.game.lookupValue(this.json.config.startOpened,this.data,false);
+        this.openOnce=this.core.game.lookupValue(this.json.config.openOnce,this.data,false);
+        this.openOnActionKey=this.core.game.lookupValue(this.json.config.openOnActionKey,this.data,'');
+        this.openDistance=this.core.game.lookupValue(this.json.config.openDistance,this.data,0);
+        this.openPause=this.core.game.lookupValue(this.json.config.openPause,this.data,false);
         
-        this.openSound=this.json.config.openSound;
-        this.closeSound=this.json.config.closeSound;
+        this.openSound=this.core.game.lookupSoundValue(this.json.config.openSound);
+        this.closeSound=this.core.game.lookupSoundValue(this.json.config.closeSound);
         
         return(true);
     }
@@ -89,7 +89,7 @@ export default class EntityContainerClass extends EntityClass
             this.opened=true;
             this.pauseTick=this.core.timestamp+this.openPause;
             
-            this.core.soundList.playJson(this,null,this.openSound);
+            if (this.openSound!==null) this.core.soundList.playJson(this,null,this.openSound);
             this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.openingAnimation[0],this.openingAnimation[1]);
             this.modelEntityAlter.queueAnimationChunkInFrames(null,30,this.openAnimation[0],this.openAnimation[1]);
             
@@ -103,7 +103,7 @@ export default class EntityContainerClass extends EntityClass
             this.opened=false;
             this.pauseTick=this.core.timestamp+this.openPause;
             
-            this.core.soundList.playJson(this,null,this.closeSound);
+            if (this.closeSound!==null) this.core.soundList.playJson(this,null,this.closeSound);
             this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.closingAnimation[0],this.closingAnimation[1]);
             this.modelEntityAlter.queueAnimationChunkInFrames(null,30,this.closedAnimation[0],this.closedAnimation[1]);
             

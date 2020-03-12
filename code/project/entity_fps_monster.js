@@ -37,7 +37,12 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.projectileRequiresSight=true;
         this.maxTurnSpeed=0;
         this.forwardAcceleration=0;
+        this.forwardDeceleration=0;
         this.forwardMaxSpeed=0;
+        this.sideAcceleration=0;
+        this.sideDeceleration=0;
+        this.sideMaxSpeed=0;
+        this.slideMoveTick=0;
         this.angleYProjectileRange=5;
         this.angleYMeleeRange=15;
         this.damageFlinchWaitTick=500;
@@ -68,10 +73,15 @@ export default class EntityFPSMonsterClass extends EntityClass
         
         this.lastInLiquid=false;
         
+        this.slideDirection=0;
+        this.slideNextTick=0;
+        
             // pre-allocations
 
         this.movement=new PointClass(0,0,0);
         this.rotMovement=new PointClass(0,0,0);
+        this.origPosition=new PointClass(0,0,0);
+        
         this.firePosition=new PointClass(0,0,0);
         this.fireAngle=new PointClass(0,0,0);
         this.fireVector=new PointClass(0,0,0);
@@ -85,46 +95,52 @@ export default class EntityFPSMonsterClass extends EntityClass
     {
         super.initialize();            
         
-        this.startHealth=this.core.game.lookupValue(this.json.config.startHealth,this.data);
-        this.wakeUpDistance=this.core.game.lookupValue(this.json.config.wakeUpDistance,this.data);
-        this.fallAsleepDistance=this.core.game.lookupValue(this.json.config.fallAsleepDistance,this.data);
+        this.startHealth=this.core.game.lookupValue(this.json.config.startHealth,this.data,0);
+        this.wakeUpDistance=this.core.game.lookupValue(this.json.config.wakeUpDistance,this.data,0);
+        this.fallAsleepDistance=this.core.game.lookupValue(this.json.config.fallAsleepDistance,this.data,0);
         
-        this.meleeDistance=this.core.game.lookupValue(this.json.config.meleeDistance,this.data);
-        this.meleeWaitTick=this.core.game.lookupValue(this.json.config.meleeWaitTick,this.data);
-        this.meleeDamageTick=this.core.game.lookupValue(this.json.config.meleeDamageTick,this.data);
-        this.meleeDamage=this.core.game.lookupValue(this.json.config.meleeDamage,this.data);
+        this.meleeDistance=this.core.game.lookupValue(this.json.config.meleeDistance,this.data,0);
+        this.meleeWaitTick=this.core.game.lookupValue(this.json.config.meleeWaitTick,this.data,0);
+        this.meleeDamageTick=this.core.game.lookupValue(this.json.config.meleeDamageTick,this.data,0);
+        this.meleeDamage=this.core.game.lookupValue(this.json.config.meleeDamage,this.data,0);
         
-        this.projectileDistance=this.core.game.lookupValue(this.json.config.projectileDistance,this.data);
-        this.projectileWaitTick=this.core.game.lookupValue(this.json.config.projectileWaitTick,this.data);
-        this.projectileFireTick=this.core.game.lookupValue(this.json.config.projectileFireTick,this.data);
-        this.projectileJson=this.json.config.projectileJson;
+        this.projectileDistance=this.core.game.lookupValue(this.json.config.projectileDistance,this.data,0);
+        this.projectileWaitTick=this.core.game.lookupValue(this.json.config.projectileWaitTick,this.data,0);
+        this.projectileFireTick=this.core.game.lookupValue(this.json.config.projectileFireTick,this.data,0);
+        this.projectileJson=this.core.game.lookupValue(this.json.config.projectileJson,this.data,null);
         this.projectileData=this.json.config.projectileData;
-        this.projectileRequiresSight=this.core.game.lookupValue(this.json.config.projectileRequiresSight,this.data);
+        this.projectileRequiresSight=this.core.game.lookupValue(this.json.config.projectileRequiresSight,this.data,0);
         
-        this.maxTurnSpeed=this.core.game.lookupValue(this.json.config.maxTurnSpeed,this.data);
-        this.forwardAcceleration=this.core.game.lookupValue(this.json.config.forwardAcceleration,this.data);
-        this.forwardMaxSpeed=this.core.game.lookupValue(this.json.config.forwardMaxSpeed,this.data);
-        this.jumpWaitTick=this.core.game.lookupValue(this.json.config.jumpWaitTick,this.data);
-        this.jumpHeight=this.core.game.lookupValue(this.json.config.jumpHeight,this.data);
-        this.angleYProjectileRange=this.core.game.lookupValue(this.json.config.angleYProjectileRange,this.data);
-        this.angleYMeleeRange=this.core.game.lookupValue(this.json.config.angleYMeleeRange,this.data);
-        this.damageFlinchWaitTick=this.core.game.lookupValue(this.json.config.damageFlinchWaitTick,this.data);
-    
-        this.idleAnimation=this.json.config.idleAnimation;
-        this.walkAnimation=this.json.config.walkAnimation;
-        this.melee1Animation=this.json.config.melee1Animation;
-        this.melee2Animation=this.json.config.melee2Animation;
-        this.projectileAnimation=this.json.config.projectileAnimation;
-        this.hitAnimation=this.json.config.hitAnimation;
-        this.deathAnimation=this.json.config.deathAnimation;
-        this.wakeUpSound=this.json.config.wakeUpSound;
-        this.hurtSound=this.json.config.hurtSound;
-        this.meleeSound=this.json.config.meleeSound;
-        this.deathSound=this.json.config.deathSound;
-        this.liquidInSound=this.json.config.liquidInSound;
-        this.liquidOutSound=this.json.config.liquidOutSound;
-        this.fallSound=this.json.config.fallSound;
-        this.fallSoundWaitTick=this.core.game.lookupValue(this.json.config.fallSoundWaitTick,this.data);
+        this.maxTurnSpeed=this.core.game.lookupValue(this.json.config.maxTurnSpeed,this.data,0);
+        this.forwardAcceleration=this.core.game.lookupValue(this.json.config.forwardAcceleration,this.data,0);
+        this.forwardDeceleration=this.core.game.lookupValue(this.json.config.forwardDeceleration,this.data,0);
+        this.forwardMaxSpeed=this.core.game.lookupValue(this.json.config.forwardMaxSpeed,this.data,0);
+        this.sideAcceleration=this.core.game.lookupValue(this.json.config.sideAcceleration,this.data,0);
+        this.sideDeceleration=this.core.game.lookupValue(this.json.config.sideDeceleration,this.data,0);
+        this.sideMaxSpeed=this.core.game.lookupValue(this.json.config.sideMaxSpeed,this.data,0);
+        this.slideMoveTick=this.core.game.lookupValue(this.json.config.slideMoveTick,this.data,0);
+        this.jumpWaitTick=this.core.game.lookupValue(this.json.config.jumpWaitTick,this.data,0);
+        this.jumpHeight=this.core.game.lookupValue(this.json.config.jumpHeight,this.data,0);
+        this.angleYProjectileRange=this.core.game.lookupValue(this.json.config.angleYProjectileRange,this.data,0);
+        this.angleYMeleeRange=this.core.game.lookupValue(this.json.config.angleYMeleeRange,this.data,0);
+        this.damageFlinchWaitTick=this.core.game.lookupValue(this.json.config.damageFlinchWaitTick,this.data,0);
+        this.fallSoundWaitTick=this.core.game.lookupValue(this.json.config.fallSoundWaitTick,this.data,0);
+        
+        this.idleAnimation=this.core.game.lookupAnimationValue(this.json.config.idleAnimation);
+        this.walkAnimation=this.core.game.lookupAnimationValue(this.json.config.walkAnimation);
+        this.melee1Animation=this.core.game.lookupAnimationValue(this.json.config.melee1Animation);
+        this.melee2Animation=this.core.game.lookupAnimationValue(this.json.config.melee2Animation);
+        this.projectileAnimation=this.core.game.lookupAnimationValue(this.json.config.projectileAnimation);
+        this.hitAnimation=this.core.game.lookupAnimationValue(this.json.config.hitAnimation);
+        this.deathAnimation=this.core.game.lookupAnimationValue(this.json.config.deathAnimation);
+        
+        this.wakeUpSound=this.core.game.lookupSoundValue(this.json.config.wakeUpSound);
+        this.hurtSound=this.core.game.lookupSoundValue(this.json.config.hurtSound);
+        this.meleeSound=this.core.game.lookupSoundValue(this.json.config.meleeSound);
+        this.deathSound=this.core.game.lookupSoundValue(this.json.config.deathSound);
+        this.liquidInSound=this.core.game.lookupSoundValue(this.json.config.liquidInSound);
+        this.liquidOutSound=this.core.game.lookupSoundValue(this.json.config.liquidOutSound);
+        this.fallSound=this.core.game.lookupSoundValue(this.json.config.fallSound);
         
         this.trapMeshName=this.json.config.trapMeshName;
         this.trapMeshShrink=this.json.config.trapMeshShrink;
@@ -422,12 +438,38 @@ export default class EntityFPSMonsterClass extends EntityClass
             // chase player (don't move if in flinch)
 
         if (this.core.timestamp>this.nextDamageTick) {
-            this.movement.moveZWithAcceleration(true,false,this.forwardAcceleration,0,this.forwardMaxSpeed,this.forwardAcceleration,0,this.forwardMaxSpeed);        
+            
+            this.movement.moveZWithAcceleration(true,false,this.forwardAcceleration,this.forwardDeceleration,this.forwardMaxSpeed,this.forwardAcceleration,this.forwardDeceleration,this.forwardMaxSpeed);        
+
             this.rotMovement.setFromPoint(this.movement);
             this.rotMovement.rotateY(null,this.angle.y);
 
+            this.origPosition.setFromPoint(this.position);
+
             this.movement.y=this.moveInMapY(this.rotMovement,false);
             this.moveInMapXZ(this.rotMovement,true,true);
+            
+                // if we hit a wall, try a slide
+                
+            if (this.collideWallMeshIdx!==-1) {    
+
+                    // time to try a new slide?
+                    
+                if ((this.slideDirection===0) || (this.core.timestamp>this.slideNextTick)) {
+                    this.slideDirection=(Math.random()<0.5)?-1:1;
+                    this.slideNextTick=this.core.timestamp+this.slideMoveTick;
+                }
+                
+                this.position.x=this.origPosition.x;
+                this.position.z=this.origPosition.z;
+                
+                this.movement.z=0;
+                this.movement.moveXWithAcceleration((this.slideDirection<0),(this.slideDirection>0),this.sideAcceleration,this.sideDeceleration,this.sideMaxSpeed,this.sideAcceleration,this.sideDeceleration,this.sideMaxSpeed);
+                this.rotMovement.setFromPoint(this.movement);
+                this.rotMovement.rotateY(null,this.angle.y);
+
+                this.moveInMapXZ(this.rotMovement,true,true);
+            }
         }
         
             // any bounding?

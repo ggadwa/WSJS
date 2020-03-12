@@ -474,19 +474,19 @@ export default class EntityClass
             
             switch (action.action) {
                 case 'trigger':
-                    this.core.setTrigger(this.core.game.lookupValue(action.name,this.data));
+                    this.core.setTrigger(this.core.game.lookupValue(action.name,this.data,''));
                     break;
                 case 'addWeapon':
-                    entity.addWeapon(this.core.game.lookupValue(action.weapon,this.data));
+                    entity.addWeapon(this.core.game.lookupValue(action.weapon,this.data,''));
                     break;
                 case 'addAmmo':
-                    entity.addAmmo(this.core.game.lookupValue(action.weapon,this.data),this.core.game.lookupValue(action.fireMethod,this.data),this.core.game.lookupValue(action.count,this.data));
+                    entity.addAmmo(this.core.game.lookupValue(action.weapon,this.data,''),this.core.game.lookupValue(action.fireMethod,this.data,''),this.core.game.lookupValue(action.count,this.data,0));
                     break;
                 case 'addHealth':
-                    entity.addHealth(this.core.game.lookupValue(action.count,this.data));
+                    entity.addHealth(this.core.game.lookupValue(action.count,this.data,0));
                     break;
                 case 'addArmor':
-                    entity.addArmor(this.core.game.lookupValue(action.count,this.data));
+                    entity.addArmor(this.core.game.lookupValue(action.count,this.data,0));
                     break;
             }
             

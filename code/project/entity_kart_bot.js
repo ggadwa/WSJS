@@ -13,7 +13,7 @@ export default class EntityKartBotClass extends EntityClass
     {
         if (!super.initialize()) return(false);
         
-//        this.opened=this.core.game.lookupValue(this.json.config.startOpened,this.data);
+//        this.opened=this.core.game.lookupValue(this.json.config.startOpened,this.data,false);
         
         return(true);
     }

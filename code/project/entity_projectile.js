@@ -45,29 +45,30 @@ export default class EntityProjectileClass extends EntityClass
     {
         if (!super.initialize()) return(false);
         
-        this.lifeTimestamp=this.core.timestamp+this.core.game.lookupValue(this.json.config.lifeTick,this.data);
-        this.speed=this.core.game.lookupValue(this.json.config.speed,this.data);
-        this.hitDamage=this.core.game.lookupValue(this.json.config.damage,this.data);
+        this.lifeTimestamp=this.core.timestamp+this.core.game.lookupValue(this.json.config.lifeTick,this.data,0);
+        this.speed=this.core.game.lookupValue(this.json.config.speed,this.data,0);
+        this.hitDamage=this.core.game.lookupValue(this.json.config.damage,this.data,0);
         
-        this.floats=this.core.game.lookupValue(this.json.config.floats,this.data);
-        this.followsFloor=this.core.game.lookupValue(this.json.config.followsFloor,this.data);
-        this.spinY=this.core.game.lookupValue(this.json.config.spinY,this.data);
-        this.spinRate=this.core.game.lookupValue(this.json.config.spinRate,this.data);
-        this.tumbles=this.core.game.lookupValue(this.json.config.tumbles,this.data);
-        this.stopOnHit=this.core.game.lookupValue(this.json.config.stopOnHit,this.data);
-        this.canBounce=this.core.game.lookupValue(this.json.config.canBounce,this.data);
-        this.canReflect=this.core.game.lookupValue(this.json.config.canReflect,this.data);
-        this.canRoll=this.core.game.lookupValue(this.json.config.canRoll,this.data);
-        this.rollDeceleration=this.core.game.lookupValue(this.json.config.rollDeceleration,this.data);
-        this.bounceFactor=this.core.game.lookupValue(this.json.config.bounceFactor,this.data);
-        this.bounceSound=this.json.config.bounceSound;
-        this.reflectSound=this.json.config.reflectSound;
-        this.spawnSound=this.json.config.spawnSound;
+        this.floats=this.core.game.lookupValue(this.json.config.floats,this.data,false);
+        this.followsFloor=this.core.game.lookupValue(this.json.config.followsFloor,this.data,false);
+        this.spinY=this.core.game.lookupValue(this.json.config.spinY,this.data,false);
+        this.spinRate=this.core.game.lookupValue(this.json.config.spinRate,this.data,0);
+        this.tumbles=this.core.game.lookupValue(this.json.config.tumbles,this.data,false);
+        this.stopOnHit=this.core.game.lookupValue(this.json.config.stopOnHit,this.data,false);
+        this.canBounce=this.core.game.lookupValue(this.json.config.canBounce,this.data,false);
+        this.canReflect=this.core.game.lookupValue(this.json.config.canReflect,this.data,false);
+        this.canRoll=this.core.game.lookupValue(this.json.config.canRoll,this.data,false);
+        this.rollDeceleration=this.core.game.lookupValue(this.json.config.rollDeceleration,this.data,0);
+        this.bounceFactor=this.core.game.lookupValue(this.json.config.bounceFactor,this.data,0);
+        
+        this.bounceSound=this.core.game.lookupSoundValue(this.json.config.bounceSound);
+        this.reflectSound=this.core.game.lookupSoundValue(this.json.config.reflectSound);
+        this.spawnSound=this.core.game.lookupSoundValue(this.json.config.spawnSound);
 
-        this.hitEffect=this.core.game.lookupValue(this.json.config.hitEffect,this.data);
+        this.hitEffect=this.core.game.lookupValue(this.json.config.hitEffect,this.data,null);
         
-        this.trailEffect=this.core.game.lookupValue(this.json.config.trailEffect,this.data);
-        this.trailSpawnTick=this.core.game.lookupValue(this.json.config.trailSpawnTick,this.data);
+        this.trailEffect=this.core.game.lookupValue(this.json.config.trailEffect,this.data,null);
+        this.trailSpawnTick=this.core.game.lookupValue(this.json.config.trailSpawnTick,this.data,0);
         
         return(true);
     }
@@ -228,6 +229,8 @@ export default class EntityProjectileClass extends EntityClass
             // touching object
             
         if (this.touchEntity!==null) {
+            if ((this.touchEntity.pickup) || (this.touchEntity.passThrough)) return;
+            
             if (this.stopOnHit) {
                 this.finish();
                 return;

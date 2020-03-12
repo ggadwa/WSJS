@@ -25,8 +25,6 @@ export default class EntityFPSBotClass extends EntityClass
         this.inStandingAnimation=true;
         
         this.maxTurnSpeed=0;
-        this.maxLookSpeed=0;
-        this.maxLookAngle=0;
         this.forwardAcceleration=0;
         this.forwardDeceleration=0;
         this.forwardMaxSpeed=0;
@@ -69,7 +67,7 @@ export default class EntityFPSBotClass extends EntityClass
         this.pausedTriggerName=null;
         this.targetEntity=null;
         this.lastTargetAngleDif=360;
-        this.currentLookIdx=0;
+        this.currentTargetYScan=0;
 
         this.respawnTick=0;
         this.telefragTriggerEntity=null;
@@ -83,7 +81,11 @@ export default class EntityFPSBotClass extends EntityClass
             
         this.movement=new PointClass(0,0,0);
         this.rotMovement=new PointClass(0,0,0);
+        
         this.stuckPoint=new PointClass(0,0,0);
+        this.lookPoint=new PointClass(0,0,0);
+        this.lookVector=new PointClass(0,0,0);
+        this.lookHitPoint=new PointClass(0,0,0);
         
         this.drawAngle=new PointClass(0,0,0);
     }
@@ -91,51 +93,49 @@ export default class EntityFPSBotClass extends EntityClass
     initialize()
     {
         let n,weaponBlock,weaponEntity;
-        let skill,skillIdx=0;
+        let skill;
         
         if (!super.initialize()) return(false);
         
             // regular config
             
-        this.idleAnimation=this.json.config.idleAnimation;
-        this.runAnimation=this.json.config.runAnimation;
-        this.dieAnimation=this.json.config.dieAnimation;
+        this.idleAnimation=this.core.game.lookupAnimationValue(this.json.config.idleAnimation);
+        this.runAnimation=this.core.game.lookupAnimationValue(this.json.config.runAnimation);
+        this.dieAnimation=this.core.game.lookupAnimationValue(this.json.config.dieAnimation);
         
-        this.liquidInSound=this.json.config.liquidInSound;
-        this.liquidOutSound=this.json.config.liquidOutSound;
-        this.hurtSound=this.json.config.hurtSound;
-        this.dieSound=this.json.config.dieSound;
+        this.liquidInSound=this.core.game.lookupSoundValue(this.json.config.liquidInSound);
+        this.liquidOutSound=this.core.game.lookupSoundValue(this.json.config.liquidOutSound);
+        this.hurtSound=this.core.game.lookupSoundValue(this.json.config.hurtSound);
+        this.dieSound=this.core.game.lookupSoundValue(this.json.config.dieSound);
 
             // skill based config
             
-        skill=this.json.config.skills[skillIdx];
+        skill=this.json.config.skills[this.core.setup.botSkill];
         
-        this.healthInitialCount=this.core.game.lookupValue(skill.healthInitialCount,this.data);
-        this.healthMaxCount=this.core.game.lookupValue(skill.healthMaxCount,this.data);
-        this.armorInitialCount=this.core.game.lookupValue(skill.armorInitialCount,this.data);
-        this.armorMaxCount=this.core.game.lookupValue(skill.armorMaxCount,this.data);
+        this.healthInitialCount=this.core.game.lookupValue(skill.healthInitialCount,this.data,0);
+        this.healthMaxCount=this.core.game.lookupValue(skill.healthMaxCount,this.data,0);
+        this.armorInitialCount=this.core.game.lookupValue(skill.armorInitialCount,this.data,0);
+        this.armorMaxCount=this.core.game.lookupValue(skill.armorMaxCount,this.data,0);
         
-        this.maxTurnSpeed=this.core.game.lookupValue(skill.maxTurnSpeed,this.data);
-        this.maxLookSpeed=this.core.game.lookupValue(skill.maxLookSpeed,this.data);
-        this.maxLookAngle=this.core.game.lookupValue(skill.maxLookAngle,this.data);
-        this.forwardAcceleration=this.core.game.lookupValue(skill.forwardAcceleration,this.data);
-        this.forwardDeceleration=this.core.game.lookupValue(skill.forwardDeceleration,this.data);
-        this.forwardMaxSpeed=this.core.game.lookupValue(skill.forwardMaxSpeed,this.data);
-        this.sideAcceleration=this.core.game.lookupValue(skill.sideAcceleration,this.data);
-        this.sideDeceleration=this.core.game.lookupValue(skill.sideDeceleration,this.data);
-        this.sideMaxSpeed=this.core.game.lookupValue(skill.sideMaxSpeed,this.data);
-        this.jumpHeight=this.core.game.lookupValue(skill.jumpHeight,this.data);
-        this.jumpWaterHeight=this.core.game.lookupValue(skill.jumpWaterHeight,this.data);
-        this.flySwimYReduce=this.core.game.lookupValue(skill.flySwimYReduce,this.data);
-        this.damageFlinchWaitTick=this.core.game.lookupValue(skill.damageFlinchWaitTick,this.data);
-        this.fallDamageMinDistance=this.core.game.lookupValue(skill.fallDamageMinDistance,this.data);
-        this.fallDamagePercentage=this.core.game.lookupValue(skill.fallDamagePercentage,this.data);
-        this.respawnWaitTick=this.core.game.lookupValue(skill.respawnWaitTick,this.data);
+        this.maxTurnSpeed=this.core.game.lookupValue(skill.maxTurnSpeed,this.data,0);
+        this.forwardAcceleration=this.core.game.lookupValue(skill.forwardAcceleration,this.data,0);
+        this.forwardDeceleration=this.core.game.lookupValue(skill.forwardDeceleration,this.data,0);
+        this.forwardMaxSpeed=this.core.game.lookupValue(skill.forwardMaxSpeed,this.data,0);
+        this.sideAcceleration=this.core.game.lookupValue(skill.sideAcceleration,this.data,0);
+        this.sideDeceleration=this.core.game.lookupValue(skill.sideDeceleration,this.data,0);
+        this.sideMaxSpeed=this.core.game.lookupValue(skill.sideMaxSpeed,this.data,0);
+        this.jumpHeight=this.core.game.lookupValue(skill.jumpHeight,this.data,0);
+        this.jumpWaterHeight=this.core.game.lookupValue(skill.jumpWaterHeight,this.data,0);
+        this.flySwimYReduce=this.core.game.lookupValue(skill.flySwimYReduce,this.data,0);
+        this.damageFlinchWaitTick=this.core.game.lookupValue(skill.damageFlinchWaitTick,this.data,0);
+        this.fallDamageMinDistance=this.core.game.lookupValue(skill.fallDamageMinDistance,this.data,0);
+        this.fallDamagePercentage=this.core.game.lookupValue(skill.fallDamagePercentage,this.data,0);
+        this.respawnWaitTick=this.core.game.lookupValue(skill.respawnWaitTick,this.data,0);
         
-        this.seekNodeDistanceSlop=this.core.game.lookupValue(skill.seekNodeDistanceSlop,this.data);
-        this.seekNodeAngleSlop=this.core.game.lookupValue(skill.seekNodeAngleSlop,this.data);
-        this.targetScanYRange=this.core.game.lookupValue(skill.targetScanYRange,this.data);
-        this.targetForgetDistance=this.core.game.lookupValue(skill.targetForgetDistance,this.data);
+        this.seekNodeDistanceSlop=this.core.game.lookupValue(skill.seekNodeDistanceSlop,this.data,0);
+        this.seekNodeAngleSlop=this.core.game.lookupValue(skill.seekNodeAngleSlop,this.data,0);
+        this.targetScanYRange=this.core.game.lookupValue(skill.targetScanYRange,this.data,0);
+        this.targetForgetDistance=this.core.game.lookupValue(skill.targetForgetDistance,this.data,0);
         
         this.nextDamageTick=0;
         this.lastInLiquid=false;
@@ -162,17 +162,17 @@ export default class EntityFPSBotClass extends EntityClass
             
                 // available to entity?
                 
-            weaponEntity.initiallyAvailable=this.core.game.lookupValue(weaponBlock.initiallyAvailable,this.data);
+            weaponEntity.initiallyAvailable=this.core.game.lookupValue(weaponBlock.initiallyAvailable,this.data,false);
             
                 // push the parent animations to the weapons
                 // so we can pick them up later
                 
-            weaponEntity.parentIdleAnimation=weaponBlock.parentIdleAnimation;
-            weaponEntity.parentRunAnimation=weaponBlock.parentRunAnimation;
-            weaponEntity.parentFireIdleAnimation=weaponBlock.parentFireIdleAnimation;
-            weaponEntity.parentPrimaryFireRunAnimation=weaponBlock.parentPrimaryFireRunAnimation;
-            weaponEntity.parentSecondaryFireRunAnimation=weaponBlock.parentSecondaryFireRunAnimation;
-            weaponEntity.parentTertiaryFireRunAnimation=weaponBlock.parentTertiaryFireRunAnimation;
+            weaponEntity.parentIdleAnimation=this.core.game.lookupAnimationValue(weaponBlock.parentIdleAnimation);
+            weaponEntity.parentRunAnimation=this.core.game.lookupAnimationValue(weaponBlock.parentRunAnimation);
+            weaponEntity.parentFireIdleAnimation=this.core.game.lookupAnimationValue(weaponBlock.parentFireIdleAnimation);
+            weaponEntity.parentPrimaryFireRunAnimation=this.core.game.lookupAnimationValue(weaponBlock.parentPrimaryFireRunAnimation);
+            weaponEntity.parentSecondaryFireRunAnimation=this.core.game.lookupAnimationValue(weaponBlock.parentSecondaryFireRunAnimation);
+            weaponEntity.parentTertiaryFireRunAnimation=this.core.game.lookupAnimationValue(weaponBlock.parentTertiaryFireRunAnimation);
         }
         
         return(true);
@@ -201,7 +201,7 @@ export default class EntityFPSBotClass extends EntityClass
         
             // start scanning in middle
             
-        this.currentLookIdx=0;
+        this.currentTargetYScan=Math.trunc(this.targetScanYRange*0.5);
         
             // move to random node
             
@@ -383,7 +383,7 @@ export default class EntityFPSBotClass extends EntityClass
             }
         }
     }
-    /*
+
     findEntityToFight()
     {
             // already fighting?
@@ -410,18 +410,21 @@ export default class EntityFPSBotClass extends EntityClass
         this.lookPoint.y+=Math.trunc(this.height*0.5);      // use middle instead of eye position in case other stuff is smaller
         
         this.lookVector.setFromValues(0,0,this.targetForgetDistance);
-        this.lookVector.rotateY(null,this.TARGET_SCAN_Y_ANGLES[this.currentLookIdx]);
+        this.lookVector.rotateY(null,(this.currentTargetYScan-Math.trunc(this.targetScanYRange*0.5)));
         
-        this.currentLookIdx++;
-        if (this.currentLookIdx>=this.TARGET_SCAN_Y_ANGLES.length) this.currentLookIdx=0;
+        this.currentTargetYScan++;
+        if (this.currentTargetYScan>=this.targetScanYRange) this.currentTargetYScan=0;
         
         if (this.rayCollision(this.lookPoint,this.lookVector,this.lookHitPoint)) {
             if (this.hitEntity!==null) {
-                if (this.hitEntity.fighter) this.targetEntity=this.hitEntity;
+                if (this.hitEntity.fighter) {
+                    console.log(this.name+' target '+this.hitEntity.name);
+                    this.targetEntity=this.hitEntity;
+                }
             }
         }
     }
-        */
+
         //
         // mainline bot run
         //
@@ -471,7 +474,7 @@ export default class EntityFPSBotClass extends EntityClass
         
             // look for things to shoot
             
-        //this.findEntityToFight();
+        this.findEntityToFight();
         
         //if (this.targetEntity!==null) this.fireWeapon();
         

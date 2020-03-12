@@ -92,47 +92,47 @@ export default class EntityFPSPlayerClass extends EntityClass
         
         if (!super.initialize()) return(false);
         
-        this.idleAnimation=this.json.config.idleAnimation;
-        this.runAnimation=this.json.config.runAnimation;
-        this.dieAnimation=this.json.config.dieAnimation;
+        this.idleAnimation=this.core.game.lookupAnimationValue(this.json.config.idleAnimation);
+        this.runAnimation=this.core.game.lookupAnimationValue(this.json.config.runAnimation);
+        this.dieAnimation=this.core.game.lookupAnimationValue(this.json.config.dieAnimation);
         
-        this.healthInitialCount=this.core.game.lookupValue(this.json.config.healthInitialCount,this.data);
-        this.healthMaxCount=this.core.game.lookupValue(this.json.config.healthMaxCount,this.data);
-        this.armorInitialCount=this.core.game.lookupValue(this.json.config.armorInitialCount,this.data);
-        this.armorMaxCount=this.core.game.lookupValue(this.json.config.armorMaxCount,this.data);
+        this.healthInitialCount=this.core.game.lookupValue(this.json.config.healthInitialCount,this.data,0);
+        this.healthMaxCount=this.core.game.lookupValue(this.json.config.healthMaxCount,this.data,0);
+        this.armorInitialCount=this.core.game.lookupValue(this.json.config.armorInitialCount,this.data,0);
+        this.armorMaxCount=this.core.game.lookupValue(this.json.config.armorMaxCount,this.data,0);
         
-        this.interfaceHealthIcon=this.core.game.lookupValue(this.json.config.interfaceHealthIcon,this.data);
-        this.interfaceHealthCount=this.core.game.lookupValue(this.json.config.interfaceHealthCount,this.data);
-        this.interfaceArmorIcon=this.core.game.lookupValue(this.json.config.interfaceArmorIcon,this.data);
-        this.interfaceArmorCount=this.core.game.lookupValue(this.json.config.interfaceArmorCount,this.data);
+        this.interfaceHealthIcon=this.core.game.lookupValue(this.json.config.interfaceHealthIcon,this.data,null);
+        this.interfaceHealthCount=this.core.game.lookupValue(this.json.config.interfaceHealthCount,this.data,null);
+        this.interfaceArmorIcon=this.core.game.lookupValue(this.json.config.interfaceArmorIcon,this.data,null);
+        this.interfaceArmorCount=this.core.game.lookupValue(this.json.config.interfaceArmorCount,this.data,null);
         
-        this.maxTurnSpeed=this.core.game.lookupValue(this.json.config.maxTurnSpeed,this.data);
-        this.maxLookSpeed=this.core.game.lookupValue(this.json.config.maxLookSpeed,this.data);
-        this.maxLookAngle=this.core.game.lookupValue(this.json.config.maxLookAngle,this.data);
-        this.forwardAcceleration=this.core.game.lookupValue(this.json.config.forwardAcceleration,this.data);
-        this.forwardDeceleration=this.core.game.lookupValue(this.json.config.forwardDeceleration,this.data);
-        this.forwardMaxSpeed=this.core.game.lookupValue(this.json.config.forwardMaxSpeed,this.data);
-        this.sideAcceleration=this.core.game.lookupValue(this.json.config.sideAcceleration,this.data);
-        this.sideDeceleration=this.core.game.lookupValue(this.json.config.sideDeceleration,this.data);
-        this.sideMaxSpeed=this.core.game.lookupValue(this.json.config.sideMaxSpeed,this.data);
-        this.jumpHeight=this.core.game.lookupValue(this.json.config.jumpHeight,this.data);
-        this.jumpWaterHeight=this.core.game.lookupValue(this.json.config.jumpWaterHeight,this.data);
-        this.flySwimYReduce=this.core.game.lookupValue(this.json.config.flySwimYReduce,this.data);
-        this.damageFlinchWaitTick=this.core.game.lookupValue(this.json.config.damageFlinchWaitTick,this.data);
-        this.fallDamageMinDistance=this.core.game.lookupValue(this.json.config.fallDamageMinDistance,this.data);
-        this.fallDamagePercentage=this.core.game.lookupValue(this.json.config.fallDamagePercentage,this.data);
-        this.respawnWaitTick=this.core.game.lookupValue(this.json.config.respawnWaitTick,this.data);
+        this.maxTurnSpeed=this.core.game.lookupValue(this.json.config.maxTurnSpeed,this.data,0);
+        this.maxLookSpeed=this.core.game.lookupValue(this.json.config.maxLookSpeed,this.data,0);
+        this.maxLookAngle=this.core.game.lookupValue(this.json.config.maxLookAngle,this.data,0);
+        this.forwardAcceleration=this.core.game.lookupValue(this.json.config.forwardAcceleration,this.data,0);
+        this.forwardDeceleration=this.core.game.lookupValue(this.json.config.forwardDeceleration,this.data,0);
+        this.forwardMaxSpeed=this.core.game.lookupValue(this.json.config.forwardMaxSpeed,this.data,0);
+        this.sideAcceleration=this.core.game.lookupValue(this.json.config.sideAcceleration,this.data,0);
+        this.sideDeceleration=this.core.game.lookupValue(this.json.config.sideDeceleration,this.data,0);
+        this.sideMaxSpeed=this.core.game.lookupValue(this.json.config.sideMaxSpeed,this.data,0);
+        this.jumpHeight=this.core.game.lookupValue(this.json.config.jumpHeight,this.data,0);
+        this.jumpWaterHeight=this.core.game.lookupValue(this.json.config.jumpWaterHeight,this.data,0);
+        this.flySwimYReduce=this.core.game.lookupValue(this.json.config.flySwimYReduce,this.data,0);
+        this.damageFlinchWaitTick=this.core.game.lookupValue(this.json.config.damageFlinchWaitTick,this.data,0);
+        this.fallDamageMinDistance=this.core.game.lookupValue(this.json.config.fallDamageMinDistance,this.data,0);
+        this.fallDamagePercentage=this.core.game.lookupValue(this.json.config.fallDamagePercentage,this.data,0);
+        this.respawnWaitTick=this.core.game.lookupValue(this.json.config.respawnWaitTick,this.data,0);
         
-        this.thirdPersonCameraDistance=this.core.game.lookupValue(this.json.config.thirdPersonCameraDistance,this.data);
-        this.thirdPersonCameraLookAngle=this.core.game.lookupValue(this.json.config.thirdPersonCameraLookAngle,this.data);
+        this.thirdPersonCameraDistance=this.core.game.lookupValue(this.json.config.thirdPersonCameraDistance,this.data,0);
+        this.thirdPersonCameraLookAngle=this.core.game.lookupValue(this.json.config.thirdPersonCameraLookAngle,this.data,0);
         
-        this.hitIndicator=this.core.game.lookupValue(this.json.config.hitIndicator,this.data);
-        this.hitIndicatorFlashTick=this.core.game.lookupValue(this.json.config.hitIndicatorFlashTick,this.data);
+        this.hitIndicator=this.core.game.lookupValue(this.json.config.hitIndicator,this.data,null);
+        this.hitIndicatorFlashTick=this.core.game.lookupValue(this.json.config.hitIndicatorFlashTick,this.data,0);
         
-        this.liquidInSound=this.json.config.liquidInSound;
-        this.liquidOutSound=this.json.config.liquidOutSound;
-        this.hurtSound=this.json.config.hurtSound;
-        this.dieSound=this.json.config.dieSound;
+        this.liquidInSound=this.core.game.lookupSoundValue(this.json.config.liquidInSound);
+        this.liquidOutSound=this.core.game.lookupSoundValue(this.json.config.liquidOutSound);
+        this.hurtSound=this.core.game.lookupSoundValue(this.json.config.hurtSound);
+        this.dieSound=this.core.game.lookupSoundValue(this.json.config.dieSound);
         
         this.nextDamageTick=0;
         this.lastInLiquid=false;
@@ -142,7 +142,7 @@ export default class EntityFPSPlayerClass extends EntityClass
         
             // initial camera
             
-        this.respawnCameraFirstPerson=this.core.game.lookupValue(this.json.config.cameraFirstPerson,this.data);
+        this.respawnCameraFirstPerson=this.core.game.lookupValue(this.json.config.cameraFirstPerson,this.data,true);
 
             // setup the weapons
         
@@ -167,7 +167,7 @@ export default class EntityFPSPlayerClass extends EntityClass
             
                 // available to entity?
                 
-            weaponEntity.initiallyAvailable=this.core.game.lookupValue(weaponBlock.initiallyAvailable,this.data);
+            weaponEntity.initiallyAvailable=this.core.game.lookupValue(weaponBlock.initiallyAvailable,this.data,false);
             
                 // push the parent animations to the weapons
                 // so we can pick them up later

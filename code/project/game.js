@@ -58,14 +58,27 @@ export default class GameClass
         return(json);
     }
     
-    lookupValue(value,data)
+    lookupValue(value,data,valueDefault)
     {
+        if (value===undefined) return(valueDefault);
         if (value===null) return(value);
         if (typeof(value)!=='string') return(value);
         if (value.length<2) return(value);
         if (value.charAt(0)!=='@') return(value);
         
         return(data[value.substring(1)]);
+    }
+    
+    lookupAnimationValue(value)
+    {
+        if ((value===undefined) || (value===null)) return(null);
+        return(value);
+    }
+    
+    lookupSoundValue(value)
+    {
+        if ((value==undefined) || (value===null)) return(null);
+        return(value);
     }
 
         //

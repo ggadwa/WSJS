@@ -7,6 +7,7 @@ export default class EntityPickupClass extends EntityClass
     {
         super(core,name,json,position,angle,data);
         
+        this.pickup=true;
         this.passThrough=true;           // can pass through
         
         this.originalY=0;
@@ -23,12 +24,13 @@ export default class EntityPickupClass extends EntityClass
     {
         if (!super.initialize()) return(false);
         
-        this.hideTick=this.core.game.lookupValue(this.json.config.hideTick,this.data);
-        this.pickupOnce=this.core.game.lookupValue(this.json.config.pickupOnce,this.data);
-        this.spinTick=this.core.game.lookupValue(this.json.config.spinTick,this.data);
-        this.floatMove=this.core.game.lookupValue(this.json.config.floatMove,this.data);
-        this.idleAnimation=this.json.config.idleAnimation;
-        this.pickupSound=this.json.config.pickupSound;
+        this.hideTick=this.core.game.lookupValue(this.json.config.hideTick,this.data,0);
+        this.pickupOnce=this.core.game.lookupValue(this.json.config.pickupOnce,this.data,false);
+        this.spinTick=this.core.game.lookupValue(this.json.config.spinTick,this.data,0);
+        this.floatMove=this.core.game.lookupValue(this.json.config.floatMove,this.data,0);
+        
+        this.idleAnimation=this.core.game.lookupAnimationValue(this.json.config.idleAnimation);
+        this.pickupSound=this.core.game.lookupSoundValue(this.json.config.pickupSound);
         
         return(true);
     }
