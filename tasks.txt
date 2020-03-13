@@ -3,7 +3,11 @@
 - sound play might need position instead of expecting object with .position (as effects call it)
 - wsserver - option to show http log in server (default to off)
 
-- bot config BY SKILL (finish - test)
+
+- bots
+   - y targeting seems bad
+   - extra weapon fires
+
 
 - trigger pause nodes part of node
 - finish fps_bot first

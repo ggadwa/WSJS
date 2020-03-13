@@ -41,14 +41,14 @@ class EntityWeaponFireClass
     
     addAmmo(count)
     {
-        if (this.interfaceAmmoIcon!==null) this.core.interface.pulseElement(this.interfaceAmmoIcon,500,10);
+        if ((this.interfaceAmmoIcon!==null) && (this.weapon.heldBy===this.core.map.entityList.getPlayer())) this.core.interface.pulseElement(this.interfaceAmmoIcon,500,10);
         
         this.ammo+=count;
         if (this.ammo>this.ammoMaxCount) this.ammo=this.ammoMaxCount;
     }
     
     updateUI()
-    {   
+    {
         if (this.interfaceAmmoText!==null) this.core.interface.updateText(this.interfaceAmmoText,this.ammo);
         if (this.interfaceAmmoCount!==null) this.core.interface.setCount(this.interfaceAmmoCount,this.ammo);
     }
@@ -76,6 +76,7 @@ export default class EntityWeaponClass extends EntityClass
         this.initiallyAvailable=false;
         this.available=false;
         this.inCarousel=false;
+        this.fireYSlop=0;
         
         this.lastFireTimestamp=0;
         
@@ -161,6 +162,8 @@ export default class EntityWeaponClass extends EntityClass
         
     hitScan(parentEntity,fire)
     {
+        let y;
+        
             // the hit scan, firing point is the eye
             // and we rotate with the look and then turn
           
@@ -169,7 +172,14 @@ export default class EntityWeaponClass extends EntityClass
         
         this.fireVector.setFromValues(0,0,fire.distance);
         this.fireVector.rotateX(null,parentEntity.angle.x);
-        this.fireVector.rotateY(null,parentEntity.angle.y);
+        
+        y=parentEntity.angle.y;
+        if (this.fireYSlop!==0) {
+            y+=(this.fireYSlop-(Math.random()*(this.fireYSlop*2)));
+            if (y<0) y=360+y;
+            if (y>360) y-=360;
+        }
+        this.fireVector.rotateY(null,y);
         
         if (parentEntity.rayCollision(this.firePoint,this.fireVector,this.fireHitPoint)) {
             
@@ -199,12 +209,22 @@ export default class EntityWeaponClass extends EntityClass
         
     projectile(parentEntity,fire)
     {
-        let projEntity;
+        let y,projEntity;
         
             // fire position
             
         this.firePoint.setFromValues(0,0,fire.startRadius);
-        this.firePoint.rotate(parentEntity.angle);
+
+        this.firePoint.rotateX(null,parentEntity.angle.x);
+        
+        y=parentEntity.angle.y;
+        if (this.fireYSlop!==0) {
+            y+=(this.fireYSlop-(Math.random()*(this.fireYSlop*2)));
+            if (y<0) y=360+y;
+            if (y>360) y-=360;
+        }
+        this.firePoint.rotateY(null,y);
+
         this.firePoint.addPoint(parentEntity.position);
         this.firePoint.y+=parentEntity.eyeOffset;
         
@@ -265,6 +285,25 @@ export default class EntityWeaponClass extends EntityClass
     }
     
         //
+        // firing
+        //
+        
+    firePrimary()
+    {
+        if (this.primary!==null) this.fireForType(this.heldBy,this.primary,this.parentPrimaryFireRunAnimation);
+    }
+    
+    fireSecondary()
+    {
+        if (this.secondary!==null) this.fireForType(this.heldBy,this.secondary,this.parentSecondaryFireRunAnimation);
+    }
+    
+    fireTertiary()
+    {
+        if (this.tertiary!==null) this.fireForType(this.heldBy,this.tertiary,this.parentTertiaryFireRunAnimation);
+    }
+    
+        //
         // main run
         //
         
@@ -274,34 +313,13 @@ export default class EntityWeaponClass extends EntityClass
       
         super.run();
         
-            // update any UI in player
+            // update any UI if player
             
         if (parentEntity===this.core.map.entityList.getPlayer()) {
             if (this.interfaceCrosshair!==null) this.core.interface.showElement(this.interfaceCrosshair,((this.show)&&(this.core.camera.isFirstPerson())));
             if (this.primary!==null) this.primary.updateUI();
             if (this.secondary!==null) this.secondary.updateUI();
             if (this.tertiary!==null) this.tertiary.updateUI();
-        }
-
-            // if entity has model but not shown,
-            // the assume carousel and skip
-
-        if (this.model!==null) {
-            if (!this.show) return;
-        }
-        
-            // any fire methods
-          
-        if (this.primary!==null) {
-            if (parentEntity.firePrimary) this.fireForType(parentEntity,this.primary,this.parentPrimaryFireRunAnimation);
-        }
-            
-        if (this.secondary!==null) {
-            if (parentEntity.fireSecondary) this.fireForType(parentEntity,this.secondary,this.parentSecondaryFireRunAnimation);
-        }
-        
-        if (this.tertiary!==null) {
-            if (parentEntity.fireTertiary) this.fireForType(parentEntity,this.tertiary,this.parentTertiaryFireRunAnimation);
         }
     }
         

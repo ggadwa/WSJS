@@ -76,6 +76,8 @@ export default class EntityFPSBotClass extends EntityClass
         this.seekNodeAngleSlop=0;
         this.targetScanYRange=0;
         this.targetForgetDistance=0;
+        this.targetFireYRange=0;
+        this.targetFireSlop=0;
         
             // pre-allocates
             
@@ -136,6 +138,8 @@ export default class EntityFPSBotClass extends EntityClass
         this.seekNodeAngleSlop=this.core.game.lookupValue(skill.seekNodeAngleSlop,this.data,0);
         this.targetScanYRange=this.core.game.lookupValue(skill.targetScanYRange,this.data,0);
         this.targetForgetDistance=this.core.game.lookupValue(skill.targetForgetDistance,this.data,0);
+        this.targetFireYRange=this.core.game.lookupValue(skill.targetFireYRange,this.data,0);
+        this.targetFireSlop=this.core.game.lookupValue(skill.targetFireSlop,this.data,0);
         
         this.nextDamageTick=0;
         this.lastInLiquid=false;
@@ -159,6 +163,10 @@ export default class EntityFPSBotClass extends EntityClass
                 weaponEntity.inCarousel=false;
                 this.extraWeapons.push(weaponEntity);
             }
+            
+                // add in the bot slop
+                
+            weaponEntity.fireYSlop=this.targetFireSlop;
             
                 // available to entity?
                 
@@ -350,10 +358,10 @@ export default class EntityFPSBotClass extends EntityClass
         
             // find best weapon
             
-        idx=-1;
+        idx=0;
 
         for (n=0;n!==this.carouselWeapons.length;n++) {
-            if (this.carouselWeapons[n].available) idx=n;
+            if ((this.carouselWeapons[n].available) && (this.carouselWeapons[n].primary.ammo!==0)) idx=n;
         }
 
         if (idx===this.currentCarouselWeaponIdx) return;
@@ -386,6 +394,14 @@ export default class EntityFPSBotClass extends EntityClass
 
     findEntityToFight()
     {
+            // special check for no ammo
+            // if so, don't fight
+        
+        if (this.carouselWeapons[this.currentCarouselWeaponIdx].primary.ammo===0) {
+            this.targetEntity=null;
+            return;
+        }
+        
             // already fighting?
             // if so, see if we are past the forget
             // distance or the target has no health
@@ -417,12 +433,50 @@ export default class EntityFPSBotClass extends EntityClass
         
         if (this.rayCollision(this.lookPoint,this.lookVector,this.lookHitPoint)) {
             if (this.hitEntity!==null) {
-                if (this.hitEntity.fighter) {
-                    console.log(this.name+' target '+this.hitEntity.name);
-                    this.targetEntity=this.hitEntity;
+                if (this.hitEntity.fighter) this.targetEntity=this.hitEntity;
+            }
+        }
+    }
+
+    fireWeapon()
+    {
+        let weapon;
+        
+            // are we turned enough towards player?
+            
+        if (Math.abs(this.lastTargetAngleDif)>this.targetFireYRange) return;
+            
+           // are we outside of grenade distance?
+           // if so, then we can throw a grenade
+           // we also have a pause so bots don't unload
+           // at one helpless player
+           
+           // run through extraWeapons here
+           /*
+        if (this.grenade.ammoCount>0) {
+            if (this.getTimestamp()>this.grenadePauseTick) {
+                if (this.position.distance(this.targetEntity.position)>this.MIN_GRENADE_DISTANCE) {
+                    this.fireAngle.setFromPoint(this.drawAngle);
+                    this.fireAngle.x=this.position.getLookAngleTo(this.targetEntity.position);
+                    this.grenade.fire(this.position,this.fireAngle,this.eyeOffset);
+                    this.grenadePauseTick=this.getTimestamp()+this.GRENADE_PAUSE_TICK;
+
+                    if (this.currentWeapon===this.WEAPON_BERETTA) {
+                        this.startModelAnimationChunkInFrames(null,30,51,91);
+                        this.queueModelAnimationChunkInFrames(null,30,406,442);
+                    }
+                    else {
+                        this.startModelAnimationChunkInFrames(null,30,820,860);
+                        this.queueModelAnimationChunkInFrames(null,30,960,996);
+                    }
+                    return;
                 }
             }
         }
+        */
+            // otherwise shot the held weapon
+            
+        weapon=this.carouselWeapons[this.currentCarouselWeaponIdx].firePrimary();
     }
 
         //
@@ -476,7 +530,7 @@ export default class EntityFPSBotClass extends EntityClass
             
         this.findEntityToFight();
         
-        //if (this.targetEntity!==null) this.fireWeapon();
+        if (this.targetEntity!==null) this.fireWeapon();
         
             // always start by moving
             

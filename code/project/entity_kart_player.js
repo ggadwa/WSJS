@@ -346,7 +346,7 @@ export default class EntityKartPlayerClass extends EntityClass
         
             // firing
         
-        if (fire) this.firePrimary=true;
+        //if (fire) this.firePrimary=true;  weapon.firePrimary()
         
             // turning
             

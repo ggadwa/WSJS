@@ -478,6 +478,7 @@ export default class EntityFPSPlayerClass extends EntityClass
         let n,x,y;
         let moveForward,moveBackward,moveLeft,moveRight;
         let liquidIdx,bump;
+        let weapon,firePrimary,fireSecondary,fireTertiary;
         let turnAdd,lookAdd,startWeaponIdx;
         let mouseWheelClick;
         let input=this.core.input;
@@ -564,9 +565,22 @@ export default class EntityFPSPlayerClass extends EntityClass
         
             // weapon firing
             
-        this.firePrimary=this.core.input.mouseButtonFlags[0]||this.core.input.isTouchStickRightClick();
-        this.fireSecondary=this.core.input.mouseButtonFlags[1];
-        this.fireTertiary=this.core.input.mouseButtonFlags[2];
+        firePrimary=this.core.input.mouseButtonFlags[0]||this.core.input.isTouchStickRightClick();
+        fireSecondary=this.core.input.mouseButtonFlags[1];
+        fireTertiary=this.core.input.mouseButtonFlags[2];
+        
+        weapon=this.carouselWeapons[this.currentCarouselWeaponIdx];
+        
+        if (firePrimary) weapon.firePrimary();
+        if (fireSecondary) weapon.fireSecondary();
+        if (fireTertiary) weapon.fireTertiary();
+        
+        for (n=0;n<this.extraWeapons.length;n++) {
+            weapon=this.extraWeapons[n];
+            if (firePrimary) weapon.firePrimary();
+            if (fireSecondary) weapon.fireSecondary();
+            if (fireTertiary) weapon.fireTertiary();
+        }
         
             // forward and shift controls
             
