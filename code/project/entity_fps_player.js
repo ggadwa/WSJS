@@ -155,13 +155,11 @@ export default class EntityFPSPlayerClass extends EntityClass
                 
             if (weaponBlock.inCarousel) {
                 weaponEntity=this.addEntity(this,weaponBlock.json,weaponBlock.name,new PointClass(0,0,0),new PointClass(0,0,0),null,true,true);
-                weaponEntity.inCarousel=true;
                 this.carouselWeapons.push(weaponEntity);
                 if ((weaponBlock.default) && (this.defaultCarouselWeaponIdx===-1)) this.defaultCarouselWeaponIdx=n;
             }
             else {
                 weaponEntity=this.addEntity(this,weaponBlock.json,weaponBlock.name,new PointClass(0,0,0),new PointClass(0,0,0),null,true,true);
-                weaponEntity.inCarousel=false;
                 this.extraWeapons.push(weaponEntity);
             }
             
@@ -569,17 +567,21 @@ export default class EntityFPSPlayerClass extends EntityClass
         fireSecondary=this.core.input.mouseButtonFlags[1];
         fireTertiary=this.core.input.mouseButtonFlags[2];
         
-        weapon=this.carouselWeapons[this.currentCarouselWeaponIdx];
-        
-        if (firePrimary) weapon.firePrimary();
-        if (fireSecondary) weapon.fireSecondary();
-        if (fireTertiary) weapon.fireTertiary();
-        
-        for (n=0;n<this.extraWeapons.length;n++) {
-            weapon=this.extraWeapons[n];
+        if (this.currentCarouselWeaponIdx!==-1) {
+            weapon=this.carouselWeapons[this.currentCarouselWeaponIdx];
+
             if (firePrimary) weapon.firePrimary();
             if (fireSecondary) weapon.fireSecondary();
             if (fireTertiary) weapon.fireTertiary();
+        }
+        
+        for (n=0;n<this.extraWeapons.length;n++) {
+            weapon=this.extraWeapons[n];
+            if (weapon.available) {
+                if (firePrimary) weapon.firePrimary();
+                if (fireSecondary) weapon.fireSecondary();
+                if (fireTertiary) weapon.fireTertiary();
+            }
         }
         
             // forward and shift controls

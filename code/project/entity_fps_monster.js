@@ -79,6 +79,7 @@ export default class EntityFPSMonsterClass extends EntityClass
             // pre-allocations
 
         this.movement=new PointClass(0,0,0);
+        this.sideMovement=new PointClass(0,0,0);
         this.rotMovement=new PointClass(0,0,0);
         this.origPosition=new PointClass(0,0,0);
         
@@ -179,6 +180,7 @@ export default class EntityFPSMonsterClass extends EntityClass
             // misc
             
         this.lastInLiquid=false;
+        this.slideNextTick=0;
             
             // start idle animation
         
@@ -439,33 +441,40 @@ export default class EntityFPSMonsterClass extends EntityClass
 
         if (this.core.timestamp>this.nextDamageTick) {
             
-            this.movement.moveZWithAcceleration(true,false,this.forwardAcceleration,this.forwardDeceleration,this.forwardMaxSpeed,this.forwardAcceleration,this.forwardDeceleration,this.forwardMaxSpeed);        
-
-            this.rotMovement.setFromPoint(this.movement);
-            this.rotMovement.rotateY(null,this.angle.y);
-
-            this.origPosition.setFromPoint(this.position);
-
-            this.movement.y=this.moveInMapY(this.rotMovement,false);
-            this.moveInMapXZ(this.rotMovement,true,true);
-            
-                // if we hit a wall, try a slide
+                // not in a back slide
                 
-            if (this.collideWallMeshIdx!==-1) {    
+            if (this.slideNextTick===0) {
+                this.movement.moveZWithAcceleration(true,false,this.forwardAcceleration,this.forwardDeceleration,this.forwardMaxSpeed,this.forwardAcceleration,this.forwardDeceleration,this.forwardMaxSpeed);        
 
-                    // time to try a new slide?
-                    
-                if ((this.slideDirection===0) || (this.core.timestamp>this.slideNextTick)) {
+                this.rotMovement.setFromPoint(this.movement);
+                this.rotMovement.rotateY(null,this.angle.y);
+
+                this.origPosition.setFromPoint(this.position);
+
+                this.movement.y=this.moveInMapY(this.rotMovement,false);
+                this.moveInMapXZ(this.rotMovement,true,true);
+
+                    // if we hit a wall, try a random slide left or right
+                    // while backing up a bit
+
+                if (this.collideWallMeshIdx!==-1) {    
+                    this.position.x=this.origPosition.x;
+                    this.position.z=this.origPosition.z;
+
                     this.slideDirection=(Math.random()<0.5)?-1:1;
                     this.slideNextTick=this.core.timestamp+this.slideMoveTick;
+                    this.sideMovement.setFromValues(0,0,0);
                 }
+            }
+            
+                // in slide
                 
-                this.position.x=this.origPosition.x;
-                this.position.z=this.origPosition.z;
-                
-                this.movement.z=0;
-                this.movement.moveXWithAcceleration((this.slideDirection<0),(this.slideDirection>0),this.sideAcceleration,this.sideDeceleration,this.sideMaxSpeed,this.sideAcceleration,this.sideDeceleration,this.sideMaxSpeed);
-                this.rotMovement.setFromPoint(this.movement);
+            else {
+                if (this.core.timestamp>this.slideNextTick) this.slideNextTick=0;
+
+                this.sideMovement.moveZWithAcceleration(false,true,this.forwardAcceleration,this.forwardDeceleration,this.forwardMaxSpeed,this.forwardAcceleration,this.forwardDeceleration,this.forwardMaxSpeed); 
+                this.sideMovement.moveXWithAcceleration((this.slideDirection<0),(this.slideDirection>0),this.sideAcceleration,this.sideDeceleration,this.sideMaxSpeed,this.sideAcceleration,this.sideDeceleration,this.sideMaxSpeed);
+                this.rotMovement.setFromPoint(this.sideMovement);
                 this.rotMovement.rotateY(null,this.angle.y);
 
                 this.moveInMapXZ(this.rotMovement,true,true);

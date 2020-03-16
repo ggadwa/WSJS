@@ -11,6 +11,7 @@ class EntityWeaponFireClass
         this.ammo=0;
         this.ammoInitialCount=this.core.game.lookupValue(fireObj.ammoInitialCount,weapon.data,0);
         this.ammoMaxCount=this.core.game.lookupValue(fireObj.ammoMaxCount,weapon.data,0);
+        this.ammoRegenerateTick=this.core.game.lookupValue(fireObj.ammoRegenerateTick,weapon.data,-1);
         
         this.interfaceAmmoIcon=this.core.game.lookupValue(fireObj.interfaceAmmoIcon,weapon.data,null);
         this.interfaceAmmoText=this.core.game.lookupValue(fireObj.interfaceAmmoText,weapon.data,null);
@@ -30,6 +31,7 @@ class EntityWeaponFireClass
         this.sound=this.core.game.lookupSoundValue(fireObj.sound);
        
         this.lastFireTimestamp=0;
+        this.lastRegenerateTimestamp=0;
     }
     
     ready()
@@ -37,6 +39,7 @@ class EntityWeaponFireClass
         this.ammo=this.ammoInitialCount;
         
         this.lastFireTimestamp=0;
+        this.lastRegenerateTimestamp=this.core.timestamp+this.ammoRegenerateTick;
     }
     
     addAmmo(count)
@@ -51,6 +54,21 @@ class EntityWeaponFireClass
     {
         if (this.interfaceAmmoText!==null) this.core.interface.updateText(this.interfaceAmmoText,this.ammo);
         if (this.interfaceAmmoCount!==null) this.core.interface.setCount(this.interfaceAmmoCount,this.ammo);
+    }
+    
+    resetRegenerateAmmo()
+    {
+        this.lastRegenerateTimestamp=this.core.timestamp+this.ammoRegenerateTick;
+    }
+    
+    regenerateAmmo()
+    {
+        if (this.ammoRegenerateTick!==-1) {
+            if (this.core.timestamp>this.lastRegenerateTimestamp) {
+                this.lastRegenerateTimestamp=this.core.timestamp+this.ammoRegenerateTick;
+                this.addAmmo(1);
+            }
+        }
     }
 }
 
@@ -75,7 +93,6 @@ export default class EntityWeaponClass extends EntityClass
         
         this.initiallyAvailable=false;
         this.available=false;
-        this.inCarousel=false;
         this.fireYSlop=0;
         
         this.lastFireTimestamp=0;
@@ -249,14 +266,15 @@ export default class EntityWeaponClass extends EntityClass
             // fire
             
         fire.ammo--;
+        fire.resetRegenerateAmmo();
         
         fire.core.soundList.playJson(parentEntity,null,fire.sound);
            
            // weapon animation
            
         if (this.model!==null) {
-            this.modelEntityAlter.startAnimationChunkInFrames(null,30,fire.animation[0],fire.animation[1]);
-            this.modelEntityAlter.queueAnimationChunkInFrames(null,30,this.idleAnimation[0],this.idleAnimation[1]);
+            if (fireAnimation!==null) this.modelEntityAlter.startAnimationChunkInFrames(null,30,fire.animation[0],fire.animation[1]);
+            if (this.idleAnimation!==null) this.modelEntityAlter.queueAnimationChunkInFrames(null,30,this.idleAnimation[0],this.idleAnimation[1]);
         }
         
             // parent animation
@@ -264,10 +282,10 @@ export default class EntityWeaponClass extends EntityClass
         if (parentEntity.model!==null) {
             if (!parentEntity.modelEntityAlter.isAnimationQueued()) {   // don't do this if we have a queue, which means another fire is still going on
                 if ((parentEntity.movement.x!==0) || (parentEntity.movement.z!==0)) {
-                    parentEntity.modelEntityAlter.interuptAnimationChunkInFrames(null,30,fireAnimation[0],fireAnimation[1]);
+                    if (fireAnimation!==null) parentEntity.modelEntityAlter.interuptAnimationChunkInFrames(null,30,fireAnimation[0],fireAnimation[1]);
                 }
                 else {
-                    parentEntity.modelEntityAlter.interuptAnimationChunkInFrames(null,30,this.parentFireIdleAnimation[0],this.parentFireIdleAnimation[1]);
+                    if (this.parentFireIdleAnimation!==null) parentEntity.modelEntityAlter.interuptAnimationChunkInFrames(null,30,this.parentFireIdleAnimation[0],this.parentFireIdleAnimation[1]);
                 }
             }
         }
@@ -312,6 +330,12 @@ export default class EntityWeaponClass extends EntityClass
         let parentEntity=this.heldBy;
       
         super.run();
+        
+            // do any ammo regen
+            
+        if (this.primary!==null) this.primary.regenerateAmmo();
+        if (this.secondary!==null) this.secondary.regenerateAmmo();
+        if (this.tertiary!==null) this.tertiary.regenerateAmmo();
         
             // update any UI if player
             

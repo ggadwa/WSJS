@@ -161,13 +161,13 @@ export default class EntityProjectileClass extends EntityClass
             // hitting floor
             // we can either start rolling, stop, or finish
 
-        if ((this.standOnMeshIdx!==-1) && (!this.rolling)) {
+        if ((this.standOnMeshIdx!==-1) && (!this.rolling) && (!this.followsFloor)) {
             if (this.stopOnHit) {
                 this.finish();
                 return;
             }
             
-            if (!this.stopped) this.core.soundList.playJson(this,null,this.bounceSound);
+            if ((!this.stopped) && (this.bounceSound!==null)) this.core.soundList.playJson(this,null,this.bounceSound);
             
             this.position.setFromPoint(this.savePoint);
             if (this.canBounce) this.floorBounce(this.motion);
@@ -183,9 +183,6 @@ export default class EntityProjectileClass extends EntityClass
                         return;
                     }
                 }
-            }
-            else {
-                this.motion.y=this.moveInMapY(this.motion,false);
             }
             
             return;

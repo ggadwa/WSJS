@@ -7,8 +7,18 @@ import EntityClass from '../project/entity.js';
 
 export default class EntityKartPlayerClass extends EntityClass
 {
+    constructor(core,name,json,position,angle,data)
+    {
+        super(core,name,json,position,angle,data);
+        
+        this.currentWeaponIdx=-1;
+        this.weapons=[];
+    }
+    
     initialize()
     {
+        let n,weaponBlock,weaponEntity;
+        
         super.initialize();
         
         this.MAX_RIGID_DROP=3000;
@@ -17,7 +27,6 @@ export default class EntityKartPlayerClass extends EntityClass
         this.MAX_LOOK_ANGLE=80.0;
         this.MAX_STARS=10;
         this.MAX_PROJECTILE_COUNT=3;
-        this.MAX_TOTAL_MINES=10;  
         this.MOUSE_MAX_LOOK_SPEED=8;
         this.MAX_LOOK_ANGLE=80.0;
         this.SMOKE_COOL_DOWN_COUNT=2;
@@ -35,8 +44,6 @@ export default class EntityKartPlayerClass extends EntityClass
         this.starCount=0;
 
         this.lastProjectileFireTick=0;
-        this.mineCount=0;
-        this.lastMineTick=0;
     
         this.lastDrawTick=0;
     
@@ -97,7 +104,14 @@ export default class EntityKartPlayerClass extends EntityClass
         this.mineRechargeTick=2000;
         this.weight=500;
         
-        this.weapons=[];
+        
+        
+        for (n=0;n!==this.json.weapons.length;n++) {
+            weaponBlock=this.json.weapons[n];
+
+             weaponEntity=this.addEntity(this,weaponBlock.json,weaponBlock.name,new PointClass(0,0,0),new PointClass(0,0,0),null,true,true);
+             this.weapons.push(weaponEntity);
+        }
         
             // variables
             
@@ -141,16 +155,9 @@ export default class EntityKartPlayerClass extends EntityClass
         this.lastDrawTick=this.getTimestamp();
         this.rigidGotoAngle.setFromValues(0,0,0);
         
-        
-        
-        for (n=0;n!==this.json.weapons.length;n++) {
-            weaponBlock=this.json.weapons[n];
-            this.weapons.push(this.addEntity(this,weaponBlock.json,weaponBlock.name,new PointClass(0,0,0),new PointClass(0,0,0),null,true,true));
-        }
-        
+        this.currentWeaponIdx=0;
         
         this.resetStars();
-        this.resetMines();
         
         this.engineSoundRateAirIncrease=0;
         this.engineSoundPlayIdx=this.playGlobal('engine',this.MIN_ENGINE_SOUND_RATE,true);
@@ -197,60 +204,6 @@ export default class EntityKartPlayerClass extends EntityClass
         this.core.interface.setCount('stars',this.starCount);
     }
     
-        //
-        // mine UI
-        //
-        
-    resetMines()
-    {
-        this.mineCount=this.maxMines;
-        this.core.interface.setCount('mines',this.mineCount);
-    }
-    
-    addMine()
-    {
-        this.mineCount++;
-        this.core.interface.setCount('mines',this.mineCount);
-    }
-    
-    removeMine()
-    {
-        this.mineCount--;
-        this.core.interface.setCount('mines',this.mineCount);
-    }
-    
-        //
-        // firing
-        //
-        
-    fire(isPlayer)
-    {
-        let timestamp=this.getTimestamp();
-        
-            // can we fire again?
-            
-        if (timestamp<(this.lastProjectileFireTick+this.fireWaitTick)) return;
-        
-            // do we have free mines?
-            // if we fire, we reset free mine wait tick
-            
-        if (this.mineCount===0) return;
-        
-        this.lastProjectileFireTick=timestamp;
-        this.lastMineTick=timestamp;
-        
-            // fire
-            
-        this.firePosition.setFromValues(0,0,(this.radius*2));
-        this.firePosition.rotateY(null,this.angle.y);
-        this.firePosition.addPoint(this.position);
-        
-        this.addEntityFromEntity(this,EntityProjectileMineClass,'projectile_mine',this.firePosition,this.angle,null,true,false);
-        
-            // if this is the player, reset the mine images
-            
-        if (isPlayer) this.removeMine();
-    }
     
         //
         // drifts, bounces, spins
@@ -305,17 +258,8 @@ export default class EntityKartPlayerClass extends EntityClass
     moveKart(turnAdd,moveForward,moveReverse,drifting,brake,fire,jump,isPlayer)
     {
         let maxTurnSpeed,speed;
-        let cube;
+        let cube,weapon;
         let timestamp=this.getTimestamp();
-        
-            // change mine count
-            
-        if (timestamp>(this.lastMineTick+this.mineRechargeWaitTick)) {
-            if (this.mineCount<this.maxMines) {
-                this.lastMineTick=timestamp;
-                this.addMine();
-            }
-        }
         
             // start spinning if you touch a monster
             
@@ -346,7 +290,11 @@ export default class EntityKartPlayerClass extends EntityClass
         
             // firing
         
-        //if (fire) this.firePrimary=true;  weapon.firePrimary()
+        if (fire) {
+            if (this.currentWeaponIdx!==-1) {
+                this.weapons[this.currentWeaponIdx].firePrimary();
+             }
+        }
         
             // turning
             

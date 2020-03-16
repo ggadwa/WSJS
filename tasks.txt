@@ -4,10 +4,15 @@
 - wsserver - option to show http log in server (default to off)
 
 
+- monster slide still bad
+   - needs backup (reverse) speeds
+
 - bots
    - y targeting seems bad
    - extra weapon fires
 
+
+- bots/player share base, kart bot/kart player share base
 
 - trigger pause nodes part of node
 - finish fps_bot first
@@ -33,6 +38,9 @@
     - get rid of any beretta naming
 
     - need to go over all the auto generate options
+- iPad
+    - esc key
+    - action key
 
 EVENTUALLY
     - add kart to demo

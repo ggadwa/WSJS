@@ -154,13 +154,11 @@ export default class EntityFPSBotClass extends EntityClass
                 
             if (weaponBlock.inCarousel) {
                 weaponEntity=this.addEntity(this,weaponBlock.json,weaponBlock.name,new PointClass(0,0,0),new PointClass(0,0,0),null,true,true);
-                weaponEntity.inCarousel=true;
                 this.carouselWeapons.push(weaponEntity);
                 if ((weaponBlock.default) && (this.defaultCarouselWeaponIdx===-1)) this.defaultCarouselWeaponIdx=n;
             }
             else {
                 weaponEntity=this.addEntity(this,weaponBlock.json,weaponBlock.name,new PointClass(0,0,0),new PointClass(0,0,0),null,true,true);
-                weaponEntity.inCarousel=false;
                 this.extraWeapons.push(weaponEntity);
             }
             
