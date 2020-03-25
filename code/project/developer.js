@@ -52,8 +52,8 @@ export default class DeveloperClass
 
             // position and angle
             
-        console.info('pos='+Math.trunc(player.position.x)+','+Math.trunc(player.position.y)+','+Math.trunc(player.position.z));
-        console.info('ang='+Math.trunc(player.angle.x)+','+Math.trunc(player.angle.y)+','+Math.trunc(player.angle.z));
+        console.info('pos='+player.position);
+        console.info('ang='+player.angle);
 
             // nodes
             

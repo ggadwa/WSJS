@@ -773,4 +773,9 @@ export default class PointClass
     {
         return(new PointClass(this.x,this.y,this.z));
     }
+    
+    toString()
+    {
+        return('('+this.x+','+this.y+','+this.z+')');
+    }
 }

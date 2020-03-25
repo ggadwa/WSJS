@@ -34,15 +34,22 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.maxTurnSpeed=0;
         this.maxLookSpeed=0;
         this.maxLookAngle=0;
+        
         this.forwardAcceleration=0;
         this.forwardDeceleration=0;
         this.forwardMaxSpeed=0;
+        this.backwardAcceleration=0;
+        this.backwardDeceleration=0;
+        this.backwardMaxSpeed=0;
         this.sideAcceleration=0;
         this.sideDeceleration=0;
         this.sideMaxSpeed=0;
+        this.flyAcceleration=0;
+        this.flyDeceleration=0;
+        this.flyMaxSpeed=0;
+        
         this.jumpHeight=0;
         this.jumpWaterHeight=0;
-        this.flySwimYReduce=0;
         this.damageFlinchWaitTick=0;
         this.fallDamageMinDistance=0;
         this.fallDamagePercentage=0;
@@ -109,15 +116,25 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.maxTurnSpeed=this.core.game.lookupValue(this.json.config.maxTurnSpeed,this.data,0);
         this.maxLookSpeed=this.core.game.lookupValue(this.json.config.maxLookSpeed,this.data,0);
         this.maxLookAngle=this.core.game.lookupValue(this.json.config.maxLookAngle,this.data,0);
+        
         this.forwardAcceleration=this.core.game.lookupValue(this.json.config.forwardAcceleration,this.data,0);
         this.forwardDeceleration=this.core.game.lookupValue(this.json.config.forwardDeceleration,this.data,0);
         this.forwardMaxSpeed=this.core.game.lookupValue(this.json.config.forwardMaxSpeed,this.data,0);
+        this.backwardAcceleration=this.core.game.lookupValue(this.json.config.backwardAcceleration,this.data,0);
+        this.backwardDeceleration=this.core.game.lookupValue(this.json.config.backwardDeceleration,this.data,0);
+        this.backwardMaxSpeed=this.core.game.lookupValue(this.json.config.backwardMaxSpeed,this.data,0);
         this.sideAcceleration=this.core.game.lookupValue(this.json.config.sideAcceleration,this.data,0);
         this.sideDeceleration=this.core.game.lookupValue(this.json.config.sideDeceleration,this.data,0);
         this.sideMaxSpeed=this.core.game.lookupValue(this.json.config.sideMaxSpeed,this.data,0);
+        this.swimAcceleration=this.core.game.lookupValue(this.json.config.swimAcceleration,this.data,0);
+        this.swimDeceleration=this.core.game.lookupValue(this.json.config.swimDeceleration,this.data,0);
+        this.swimMaxSpeed=this.core.game.lookupValue(this.json.config.swimMaxSpeed,this.data,0);
+        this.flyAcceleration=this.core.game.lookupValue(this.json.config.flyAcceleration,this.data,0);
+        this.flyDeceleration=this.core.game.lookupValue(this.json.config.flyDeceleration,this.data,0);
+        this.flyMaxSpeed=this.core.game.lookupValue(this.json.config.flyMaxSpeed,this.data,0);
+
         this.jumpHeight=this.core.game.lookupValue(this.json.config.jumpHeight,this.data,0);
         this.jumpWaterHeight=this.core.game.lookupValue(this.json.config.jumpWaterHeight,this.data,0);
-        this.flySwimYReduce=this.core.game.lookupValue(this.json.config.flySwimYReduce,this.data,0);
         this.damageFlinchWaitTick=this.core.game.lookupValue(this.json.config.damageFlinchWaitTick,this.data,0);
         this.fallDamageMinDistance=this.core.game.lookupValue(this.json.config.fallDamageMinDistance,this.data,0);
         this.fallDamagePercentage=this.core.game.lookupValue(this.json.config.fallDamagePercentage,this.data,0);
@@ -686,16 +703,25 @@ export default class EntityFPSPlayerClass extends EntityClass
             
         bump=(this.standOnMeshIdx!==-1)||(this.lastUnderLiquid);
         
-            // figure out the movement
+            // move
          
-        this.movement.moveZWithAcceleration(moveForward,moveBackward,this.forwardAcceleration,this.forwardDeceleration,this.forwardMaxSpeed,this.forwardAcceleration,this.forwardDeceleration,this.forwardMaxSpeed);
+        if (this.core.game.developer.playerFly) {
+            this.movement.moveZWithAcceleration(moveForward,moveBackward,this.flyAcceleration,this.flyDeceleration,this.flyMaxSpeed,this.flyAcceleration,this.flyDeceleration,this.flyMaxSpeed);
+        }
+        else {
+            if (this.lastUnderLiquid) {
+                this.movement.moveZWithAcceleration(moveForward,moveBackward,this.swimAcceleration,this.swimDeceleration,this.swimMaxSpeed,this.swimAcceleration,this.swimDeceleration,this.swimMaxSpeed);
+            }
+            else {
+                this.movement.moveZWithAcceleration(moveForward,moveBackward,this.forwardAcceleration,this.forwardDeceleration,this.forwardMaxSpeed,this.backwardAcceleration,this.backwardDeceleration,this.backwardMaxSpeed);
+            }
+        }
         this.movement.moveXWithAcceleration(moveLeft,moveRight,this.sideAcceleration,this.sideDeceleration,this.sideMaxSpeed,this.sideAcceleration,this.sideDeceleration,this.sideMaxSpeed);
         
         this.rotMovement.setFromPoint(this.movement);
         if ((this.core.game.developer.playerFly) || (this.lastUnderLiquid)) {
             this.rotMovement.y=0;       // only Y movement comes from X angle rotation
             this.rotMovement.rotateX(null,this.angle.x);     // if flying or swimming, add in the X rotation
-            this.rotMovement.y*=this.flySwimYReduce;
         }
         this.rotMovement.rotateY(null,this.angle.y);
 

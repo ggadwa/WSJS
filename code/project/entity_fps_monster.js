@@ -39,6 +39,9 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.forwardAcceleration=0;
         this.forwardDeceleration=0;
         this.forwardMaxSpeed=0;
+        this.reverseAcceleration=0;
+        this.reverseDeceleration=0;
+        this.reverseMaxSpeed=0;
         this.sideAcceleration=0;
         this.sideDeceleration=0;
         this.sideMaxSpeed=0;
@@ -116,6 +119,9 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.forwardAcceleration=this.core.game.lookupValue(this.json.config.forwardAcceleration,this.data,0);
         this.forwardDeceleration=this.core.game.lookupValue(this.json.config.forwardDeceleration,this.data,0);
         this.forwardMaxSpeed=this.core.game.lookupValue(this.json.config.forwardMaxSpeed,this.data,0);
+        this.reverseAcceleration=this.core.game.lookupValue(this.json.config.reverseAcceleration,this.data,0);
+        this.reverseDeceleration=this.core.game.lookupValue(this.json.config.reverseDeceleration,this.data,0);
+        this.reverseMaxSpeed=this.core.game.lookupValue(this.json.config.reverseMaxSpeed,this.data,0);
         this.sideAcceleration=this.core.game.lookupValue(this.json.config.sideAcceleration,this.data,0);
         this.sideDeceleration=this.core.game.lookupValue(this.json.config.sideDeceleration,this.data,0);
         this.sideMaxSpeed=this.core.game.lookupValue(this.json.config.sideMaxSpeed,this.data,0);
@@ -249,7 +255,7 @@ export default class EntityFPSMonsterClass extends EntityClass
     
     jump()
     {
-        this.gravity=this.gravityMinValue;
+        this.gravity=this.core.map.gravityMinValue;
         this.movement.y=this.jumpHeight;
         
         this.core.soundList.playJson(this,null,this.wakeUpSound);
@@ -335,6 +341,26 @@ export default class EntityFPSMonsterClass extends EntityClass
         
         projEntity=this.addEntity(this,this.projectileJson,('projectile_'+this.name),this.firePosition,this.fireAngle,this.projectileData,true,false);
         if (projEntity!==null) projEntity.ready();
+    }
+    
+    findSlideDirection(player)
+    {
+        let distNeg,distPos;
+        let moveAdd=this.slideMoveTick/16;      // estimation of physics ticks
+        
+            // find which direction gets you close to player
+            
+        this.rotMovement.setFromValues((this.sideMaxSpeed*moveAdd),0,-(this.reverseMaxSpeed*moveAdd));
+        this.rotMovement.rotateY(null,this.angle.y);
+        this.rotMovement.addPoint(this.position);
+        distNeg=this.rotMovement.distance(player.position);
+        
+        this.rotMovement.setFromValues(-(this.sideMaxSpeed*moveAdd),0,-(this.reverseMaxSpeed*moveAdd));
+        this.rotMovement.rotateY(null,this.angle.y);
+        this.rotMovement.addPoint(this.position);
+        distPos=this.rotMovement.distance(player.position);
+        
+        return((distNeg>distPos)?-1:1);
     }
     
     run()
@@ -458,26 +484,29 @@ export default class EntityFPSMonsterClass extends EntityClass
                     // while backing up a bit
 
                 if (this.collideWallMeshIdx!==-1) {    
-                    this.position.x=this.origPosition.x;
-                    this.position.z=this.origPosition.z;
+                    this.position.setFromPoint(this.origPosition);
 
-                    this.slideDirection=(Math.random()<0.5)?-1:1;
+                    this.slideDirection=this.findSlideDirection(player);
                     this.slideNextTick=this.core.timestamp+this.slideMoveTick;
-                    this.sideMovement.setFromValues(0,0,0);
+                    this.sideMovement.setFromValues(0,this.movement.y,0);
                 }
             }
             
                 // in slide
                 
             else {
-                if (this.core.timestamp>this.slideNextTick) this.slideNextTick=0;
-
-                this.sideMovement.moveZWithAcceleration(false,true,this.forwardAcceleration,this.forwardDeceleration,this.forwardMaxSpeed,this.forwardAcceleration,this.forwardDeceleration,this.forwardMaxSpeed); 
+                this.sideMovement.moveZWithAcceleration(false,true,this.forwardAcceleration,this.forwardDeceleration,this.forwardMaxSpeed,this.reverseAcceleration,this.reverseDeceleration,this.reverseMaxSpeed); 
                 this.sideMovement.moveXWithAcceleration((this.slideDirection<0),(this.slideDirection>0),this.sideAcceleration,this.sideDeceleration,this.sideMaxSpeed,this.sideAcceleration,this.sideDeceleration,this.sideMaxSpeed);
                 this.rotMovement.setFromPoint(this.sideMovement);
                 this.rotMovement.rotateY(null,this.angle.y);
-
+                
+                this.sideMovement.y=this.moveInMapY(this.rotMovement,false);
                 this.moveInMapXZ(this.rotMovement,true,true);
+               
+                if (this.core.timestamp>this.slideNextTick) {
+                    this.slideNextTick=0;
+                    this.movement.y=this.sideMovement.y;
+                }
             }
         }
         

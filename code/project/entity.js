@@ -822,7 +822,7 @@ export default class EntityClass
             // get the initial y movement
             
         yAdd=movePnt.y;
-         
+          
             // add in gravity
             
         if (noGravity) {

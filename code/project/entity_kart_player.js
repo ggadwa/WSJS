@@ -326,7 +326,7 @@ export default class EntityKartPlayerClass extends EntityClass
            
         if (jump) {
             if (this.isStandingOnFloor()) {
-                this.gravity=this.gravityMinValue;
+                this.gravity=this.core.map.gravityMinValue;
                 this.movement.y=this.jumpHeight;
             }
         }
