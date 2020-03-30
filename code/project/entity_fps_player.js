@@ -492,12 +492,42 @@ export default class EntityFPSPlayerClass extends EntityClass
     {
         let n,x,y;
         let moveForward,moveBackward,moveLeft,moveRight;
-        let liquidIdx,bump;
+        let liquidIdx,bump,gravityFactor;
         let weapon,firePrimary,fireSecondary,fireTertiary;
         let turnAdd,lookAdd,startWeaponIdx;
         let mouseWheelClick;
         let input=this.core.input;
         let setup=this.core.setup;
+        
+            // liquid changes
+            
+        liquidIdx=this.core.map.liquidList.getLiquidForEyePoint(this.position,this.eyeOffset);
+        
+        if (liquidIdx!==-1) {
+            this.lastUnderLiquid=true;
+        }
+        else {
+            if ((this.lastUnderLiquid) && (this.angle.x<0)) {
+                this.gravity=this.core.map.gravityMinValue;
+                this.movement.y=this.jumpWaterHeight;
+                if ((this.lastInLiquid) && (this.liquidOutSound!==null)) this.core.soundList.playJson(this,null,this.liquidOutSound);
+            }
+            
+            this.lastUnderLiquid=false;
+        }
+        
+        liquidIdx=this.core.map.liquidList.getLiquidForPoint(this.position);
+        
+        if (liquidIdx!==-1) {
+            if ((!this.lastInLiquid) && (this.liquidInSound!==null)) this.core.soundList.playJson(this,null,this.liquidInSound);
+            this.lastInLiquid=true;
+            gravityFactor=this.core.map.liquidList.liquids[liquidIdx].gravityFactor;
+        }
+        else {
+            if ((this.lastInLiquid) && (this.liquidOutSound!==null)) this.core.soundList.playJson(this,null,this.liquidOutSound);
+            this.lastInLiquid=false;
+            gravityFactor=1.0;
+        }
         
             // dead
             
@@ -506,7 +536,7 @@ export default class EntityFPSPlayerClass extends EntityClass
                 // keep falling
                 
             this.rotMovement.setFromValues(0,0,0);
-            this.moveInMapY(this.rotMovement,false);
+            this.moveInMapY(this.rotMovement,gravityFactor,false);
             
                 // only recover in multiplayer
                 
@@ -660,33 +690,6 @@ export default class EntityFPSPlayerClass extends EntityClass
             this.angle.x=0;
         }
         
-            // liquid changes
-            
-        liquidIdx=this.core.map.liquidList.getLiquidForEyePoint(this.position,this.eyeOffset);
-        
-        if (liquidIdx!==-1) {
-            this.lastUnderLiquid=true;
-        }
-        else {
-            if ((this.lastUnderLiquid) && (this.angle.x>0)) {
-                this.gravity=0;
-                this.movement.y-=this.jumpWaterHeight;
-            }
-            
-            this.lastUnderLiquid=false;
-        }
-        
-        liquidIdx=this.core.map.liquidList.getLiquidForPoint(this.position);
-        
-        if (liquidIdx!==-1) {
-            if ((!this.lastInLiquid) && (this.liquidInSound!==null)) this.core.soundList.playJson(this,null,this.liquidInSound);
-            this.lastInLiquid=true;
-        }
-        else {
-            if ((this.lastInLiquid) && (this.liquidOutSound!==null)) this.core.soundList.playJson(this,null,this.liquidOutSound);
-            this.lastInLiquid=false;
-        }
-        
             // jumping
            
         if (input.isKeyDown(' ')) {
@@ -735,7 +738,7 @@ export default class EntityFPSPlayerClass extends EntityClass
             // move around the map
         
         else {
-            this.movement.y=this.moveInMapY(this.rotMovement,this.core.game.developer.playerFly);
+            this.movement.y=this.moveInMapY(this.rotMovement,gravityFactor,this.core.game.developer.playerFly);
             this.moveInMapXZ(this.rotMovement,bump,true);
         }
 

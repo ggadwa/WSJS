@@ -156,7 +156,7 @@ export default class EntityProjectileClass extends EntityClass
         this.savePoint.setFromPoint(this.position);
         
         if (!this.stopped) this.moveInMapXZ(this.motion,false,false);
-        this.moveInMapY(this.motion,this.floats);
+        this.moveInMapY(this.motion,1.0,this.floats);
        
             // hitting floor
             // we can either start rolling, stop, or finish

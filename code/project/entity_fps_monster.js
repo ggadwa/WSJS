@@ -366,11 +366,26 @@ export default class EntityFPSMonsterClass extends EntityClass
     run()
     {
         let angleDif;
-        let player,distToPlayer,liquidIdx;
+        let player,distToPlayer,liquidIdx,gravityFactor;
         
             // the developer freeze
             
         if (this.core.game.developer.freezeBotMonsters) return;
+        
+            // liquids
+            
+        liquidIdx=this.getInLiquidIndex();
+        
+        if (liquidIdx!==-1) {
+            if (!this.lastInLiquid) this.core.soundList.playJson(this,null,this.liquidInSound);
+            this.lastInLiquid=true;
+            gravityFactor=this.core.map.liquidList.liquids[liquidIdx].gravityFactor;
+        }
+        else {
+            if (this.lastInLiquid) this.core.soundList.playJson(this,null,this.liquidOutSound);
+            this.lastInLiquid=false;
+            gravityFactor=1.0;
+        }
         
             // if dead, only fall and play
             // and fall sound
@@ -385,7 +400,7 @@ export default class EntityFPSMonsterClass extends EntityClass
             }
             
             this.rotMovement.setFromValues(0,0,0);
-            this.moveInMapY(this.rotMovement,false);
+            this.moveInMapY(this.rotMovement,gravityFactor,false);
             return;
         }
         
@@ -436,19 +451,6 @@ export default class EntityFPSMonsterClass extends EntityClass
             return;
         }
         
-            // liquids
-            
-        liquidIdx=this.getInLiquidIndex();
-        
-        if (liquidIdx!==-1) {
-            if (!this.lastInLiquid) this.core.soundList.playJson(this,null,this.liquidInSound);
-            this.lastInLiquid=true;
-        }
-        else {
-            if (this.lastInLiquid) this.core.soundList.playJson(this,null,this.liquidOutSound);
-            this.lastInLiquid=false;
-        }
-        
             // projectiles and melee starts
         
         if ((this.projectileJson!=null) && (Math.abs(angleDif)<=this.angleYProjectileRange)) this.projectileStart(player,distToPlayer);
@@ -477,7 +479,7 @@ export default class EntityFPSMonsterClass extends EntityClass
 
                 this.origPosition.setFromPoint(this.position);
 
-                this.movement.y=this.moveInMapY(this.rotMovement,false);
+                this.movement.y=this.moveInMapY(this.rotMovement,gravityFactor,false);
                 this.moveInMapXZ(this.rotMovement,true,true);
 
                     // if we hit a wall, try a random slide left or right
@@ -500,7 +502,7 @@ export default class EntityFPSMonsterClass extends EntityClass
                 this.rotMovement.setFromPoint(this.sideMovement);
                 this.rotMovement.rotateY(null,this.angle.y);
                 
-                this.sideMovement.y=this.moveInMapY(this.rotMovement,false);
+                this.sideMovement.y=this.moveInMapY(this.rotMovement,gravityFactor,false);
                 this.moveInMapXZ(this.rotMovement,true,true);
                
                 if (this.core.timestamp>this.slideNextTick) {

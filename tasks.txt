@@ -3,7 +3,6 @@
 - sound play might need position instead of expecting object with .position (as effects call it)
 - wsserver - option to show http log in server (default to off)
 
-liquids need gravity cut
 
 - bots
    - y targeting seems bad
@@ -17,6 +16,8 @@ liquids need gravity cut
 - fallDamagePercentage
 (in bots, too)
 
+- lights in glTF?
+
 - kart move out the weapons, clean up entity_kart_player from weapons, implement follow floor projectile
 
     - death messages by game with json setup
@@ -25,9 +26,6 @@ liquids need gravity cut
     - fall damage
     
     - bots/remotes (no need for game json for remotes)
-
-    - mouse wheel broken chrome/windows
-    - fix swimming
 
     - eventually clean up entity and unecessary pass through APIs
     - need to test failures (missing bitmap, missing json, bad json, etc)

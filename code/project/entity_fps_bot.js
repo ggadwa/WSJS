@@ -505,13 +505,28 @@ export default class EntityFPSBotClass extends EntityClass
     run()
     {
         let nodeIdx,prevNodeIdx,moveForward;
-        let turnDiff,slideLeft,liquidIdx;
+        let turnDiff,slideLeft,liquidIdx,gravityFactor;
         let idleAnimation;
         
             // the developer freeze
             
         if (this.core.game.developer.freezeBotMonsters) return;
         
+            // liquids
+            
+        liquidIdx=this.core.map.liquidList.getLiquidForPoint(this.position);
+        
+        if (liquidIdx!==-1) {
+            if ((!this.lastInLiquid) && (this.liquidInSound!==null)) this.core.soundList.playJson(this,null,this.liquidInSound);
+            this.lastInLiquid=true;
+            gravityFactor=this.core.map.liquidList.liquids[liquidIdx].gravityFactor;
+        }
+        else {
+            if ((this.lastInLiquid) && (this.liquidOutSound!==null)) this.core.soundList.playJson(this,null,this.liquidOutSound);
+            this.lastInLiquid=false;
+            gravityFactor=1.0;
+        }
+       
             // dead
             
         if (this.respawnTick!==0) {
@@ -519,7 +534,7 @@ export default class EntityFPSBotClass extends EntityClass
                 // keep falling
                 
             this.rotMovement.setFromValues(0,0,0);
-            this.moveInMapY(this.rotMovement,false);
+            this.moveInMapY(this.rotMovement,gravityFactor,false);
             
                 // bots always recover
                 
@@ -658,7 +673,7 @@ export default class EntityFPSBotClass extends EntityClass
         }
         this.rotMovement.rotateY(null,this.angle.y);
                     
-        this.movement.y=this.moveInMapY(this.rotMovement,false);
+        this.movement.y=this.moveInMapY(this.rotMovement,gravityFactor,false);
         this.moveInMapXZ(this.rotMovement,true,true);
         
             // detect stuck
@@ -675,19 +690,6 @@ export default class EntityFPSBotClass extends EntityClass
         }
         
         this.stuckPoint.setFromPoint(this.position);
-        
-            // liquids
-            
-        liquidIdx=this.core.map.liquidList.getLiquidForPoint(this.position);
-        
-        if (liquidIdx!==-1) {
-            if ((!this.lastInLiquid) && (this.liquidInSound!==null)) this.core.soundList.playJson(this,null,this.liquidInSound);
-            this.lastInLiquid=true;
-        }
-        else {
-            if ((this.lastInLiquid) && (this.liquidOutSound!==null)) this.core.soundList.playJson(this,null,this.liquidOutSound);
-            this.lastInLiquid=false;
-        }
     }
     
     drawSetup()

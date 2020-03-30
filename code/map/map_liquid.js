@@ -8,7 +8,7 @@ import BoundClass from '../utility/bound.js';
 
 export default class MapLiquidClass
 {
-    constructor(core,bitmap,waveSize,wavePeriod,waveHeight,waveUVStamp,uShift,vShift,tint,xBound,yBound,zBound)
+    constructor(core,bitmap,waveSize,wavePeriod,waveHeight,waveUVStamp,uShift,vShift,gravityFactor,tint,xBound,yBound,zBound)
     {
         this.core=core;
         this.bitmap=bitmap;
@@ -18,6 +18,7 @@ export default class MapLiquidClass
         this.waveUVStamp=waveUVStamp;
         this.uShift=uShift;
         this.vShift=vShift;
+        this.gravityFactor=gravityFactor;
         this.tint=tint;
         
             // setup size

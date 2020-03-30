@@ -810,9 +810,9 @@ export default class EntityClass
         }
     }
     
-    moveInMapY(movePnt,noGravity)
+    moveInMapY(movePnt,gravityFactor,noGravity)
     {
-        let yAdd,fallY,riseY;
+        let yAdd,fallY,riseY,maxValue;
         
             // clear collisions
             
@@ -833,7 +833,7 @@ export default class EntityClass
                 // then reduce it by the current gravity acceleration
   
             if (movePnt.y>0) {
-                movePnt.y-=(this.weight*this.core.map.gravityAcceleration);
+                movePnt.y-=((this.weight*this.core.map.gravityAcceleration)*gravityFactor);
                 if (movePnt.y<=0) {
                     this.gravity=-movePnt.y;
                     movePnt.y=0;
@@ -847,8 +847,10 @@ export default class EntityClass
                 // add it into the movement
 
             else {
-                this.gravity+=(this.weight*this.core.map.gravityAcceleration);
-                if (this.gravity>this.core.map.gravityMaxValue) this.gravity=this.core.map.gravityMaxValue;
+                this.gravity+=((this.weight*this.core.map.gravityAcceleration)*gravityFactor);
+                
+                maxValue=this.core.map.gravityMaxValue*gravityFactor;
+                if (this.gravity>maxValue) this.gravity=maxValue;
             
                 yAdd-=this.gravity;
             }
@@ -878,7 +880,7 @@ export default class EntityClass
             riseY=this.collision.riseEntityInMap(this,yAdd);
             this.position.addValuesTrunc(0,riseY,0);
             
-            if (riseY<yAdd) return(0);                      // if we can't get as high as we want, then clear any movement
+            if (Math.trunc(riseY)<Math.trunc(yAdd)) return(0);      // if we can't get as high as we want, then clear any movement
         }
         
         return(movePnt.y);

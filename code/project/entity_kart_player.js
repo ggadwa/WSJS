@@ -368,7 +368,7 @@ export default class EntityKartPlayerClass extends EntityClass
             // move around the map
         
         if ((!this.core.game.developer.playerNoClip) || (!isPlayer)) {
-            this.movement.y=this.moveInMapY(this.rotMovement,false);
+            this.movement.y=this.moveInMapY(this.rotMovement,1.0,false);
             this.moveInMapXZ(this.rotMovement,true,true);
         }
         else {
