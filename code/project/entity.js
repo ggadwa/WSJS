@@ -102,7 +102,20 @@ export default class EntityClass
         this.model=null;
         
         if ((this.json.setup.model!==null) && (this.json.setup.model!==undefined)) {
-            this.setModel(this.json.setup.model);
+        
+                // cached shared model
+
+            this.model=this.core.modelList.get(this.json.setup.model);
+            if (this.model===undefined) {
+                console.log('model '+this.json.setup.model+' does not exist, needs to be defined in map setup');
+                return(false);
+            }
+
+                // this entities person model animation/altering data
+
+            this.modelEntityAlter=new ModelEntityAlterClass(this.core,this);
+            this.modelEntityAlter.initialize();
+
             this.modelEntityAlter.rotationOrder=this.MODEL_ROTATION_ORDER_LIST.indexOf(this.json.setup.rotationOrder);
             this.scale.setFromValues(this.json.setup.scale.x,this.json.setup.scale.y,this.json.setup.scale.z);
             
@@ -164,78 +177,6 @@ export default class EntityClass
     getLiquidList()
     {
         return(this.core.map.liquidList);
-    }
-    
-        //
-        // input
-        //
-        
-    isKeyDown(key)
-    {
-        return(this.core.input.isKeyDown(key));
-    }
-    
-    isKeyDownAndClear(key)
-    {
-        return(this.core.input.isKeyDownAndClear(key));
-    }
-    
-    isMouseButtonDown(buttonIdx)
-    {
-        return(this.core.input.mouseButtonFlags[buttonIdx]);
-    }
-    
-    getMouseWheelClick()
-    {
-        return(this.core.input.mouseWheelRead());
-    }
-    
-    getMouseMoveX()
-    {
-        let x;
-        
-        x=this.core.input.mouseChangeX;
-        this.core.input.mouseChangeX=0;
-        return(x);
-    }
-    
-    getMouseMoveY()
-    {
-        let y;
-        
-        y=this.core.input.mouseChangeY;
-        this.core.input.mouseChangeY=0;
-        return(y);
-    }
-    
-    isTouchStickLeftClick()
-    {
-        return(this.core.input.isTouchStickLeftClick());
-    }
-    
-    getTouchStickLeftX()
-    {
-        return(this.core.input.getTouchStickLeftX());
-    }
-    
-    getTouchStickLeftY()
-    {
-        return(this.core.input.getTouchStickLeftY());
-    }
-    
-    isTouchStickRightClick()
-    {
-        return(this.core.input.isTouchStickRightClick());
-    }
-    
-    getTouchStickRightX()
-    {
-        return(this.core.input.getTouchStickRightX());
-    }
-    
-    getTouchStickRightY()
-    {
-        return(this.core.input.getTouchStickRightY());
     }
     
         //
@@ -589,13 +530,7 @@ export default class EntityClass
     
     hitPathNode(nodeIdx,slopDistance)
     {
-        let node=this.core.map.path.nodes[nodeIdx];
-        
-        if (node.altPosition!==null) {
-            if (node.altPosition.distance(this.position)<slopDistance) return(true);
-        }
-        
-        return(node.position.distance(this.position)<slopDistance);
+        return(this.core.map.path.nodes[nodeIdx].position.distance(this.position)<slopDistance);
     }
     
     nextNodeInPath(fromNodeIdx,toNodeIdx)

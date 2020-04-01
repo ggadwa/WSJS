@@ -55,23 +55,14 @@ class MainClass
     {
         let startMap,mapJson;
         
-            // initialize the game
-            
-        this.core.game=new GameClass(this.core,this.data);
-        if (!(await this.core.game.initialize())) return;
-        
           // initialize the map
           
         startMap=this.core.game.lookupValue(this.core.game.json.startMap,this.data);
-        mapJson=this.core.game.getCachedJson(startMap);
+        mapJson=this.core.game.getCachedJsonMap(startMap);
         if (mapJson===null) return;
         
         this.core.map=new MapClass(this.core,mapJson);
         if (!this.core.map.initialize()) return;
-        
-            // finish the core loading
-            
-        this.core.loadSetup();
 
             // next step
 
@@ -380,6 +371,11 @@ function mainLoop(timestamp)
         core.fpsTotal=0;
         core.fpsCount=0;
     }
+    
+        // special check for touch controls
+        // pausing the game
+
+    if (core.input.touchMenuTrigger) core.setPauseState(true,false);
 }
 
 //

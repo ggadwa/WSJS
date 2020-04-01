@@ -67,7 +67,7 @@ export default class MapEntityListClass
         
             // load the json
             
-        json=this.core.game.getCachedJson(jsonName);
+        json=this.core.game.getCachedJsonEntity(jsonName);
         if (json===null) return(null);
 
             // get the correct entity

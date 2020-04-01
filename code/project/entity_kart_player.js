@@ -2,7 +2,6 @@ import PointClass from '../utility/point.js';
 import QuaternionClass from '../utility/quaternion.js';
 import BoundClass from '../utility/bound.js';
 import ColorClass from '../utility/color.js';
-import ModelClass from '../model/model.js';
 import EntityClass from '../project/entity.js';
 
 export default class EntityKartPlayerClass extends EntityClass
@@ -531,15 +530,16 @@ export default class EntityKartPlayerClass extends EntityClass
         let x,y,turnAdd,lookAdd,fire;
         let forward,reverse,drifting,brake,jump;
         let rate,textLap;
+        let input=this.core.input;
         let setup=this.getSetup();
         
             // keys
             
-        forward=this.isKeyDown('w');
-        reverse=this.isKeyDown('s');
-        drifting=(this.isKeyDown('a')||this.isKeyDown('d'));
-        brake=this.isKeyDown('q');
-        jump=this.isKeyDown(' ');
+        forward=input.isKeyDown('w');
+        reverse=input.isKeyDown('s');
+        drifting=(input.isKeyDown('a')||input.isKeyDown('d'));
+        brake=input.isKeyDown('q');
+        jump=input.isKeyDown(' ');
         
             // turning
             
@@ -573,7 +573,7 @@ export default class EntityKartPlayerClass extends EntityClass
         
             // run the kart
         
-        fire=this.isMouseButtonDown(0);  
+        fire=input.mouseButtonFlags[0];  
         this.moveKart(turnAdd,forward,reverse,drifting,brake,fire,jump,true);
         
             // update the sound

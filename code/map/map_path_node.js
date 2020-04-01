@@ -4,11 +4,10 @@
 
 export default class MapPathNodeClass
 {
-    constructor(nodeIdx,position,altPosition,links,key,data)
+    constructor(nodeIdx,position,links,key,data)
     {
         this.nodeIdx=nodeIdx;
         this.position=position;
-        this.altPosition=(altPosition===undefined)?null:altPosition;
         this.links=links;
         this.key=(key===undefined)?null:key;
         this.data=(data===undefined)?null:data;

@@ -14,7 +14,10 @@ export default class GameClass
         this.developer=new DeveloperClass(core);
         
         this.json=null;
-        this.jsonCache=new Map();
+        
+        this.jsonEffectCache=[];
+        this.jsonEntityCache=[];
+        this.jsonMapCache=[];
         
         this.scores=null;
         this.scoreShow=false;
@@ -45,17 +48,40 @@ export default class GameClass
         // json caches and utilities
         //
         
-    getCachedJson(name)
+    getCachedJsonEffect(name)
     {
-        let json;
+        let n;
         
-        json=this.jsonCache.get(name);
-        if (json===undefined) {
-            console.log('Unknown json: '+name);
-            return(null);
+        for (n=0;n!==this.jsonEffectCache.length;n++) {
+            if (this.jsonEffectCache[n].name===name) return(this.jsonEffectCache[n]);
         }
         
-        return(json);
+        console.log('Unknown effect: '+name);
+        return(null);
+    }
+    
+    getCachedJsonEntity(name)
+    {
+        let n;
+        
+        for (n=0;n!==this.jsonEntityCache.length;n++) {
+            if (this.jsonEntityCache[n].name===name) return(this.jsonEntityCache[n]);
+        }
+        
+        console.log('Unknown entity: '+name);
+        return(null);
+    }
+    
+    getCachedJsonMap(name)
+    {
+        let n;
+        
+        for (n=0;n!==this.jsonMapCache.length;n++) {
+            if (this.jsonMapCache[n].name===name) return(this.jsonMapCache[n]);
+        }
+        
+        console.log('Unknown map: '+name);
+        return(null);
     }
     
     lookupValue(value,data,valueDefault)
@@ -88,7 +114,6 @@ export default class GameClass
     async initialize()
     {
         let data;
-        let jsonName;
         
         data=null;
         
@@ -110,13 +135,9 @@ export default class GameClass
            
         this.json=data;
         
-            // now run through and cache all
-            // the custom json for the project
+            // effects
             
-        for (jsonName of this.json.jsons) {
-            data=null;
-            
-            await this.fetchJson(jsonName)
+        await this.fetchJson('effect')
             .then
                 (
                     value=>{
@@ -127,10 +148,43 @@ export default class GameClass
                     }
                 );
         
-            if (data===null) return(false);
+        if (data===null) return(false);
+           
+        this.jsonEffectCache=data;
+        
+            // entities
             
-            this.jsonCache.set(jsonName,data);
-        }
+        await this.fetchJson('entity')
+            .then
+                (
+                    value=>{
+                        data=value;
+                    },
+                    value=>{
+                        console.log(value);
+                    }
+                );
+        
+        if (data===null) return(false);
+           
+        this.jsonEntityCache=data;
+        
+            // maps
+            
+        await this.fetchJson('map')
+            .then
+                (
+                    value=>{
+                        data=value;
+                    },
+                    value=>{
+                        console.log(value);
+                    }
+                );
+        
+        if (data===null) return(false);
+           
+        this.jsonMapCache=data;
             
         return(true);
     }

@@ -75,7 +75,7 @@ export default class EntityContainerClass extends EntityClass
             // check for open/close conditions
             
         if (this.openOnActionKey) {
-            if (!this.core.input.isKeyDown('e')) return;
+            if ((!this.core.input.isKeyDown('e')) && (!this.core.input.isTouchStickLeftClick())) return;
         }
         
         player=this.core.map.entityList.getPlayer();

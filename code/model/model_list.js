@@ -43,28 +43,23 @@ export default class ModelListClass
         
     async loadAllModels()
     {
-        let loadModelList=this.core.map.json.models;
-        let modelDef,model;
+        let propList=Object.keys(this.core.game.jsonEntityCache);
+        let propName,name,model;
         let success,promises;
         
-        if (loadModelList===undefined) {
-            console.log('the map json lacks a model list');
-            return(false);
-        }
-        
-            // get all the models and wrap the
-            // loading into a list of promises
-            
         promises=[];
         
-        for (modelDef of loadModelList) {
-            model=new ModelClass(this.core,modelDef);
+        for (propName of propList) {
+            name=this.core.game.jsonEntityCache[propName].setup.model;
+            if (name===null) continue;
+            
+            model=new ModelClass(this.core,{"name":name});
             model.initialize();
             promises.push(model.load());
             
-            this.models.set(modelDef.name,model);
+            this.models.set(name,model);
         }
-        
+
             // and await them all
             
         success=true;

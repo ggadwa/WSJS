@@ -54,7 +54,8 @@ export default class EntityFPSBotClass extends EntityClass
         this.dieSound=null;
         
         this.nextDamageTick=0;
-        this.currentFallDistance=0;
+        this.falling=false;
+        this.fallStartY=0;
         this.lastInLiquid=false;
         this.lastUnderLiquid=false;
         
@@ -216,7 +217,8 @@ export default class EntityFPSBotClass extends EntityClass
         this.stuckCount=0;
         this.passThrough=false;         // reset if this is being called after bot died
         
-        this.currentFallDistance=0;
+        this.falling=false;
+        this.fallStartY=0;
         
         this.respawnTick=0;
         this.telefragTriggerEntity=null;
@@ -505,7 +507,7 @@ export default class EntityFPSBotClass extends EntityClass
     run()
     {
         let nodeIdx,prevNodeIdx,moveForward;
-        let turnDiff,slideLeft,liquidIdx,gravityFactor;
+        let turnDiff,slideLeft,liquidIdx,gravityFactor,fallDist;
         let idleAnimation;
         
             // the developer freeze
@@ -552,6 +554,27 @@ export default class EntityFPSBotClass extends EntityClass
             return;
         }
         
+            // falling
+            
+        if ((this.standOnMeshIdx!==-1) && (liquidIdx===-1)) {
+            if (this.falling) {
+                this.falling=false;
+                fallDist=(this.fallStartY-this.position.y)-this.fallDamageMinDistance;
+                if (fallDist>0) this.damage(this,Math.trunc(fallDist*this.fallDamagePercentage),this.position);
+            }
+        }
+        else {
+            if (this.movement.y>0) {
+                this.falling=false;
+            }
+            else {
+                if (!this.falling) {
+                    this.falling=true;
+                    this.fallStartY=this.position.y;
+                }
+            }
+        }
+        
             // if no node, just skip out
             
         if (this.nextNodeIdx===-1) return;
@@ -565,6 +588,48 @@ export default class EntityFPSBotClass extends EntityClass
         this.findEntityToFight();
         
         if (this.targetEntity!==null) this.fireWeapon();
+        
+            // run the nodes, we do this before
+            // freezing for trigger waits because we might
+            // be standing upon something that auto moves us to
+            // the next node
+        
+            // have we hit goal node?
+            // we only chase goals if we aren't targetting another entity
+
+        if (this.targetEntity===null) {
+            if (this.hitPathNode(this.goalNodeIdx,this.seekNodeDistanceSlop)) {
+                nodeIdx=this.goalNodeIdx;
+                this.goalNodeIdx=this.getRandomKeyNodeIndex();
+                this.nextNodeIdx=this.nextNodeInPath(nodeIdx,this.goalNodeIdx);
+            }
+        }
+
+            // have we hit the next node?
+            // if we are targetting an entity, go to the next nearest
+            // linked node closest to the entity, otherwise path to the goal
+
+        if (this.hitPathNode(this.nextNodeIdx,this.seekNodeDistanceSlop)) {
+            prevNodeIdx=this.nextNodeIdx;
+
+            if (this.targetEntity===null) {
+                this.nextNodeIdx=this.nextNodeInPath(this.nextNodeIdx,this.goalNodeIdx);
+            }
+            else {
+                this.nextNodeIdx=this.nextNodeTowardsEntity(this.nextNodeIdx,this.targetEntity);
+            }
+
+                // is this a node we should pause at?
+
+            this.pausedTriggerName=this.isNodeATriggerPauseNode(prevNodeIdx,this.nextNodeIdx);
+            if (this.pausedTriggerName!==null) {
+                if (!this.core.checkTrigger(this.pausedTriggerName)) {
+                    idleAnimation=this.carouselWeapons[this.currentCarouselWeaponIdx].parentIdleAnimation;
+                    this.modelEntityAlter.startAnimationChunkInFrames(null,30,idleAnimation[0],idleAnimation[1]);
+                    return;
+                }
+            }
+        }
         
             // always start by moving
             
@@ -580,47 +645,6 @@ export default class EntityFPSBotClass extends EntityClass
             else {
                 this.pausedTriggerName=null;
                 this.startModelAnimationChunkInFrames(null,30,960,996);
-            }
-        }
-        
-            // if we aren't paused, see if we hit
-            // next node or goal
-            
-        else {
-
-                // have we hit goal node?
-                // we only chase goals if we aren't targetting another entity
-
-            if (this.targetEntity===null) {
-                if (this.hitPathNode(this.goalNodeIdx,this.seekNodeDistanceSlop)) {
-                    nodeIdx=this.goalNodeIdx;
-                    this.goalNodeIdx=this.getRandomKeyNodeIndex();
-                    this.nextNodeIdx=this.nextNodeInPath(nodeIdx,this.goalNodeIdx);
-                }
-            }
-            
-                // have we hit the next node?
-                // if we are targetting an entity, go to the next nearest
-                // linked node closest to the entity, otherwise path to the goal
-
-            if (this.hitPathNode(this.nextNodeIdx,this.seekNodeDistanceSlop)) {
-                prevNodeIdx=this.nextNodeIdx;
-                
-                if (this.targetEntity===null) {
-                    this.nextNodeIdx=this.nextNodeInPath(this.nextNodeIdx,this.goalNodeIdx);
-                }
-                else {
-                    this.nextNodeIdx=this.nextNodeTowardsEntity(this.nextNodeIdx,this.targetEntity);
-                }
-                
-                    // is this a node we should pause at?
-
-                this.pausedTriggerName=this.isNodeATriggerPauseNode(prevNodeIdx,this.nextNodeIdx);
-                if (this.pausedTriggerName!==null) {
-                    idleAnimation=this.carouselWeapons[this.currentCarouselWeaponIdx].parentIdleAnimation;
-                    this.modelEntityAlter.startAnimationChunkInFrames(null,30,idleAnimation[0],idleAnimation[1]);
-                    return;
-                }
             }
         }
         

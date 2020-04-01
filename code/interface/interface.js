@@ -1,11 +1,13 @@
+import PointClass from '../utility/point.js';
 import ColorClass from '../utility/color.js';
-import RectClass from '../../../code/utility/rect.js';
+import RectClass from '../utility/rect.js';
 import InterfaceLiquidClass from '../interface/interface_liquid.js';
 import InterfaceHitClass from '../interface/interface_hit.js';
 import InterfaceElementClass from '../interface/interface_element.js';
 import InterfaceCountClass from '../interface/interface_count.js';
 import InterfaceTextClass from '../interface/interface_text.js';
-import TouchStickClass from '../interface/interface_touch_stick.js';
+import InterfaceTouchStickClass from '../interface/interface_touch_stick.js';
+import InterfaceTouchButtonClass from '../interface/interface_touch_button.js';
 
 //
 // interface class
@@ -57,6 +59,7 @@ export default class InterfaceClass
         
         this.touchStickLeft=null;
         this.touchStickRight=null;
+        this.touchButtonMenu=null;
         
         Object.seal(this);
     }
@@ -104,13 +107,19 @@ export default class InterfaceClass
         this.hitBottom=new InterfaceHitClass(this.core,new RectClass(hitMargin,(this.core.canvas.height-hitSize),(this.core.canvas.width-hitMargin),this.core.canvas.height),[[1,1],[0,1],[0,0],[1,0]]);
         if (!this.hitBottom.initialize()) return(false);
 
-            // touch sticks
+            // touch controls
             
-        this.touchStickLeft=new TouchStickClass(this.core);
+        this.touchStickLeft=new InterfaceTouchStickClass(this.core,this.core.game.json.config.touchStickRingBitmap,this.core.game.json.config.touchStickThumbBitmap,this.core.game.json.config.touchStickSize);
         if (!this.touchStickLeft.initialize()) return(false);
         
-        this.touchStickRight=new TouchStickClass(this.core);
+        this.touchStickRight=new InterfaceTouchStickClass(this.core,this.core.game.json.config.touchStickRingBitmap,this.core.game.json.config.touchStickThumbBitmap,this.core.game.json.config.touchStickSize);
         if (!this.touchStickRight.initialize()) return(false);
+        
+        this.touchButtonMenu=null;
+        if (this.core.game.json.config.touchMenuBitmap!==null) {
+            this.touchButtonMenu=new InterfaceTouchButtonClass(this.core,this.core.game.json.config.touchMenuBitmap,new PointClass(this.core.game.json.config.touchMenuPosition[0],this.core.game.json.config.touchMenuPosition[1],0),this.core.game.json.config.touchButtonSize);
+            if (!this.touchButtonMenu.initialize()) return(false);
+        }
 
         return(true);
     }
@@ -128,6 +137,8 @@ export default class InterfaceClass
         
         this.touchStickLeft.release();
         this.touchStickRight.release();
+        
+        if (this.touchButtonMenu!==null) this.touchButtonMenu.release();
         
             // release all elements, counts, and texts
             
@@ -495,13 +506,14 @@ export default class InterfaceClass
         
         this.core.shaderList.textShader.drawEnd();
         
-            // sticks
+            // touch controls
             
         if (this.core.input.hasTouch) {
             this.core.shaderList.interfaceShader.drawStart();
             
             this.touchStickLeft.draw();
             this.touchStickRight.draw();
+            if (this.touchButtonMenu!==null) this.touchButtonMenu.draw();
             
             this.core.shaderList.interfaceShader.drawEnd();
         }

@@ -256,7 +256,7 @@ export default class GenerateMapClass
                 
             x=room.offset.x+((x*segmentSize)+offset);
             z=room.offset.z+((z*segmentSize)+offset);
-            pathNode=new MapPathNodeClass(path.nodes.length,new PointClass(x,room.offset.y,z),null,[],null,null);
+            pathNode=new MapPathNodeClass(path.nodes.length,new PointClass(x,room.offset.y,z),[],null,null);
             path.nodes.push(pathNode);
         }
     }

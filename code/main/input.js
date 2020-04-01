@@ -57,6 +57,7 @@ export default class InputClass
             // touches
             
         this.hasTouch=(navigator.maxTouchPoints>1);
+        this.touchMenuTrigger=false;
         
         this.touchStickLeftClick=false;
         this.touchStickRightClick=false;
@@ -164,6 +165,8 @@ export default class InputClass
         this.mouseButtonClear();
         this.touchClear();
         
+        this.touchMenuTrigger=false;
+        
             // if not touch, request pointer lock
             
         if (!this.hasTouch) {
@@ -202,8 +205,6 @@ export default class InputClass
             document.removeEventListener('touchend',this.touchEndListener,false);
             document.removeEventListener('touchcancel',this.touchCancelListener,false);
             document.removeEventListener('touchmove',this.touchMoveListener,false);
-            
-            this.core.setPauseState(true,false);            // a pointer lock release auto pauses the game
         }
     }
     
@@ -366,6 +367,7 @@ export default class InputClass
     touchStart(event)
     {
         let touch,x,y,quadrant;
+        let iface=this.core.interface;
         
         event.preventDefault();
         
@@ -384,10 +386,21 @@ export default class InputClass
 
             if (y>this.canvasMidY) {
                 if (x<this.canvasMidX) {
-                    if (!this.core.interface.touchStickLeft.show) this.core.interface.touchStickLeft.touchDown(touch.identifier,x,y);
+                    if (!iface.touchStickLeft.show) iface.touchStickLeft.touchDown(touch.identifier,x,y);
                 }
                 else {
-                    if (!this.core.interface.touchStickRight.show) this.core.interface.touchStickRight.touchDown(touch.identifier,x,y);
+                    if (!iface.touchStickRight.show) iface.touchStickRight.touchDown(touch.identifier,x,y);
+                }
+            }
+            
+                // check buttons
+                
+            if (iface.touchButtonMenu!==null) {
+                if (iface.touchButtonMenu.isTouchInButton(x,y)) {
+                    if (iface.touchButtonMenu.id!==touch.identifier) {
+                        iface.touchButtonMenu.touchDown(touch.identifier);
+                        this.touchMenuTrigger=true;
+                    }
                 }
             }
         }
@@ -396,6 +409,7 @@ export default class InputClass
     touchEnd(event)
     {
         let touch;
+        let iface=this.core.interface;
         
         event.preventDefault();
         
@@ -403,14 +417,23 @@ export default class InputClass
             
                 // release on either stick?
                 
-            if (this.core.interface.touchStickLeft.id===touch.identifier) {
-                this.touchStickLeftClick=this.core.interface.touchStickLeft.touchUp();
+            if (iface.touchStickLeft.id===touch.identifier) {
+                this.touchStickLeftClick=iface.touchStickLeft.touchUp();
                 break;
             }
             
-            if (this.core.interface.touchStickRight.id===touch.identifier) {
-                this.touchStickRightClick=this.core.interface.touchStickRight.touchUp();
+            if (iface.touchStickRight.id===touch.identifier) {
+                this.touchStickRightClick=iface.touchStickRight.touchUp();
                 break;
+            }
+            
+                // release on buttons
+                
+            if (iface.touchButtonMenu!==null) {
+                if (iface.touchButtonMenu.id===touch.identifier) {
+                    iface.touchButtonMenu.touchUp();
+                    break;
+                }
             }
         }
     }

@@ -3,27 +3,25 @@
 - sound play might need position instead of expecting object with .position (as effects call it)
 - wsserver - option to show http log in server (default to off)
 
+- do bitmaps next
+- sound distance/loop part of sound play/json
+
+- swipe up for grenade
+
+- vampire sparkle weapon doesn't hit player
+
+EDIT MODE
+  - goes directly to fly mode edit control
+  - shoot ray to select spot (show mesh in box, color hit polygon?)
+  - show effects, lights, monsters, paths
 
 - bots
    - y targeting seems bad
    - extra weapon fires
 
-
-- trigger pause nodes part of node
-- finish fps_bot first
-
-- fallDamageMinDistance
-- fallDamagePercentage
-(in bots, too)
-
-- lights in glTF?
-
 - kart move out the weapons, clean up entity_kart_player from weapons, implement follow floor projectile
 
     - death messages by game with json setup
-
-    - death is broken for player
-    - fall damage
     
     - bots/remotes (no need for game json for remotes)
 
@@ -32,9 +30,6 @@
     - get rid of any beretta naming
 
     - need to go over all the auto generate options
-- iPad
-    - menu key
-    - action key
 
 EVENTUALLY
     - add kart to demo

@@ -85,7 +85,6 @@ export default class DeveloperClass
         if (key==='nodeIdx') return(undefined);
         if (key==='pathHints') return(undefined);
         if (key==='pathHintCounts') return(undefined);
-        if ((key==='altPosition') && (value===null)) return(undefined);
         if ((key==='key') && (value===null)) return(undefined);
         if ((key==='data') && (value===null)) return(undefined);
         return(value);
@@ -131,7 +130,7 @@ export default class DeveloperClass
             }
             
             nodeIdx=path.nodes.length;
-            path.nodes.push(new MapPathNodeClass(nodeIdx,player.position.copy(),null,[path.editorSplitStartNodeIdx,path.editorSplitEndNodeIdx],null,null));
+            path.nodes.push(new MapPathNodeClass(nodeIdx,player.position.copy(),[path.editorSplitStartNodeIdx,path.editorSplitEndNodeIdx],null,null));
             
             links=path.nodes[path.editorSplitStartNodeIdx].links;
             links[links.indexOf(path.editorSplitEndNodeIdx)]=nodeIdx;
@@ -177,7 +176,7 @@ export default class DeveloperClass
                 path.nodes[path.editorParentNodeIdx].links.push(nodeIdx);
             }
             
-            path.nodes.push(new MapPathNodeClass(nodeIdx,player.position.copy(),null,links,null,null));
+            path.nodes.push(new MapPathNodeClass(nodeIdx,player.position.copy(),links,null,null));
             
             path.editorParentNodeIdx=nodeIdx;
             
@@ -207,8 +206,6 @@ export default class DeveloperClass
             // [ key deletes selected node
             
         if (input.isKeyDownAndClear('[')) {
-            input.keyFlags[219]=false;
-            
             if (path.editorParentNodeIdx!==-1) {
                 
                     // fix any links
@@ -250,17 +247,17 @@ export default class DeveloperClass
             // \ key displays json of path
             
         if (input.isKeyDownAndClear('\\')) {            
-            str='                "paths":\n';
-            str+='                    [\n';
+            str='    "paths":\n';
+            str+='        [\n';
             
             for (n=0;n!==path.nodes.length;n++) {
-                str+='                        ';
+                str+='            ';
                 str+=JSON.stringify(path.nodes[n],this.pathJSONReplacer.bind(this));
                 if (n!==(path.nodes.length-1)) str+=',';
                 str+='\n';
             }
             
-            str+='                    ]\n';
+            str+='        ],\n';
             
             console.info(str);
         }

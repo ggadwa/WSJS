@@ -1,11 +1,14 @@
-export default class TouchStickClass
+export default class InterfaceTouchStickClass
 {
-    constructor(core)
+    constructor(core,ringBitmapName,thumbBitmapName,ringSize)
     {
         this.TOUCH_CLICK_TICK=300;
         this.TOUCH_DEAD_ZONE=20;
         
         this.core=core;
+        this.ringBitmapName=ringBitmapName;
+        this.thumbBitmapName=thumbBitmapName;
+        this.ringSize=ringSize;
         
         this.id=null;
         this.timestamp=0;
@@ -16,7 +19,6 @@ export default class TouchStickClass
         this.thumbY=0;
         this.show=false;
         
-        this.ringSize=Math.trunc(this.core.canvas.width*0.15);
         this.ringRadius=Math.trunc(this.ringSize*0.5);
         this.thumbSize=Math.trunc(this.ringSize*0.4);
         this.thumbRadius=Math.trunc(this.thumbSize*0.5);
@@ -165,6 +167,7 @@ export default class TouchStickClass
         let gl=this.core.gl;
         
         if (!this.show) return;
+        if ((this.ringBitmapName===null) || (this.thumbBitmapName===null)) return;
         
         gl.uniform4f(shader.colorUniform,1,1,1,1);
         
@@ -191,11 +194,11 @@ export default class TouchStickClass
         
             // draw the outer ring
             
-        bitmap=this.core.bitmapList.get('textures/stick_ring.png');
+        bitmap=this.core.bitmapList.get(this.ringBitmapName);
         bitmap.attachAsInterface();
         gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_SHORT,0);
         
-        bitmap=this.core.bitmapList.get('textures/stick_thumb.png');
+        bitmap=this.core.bitmapList.get(this.thumbBitmapName);
         bitmap.attachAsInterface();
         gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_SHORT,(6*2));
 

@@ -67,7 +67,8 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.dieSound=null;
         
         this.nextDamageTick=0;
-        this.currentFallDistance=0;
+        this.falling=false;
+        this.fallStartY=0;
         this.lastInLiquid=false;
         this.lastUnderLiquid=false;
         
@@ -272,7 +273,9 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.passThrough=false;
         
         this.respawnTick=0;
-        this.currentFallDistance=0;
+        
+        this.falling=false;
+        this.fallStartY=0;
         
             // some animation defaults
             
@@ -315,7 +318,7 @@ export default class EntityFPSPlayerClass extends EntityClass
     }
     
         //
-        // action messages
+        // messages
         //
         
     findWeaponByName(weaponName)
@@ -492,7 +495,7 @@ export default class EntityFPSPlayerClass extends EntityClass
     {
         let n,x,y;
         let moveForward,moveBackward,moveLeft,moveRight;
-        let liquidIdx,bump,gravityFactor;
+        let liquidIdx,bump,gravityFactor,fallDist;
         let weapon,firePrimary,fireSecondary,fireTertiary;
         let turnAdd,lookAdd,startWeaponIdx;
         let mouseWheelClick;
@@ -561,6 +564,27 @@ export default class EntityFPSPlayerClass extends EntityClass
             return;
         }
         
+            // falling
+            
+        if ((this.standOnMeshIdx!==-1) && (liquidIdx===-1) && (!this.core.game.developer.playerFly)) {
+            if (this.falling) {
+                this.falling=false;
+                fallDist=(this.fallStartY-this.position.y)-this.fallDamageMinDistance;
+                if (fallDist>0) this.damage(this,Math.trunc(fallDist*this.fallDamagePercentage),this.position);
+            }
+        }
+        else {
+            if (this.movement.y>0) {
+                this.falling=false;
+            }
+            else {
+                if (!this.falling) {
+                    this.falling=true;
+                    this.fallStartY=this.position.y;
+                }
+            }
+        }
+        
             // weapon switching
             
         mouseWheelClick=this.core.input.mouseWheelRead();
@@ -598,7 +622,7 @@ export default class EntityFPSPlayerClass extends EntityClass
         }
         
         for (n=0;n<this.carouselWeapons.length;n++) {
-            if (this.core.input.isKeyDown(String.fromCharCode(49+n))) {
+            if (input.isKeyDown(String.fromCharCode(49+n))) {
                 if (this.carouselWeapons[n].available) {
                     this.currentCarouselWeaponIdx=n;
                     this.showCarouselWeapon();
@@ -610,9 +634,9 @@ export default class EntityFPSPlayerClass extends EntityClass
         
             // weapon firing
             
-        firePrimary=this.core.input.mouseButtonFlags[0]||this.core.input.isTouchStickRightClick();
-        fireSecondary=this.core.input.mouseButtonFlags[1];
-        fireTertiary=this.core.input.mouseButtonFlags[2];
+        firePrimary=input.mouseButtonFlags[0]||input.isTouchStickRightClick();
+        fireSecondary=input.mouseButtonFlags[1];
+        fireTertiary=input.mouseButtonFlags[2];
         
         if (this.currentCarouselWeaponIdx!==-1) {
             weapon=this.carouselWeapons[this.currentCarouselWeaponIdx];

@@ -152,6 +152,48 @@ export default class BitmapListClass
             // we will already have bitmaps that
             // were added by importing glTF models,
             // so we only add the rest here
+            
+            /*
+              game.json
+                 "config":
+        {
+            "multiplayerMessageText":"multiplayer_message",
+            "multiplayerMessageWaitTick":5000,
+            "touchStickSize":128,
+            "touchStickRingBitmap":"textures/stick_ring.png",
+            "touchStickThumbBitmap":"textures/stick_thumb.png",
+            "touchButtonSize":32,
+            "touchMenuPosition":[5,5],
+            "touchMenuBitmap":"textures/menu.png"
+        },
+    "interface":
+            
+            
+            (all entities interface)
+            
+            "interface":
+            {
+                "elements":
+                    [
+                        {"id":"pistol_crosshair","bitmap":"textures/crosshair_dot.png","width":8,"height":8,"positionMode":"middle","positionOffset":{"x":-4,"y":-4},"color":{"r":1,"g":1,"b":1},"alpha":1,"show":true},
+                        {"id":"pistol_bullet","bitmap":"textures/icon_beretta_bullet.png","width":25,"height":50,"positionMode":"bottomLeft","positionOffset":{"x":5,"y":-165},"color":{"r":1,"g":1,"b":1},"alpha":1,"show":true}
+        
+            effect.json
+            
+            "billboards": [multiple]
+            [
+                {
+                    "bitmap":"textures/particle_hit.png","mode":"additive",
+
+
+        "particles": [multiple]
+            [
+                {
+                    "bitmap":"textures/particle_smoke.png","mode":"transparent","count":60,"motion":{"x":25000,"y":25000,"z":25000},"grid":"4","gridPeriod":600,"gridOffset":0,
+                    "frames":
+
+
+             */
         
         for (bitmapDef of loadBitmapList) {
             if (!this.bitmaps.has(bitmapDef.url)) {

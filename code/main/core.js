@@ -10,9 +10,10 @@ import ColorClass from '../utility/color.js';
 import QuaternionClass from '../utility/quaternion.js';
 import Matrix4Class from '../utility/matrix4.js';
 import Matrix3Class from '../utility/matrix3.js';
+import GameClass from '../project/game.js';
+import InterfaceClass from '../interface/interface.js';
 import InputClass from '../main/input.js';
 import CameraClass from '../main/camera.js';
-import InterfaceClass from '../interface/interface.js';
 import NetworkClass from '../main/network.js';
 import SetupClass from '../main/setup.js';
 import DialogSettingsClass from '../main/dialog_settings.js';
@@ -203,7 +204,7 @@ export default class CoreClass
         // initialize and release
         //
     
-    initialize()
+    async initialize(data)
     {
         let glOptions={
             alpha:false,
@@ -253,14 +254,20 @@ export default class CoreClass
         this.modelList=new ModelListClass(this);
         this.modelList.initialize();
         
-            // create misc objects
+            // game and interface
             
+        this.game=new GameClass(this,data);
+        if (!(await this.game.initialize())) return;
+        
         this.interface=new InterfaceClass(this);
         if (!this.interface.initialize()) return;
         
+            // create misc objects
+            
         this.camera=new CameraClass(this);
         
         this.setup=new SetupClass();
+        this.setup.load(this);      // requires game to be initialized, so we do this later
         
         this.settingsDialog=new DialogSettingsClass(this);
         this.connectDialog=new DialogConnectClass(this);
@@ -269,19 +276,11 @@ export default class CoreClass
     release()
     {
         this.interface.release();
+        this.game.release();
         this.modelList.release();
         this.shaderList.release();
         this.soundList.release();
         this.bitmapList.release();
-    }
-    
-        //
-        // setup
-        //
-        
-    loadSetup()
-    {
-        this.setup.load(this);      // requires game to be initialized, so we do this later
     }
     
         //
@@ -382,10 +381,8 @@ export default class CoreClass
         
         if (pause) {    
             this.input.stopInput();
-            this.canvas.onclick=this.setPauseState.bind(this,false,false);    // the click to restart
         }
         else {
-            this.canvas.onclick=null;
             this.input.startInput();
         }
         
