@@ -105,7 +105,7 @@ export default class InterfaceHitClass
                 
             // setup the bitmap
             
-        bitmap=this.core.bitmapList.get('textures/interface_hit.png');
+        bitmap=this.core.bitmapList.get(this.core.game.json.config.interfaceHitBitmap);
         bitmap.attachAsInterface();
         gl.uniform4f(shader.colorUniform,1,1,1,alpha);
         

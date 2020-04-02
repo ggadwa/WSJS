@@ -102,23 +102,107 @@ export default class SoundListClass
         // loading
         //
         
+    addSound(name)
+    {
+        let sound;
+        
+        if ((name===undefined) || (name===null)) return;        // name can come from json
+        
+        if (this.sounds.has(name)) return;
+        
+        sound=new SoundClass(this.core,this.ctx,name,25000,0,0);
+        sound.initialize();
+            
+        this.sounds.set(name,sound);
+    }
+    
+    addSoundByNameAttribute(elem)
+    {
+        if ((elem===undefined) || (elem===null)) return;
+        if ((elem.name!==undefined) && (elem.name!==null)) this.addSound(elem.name);
+    }
+    
+    addSoundBySoundNameAttribute(elem)
+    {
+        if ((elem===undefined) || (elem===null)) return;  
+        this.addSoundByNameAttribute(elem.sound);
+    }
+
     async loadAllSounds()
     {
-        let loadSoundList=this.core.map.json.sounds;
-        let soundDef,sound;
+        let n,k;
+        let mapDef,entityDef,effectDef,keys,key;
+        let movementDef,moveDef;
+        let keyIter,rtn;
         let success,promises;
+        let game=this.core.game;
         
-            // get all the models and wrap the
-            // loading into a list of promises
+            // go throw the jsons and find
+            // all the sounds, we look at 
+            // maps, entities, and effects
+            
+        keys=Object.keys(game.jsonMapCache);
+        
+        for (key of keys)
+        {
+            mapDef=game.jsonMapCache[key];
+            if ((mapDef.movements===undefined) || (mapDef.movements===null)) continue;
+            
+            for (n=0;n!==mapDef.movements.length;n++) {
+                movementDef=mapDef.movements[n];
+                for (k=0;k!==movementDef.moves.length;k++) {
+                    moveDef=movementDef.moves[k];
+                    if ((moveDef.sound!==undefined) && (moveDef.sound!==null)) this.addSound(moveDef.sound);
+                }
+                
+            }
+        }
+            
+        keys=Object.keys(game.jsonEntityCache);
+        
+        for (key of keys)
+        {
+            entityDef=game.jsonEntityCache[key];
+
+            this.addSoundBySoundNameAttribute(entityDef.config.primary);
+            this.addSoundBySoundNameAttribute(entityDef.config.secondary);
+            this.addSoundBySoundNameAttribute(entityDef.config.tertiary);
+            
+            this.addSoundByNameAttribute(entityDef.config.liquidInSound);
+            this.addSoundByNameAttribute(entityDef.config.liquidOutSound);
+            this.addSoundByNameAttribute(entityDef.config.hurtSound);
+            this.addSoundByNameAttribute(entityDef.config.dieSound);
+            this.addSoundByNameAttribute(entityDef.config.pickupSound);
+            this.addSoundByNameAttribute(entityDef.config.bounceSound);
+            this.addSoundByNameAttribute(entityDef.config.reflectSound);
+            this.addSoundByNameAttribute(entityDef.config.spawnSound);
+            this.addSoundByNameAttribute(entityDef.config.openSound);
+            this.addSoundByNameAttribute(entityDef.config.closeSound);
+            this.addSoundByNameAttribute(entityDef.config.wakeUpSound);
+            this.addSoundByNameAttribute(entityDef.config.meleeSound);
+            this.addSoundByNameAttribute(entityDef.config.deathSound);
+            this.addSoundByNameAttribute(entityDef.config.fallSound);
+        }
+        
+        keys=Object.keys(game.jsonEffectCache);
+        
+        for (key of keys)
+        {
+            effectDef=game.jsonEffectCache[key];
+            this.addSoundBySoundNameAttribute(effectDef);
+        }
+            
+            // load the sounds
             
         promises=[];
         
-        for (soundDef of loadSoundList) {
-            sound=new SoundClass(this.core,this.ctx,soundDef.name,soundDef.distance,soundDef.loopStart,soundDef.loopEnd);
-            sound.initialize();
-            promises.push(sound.load());
+        keyIter=this.sounds.keys();
+        
+        while (true) {
+            rtn=keyIter.next();
+            if (rtn.done) break;
             
-            this.sounds.set(soundDef.name,sound);
+            promises.push(this.sounds.get(rtn.value).load());
         }
 
             // and await them all

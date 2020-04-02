@@ -82,6 +82,7 @@ export default class BitmapListClass
             
             // already in list?
             
+        if (colorURL===null) return(null);  // can come from a json
         if (this.bitmaps.has(colorURL)) return(this.bitmaps.get(colorURL));
         
             // add bitmap to list, these will be loaded
@@ -92,6 +93,49 @@ export default class BitmapListClass
         this.bitmaps.set(colorURL,bitmap);
         
         return(bitmap);
+    }
+    
+    addSimpleFromJson(arr)
+    {
+        let obj;
+        
+        if ((arr===undefined) || (arr===null)) return;
+        
+        for (obj of arr)
+        {
+            this.addSimple(obj.bitmap);
+        }
+    }
+    
+    addInterface(colorURL)
+    {
+        let bitmap;
+            
+            // already in list?
+            
+        if (colorURL===null) return(null);  // can come from a json
+        if (this.bitmaps.has(colorURL)) return(this.bitmaps.get(colorURL));
+        
+            // add bitmap to list, these will be loaded
+            // in a later call
+                    
+        bitmap=new BitmapClass(this.core);
+        bitmap.initializeInterfaceURL(colorURL);
+        this.bitmaps.set(colorURL,bitmap);
+        
+        return(bitmap);
+    }
+    
+    addInterfaceFromJson(arr)
+    {
+        let obj;
+        
+        if ((arr===undefined) || (arr===null)) return;
+        
+        for (obj of arr)
+        {
+            this.addInterface(obj.bitmap);
+        }
     }
     
     addGenerated(colorImage,normalImage,specularImage,specularFactor,glowImage,glowFrequency,glowMin,glowMax)
@@ -144,71 +188,40 @@ export default class BitmapListClass
         
     async loadAllBitmaps()
     {
-        let loadBitmapList=this.core.map.json.bitmaps;
-        let bitmapDef;
+        let entityDef,effectDef,keys,key;
         let keyIter,rtn,bitmap;
         let success,promises;
+        let game=this.core.game;
         
             // we will already have bitmaps that
             // were added by importing glTF models,
             // so we only add the rest here
+            // we look at the game, entity, and effect json
             
-            /*
-              game.json
-                 "config":
+        this.addInterface(game.json.config.interfaceHitBitmap);
+        this.addInterface(game.json.config.touchStickRingBitmap);
+        this.addInterface(game.json.config.touchStickThumbBitmap);
+        this.addInterface(game.json.config.touchMenuBitmap);
+        if (game.interface!==undefined) this.addInterfaceFromJson(game.json.interface.elements);
+        
+        keys=Object.keys(game.jsonEntityCache);
+        
+        for (key of keys)
         {
-            "multiplayerMessageText":"multiplayer_message",
-            "multiplayerMessageWaitTick":5000,
-            "touchStickSize":128,
-            "touchStickRingBitmap":"textures/stick_ring.png",
-            "touchStickThumbBitmap":"textures/stick_thumb.png",
-            "touchButtonSize":32,
-            "touchMenuPosition":[5,5],
-            "touchMenuBitmap":"textures/menu.png"
-        },
-    "interface":
-            
-            
-            (all entities interface)
-            
-            "interface":
-            {
-                "elements":
-                    [
-                        {"id":"pistol_crosshair","bitmap":"textures/crosshair_dot.png","width":8,"height":8,"positionMode":"middle","positionOffset":{"x":-4,"y":-4},"color":{"r":1,"g":1,"b":1},"alpha":1,"show":true},
-                        {"id":"pistol_bullet","bitmap":"textures/icon_beretta_bullet.png","width":25,"height":50,"positionMode":"bottomLeft","positionOffset":{"x":5,"y":-165},"color":{"r":1,"g":1,"b":1},"alpha":1,"show":true}
-        
-            effect.json
-            
-            "billboards": [multiple]
-            [
-                {
-                    "bitmap":"textures/particle_hit.png","mode":"additive",
-
-
-        "particles": [multiple]
-            [
-                {
-                    "bitmap":"textures/particle_smoke.png","mode":"transparent","count":60,"motion":{"x":25000,"y":25000,"z":25000},"grid":"4","gridPeriod":600,"gridOffset":0,
-                    "frames":
-
-
-             */
-        
-        for (bitmapDef of loadBitmapList) {
-            if (!this.bitmaps.has(bitmapDef.url)) {
-                bitmap=new BitmapClass(this.core);
-                if (bitmapDef.interface===true) {       // need to work around being undefined here
-                    bitmap.initializeInterfaceURL(bitmapDef.url);
-                }
-                else {
-                    bitmap.initializeSimpleURL(bitmapDef.url);
-                }
-                
-                this.bitmaps.set(bitmapDef.url,bitmap);
-            }
+            entityDef=game.jsonEntityCache[key];
+            if (entityDef.interface!==undefined) this.addInterfaceFromJson(entityDef.interface.elements);
         }
         
+        keys=Object.keys(game.jsonEffectCache);
+        
+        for (key of keys)
+        {
+            effectDef=game.jsonEffectCache[key];
+            this.addSimpleFromJson(effectDef.billboards);
+            this.addSimpleFromJson(effectDef.particles);
+            this.addSimpleFromJson(effectDef.triangles);
+        }
+     
             // gather all the promises
             
         promises=[];

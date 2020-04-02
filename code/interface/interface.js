@@ -71,6 +71,7 @@ export default class InterfaceClass
     initialize()
     {
         let hitSize,hitMargin;
+        let game=this.core.game;
         
             // clear all current elements and texts
             
@@ -92,32 +93,34 @@ export default class InterfaceClass
         hitSize=Math.trunc(this.core.canvas.width*0.08);
         hitMargin=Math.trunc(this.core.canvas.height*0.25);
         
-        this.hitLeft=new InterfaceHitClass(this.core,new RectClass(0,hitMargin,hitSize,this.core.canvas.height-hitMargin),[[1,0],[1,1],[0,1],[0,0]]);
-        if (!this.hitLeft.initialize()) return(false);
-        
-        this.hitRight=new InterfaceHitClass(this.core,new RectClass((this.core.canvas.width-hitSize),hitMargin,this.core.canvas.width,(this.core.canvas.height-hitMargin)),[[1,1],[1,0],[0,0],[0,1]]);
-        if (!this.hitRight.initialize()) return(false);
-        
-        hitSize=Math.trunc(this.core.canvas.height*0.08);
-        hitMargin=Math.trunc(this.core.canvas.width*0.25);
-        
-        this.hitTop=new InterfaceHitClass(this.core,new RectClass(hitMargin,0,(this.core.canvas.width-hitMargin),hitSize),[[0,0],[1,0],[1,1],[0,1]]);
-        if (!this.hitTop.initialize()) return(false);
-        
-        this.hitBottom=new InterfaceHitClass(this.core,new RectClass(hitMargin,(this.core.canvas.height-hitSize),(this.core.canvas.width-hitMargin),this.core.canvas.height),[[1,1],[0,1],[0,0],[1,0]]);
-        if (!this.hitBottom.initialize()) return(false);
+        if (game.json.config.interfaceHitBitmap!==null) {
+            this.hitLeft=new InterfaceHitClass(this.core,new RectClass(0,hitMargin,hitSize,this.core.canvas.height-hitMargin),[[1,0],[1,1],[0,1],[0,0]]);
+            if (!this.hitLeft.initialize()) return(false);
 
+            this.hitRight=new InterfaceHitClass(this.core,new RectClass((this.core.canvas.width-hitSize),hitMargin,this.core.canvas.width,(this.core.canvas.height-hitMargin)),[[1,1],[1,0],[0,0],[0,1]]);
+            if (!this.hitRight.initialize()) return(false);
+
+            hitSize=Math.trunc(this.core.canvas.height*0.08);
+            hitMargin=Math.trunc(this.core.canvas.width*0.25);
+
+            this.hitTop=new InterfaceHitClass(this.core,new RectClass(hitMargin,0,(this.core.canvas.width-hitMargin),hitSize),[[0,0],[1,0],[1,1],[0,1]]);
+            if (!this.hitTop.initialize()) return(false);
+
+            this.hitBottom=new InterfaceHitClass(this.core,new RectClass(hitMargin,(this.core.canvas.height-hitSize),(this.core.canvas.width-hitMargin),this.core.canvas.height),[[1,1],[0,1],[0,0],[1,0]]);
+            if (!this.hitBottom.initialize()) return(false);
+        }
+        
             // touch controls
             
-        this.touchStickLeft=new InterfaceTouchStickClass(this.core,this.core.game.json.config.touchStickRingBitmap,this.core.game.json.config.touchStickThumbBitmap,this.core.game.json.config.touchStickSize);
+        this.touchStickLeft=new InterfaceTouchStickClass(this.core,game.json.config.touchStickRingBitmap,game.json.config.touchStickThumbBitmap,game.json.config.touchStickSize);
         if (!this.touchStickLeft.initialize()) return(false);
         
-        this.touchStickRight=new InterfaceTouchStickClass(this.core,this.core.game.json.config.touchStickRingBitmap,this.core.game.json.config.touchStickThumbBitmap,this.core.game.json.config.touchStickSize);
+        this.touchStickRight=new InterfaceTouchStickClass(this.core,game.json.config.touchStickRingBitmap,game.json.config.touchStickThumbBitmap,game.json.config.touchStickSize);
         if (!this.touchStickRight.initialize()) return(false);
         
         this.touchButtonMenu=null;
         if (this.core.game.json.config.touchMenuBitmap!==null) {
-            this.touchButtonMenu=new InterfaceTouchButtonClass(this.core,this.core.game.json.config.touchMenuBitmap,new PointClass(this.core.game.json.config.touchMenuPosition[0],this.core.game.json.config.touchMenuPosition[1],0),this.core.game.json.config.touchButtonSize);
+            this.touchButtonMenu=new InterfaceTouchButtonClass(this.core,game.json.config.touchMenuBitmap,new PointClass(game.json.config.touchMenuPosition[0],game.json.config.touchMenuPosition[1],0),game.json.config.touchButtonSize);
             if (!this.touchButtonMenu.initialize()) return(false);
         }
 
@@ -130,10 +133,10 @@ export default class InterfaceClass
         
         this.liquid.release();
         
-        this.hitLeft.release();
-        this.hitRight.release();
-        this.hitTop.release();
-        this.hitBottom.release();
+        if (this.hitLeft!==null) this.hitLeft.release();
+        if (this.hitRight!==null) this.hitRight.release();
+        if (this.hitTop!==null) this.hitTop.release();
+        if (this.hitBottom!==null) this.hitBottom.release();
         
         this.touchStickLeft.release();
         this.touchStickRight.release();
@@ -475,10 +478,10 @@ export default class InterfaceClass
         
         this.liquid.draw();
         
-        this.hitLeft.draw();
-        this.hitRight.draw();
-        this.hitTop.draw();
-        this.hitBottom.draw();
+        if (this.hitLeft!==null) this.hitLeft.draw();
+        if (this.hitRight!==null) this.hitRight.draw();
+        if (this.hitTop!==null) this.hitTop.draw();
+        if (this.hitBottom!==null) this.hitBottom.draw();
         
             // elements and counts
             
