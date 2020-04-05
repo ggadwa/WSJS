@@ -4,14 +4,14 @@
 
 export default class MoveClass
 {
-    constructor(lifeTick,movePnt,rotateAngle,pauseType,pauseData,soundName,triggerName)
+    constructor(lifeTick,movePnt,rotateAngle,pauseType,pauseData,sound,triggerName)
     {
         this.lifeTick=lifeTick;
         this.movePnt=movePnt;
         this.rotateAngle=rotateAngle;
         this.pauseType=pauseType;
         this.pauseData=pauseData;
-        this.soundName=(soundName===undefined)?null:soundName;
+        this.sound=(sound===undefined)?null:sound;
         this.triggerName=(triggerName===undefined)?null:triggerName;
     }
     

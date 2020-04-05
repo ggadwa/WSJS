@@ -89,7 +89,7 @@ export default class EntityContainerClass extends EntityClass
             this.opened=true;
             this.pauseTick=this.core.timestamp+this.openPause;
             
-            if (this.openSound!==null) this.core.soundList.playJson(this,null,this.openSound);
+            if (this.openSound!==null) this.core.soundList.playJson(this.position,this.openSound);
             this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.openingAnimation[0],this.openingAnimation[1]);
             this.modelEntityAlter.queueAnimationChunkInFrames(null,30,this.openAnimation[0],this.openAnimation[1]);
             
@@ -103,7 +103,7 @@ export default class EntityContainerClass extends EntityClass
             this.opened=false;
             this.pauseTick=this.core.timestamp+this.openPause;
             
-            if (this.closeSound!==null) this.core.soundList.playJson(this,null,this.closeSound);
+            if (this.closeSound!==null) this.core.soundList.playJson(this.position,this.closeSound);
             this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.closingAnimation[0],this.closingAnimation[1]);
             this.modelEntityAlter.queueAnimationChunkInFrames(null,30,this.closedAnimation[0],this.closedAnimation[1]);
             

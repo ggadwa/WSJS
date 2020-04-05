@@ -395,7 +395,7 @@ export default class EntityFPSPlayerClass extends EntityClass
         
         this.core.camera.gotoThirdPersonBehind(this.thirdPersonCameraDistance,this.thirdPersonCameraLookAngle);
 
-        this.core.soundList.playJson(this,null,this.dieSound);
+        this.core.soundList.playJson(this.position,this.dieSound);
         this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.dieAnimation[0],this.dieAnimation[1]);
         this.modelEntityAlter.queueAnimationStop();
         
@@ -478,7 +478,7 @@ export default class EntityFPSPlayerClass extends EntityClass
             
         if (this.core.timestamp>this.nextDamageTick) {
             this.nextDamageTick=this.core.timestamp+this.damageFlinchWaitTick;
-            this.core.soundList.playJson(this,null,this.hurtSound);
+            this.core.soundList.playJson(this.position,this.hurtSound);
         }
     }
     
@@ -513,7 +513,7 @@ export default class EntityFPSPlayerClass extends EntityClass
             if ((this.lastUnderLiquid) && (this.angle.x<0)) {
                 this.gravity=this.core.map.gravityMinValue;
                 this.movement.y=this.jumpWaterHeight;
-                if ((this.lastInLiquid) && (this.liquidOutSound!==null)) this.core.soundList.playJson(this,null,this.liquidOutSound);
+                if ((this.lastInLiquid) && (this.liquidOutSound!==null)) this.core.soundList.playJson(this.position,this.liquidOutSound);
             }
             
             this.lastUnderLiquid=false;
@@ -522,12 +522,12 @@ export default class EntityFPSPlayerClass extends EntityClass
         liquidIdx=this.core.map.liquidList.getLiquidForPoint(this.position);
         
         if (liquidIdx!==-1) {
-            if ((!this.lastInLiquid) && (this.liquidInSound!==null)) this.core.soundList.playJson(this,null,this.liquidInSound);
+            if ((!this.lastInLiquid) && (this.liquidInSound!==null)) this.core.soundList.playJson(this.position,this.liquidInSound);
             this.lastInLiquid=true;
             gravityFactor=this.core.map.liquidList.liquids[liquidIdx].gravityFactor;
         }
         else {
-            if ((this.lastInLiquid) && (this.liquidOutSound!==null)) this.core.soundList.playJson(this,null,this.liquidOutSound);
+            if ((this.lastInLiquid) && (this.liquidOutSound!==null)) this.core.soundList.playJson(this.position,this.liquidOutSound);
             this.lastInLiquid=false;
             gravityFactor=1.0;
         }

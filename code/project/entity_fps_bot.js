@@ -269,7 +269,7 @@ export default class EntityFPSBotClass extends EntityClass
         this.respawnTick=this.core.timestamp+this.respawnWaitTick;
         this.passThrough=true;
         
-        this.core.soundList.playJson(this,null,this.dieSound);
+        this.core.soundList.playJson(this.position,this.dieSound);
         this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.dieAnimation[0],this.dieAnimation[1]);
         this.modelEntityAlter.queueAnimationStop();
 
@@ -519,12 +519,12 @@ export default class EntityFPSBotClass extends EntityClass
         liquidIdx=this.core.map.liquidList.getLiquidForPoint(this.position);
         
         if (liquidIdx!==-1) {
-            if ((!this.lastInLiquid) && (this.liquidInSound!==null)) this.core.soundList.playJson(this,null,this.liquidInSound);
+            if ((!this.lastInLiquid) && (this.liquidInSound!==null)) this.core.soundList.playJson(this.position,this.liquidInSound);
             this.lastInLiquid=true;
             gravityFactor=this.core.map.liquidList.liquids[liquidIdx].gravityFactor;
         }
         else {
-            if ((this.lastInLiquid) && (this.liquidOutSound!==null)) this.core.soundList.playJson(this,null,this.liquidOutSound);
+            if ((this.lastInLiquid) && (this.liquidOutSound!==null)) this.core.soundList.playJson(this.position,this.liquidOutSound);
             this.lastInLiquid=false;
             gravityFactor=1.0;
         }

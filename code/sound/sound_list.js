@@ -110,7 +110,7 @@ export default class SoundListClass
         
         if (this.sounds.has(name)) return;
         
-        sound=new SoundClass(this.core,this.ctx,name,25000,0,0);
+        sound=new SoundClass(this.core,this.ctx,name);
         sound.initialize();
             
         this.sounds.set(name,sound);
@@ -152,7 +152,7 @@ export default class SoundListClass
                 movementDef=mapDef.movements[n];
                 for (k=0;k!==movementDef.moves.length;k++) {
                     moveDef=movementDef.moves[k];
-                    if ((moveDef.sound!==undefined) && (moveDef.sound!==null)) this.addSound(moveDef.sound);
+                    if ((moveDef.sound!==undefined) && (moveDef.sound!==null)) this.addSoundByNameAttribute(moveDef.sound);
                 }
                 
             }
@@ -182,6 +182,11 @@ export default class SoundListClass
             this.addSoundByNameAttribute(entityDef.config.meleeSound);
             this.addSoundByNameAttribute(entityDef.config.deathSound);
             this.addSoundByNameAttribute(entityDef.config.fallSound);
+            
+            this.addSoundByNameAttribute(entityDef.config.engineSound);
+            this.addSoundByNameAttribute(entityDef.config.skidSound);
+            this.addSoundByNameAttribute(entityDef.config.crashKartSound);
+            this.addSoundByNameAttribute(entityDef.config.crashWallSound);
         }
         
         keys=Object.keys(game.jsonEffectCache);
@@ -271,7 +276,7 @@ export default class SoundListClass
         // (or if no attachment, a global sound)
         //
         
-    play(entity,mesh,name,rate,loop)
+    play(position,name,rate,distance,loopStart,loopEnd,loop)
     {
         let n,idx,sound;
         let soundPlay=null;
@@ -281,7 +286,7 @@ export default class SoundListClass
         sound=this.sounds.get(name);
         if (sound===undefined) {
             console.log('warning: unknown sound: '+name);
-            return;
+            return(-1);
         }
         
             // find a free sound play
@@ -294,26 +299,26 @@ export default class SoundListClass
             }
         }
         
-        if (soundPlay===null) return;
+        if (soundPlay===null) return(-1);
         
             // set it to entity
             
-        soundPlay.play(this.ctx,this.currentListenerEntity,entity,mesh,sound,rate,loop);
+        soundPlay.play(this.ctx,this.currentListenerEntity,position,sound,rate,distance,loopStart,loopEnd,loop);
         
         return(idx);
     }
     
-    playJson(entity,mesh,obj)
+    playJson(position,obj)
     {
         let rate;
         
-        if (obj===undefined) return;
-        if ((obj.name===undefined) || (obj.name==='')) return;
+        if (obj===undefined) return(-1);
+        if ((obj.name===undefined) || (obj.name==='')) return(-1);
         
         rate=obj.rate;
         if (obj.randomRateAdd!==0) rate+=(Math.random()*obj.randomRateAdd);
         
-        this.play(entity,mesh,obj.name,rate,obj.loop);
+        return(this.play(position,obj.name,rate,obj.distance,obj.loopStart,obj.loopEnd,obj.loop));
     }
     
     stop(playIdx)

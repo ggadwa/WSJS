@@ -202,14 +202,20 @@ export default class BitmapListClass
         this.addInterface(game.json.config.touchStickRingBitmap);
         this.addInterface(game.json.config.touchStickThumbBitmap);
         this.addInterface(game.json.config.touchMenuBitmap);
-        if (game.interface!==undefined) this.addInterfaceFromJson(game.json.interface.elements);
+        if (game.interface!==undefined) {
+            this.addInterfaceFromJson(game.json.interface.elements);
+            this.addInterfaceFromJson(game.json.interface.counts);
+        }
         
         keys=Object.keys(game.jsonEntityCache);
         
         for (key of keys)
         {
             entityDef=game.jsonEntityCache[key];
-            if (entityDef.interface!==undefined) this.addInterfaceFromJson(entityDef.interface.elements);
+            if (entityDef.interface!==undefined) {
+                this.addInterfaceFromJson(entityDef.interface.elements);
+                this.addInterfaceFromJson(entityDef.interface.counts);
+            }
         }
         
         keys=Object.keys(game.jsonEffectCache);

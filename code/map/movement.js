@@ -132,7 +132,7 @@ export default class MovementClass
                     // set any trigger or sound
                     
                 if (move.triggerName!==null) this.core.setTrigger(move.triggerName);
-                if (move.soundName!==null) this.core.soundList.play(null,this.core.map.meshList.get(this.meshIdxList[0]),move.soundName,1.0,false)
+                if (move.sound!==null) this.core.soundList.playJson(this.core.map.meshList.get(this.meshIdxList[0]).center,move.sound);
             }
         }
         

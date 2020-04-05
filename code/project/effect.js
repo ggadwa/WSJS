@@ -409,7 +409,7 @@ export default class EffectClass
         
             // finally any sound, shaking or damage
             
-        this.core.soundList.playJson(this,null,this.json.sound);
+        this.core.soundList.playJson(this.position,this.json.sound);
         
         if (this.json.shake!==undefined) {
             dist=this.position.distance(this.core.map.entityList.getPlayer().position);

@@ -9,8 +9,7 @@ export default class SoundPlayClass
         this.soundList=soundList;
         
         this.free=true;
-        this.entity=null;
-        this.mesh=null;
+        this.position=null;
         
         this.sourceNode=null;
         this.gainNode=null;
@@ -24,23 +23,18 @@ export default class SoundPlayClass
     }
     
         //
-        // play a sound buffer at this entity
+        // play a sound buffer at this position
         //
         
-    play(ctx,entityListener,entity,mesh,sound,rate,loop)
+    play(ctx,entityListener,position,sound,rate,distance,loopStart,loopEnd,loop)
     {
         let dist;
         
-            // skip if over max distance from entity/mesh
+            // skip if over max distance from position
         
-        if (entity!==null) {
-            dist=entity.position.distance(entityListener.position);
-            if (dist>sound.maxDistance) return(false);
-        }
-        
-        if (mesh!==null) {
-            dist=mesh.center.distance(entityListener.position);
-            if (dist>sound.maxDistance) return(false);
+        if (position!==null) {
+            dist=position.distance(entityListener.position);
+            if (dist>distance) return(false);
         }
         
             // set the audio nodes
@@ -48,15 +42,15 @@ export default class SoundPlayClass
         this.sourceNode=ctx.createBufferSource();
         this.sourceNode.buffer=sound.buffer;
         this.sourceNode.playbackRate.value=rate;
-        this.sourceNode.loopStart=sound.loopStart;
-        this.sourceNode.loopEnd=sound.loopEnd;
+        this.sourceNode.loopStart=loopStart;
+        this.sourceNode.loopEnd=loopEnd;
         this.sourceNode.loop=loop;
         this.sourceNode.onended=this.ended.bind(this);
         
-            // if no entity/mesh, than just add
+            // if no position, than just add
             // a gain node, otherwise a panner
             
-        if ((entity===null) && (mesh===null)) {
+        if (position===null) {
             this.gainNode=ctx.createGain();
             this.gainNode.gain.value=this.soundList.core.setup.soundVolume;
         
@@ -68,32 +62,20 @@ export default class SoundPlayClass
             
             this.pannerNode.panningModel='HRTF';
             this.pannerNode.distanceModel='inverse';
-            this.pannerNode.refDistance=sound.maxDistance*0.25;
-            this.pannerNode.maxDistance=sound.maxDistance;
+            this.pannerNode.refDistance=distance*0.25;
+            this.pannerNode.maxDistance=distance;
             this.pannerNode.rolloffFactor=1;
             this.pannerNode.coneInnerAngle=360;
             this.pannerNode.coneOuterAngle=0;
             this.pannerNode.coneOuterGain=0;
             
-            if (entity!==null) {
-                if (this.pannerNode.positionX) {        // backwards compatiablity
-                    this.pannerNode.positionX.value=entity.position.x;
-                    this.pannerNode.positionY.value=entity.position.y;
-                    this.pannerNode.positionZ.value=entity.position.z;
-                }
-                else {
-                    this.pannerNode.setPosition(entity.position.x,entity.position.y,entity.position.z);
-                }
+            if (this.pannerNode.positionX) {        // backwards compatiablity
+                this.pannerNode.positionX.value=position.x;
+                this.pannerNode.positionY.value=position.y;
+                this.pannerNode.positionZ.value=position.z;
             }
             else {
-                if (this.pannerNode.positionX) {        // backwards compatiablity
-                    this.pannerNode.positionX.value=mesh.center.x;
-                    this.pannerNode.positionY.value=mesh.center.y;
-                    this.pannerNode.positionZ.value=mesh.center.z;
-                }
-                else {
-                    this.pannerNode.setPosition(mesh.center.x,mesh.center.y,mesh.center.z);
-                }
+                this.pannerNode.setPosition(position.x,position.y,position.z);
             }
             
             if (this.pannerNode.orientationX) {
@@ -114,10 +96,9 @@ export default class SoundPlayClass
             this.gainNode.connect(ctx.destination);
         }
        
-            // set to entity and mark as used
+            // set to position and mark as used
         
-        this.entity=entity;
-        this.mesh=mesh;
+        this.position=position;
         
         this.free=false;
         
@@ -129,8 +110,7 @@ export default class SoundPlayClass
     ended()
     {
         this.free=true;
-        this.entity=null;           // otherwise entities/meshes cleared from entity list will be cleaned up late
-        this.mesh=null;
+        this.position=null;
         this.sourceNode=null;
         this.gainNode=null;
         this.pannerNode=null;
@@ -155,31 +135,21 @@ export default class SoundPlayClass
     }
     
         //
-        // handle any entity updates to this sound
+        // handle any position updates to this sound
         //
         
     update()
     {
-        if (this.entity!==null) {
+        if (this.position!==null) {
             if (this.pannerNode.positionX) {
-                this.pannerNode.positionX.value=this.entity.position.x;
-                this.pannerNode.positionY.value=this.entity.position.y;
-                this.pannerNode.positionZ.value=this.entity.position.z;
+                this.pannerNode.positionX.value=this.position.x;
+                this.pannerNode.positionY.value=this.position.y;
+                this.pannerNode.positionZ.value=this.position.z;
             }
             else {
-                this.pannerNode.setPosition(this.entity.position.x,this.entity.position.y,this.entity.position.z);
+                this.pannerNode.setPosition(this.position.x,this.position.y,this.position.z);
             }
             return;
-        }
-        if (this.mesh!==null) {
-            if (this.pannerNode.positionX) {
-                this.pannerNode.positionX.value=this.mesh.center.x;
-                this.pannerNode.positionY.value=this.mesh.center.y;
-                this.pannerNode.positionZ.value=this.mesh.center.z;
-            }
-            else {
-                this.pannerNode.setPosition(this.mesh.center.x,this.mesh.center.y,this.mesh.center.z);
-            }
         }
     }
 

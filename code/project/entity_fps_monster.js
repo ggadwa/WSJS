@@ -208,7 +208,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         
         this.nextDamageTick=this.core.timestamp;
         
-        this.core.soundList.playJson(this,null,this.wakeUpSound);
+        this.core.soundList.playJson(this.position,this.wakeUpSound);
         this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.walkAnimation[0],this.walkAnimation[1]);
     }
     
@@ -234,7 +234,7 @@ export default class EntityFPSMonsterClass extends EntityClass
             if (this.core.timestamp>this.nextDamageTick) {
                 this.nextDamageTick=this.core.timestamp+this.damageFlinchWaitTick;
 
-                this.core.soundList.playJson(this,null,this.hurtSound);
+                this.core.soundList.playJson(this.position,this.hurtSound);
                 this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.hitAnimation[0],this.hitAnimation[1]);
                 this.modelEntityAlter.queueAnimationChunkInFrames(null,30,this.walkAnimation[0],this.walkAnimation[1]);
             }
@@ -248,7 +248,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.deathAnimation[0],this.deathAnimation[1]);
         this.queueAnimationStop();
         
-        this.core.soundList.playJson(this,null,this.deathSound);
+        this.core.soundList.playJson(this.position,this.deathSound);
         
         this.fallSoundNextTick=this.core.timestamp+this.fallSoundWaitTick;
     }
@@ -258,7 +258,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.gravity=this.core.map.gravityMinValue;
         this.movement.y=this.jumpHeight;
         
-        this.core.soundList.playJson(this,null,this.wakeUpSound);
+        this.core.soundList.playJson(this.position,this.wakeUpSound);
     }
     
     meleeStart(distToPlayer)
@@ -284,7 +284,7 @@ export default class EntityFPSMonsterClass extends EntityClass
     
     meleeHit(player)
     {
-        this.core.soundList.playJson(this,null,this.meleeSound);
+        this.core.soundList.playJson(this.position,this.meleeSound);
         player.damage(this,this.meleeDamage,this.position);
     }
     
@@ -377,12 +377,12 @@ export default class EntityFPSMonsterClass extends EntityClass
         liquidIdx=this.getInLiquidIndex();
         
         if (liquidIdx!==-1) {
-            if (!this.lastInLiquid) this.core.soundList.playJson(this,null,this.liquidInSound);
+            if (!this.lastInLiquid) this.core.soundList.playJson(this.position,this.liquidInSound);
             this.lastInLiquid=true;
             gravityFactor=this.core.map.liquidList.liquids[liquidIdx].gravityFactor;
         }
         else {
-            if (this.lastInLiquid) this.core.soundList.playJson(this,null,this.liquidOutSound);
+            if (this.lastInLiquid) this.core.soundList.playJson(this.position,this.liquidOutSound);
             this.lastInLiquid=false;
             gravityFactor=1.0;
         }
@@ -394,7 +394,7 @@ export default class EntityFPSMonsterClass extends EntityClass
             
             if ((this.fallSound!==null) && (this.fallSoundNextTick!==0)) {
                 if (this.core.timestamp>this.fallSoundNextTick) {
-                    this.core.soundList.playJson(this,null,this.fallSound);
+                    this.core.soundList.playJson(this.position,this.fallSound);
                     this.fallSoundNextTick=0;
                 }
             }

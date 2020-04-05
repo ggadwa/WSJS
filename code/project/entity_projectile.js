@@ -83,7 +83,7 @@ export default class EntityProjectileClass extends EntityClass
         this.motion.setFromValues(0,0,this.speed);
         this.motion.rotate(this.angle);
         
-        if (this.spawnSound!==null) this.core.soundList.playJson(this,null,this.spawnSound);
+        if (this.spawnSound!==null) this.core.soundList.playJson(this.position,this.spawnSound);
         
         this.nextTrailTick=this.core.timestamp;
     }
@@ -167,7 +167,7 @@ export default class EntityProjectileClass extends EntityClass
                 return;
             }
             
-            if ((!this.stopped) && (this.bounceSound!==null)) this.core.soundList.playJson(this,null,this.bounceSound);
+            if ((!this.stopped) && (this.bounceSound!==null)) this.core.soundList.playJson(this.position,this.bounceSound);
             
             this.position.setFromPoint(this.savePoint);
             if (this.canBounce) this.floorBounce(this.motion);
@@ -196,7 +196,7 @@ export default class EntityProjectileClass extends EntityClass
                 return;
             }
             
-            this.core.soundList.playJson(this,null,this.bounceSound);
+            this.core.soundList.playJson(this.position,this.bounceSound);
 
             this.position.setFromPoint(this.savePoint);
             this.motion.y=0;
@@ -210,7 +210,7 @@ export default class EntityProjectileClass extends EntityClass
                 return;
             }
             
-            this.core.soundList.playJson(this,null,this.reflectSound);
+            this.core.soundList.playJson(this.position,this.reflectSound);
             
             this.position.setFromPoint(this.savePoint);
             
@@ -234,7 +234,7 @@ export default class EntityProjectileClass extends EntityClass
             }
             
             if (!this.stopped) {
-                this.core.soundList.playJson(this,null,this.reflectSound);
+                this.core.soundList.playJson(this.position,this.reflectSound);
 
                 this.position.setFromPoint(this.savePoint);
                 this.motion.x=0;

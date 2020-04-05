@@ -10,6 +10,11 @@ export default class EntityKartPlayerClass extends EntityClass
     {
         super(core,name,json,position,angle,data);
         
+        this.engineSound=null;
+        this.skidSound=null;
+        this.crashKartSound=null;
+        this.crashWallSound=null;
+        
         this.currentWeaponIdx=-1;
         this.weapons=[];
     }
@@ -103,6 +108,10 @@ export default class EntityKartPlayerClass extends EntityClass
         this.mineRechargeTick=2000;
         this.weight=500;
         
+        this.engineSound=this.core.game.lookupSoundValue(this.json.config.engineSound);
+        this.skidSound=this.core.game.lookupSoundValue(this.json.config.skidSound);
+        this.crashKartSound=this.core.game.lookupSoundValue(this.json.config.crashKartSound);
+        this.crashWallSound=this.core.game.lookupSoundValue(this.json.config.crashWallSound);
         
         
         for (n=0;n!==this.json.weapons.length;n++) {
@@ -159,7 +168,7 @@ export default class EntityKartPlayerClass extends EntityClass
         this.resetStars();
         
         this.engineSoundRateAirIncrease=0;
-        this.engineSoundPlayIdx=this.playGlobal('engine',this.MIN_ENGINE_SOUND_RATE,true);
+        this.engineSoundPlayIdx=this.core.soundList.playJson(this.position,this.engineSound);
     }
     
         //
@@ -174,7 +183,7 @@ export default class EntityKartPlayerClass extends EntityClass
         this.smokePosition.rotateY(null,((this.angle.y+offsetAngleY)%360));
         this.smokePosition.addPoint(this.position);
 
-        this.addEffect(this,'effect_tire_smoke',this.smokePosition,null,true);
+        this.addEffect(this,'tire_smoke',this.smokePosition,null,true);
     }
     
         //
@@ -212,7 +221,7 @@ export default class EntityKartPlayerClass extends EntityClass
     {
         this.inDrift=true;
         this.driftMovement.setFromPoint(this.rotMovement);
-        this.lastDriftSoundPlayIdx=this.playSound('skid',1.0,false);
+        this.lastDriftSoundPlayIdx=this.core.soundList.playJson(this.position,this.skidSound);
     }
     
     driftEnd()
@@ -222,18 +231,18 @@ export default class EntityKartPlayerClass extends EntityClass
         this.inDrift=false;
 
         if (this.lastDriftSoundPlayIdx!==-1) {
-            this.stopSound(this.lastDriftSoundPlayIdx);
+            this.core.soundList.stop(this.lastDriftSoundPlayIdx);
             this.lastDriftSoundPlayIdx=-1;
         }
     }
 
-    bounceStart(crashSoundRate)
+    bounceStart(soundJson)
     {
             // turn on bounce
             
         this.bounceCount=this.bounceWaitCount;
         if (this.spinOutCount===0) this.spinOutCount=360;
-        this.playSound('crash',crashSoundRate,false);
+        this.core.soundList.playJson(this.position,soundJson);
         
             // all bounces cost a star
             
@@ -244,10 +253,10 @@ export default class EntityKartPlayerClass extends EntityClass
         this.driftEnd();
     }
     
-    spinStart(crashSoundRate)
+    spinStart(soundJson)
     {
         this.spinOutCount=360;
-        this.playSound('crash',crashSoundRate,false);
+        this.core.soundList.playJson(this.position,soundJson);
     }
 
         //
@@ -265,7 +274,7 @@ export default class EntityKartPlayerClass extends EntityClass
         if (this.spinOutCount===0) {
             if (this.touchEntity!==null) {
                 if (this.touchEntity.name.startsWith('monster_')) {
-                    this.spinStart(1.5);
+                    this.spinStart(this.crashKartSound);
                 }
             }
         }
@@ -283,7 +292,7 @@ export default class EntityKartPlayerClass extends EntityClass
             
         if (this.touchEntity!==null) {
             if (this.touchEntity.name.startsWith('kart_')) {
-                this.bounceStart(2.0);
+                this.bounceStart(this.crashKartSound);
             }
         }   
         
@@ -382,7 +391,7 @@ export default class EntityKartPlayerClass extends EntityClass
         }
         else {
             if ((this.collideWallMeshIdx!==-1) || (this.slideWallMeshIdx!==-1)) {
-                this.bounceStart(1.0);
+                this.bounceStart(this.crashWallSound);
             }
         }
 
@@ -545,7 +554,7 @@ export default class EntityKartPlayerClass extends EntityClass
             
         turnAdd=0;
 
-        x=this.getMouseMoveX();
+        x=input.getMouseMoveX();
         if (x!==0) {
             turnAdd=-(x*setup.mouseXSensitivity);
             turnAdd+=(turnAdd*setup.mouseXAcceleration);
@@ -555,7 +564,7 @@ export default class EntityKartPlayerClass extends EntityClass
             // looking (mostly for developer flying)
         
         if (this.core.game.developer.playerFly) {    
-            y=this.getMouseMoveY();
+            y=input.getMouseMoveY();
             if (y!==0) {
                 lookAdd=y*setup.mouseYSensitivity;
                 lookAdd+=(lookAdd*setup.mouseYAcceleration);
@@ -592,7 +601,7 @@ export default class EntityKartPlayerClass extends EntityClass
             }
         }
         
-        this.changeSoundRate(this.engineSoundPlayIdx,rate);
+        this.core.soundList.changeRate(this.engineSoundPlayIdx,rate);
         
             // calculate place
             
