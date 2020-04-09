@@ -1,6 +1,6 @@
 export default class InterfaceElementClass
 {
-    constructor(core,bitmap,rect,color,alpha)
+    constructor(core,bitmap,rect,color,alpha,developer)
     {
         this.core=core;
         
@@ -8,6 +8,7 @@ export default class InterfaceElementClass
         this.rect=rect;
         this.color=color;
         this.alpha=alpha;
+        this.developer=developer;
         
         this.show=true;
         
@@ -84,7 +85,7 @@ export default class InterfaceElementClass
         
             // skip if not shown
             
-        if (!this.show) return;
+        if ((!this.show) || (this.core.game.developer.on!==this.developer)) return;
         
             // handle any pulses
             

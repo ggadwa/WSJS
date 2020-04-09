@@ -368,10 +368,6 @@ export default class EntityFPSMonsterClass extends EntityClass
         let angleDif;
         let player,distToPlayer,liquidIdx,gravityFactor;
         
-            // the developer freeze
-            
-        if (this.core.game.developer.freezeBotMonsters) return;
-        
             // liquids
             
         liquidIdx=this.getInLiquidIndex();

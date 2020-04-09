@@ -165,11 +165,11 @@ export default class ImportMapClass
             for (n=0;n!==json.paths.length;n++) {
                 pathDef=json.paths[n];
                 
-                pathNode=new MapPathNodeClass(this.core.map.path.nodes.length,new PointClass(pathDef.position.x,pathDef.position.y,pathDef.position.z),pathDef.links,pathDef.key,pathDef.data);
+                pathNode=new MapPathNodeClass(this.core.map.path.nodes.length,new PointClass(pathDef.position.x,pathDef.position.y,pathDef.position.z),pathDef.links,pathDef.key,new Int16Array(pathDef.pathHints),pathDef.data);
                 this.core.map.path.nodes.push(pathNode);
             }
             
-            this.core.map.path.buildPathHints();
+            this.core.map.path.preparePaths();
         }
         
             // cubes

@@ -106,4 +106,9 @@ export default class QuaternionClass
     {
         return(new QuaternionClass(this.x,this.y,this.z,this.w));
     }
+    
+    toString()
+    {
+        return('('+this.x+','+this.y+','+this.z+','+this.w+')');
+    }
 }

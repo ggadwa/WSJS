@@ -96,14 +96,12 @@ export default class ModelClass
         
         this.meshList.draw(modelEntityAlter,false);
         
-            // debug skeleton and/or bounds drawing
+            // developer bounds drawing
             // note this can't draw held stuff
             
-        if (((this.core.game.developer.skeletons) || (this.core.game.developer.entityBounds)) && (entity.heldBy===null)) {
+        if ((this.core.game.developer.on) && (entity.heldBy===null)) {
             modelEntityAlter.setupModelMatrix(false);
-
-            if (this.core.game.developer.skeletons) modelEntityAlter.debugDrawSkeleton();
-            if (this.core.game.developer.entityBounds) modelEntityAlter.debugDrawBounds();
+            modelEntityAlter.drawBounds();
         }
         
             // add up model draws for stats

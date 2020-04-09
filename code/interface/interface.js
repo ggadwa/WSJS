@@ -229,7 +229,7 @@ export default class InterfaceClass
         // add interface chunks
         //
         
-    addElement(id,bitmap,width,height,positionMode,positionOffset,color,alpha)
+    addElement(id,bitmap,width,height,positionMode,positionOffset,color,alpha,developer)
     {
         let element;
         let rect=new RectClass(positionOffset.x,positionOffset.y,(positionOffset.x+width),(positionOffset.y+height));
@@ -249,7 +249,7 @@ export default class InterfaceClass
                 break;
         }
             
-        element=new InterfaceElementClass(this.core,bitmap,rect,color,alpha);
+        element=new InterfaceElementClass(this.core,bitmap,rect,color,alpha,developer);
         element.initialize();
         this.elements.set(id,element);
     }
@@ -276,7 +276,7 @@ export default class InterfaceClass
         element.pulse(tick,expand);
     }
     
-    addCount(id,bitmap,maxCount,width,height,positionMode,positionOffset,addOffset,onColor,onAlpha,offColor,offAlpha)
+    addCount(id,bitmap,maxCount,width,height,positionMode,positionOffset,addOffset,onColor,onAlpha,offColor,offAlpha,developer)
     {
         let count;
         let rect=new RectClass(positionOffset.x,positionOffset.y,(positionOffset.x+width),(positionOffset.y+height));
@@ -296,7 +296,7 @@ export default class InterfaceClass
                 break;
         }
             
-        count=new InterfaceCountClass(this.core,bitmap,maxCount,rect,addOffset,onColor,onAlpha,offColor,offAlpha);
+        count=new InterfaceCountClass(this.core,bitmap,maxCount,rect,addOffset,onColor,onAlpha,offColor,offAlpha,developer);
         count.initialize();
         this.counts.set(id,count);
     }
@@ -323,7 +323,7 @@ export default class InterfaceClass
         count.count=value;
     }
     
-    addText(id,str,positionMode,positionOffset,fontSize,align,color,alpha)
+    addText(id,str,positionMode,positionOffset,fontSize,align,color,alpha,developer)
     {
         let text;
         let x=positionOffset.x;
@@ -346,7 +346,7 @@ export default class InterfaceClass
                 break;
         }
 
-        text=new InterfaceTextClass(this.core,(''+str),x,y,fontSize,align,color,alpha);
+        text=new InterfaceTextClass(this.core,(''+str),x,y,fontSize,align,color,alpha,developer);
         text.initialize();
         this.texts.set(id,text);
     }
@@ -427,7 +427,7 @@ export default class InterfaceClass
                 
                 positionMode=this.POSITION_MODE_LIST.indexOf(element.positionMode);
 
-                this.addElement(element.id,bitmap,element.width,element.height,positionMode,element.positionOffset,new ColorClass(element.color.r,element.color.g,element.color.b),element.alpha);
+                this.addElement(element.id,bitmap,element.width,element.height,positionMode,element.positionOffset,new ColorClass(element.color.r,element.color.g,element.color.b),element.alpha,false);
                 this.showElement(element.id,element.show);
             }
         }
@@ -445,7 +445,7 @@ export default class InterfaceClass
                 
                 positionMode=this.POSITION_MODE_LIST.indexOf(count.positionMode);
 
-                this.addCount(count.id,bitmap,count.count,count.width,count.height,positionMode,count.positionOffset,count.addOffset,new ColorClass(count.onColor.r,count.onColor.g,count.onColor.b),count.onAlpha,new ColorClass(count.offColor.r,count.offColor.g,count.offColor.b),count.offAlpha);
+                this.addCount(count.id,bitmap,count.count,count.width,count.height,positionMode,count.positionOffset,count.addOffset,new ColorClass(count.onColor.r,count.onColor.g,count.onColor.b),count.onAlpha,new ColorClass(count.offColor.r,count.offColor.g,count.offColor.b),count.offAlpha,false);
                 this.showCount(count.id,count.show);
             }
         }
@@ -454,7 +454,7 @@ export default class InterfaceClass
             for (text of jsonInterface.texts) {
                 align=this.core.interface.TEXT_ALIGN_LIST.indexOf(text.textAlign);
                 positionMode=this.POSITION_MODE_LIST.indexOf(text.positionMode);
-                this.addText(text.id,text.text,positionMode,text.positionOffset,text.textSize,align,new ColorClass(text.color.r,text.color.g,text.color.b),text.alpha);
+                this.addText(text.id,text.text,positionMode,text.positionOffset,text.textSize,align,new ColorClass(text.color.r,text.color.g,text.color.b),text.alpha,false);
                 this.showText(text.id,text.show);
             }
         }
@@ -549,7 +549,7 @@ export default class InterfaceClass
         
         for (n=0;n!==nLine;n++) {
             if (n===(nLine-1)) col=new ColorClass(1,0.3,0.3);
-            text=new InterfaceTextClass(this.core,consoleStrings[n],5,y,20,this.TEXT_ALIGN_LEFT,col,1);
+            text=new InterfaceTextClass(this.core,consoleStrings[n],5,y,20,this.TEXT_ALIGN_LEFT,col,1,false);
             text.initialize();
             text.draw();
             text.release();

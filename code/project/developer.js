@@ -9,26 +9,44 @@ export default class DeveloperClass
     constructor(core)
     {
         this.core=core;
-              
-        this.playerFly=false;
-        this.playerNoClip=false;
-        this.playerNoDamage=false;
-        this.freezeBotMonsters=false;
-        this.entityBounds=false;
-        this.paths=false;
-        this.skeletons=false;
-        this.collisionSurfaces=false;
+        
+        this.MOVE_SPEED=100;
+        this.SIDE_SPEED=50;
+        this.MAX_TURN_SPEED=10;
+        this.MAX_LOOK_SPEED=5;
+        this.MAX_LOOK_ANGLE=90;
+        this.MOVE_FAST_FACTOR=3.0;
+        
+        this.NEAR_PATH_NODE_DISTANCE=5000;
+        this.CONTACT_MESH_RADIUS=100;
+        
+        this.on=false;
+        this.position=new PointClass(0,0,0);
+        this.angle=new PointClass(0,0,0);
+        
+            // pre-allocates
+            
+        this.movement=new PointClass(0,0,0);
+        this.xBound=new BoundClass(0,0);
+        this.yBound=new BoundClass(0,0);
+        this.zBound=new BoundClass(0,0);
         
         Object.seal(this);
     }
     
     initialize()
     {
-        this.core.interface.addText('fps','',this.core.interface.POSITION_MODE_TOP_RIGHT,{"x":-5,"y":23},20,this.core.interface.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1);
-        this.core.interface.addText('meshCount','',this.core.interface.POSITION_MODE_TOP_RIGHT,{"x":-5,"y":46},20,this.core.interface.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1);
-        this.core.interface.addText('trigCount','',this.core.interface.POSITION_MODE_TOP_RIGHT,{"x":-5,"y":69},20,this.core.interface.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1);
-        this.core.interface.addText('modelCount','',this.core.interface.POSITION_MODE_TOP_RIGHT,{"x":-5,"y":92},20,this.core.interface.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1);
-        this.core.interface.addText('effectCount','',this.core.interface.POSITION_MODE_TOP_RIGHT,{"x":-5,"y":115},20,this.core.interface.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1);
+        this.core.interface.addText('wsFPS','',this.core.interface.POSITION_MODE_TOP_RIGHT,{"x":-5,"y":23},20,this.core.interface.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1,false);
+        
+        this.core.interface.addText('wsMeshCount','',this.core.interface.POSITION_MODE_TOP_RIGHT,{"x":-5,"y":23},20,this.core.interface.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1,true);
+        this.core.interface.addText('wsTrigCount','',this.core.interface.POSITION_MODE_TOP_RIGHT,{"x":-5,"y":46},20,this.core.interface.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1,true);
+        this.core.interface.addText('wsModelCount','',this.core.interface.POSITION_MODE_TOP_RIGHT,{"x":-5,"y":69},20,this.core.interface.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1,true);
+        this.core.interface.addText('wsEffectCount','',this.core.interface.POSITION_MODE_TOP_RIGHT,{"x":-5,"y":92},20,this.core.interface.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1,true);
+        
+        this.core.interface.addText('wsPosition','',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-72},20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
+        this.core.interface.addText('wsAngle','',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-49},20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
+        this.core.interface.addText('wsNode','',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-26},20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
+        this.core.interface.addText('wsMesh','',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-3},20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
 
         return(true);
     }
@@ -57,7 +75,7 @@ export default class DeveloperClass
 
             // nodes
             
-        nodeIdx=player.findNearestPathNode(5000);
+        nodeIdx=this.findNearestPathNode(5000);
         if (nodeIdx!==-1) console.info('node='+this.core.map.path.nodes[nodeIdx].nodeIdx);
             
             // meshes
@@ -83,11 +101,32 @@ export default class DeveloperClass
     pathJSONReplacer(key,value)
     {
         if (key==='nodeIdx') return(undefined);
-        if (key==='pathHints') return(undefined);
+        if (key==='pathHints') return(new Array(...value));
         if (key==='pathHintCounts') return(undefined);
         if ((key==='key') && (value===null)) return(undefined);
         if ((key==='data') && (value===null)) return(undefined);
         return(value);
+    }
+    
+    findNearestPathNode(maxDistance)
+    {
+        let n,d,dist;
+        let nodeIdx;
+        let nodes=this.core.map.path.nodes;
+        let nNode=nodes.length;
+        
+        nodeIdx=-1;
+        dist=maxDistance;
+        
+        for (n=0;n!==nNode;n++) {
+            d=nodes[n].position.distance(this.position);
+            if ((d<dist) || (dist===-1)) {
+                dist=d;
+                nodeIdx=n;
+            }
+        }
+
+        return(nodeIdx);
     }
     
     pathEditor()
@@ -101,7 +140,7 @@ export default class DeveloperClass
             // i key picks a new parent from closest node
             
         if (input.isKeyDownAndClear('i')) {
-            nodeIdx=player.findNearestPathNode(1000000);
+            nodeIdx=this.findNearestPathNode(1000000);
             if (nodeIdx===-1) return;
             
             path.editorParentNodeIdx=nodeIdx;
@@ -114,7 +153,7 @@ export default class DeveloperClass
             // hit o on each node, then o for new node
             
         if (input.isKeyDownAndClear('o')) {
-            nodeIdx=player.findNearestPathNode(1000000);
+            nodeIdx=this.findNearestPathNode(1000000);
             if (nodeIdx===-1) return;
             
             if (path.editorSplitStartNodeIdx===-1) {
@@ -130,7 +169,7 @@ export default class DeveloperClass
             }
             
             nodeIdx=path.nodes.length;
-            path.nodes.push(new MapPathNodeClass(nodeIdx,player.position.copy(),[path.editorSplitStartNodeIdx,path.editorSplitEndNodeIdx],null,null));
+            path.nodes.push(new MapPathNodeClass(nodeIdx,player.position.copy(),[path.editorSplitStartNodeIdx,path.editorSplitEndNodeIdx],null,null,null));
             
             links=path.nodes[path.editorSplitStartNodeIdx].links;
             links[links.indexOf(path.editorSplitEndNodeIdx)]=nodeIdx;
@@ -152,7 +191,7 @@ export default class DeveloperClass
                 // is there a close node?
                 // if so connect to that
                 
-            nodeIdx=player.findNearestPathNode(5000);
+            nodeIdx=this.findNearestPathNode(this.NEAR_PATH_NODE_DISTANCE);
             if (nodeIdx!==-1) {
                 if (path.editorParentNodeIdx!==-1) {
                     path.nodes[nodeIdx].links.push(path.editorParentNodeIdx);
@@ -176,7 +215,7 @@ export default class DeveloperClass
                 path.nodes[path.editorParentNodeIdx].links.push(nodeIdx);
             }
             
-            path.nodes.push(new MapPathNodeClass(nodeIdx,player.position.copy(),links,null,null));
+            path.nodes.push(new MapPathNodeClass(nodeIdx,player.position.copy(),links,null,null,null));
             
             path.editorParentNodeIdx=nodeIdx;
             
@@ -187,7 +226,7 @@ export default class DeveloperClass
             // u key adds a key to nearest node
             
         if (input.isKeyDownAndClear('u')) {
-            nodeIdx=player.findNearestPathNode(5000);
+            nodeIdx=this.findNearestPathNode(this.NEAR_PATH_NODE_DISTANCE);
             if (nodeIdx!==-1) {
                 path.editorParentNodeIdx=nodeIdx;
                 
@@ -246,7 +285,12 @@ export default class DeveloperClass
         
             // \ key displays json of path
             
-        if (input.isKeyDownAndClear('\\')) {            
+        if (input.isKeyDownAndClear('\\')) {
+            this.core.setPauseState(true,false);
+            
+            console.info('Generating hints, wait ...');
+            path.buildPathHints();
+            
             str='    "paths":\n';
             str+='        [\n';
             
@@ -262,6 +306,154 @@ export default class DeveloperClass
             console.info(str);
         }
     }
+    
+        //
+        // developer movement
+        //
+        
+    move()
+    {
+        let moveForward,moveBackward,moveLeft,moveRight,moveFactor;
+        let x,y,turnAdd,lookAdd;
+        let input=this.core.input;
+        let setup=this.core.setup;
+        
+        moveForward=(input.isKeyDown('w')) || (input.isKeyDown('W'));
+        moveBackward=(input.isKeyDown('s')) || (input.isKeyDown('S'));
+        moveLeft=(input.isKeyDown('a')) || (input.isKeyDown('A'));
+        moveRight=(input.isKeyDown('d')) || (input.isKeyDown('D'));
+        
+        moveFactor=input.isKeyDown('Shift')?this.MOVE_FAST_FACTOR:1.0;
+        
+            // turning
+            
+        turnAdd=0;
+            
+        x=input.getMouseMoveX();
+        if (x!==0) {
+            turnAdd=-(x*setup.mouseXSensitivity);
+            turnAdd+=(turnAdd*setup.mouseXAcceleration);
+            if (setup.mouseXInvert) turnAdd=-turnAdd;
+            if (Math.abs(turnAdd)>this.MAX_TURN_SPEED) turnAdd=this.MAX_TURN_SPEED*Math.sign(turnAdd);
+            
+            if (turnAdd!==0) {
+                this.angle.y+=turnAdd;
+                if (this.angle.y<0.0) this.angle.y+=360.0;
+                if (this.angle.y>=360.00) this.angle.y-=360.0;
+            }
+        }
+        
+            // looking
+            
+        lookAdd=0;
+            
+        y=input.getMouseMoveY();
+        if (y!==0) {
+            lookAdd=y*setup.mouseYSensitivity;
+            lookAdd+=(lookAdd*setup.mouseYAcceleration);
+            if (setup.mouseYInvert) lookAdd=-lookAdd;
+            if (Math.abs(lookAdd)>this.MAX_LOOK_SPEED) lookAdd=this.MAX_LOOK_SPEED*Math.sign(lookAdd);
+            
+            if (lookAdd!==0) {
+                this.angle.x+=lookAdd;
+                if (this.angle.x<-this.MAX_LOOK_ANGLE) this.angle.x=-this.MAX_LOOK_ANGLE;
+                if (this.angle.x>=this.MAX_LOOK_ANGLE) this.angle.x=this.MAX_LOOK_ANGLE;
+            }
+        }
+
+        this.movement.z=Math.trunc(((moveForward?this.MOVE_SPEED:0)+(moveBackward?-this.MOVE_SPEED:0))*moveFactor);
+        this.movement.x=Math.trunc(((moveLeft?this.SIDE_SPEED:0)+(moveRight?-this.SIDE_SPEED:0))*moveFactor);
+        this.movement.y=0;
+
+        this.movement.rotateX(null,this.angle.x);     // if flying or swimming, add in the X rotation
+        this.movement.rotateY(null,this.angle.y);
+
+        this.position.addPoint(this.movement);
+    }
+    
+        //
+        // developer on/off
+        //
+    
+    playerToDeveloper()
+    {
+        let player=this.core.map.entityList.getPlayer();
+        
+        this.position.setFromPoint(player.position);
+        this.position.y+=player.eyeOffset;
+        this.angle.setFromPoint(player.angle);
+    }
+    
+    developerToPlayer()
+    {
+        let player=this.core.map.entityList.getPlayer();
+        
+        player.position.setFromPoint(this.position);
+        player.position.y-=player.eyeOffset;
+        player.angle.setFromPoint(this.angle);
+    }
+    
+        //
+        // interface output
+        //
+        
+    clearInterfaceOutput()
+    {
+        this.core.interface.updateText('wsMeshCount','');
+        this.core.interface.updateText('wsTrigCount','');
+        this.core.interface.updateText('wsModelCount','');
+        this.core.interface.updateText('wsEffectCount','');
+        
+        this.core.interface.updateText('wsPosition','');
+        this.core.interface.updateText('wsAngle','');
+        this.core.interface.updateText('wsNode','');
+        this.core.interface.updateText('wsMesh','');
+    }
+    
+    setInterfaceOutput()
+    {
+        let n,nodeIdx,str;
+        
+            // draw counts
+            
+        this.core.interface.updateText('wsMeshCount',('mesh:'+this.core.drawMeshCount));
+        this.core.interface.updateText('wsTrigCount',('trig:'+this.core.drawTrigCount));
+        this.core.interface.updateText('wsModelCount',('model:'+this.core.drawModelCount));
+        this.core.interface.updateText('wsEffectCount',('effect:'+this.core.drawEffectCount));
+        
+            // world info
+            
+        this.core.interface.updateText('wsPosition',('pos:'+this.position.toDisplayString()));
+        this.core.interface.updateText('wsAngle',('ang:'+this.angle.toDisplayString()));
+        
+        let xBound=new BoundClass((this.position.x-this.CONTACT_MESH_RADIUS),(this.position.x+this.CONTACT_MESH_RADIUS));
+        let yBound=new BoundClass((this.position.y-this.CONTACT_MESH_RADIUS),(this.position.y+this.CONTACT_MESH_RADIUS));
+        let zBound=new BoundClass((this.position.z-this.CONTACT_MESH_RADIUS),(this.position.z+this.CONTACT_MESH_RADIUS));
+        
+        nodeIdx=this.findNearestPathNode(this.NEAR_PATH_NODE_DISTANCE);
+        if (nodeIdx===-1) {
+            this.core.interface.updateText('wsNode','');
+        }
+        else {
+            this.core.interface.updateText('wsNode',nodeIdx);
+        }
+            
+        str='';
+
+        for (n=0;n!==this.core.map.meshList.meshes.length;n++) {
+            if (this.core.map.meshList.meshes[n].boxBoundCollision(xBound,yBound,zBound)) {
+                if (str!=='') str+='|';
+                str+=this.core.map.meshList.meshes[n].name;
+            }
+        }
+        
+        if (str==='') {
+            this.core.interface.updateText('wsMesh','');
+        }
+        else {
+            this.core.interface.updateText('wsMesh',str);
+        }
+    }
 
         //
         // mainline
@@ -273,7 +465,8 @@ export default class DeveloperClass
         let fpsStr=this.core.fps.toString();
         let input=this.core.input;
         
-            // debug output
+            // developer output
+            // always do fps, only others if in developer mode
             
         idx=fpsStr.indexOf('.');
         if (idx===-1) {
@@ -283,11 +476,39 @@ export default class DeveloperClass
             fpsStr=fpsStr.substring(0,(idx+3));
         }
         
-        this.core.interface.updateText('fps',fpsStr);
-        this.core.interface.updateText('meshCount',('mesh:'+this.core.drawMeshCount));
-        this.core.interface.updateText('trigCount',('trig:'+this.core.drawTrigCount));
-        this.core.interface.updateText('modelCount',('model:'+this.core.drawModelCount));
-        this.core.interface.updateText('effectCount',('effect:'+this.core.drawEffectCount));
+        this.core.interface.updateText('wsFPS',fpsStr);
+        if (this.on) this.setInterfaceOutput();
+        
+            // can run any developer mode is network game
+            
+        if ((this.core.isMultiplayer) && (!this.core.setup.localGame)) return;
+        
+            // turn on/off developer mode
+            
+            // if going into developer mode, put developer
+            // mode position at player, and vice-versa, and
+            // reset all the entities
+            
+        if (input.isKeyDownAndClear('PageUp')) {
+            if (this.on) {
+                this.on=false;
+                this.developerToPlayer();
+                this.clearInterfaceOutput();
+                console.info('developer mode: off');
+            }
+            else {
+                this.on=true;
+                this.playerToDeveloper();
+                console.info('developer mode: on');
+            }
+        }
+        
+            // if in developer mode, we can move
+            // the player
+            
+        if (this.on) this.move();
+
+        return;
         
             // backspace prints out position info
             
@@ -296,32 +517,12 @@ export default class DeveloperClass
             return;
         }
         
-            // - for no clip
-            
-        if (input.isKeyDownAndClear('-')) {
-            this.playerNoClip=!this.playerNoClip;
-            console.info('player no clip='+this.playerNoClip);
-        }
-        
-            // = for fly
-        
-        if (input.isKeyDownAndClear('=')) {
-            this.playerFly=!this.playerFly;
-            console.info('player fly='+this.playerFly);
-        }
-        
-            // insert turns on freeze
-            
-        if (input.isKeyDownAndClear('Insert')) {
-            this.freezeBotMonsters=!this.freezeBotMonsters;
-            console.info('monster/bot freeze='+this.freezeBotMonsters);
-        }            
         
             // delete turns on path editor
             
         if (input.isKeyDownAndClear('Delete')) {
-            this.paths=!this.paths;
-            console.info('path editor='+this.paths);
+            //this.paths=!this.paths;
+            //console.info('path editor='+this.paths);
             
             if (this.paths) {
                 console.info('u add key to nearest node');
@@ -334,36 +535,11 @@ export default class DeveloperClass
             }
         }
         
-            // end turns on entity bounds
-            
-        if (input.isKeyDownAndClear('End')) {
-            this.entityBounds=!this.entityBounds;
-            console.info('draw entity bounds='+this.entityBounds);
-        }
         
-            // page down turns on entity skeletons
         
-        if (input.isKeyDownAndClear('PageDown')) {
-            this.skeletons=!this.skeletons;
-            console.info('draw entity skeletons='+this.skeletons);
-        }
-        
-            // page up turns on collision surfaces
-            
-        if (input.isKeyDownAndClear('PageUp')) {
-            this.collisionSurfaces=!this.collisionSurfaces;
-            console.info('draw collision surfaces='+this.collisionSurfaces);
-        }
-        
-            // home turns off damage
-            
-        if (input.isKeyDownAndClear('Home')) {
-            this.playerNoDamage=!this.playerNoDamage;
-            console.info('no damage='+this.playerNoDamage);
-        }
         
             // path editing
             
-        if (this.paths) this.pathEditor();
+        //if (this.paths) this.pathEditor();
     }
 }

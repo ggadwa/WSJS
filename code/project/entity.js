@@ -42,6 +42,7 @@ export default class EntityClass
         this.show=true;
         this.heldBy=null;
         this.fighter=false;
+        this.canPickup=false;
         this.pickup=false;
         this.spawnedBy=null;
         this.markDelete=false;
@@ -341,66 +342,6 @@ export default class EntityClass
     addEffect(spawnedByEntity,jsonName,position,data,show)
     {
         return(this.core.map.effectList.add(spawnedByEntity,jsonName,position,data,show));
-    }
-    
-        //
-        // interface utilities
-        //
-        
-    addInterfaceElement(id,colorURL,width,height,positionMode,positionOffset,color,alpha)
-    {
-        let bitmap=this.core.bitmapList.get(colorURL);
-        if (bitmap===null) {
-            console.log('Missing bitmap to add to interface: '+colorURL);
-            return;
-        }
-                    
-        this.core.interface.addElement(id,bitmap,width,height,positionMode,positionOffset,color,alpha);
-    }
-    
-    showInterfaceElement(id,show)
-    {
-        this.core.interface.showElement(id,show);
-    }
-    
-    pulseInterfaceElement(id,tick,expand)
-    {
-        this.core.interface.pulseElement(id,tick,expand);
-    }
-    
-    addInterfaceText(id,text,positionMode,positionOffset,fontSize,align,color,alpha)
-    {
-        this.core.interface.addText(id,text,positionMode,positionOffset,fontSize,align,color,alpha);
-    }
-    
-    removeInterfaceText(id)
-    {
-        this.core.interface.removeText(id);
-    }
-    
-    showInterfaceText(id,show)
-    {
-        this.core.interface.showText(id,show);
-    }
-    
-    updateInterfaceText(id,str)
-    {
-        this.core.interface.updateText(id,str);
-    }
-    
-    updateInterfaceTemporaryText(id,str,tick)
-    {
-        this.core.interface.updateTemporaryText(id,str,tick);
-    }
-    
-    getInterfaceWidth()
-    {
-        return(this.core.wid);
-    }
-    
-    getInterfaceHeight()
-    {
-        return(this.core.high);
     }
     
         //
@@ -1167,8 +1108,14 @@ export default class EntityClass
             // call the draw setup and
             // then if returns true, run the animation
             
-        if (!this.drawSetup()) return;        
-        this.modelEntityAlter.runAnimation();
+        if (!this.drawSetup()) return;
+        
+        if (!this.core.game.developer.on) {
+            this.modelEntityAlter.runAnimation();
+        }
+        else {
+            this.modelEntityAlter.runAninimationDeveloper();
+        }
         
             // draw the model
             

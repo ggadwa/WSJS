@@ -300,7 +300,10 @@ export default class EntityKartPlayerClass extends EntityClass
         
         if (fire) {
             if (this.currentWeaponIdx!==-1) {
-                this.weapons[this.currentWeaponIdx].firePrimary();
+                this.firePosition.setFromPoint(this.position);
+                this.firePosition.y+=Math.trunc(this.height*0.25);
+
+                this.weapons[this.currentWeaponIdx].firePrimary(this.firePosition,this.drawAngle);
              }
         }
         
@@ -361,11 +364,6 @@ export default class EntityKartPlayerClass extends EntityClass
             }
 
             this.rotMovement.setFromPoint(this.movement);
-            if (this.core.game.developer.playerFly) {
-                this.rotMovement.y=0;       // only Y movement comes from X angle rotation
-                this.rotMovement.rotateX(null,this.angle.x);
-                this.rotMovement.y*=0.5;
-            }
             this.rotMovement.rotateY(null,this.angle.y);
         }
                 
@@ -375,13 +373,8 @@ export default class EntityKartPlayerClass extends EntityClass
         
             // move around the map
         
-        if ((!this.core.game.developer.playerNoClip) || (!isPlayer)) {
-            this.movement.y=this.moveInMapY(this.rotMovement,1.0,false);
-            this.moveInMapXZ(this.rotMovement,true,true);
-        }
-        else {
-            this.position.addPoint(this.rotMovement);
-        }
+        this.movement.y=this.moveInMapY(this.rotMovement,1.0,false);
+        this.moveInMapXZ(this.rotMovement,true,true);
         
             // bounce and spin out if hit wall
             // we loose a star for this
@@ -536,7 +529,7 @@ export default class EntityKartPlayerClass extends EntityClass
     
     run()
     {
-        let x,y,turnAdd,lookAdd,fire;
+        let x,y,turnAdd,fire;
         let forward,reverse,drifting,brake,jump;
         let rate,textLap;
         let input=this.core.input;
@@ -559,25 +552,6 @@ export default class EntityKartPlayerClass extends EntityClass
             turnAdd=-(x*setup.mouseXSensitivity);
             turnAdd+=(turnAdd*setup.mouseXAcceleration);
             if (setup.mouseXInvert) turnAdd=-turnAdd;
-        }
-        
-            // looking (mostly for developer flying)
-        
-        if (this.core.game.developer.playerFly) {    
-            y=input.getMouseMoveY();
-            if (y!==0) {
-                lookAdd=y*setup.mouseYSensitivity;
-                lookAdd+=(lookAdd*setup.mouseYAcceleration);
-                if (setup.mouseYInvert) lookAdd=-lookAdd;
-                if (Math.abs(lookAdd)>this.MOUSE_MAX_LOOK_SPEED) lookAdd=this.MOUSE_MAX_LOOK_SPEED*Math.sign(lookAdd);
-
-                this.angle.x+=lookAdd;
-                if (this.angle.x<-this.MAX_LOOK_ANGLE) this.angle.x=-this.MAX_LOOK_ANGLE;
-                if (this.angle.x>=this.MAX_LOOK_ANGLE) this.angle.x=this.MAX_LOOK_ANGLE;
-            }
-        }
-        else {
-            this.angle.x=0;
         }
         
             // run the kart
@@ -611,12 +585,12 @@ export default class EntityKartPlayerClass extends EntityClass
             
         textLap=(this.lap===-1)?1:(this.lap+1);
             
-        this.updateInterfaceText('place',(this.place+1));
-        this.updateInterfaceText('lap',(textLap+'/3'));
-        this.updateInterfaceText('speed',this.movement.z);      // testing
+        this.core.interface.updateText('place',(this.place+1));
+        this.core.interface.updateText('lap',(textLap+'/3'));
+        this.core.interface.updateText('speed',this.movement.z);      // testing
         
         if ((this.place!==this.previousPlace) || (this.lap!==this.previousLap)) {
-            if ((this.previousPlace!==-1) && (this.previousLap!==-1)) this.pulseInterfaceElement('lap_background',500,10);
+            if ((this.previousPlace!==-1) && (this.previousLap!==-1)) this.core.interface.pulseElement('lap_background',500,10);
             this.previousPlace=this.place;
             this.previousLap=this.lap;
         }

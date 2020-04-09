@@ -1,6 +1,6 @@
 export default class InterfaceCountClass
 {
-    constructor(core,bitmap,maxCount,rect,addOffset,onColor,onAlpha,offColor,offAlpha)
+    constructor(core,bitmap,maxCount,rect,addOffset,onColor,onAlpha,offColor,offAlpha,developer)
     {
         this.core=core;
         
@@ -12,6 +12,7 @@ export default class InterfaceCountClass
         this.onAlpha=onAlpha;
         this.offColor=offColor;
         this.offAlpha=offAlpha;
+        this.developer=developer;
         
         this.count=maxCount;
         this.show=true;
@@ -108,7 +109,7 @@ export default class InterfaceCountClass
         
             // skip if not shown
             
-        if (!this.show) return;
+        if ((!this.show) || (this.core.game.developer.on!==this.developer)) return;
                 
             // setup the bitmap
             

@@ -1151,7 +1151,7 @@ export default class GenerateBitmapBaseClass
         let colorData=this.colorImgData.data;
         let normalData=this.normalImgData.data;
         
-        if ((y0<y1) && (y0<y2)) {
+        if ((y0<=y1) && (y0<=y2)) {
             ty=y0;
             tyX=x0;
             if (y1<y2) {
@@ -1168,7 +1168,7 @@ export default class GenerateBitmapBaseClass
             }
         }
         else {
-            if ((y1<y0) && (y1<y2)) {
+            if ((y1<=y0) && (y1<=y2)) {
                 ty=y1;
                 tyX=x1;
                 if (y0<y2) {

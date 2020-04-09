@@ -778,4 +778,9 @@ export default class PointClass
     {
         return('('+this.x+','+this.y+','+this.z+')');
     }
+    
+    toDisplayString()
+    {
+        return('('+Math.trunc(this.x)+','+Math.trunc(this.y)+','+Math.trunc(this.z)+')');
+    }
 }

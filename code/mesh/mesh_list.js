@@ -241,7 +241,7 @@ export default class MeshListClass
     {
         let n,k,mesh;
         let jointMatrixArray;
-        let currentBitmap,currentSkinIdx;
+        let currentBitmap,currentShadowmap,currentSkinIdx;
         let gl=this.core.gl;
         let nMesh=this.meshes.length;
         
@@ -279,6 +279,7 @@ export default class MeshListClass
 
         currentSkinIdx=-1;
         currentBitmap=null;
+        currentShadowmap=null;
         
             // draw the meshes
 
@@ -340,6 +341,13 @@ export default class MeshListClass
                 mesh.bitmap.attachAsTexture(this.shader);
             }
             
+            if (mesh.shadowmap!==null) {
+                if (mesh.shadowmap!==currentShadowmap) {
+                    currentShadowmap=mesh.shadowmap;
+                    mesh.shadowmap.attachAsSahdow(this.shader);
+                }
+            }
+            
                 // draw the mesh
 
             mesh.updateBuffers();
@@ -355,7 +363,7 @@ export default class MeshListClass
         // note this is not optimal and slow!
         //
         
-    debugDrawCollisionSurfaces()
+    drawCollisionSurfaces()
     {
         let k,mesh,wall,floor,ceiling;
         let idx,vertexCount;

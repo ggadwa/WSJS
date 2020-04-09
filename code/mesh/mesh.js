@@ -38,6 +38,10 @@ export default class MeshClass
         this.need32BitJointIndexes=false;
         if (this.jointArray!==null) this.need32BitJointIndexes=(this.jointArray.constructor.name==='Uint32Array');
         
+            // possible shadow map
+            
+        this.shadowmap=null;
+        
             // center and bounds
             
         this.center=new PointClass(0,0,0);

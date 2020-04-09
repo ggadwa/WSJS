@@ -1,4 +1,5 @@
 import MapMeshShaderClass from '../shader/map_mesh_shader.js';
+import MapMeshShadowShaderClass from '../shader/map_mesh_shadow_shader.js';
 import MapLiquidShaderClass from '../shader/map_liquid_shader.js';
 import SkyShaderClass from '../shader/sky_shader.js';
 import ModelMeshShaderClass from '../shader/model_mesh_shader.js';
@@ -19,6 +20,7 @@ export default class ShaderListClass
         this.core=core;
         
         this.mapMeshShader=null;
+        this.mapMeshShadowShader=null;
         this.mapLiquidShader=null;
         this.skyShader=null;
         this.modelMeshShader=null;
@@ -28,21 +30,17 @@ export default class ShaderListClass
         this.tintShader=null;
         this.textShader=null;
         
-        this.finalInitCallback=null;
-        
         Object.seal(this);
     }
     
         //
-        // load the shaders
-        // 
-        // this looks really messy because we have to do it all with callbacks,
-        // there isn't a asynch way to load the files
+        // initialize/release
         //
     
     initialize()
     {
         this.mapMeshShader=null;
+        this.mapMeshShadowShader=null;
         this.mapLiquidShader=null;
         this.skyShader=null;
         this.modelMeshShader=null;
@@ -57,6 +55,7 @@ export default class ShaderListClass
     release()
     {
         if (this.mapMeshShader!==null) this.mapMeshShader.release();
+        if (this.mapMeshShadowShader!==null) this.mapMeshShadowShader.release();
         if (this.mapLiquidShader!==null) this.mapLiquidShader.release();
         if (this.skyShader!==null) this.skyShader.release();
         if (this.modelMeshShader!==null) this.modelMeshShader.release();
@@ -76,6 +75,10 @@ export default class ShaderListClass
         this.mapMeshShader=new MapMeshShaderClass(this.core);
         this.mapMeshShader.initialize();
         if (!(await this.mapMeshShader.load())) return(false);
+        
+        this.mapMeshShadowShader=new MapMeshShadowShaderClass(this.core);
+        this.mapMeshShadowShader.initialize();
+        if (!(await this.mapMeshShadowShader.load())) return(false);
 
         this.mapLiquidShader=new MapLiquidShaderClass(this.core);
         this.mapLiquidShader.initialize();

@@ -3,7 +3,7 @@ import InterfaceClass from '../interface/interface.js';
 
 export default class InterfaceTextClass
 {
-    constructor(core,str,x,y,fontSize,align,color,alpha)
+    constructor(core,str,x,y,fontSize,align,color,alpha,developer)
     {
         this.TEXT_MAX_STRING_LEN=256;
 
@@ -19,6 +19,7 @@ export default class InterfaceTextClass
         this.align=align;
         this.color=color;
         this.alpha=alpha;
+        this.developer=developer;
         
         this.show=true;
         this.hideTick=-1;
@@ -223,7 +224,7 @@ export default class InterfaceTextClass
     
     draw()
     {
-        if (!this.show) return;
+        if ((!this.show) || (this.core.game.developer.on!==this.developer)) return;
         
             // check for temporary time out
          

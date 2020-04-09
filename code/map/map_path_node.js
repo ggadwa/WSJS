@@ -4,16 +4,16 @@
 
 export default class MapPathNodeClass
 {
-    constructor(nodeIdx,position,links,key,data)
+    constructor(nodeIdx,position,links,key,pathHints,data)
     {
         this.nodeIdx=nodeIdx;
         this.position=position;
         this.links=links;
         this.key=(key===undefined)?null:key;
+        this.pathHints=pathHints;
         this.data=(data===undefined)?null:data;
 
-        this.pathHints=null;
-        this.pathHintCounts=null;
+        this.pathHintCounts=null;   // used in pathHints construction
     }
     
         //
@@ -73,20 +73,20 @@ export default class MapPathNodeClass
         let count,linkPathCount,nodeHits;
         let nNode=nodes.length;
         
-        this.pathHints=new Uint16Array(nNode);
-        this.pathHintCounts=new Uint16Array(nNode);
+        this.pathHints=new Int16Array(nNode);
+        this.pathHintCounts=new Int16Array(nNode);
         
         for (n=0;n!==nNode;n++) {
             
                 // we only trace to nodes that
                 // have keys
-                
+    
             if (nodes[n].key===null) {
                 this.pathHints[n]=-1;
                 this.pathHintCounts[n]=0;
                 continue;
             }
-            
+
                 // path to itself
                 
             if (n===this.nodeIdx) {

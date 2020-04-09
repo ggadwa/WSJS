@@ -177,20 +177,18 @@ export default class EntityWeaponClass extends EntityClass
         // hit scans
         //
         
-    hitScan(parentEntity,fire)
+    hitScan(parentEntity,fire,firePosition,fireAngle)
     {
         let y;
         
-            // the hit scan, firing point is the eye
-            // and we rotate with the look and then turn
+            // the hit scan
           
-        this.firePoint.setFromPoint(parentEntity.position);
-        this.firePoint.y+=parentEntity.eyeOffset;
+        this.firePoint.setFromPoint(firePosition);
         
         this.fireVector.setFromValues(0,0,fire.distance);
-        this.fireVector.rotateX(null,parentEntity.angle.x);
+        this.fireVector.rotateX(null,fireAngle.x);
         
-        y=parentEntity.angle.y;
+        y=fireAngle.y;
         if (this.fireYSlop!==0) {
             y+=(this.fireYSlop-(Math.random()*(this.fireYSlop*2)));
             if (y<0) y=360+y;
@@ -224,7 +222,7 @@ export default class EntityWeaponClass extends EntityClass
         // projectiles
         //
         
-    projectile(parentEntity,fire)
+    projectile(parentEntity,fire,firePosition,fireAngle)
     {
         let y,projEntity;
         
@@ -232,9 +230,9 @@ export default class EntityWeaponClass extends EntityClass
             
         this.firePoint.setFromValues(0,0,fire.startRadius);
 
-        this.firePoint.rotateX(null,parentEntity.angle.x);
+        this.firePoint.rotateX(null,fireAngle.x);
         
-        y=parentEntity.angle.y;
+        y=fireAngle.y;
         if (this.fireYSlop!==0) {
             y+=(this.fireYSlop-(Math.random()*(this.fireYSlop*2)));
             if (y<0) y=360+y;
@@ -242,13 +240,12 @@ export default class EntityWeaponClass extends EntityClass
         }
         this.firePoint.rotateY(null,y);
 
-        this.firePoint.addPoint(parentEntity.position);
-        this.firePoint.y+=parentEntity.eyeOffset;
+        this.firePoint.addPoint(firePosition);
         
             // spawn from whatever is holding this weapon
             // so it counts as the spawnBy for any damage calculations, etc
 
-        projEntity=this.addEntity(parentEntity,fire.projectileJson,('projectile_'+this.name),this.firePoint,parentEntity.angle,null,true,false);
+        projEntity=this.addEntity(parentEntity,fire.projectileJson,('projectile_'+this.name),this.firePoint,fireAngle,null,true,false);
         if (projEntity!==null) projEntity.ready();
     }
     
@@ -256,7 +253,7 @@ export default class EntityWeaponClass extends EntityClass
         // fire for type
         //
         
-    fireForType(parentEntity,fire,fireAnimation)
+    fireForType(parentEntity,fire,fireAnimation,firePosition,fireAngle)
     {
         if (fire.ammo===0) return;
         
@@ -268,7 +265,7 @@ export default class EntityWeaponClass extends EntityClass
         fire.ammo--;
         fire.resetRegenerateAmmo();
         
-        fire.core.soundList.playJson(parentEntity.position,fire.sound);
+        fire.core.soundList.playJson(firePosition,fire.sound);
            
            // weapon animation
            
@@ -294,10 +291,10 @@ export default class EntityWeaponClass extends EntityClass
             
         switch (fire.type) {
             case this.FIRE_TYPE_HIT_SCAN:
-                this.hitScan(parentEntity,fire);
+                this.hitScan(parentEntity,fire,firePosition,fireAngle);
                 return;
             case this.FIRE_TYPE_PROJECTILE:
-                this.projectile(parentEntity,fire);
+                this.projectile(parentEntity,fire,firePosition,fireAngle);
                 return;
         }
     }
@@ -306,19 +303,19 @@ export default class EntityWeaponClass extends EntityClass
         // firing
         //
         
-    firePrimary()
+    firePrimary(firePosition,fireAngle)
     {
-        if (this.primary!==null) this.fireForType(this.heldBy,this.primary,this.parentPrimaryFireRunAnimation);
+        if (this.primary!==null) this.fireForType(this.heldBy,this.primary,this.parentPrimaryFireRunAnimation,firePosition,fireAngle);
     }
     
-    fireSecondary()
+    fireSecondary(firePosition,fireAngle)
     {
-        if (this.secondary!==null) this.fireForType(this.heldBy,this.secondary,this.parentSecondaryFireRunAnimation);
+        if (this.secondary!==null) this.fireForType(this.heldBy,this.secondary,this.parentSecondaryFireRunAnimation,firePosition,fireAngle);
     }
     
-    fireTertiary()
+    fireTertiary(firePosition,fireAngle)
     {
-        if (this.tertiary!==null) this.fireForType(this.heldBy,this.tertiary,this.parentTertiaryFireRunAnimation);
+        if (this.tertiary!==null) this.fireForType(this.heldBy,this.tertiary,this.parentTertiaryFireRunAnimation,firePosition,fireAngle);
     }
     
         //

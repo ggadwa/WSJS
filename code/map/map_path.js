@@ -22,8 +22,8 @@ export default class MapPathClass
     }
     
         //
-        // fixes any path links that aren't
-        // linked back from linking node
+        // some utility functions called after load
+        // to setup some path data for hints and keys
         //
         
     fixBrokenLinks()
@@ -40,13 +40,7 @@ export default class MapPathClass
         }
     }
     
-        //
-        // called after loading to build path hints,
-        // which are which link to follow from any node
-        // for the shortest path to another node
-        //
-        
-    buildPathHints()
+    preparePaths()
     {
         let n,node;
         
@@ -63,17 +57,37 @@ export default class MapPathClass
         for (n=0;n!==this.nodes.length;n++) {
             node=this.nodes[n];
             if (node.key!==null) this.keyNodes.push(n);
-            
-            node.buildPathHints(this.nodes);
         }
     }
     
         //
-        // draw the path for debug purposes
+        // builds the hints which shows which link
+        // to take to get to a key the fastest, this is
+        // usually called from the developer tools
+        //
+        
+    buildPathHints()
+    {
+        let n;
+        
+            // before we start, fix any links that
+            // that aren't followed back
+            
+        this.fixBrokenLinks();
+        
+            // now recurse for path hints
+        
+        for (n=0;n!==this.nodes.length;n++) {
+            this.nodes[n].buildPathHints(this.nodes);
+        }
+    }
+    
+        //
+        // draw the path for development purposes
         // note this is not optimal and slow!
         //
         
-    debugDrawPath()
+    drawPath()
     {
         let n,k,nNode,nLine,node,linkNode;
         let vertices,indexes,vIdx,iIdx,elementIdx;

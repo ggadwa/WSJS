@@ -147,4 +147,9 @@ export default class CameraClass
         this.angle.setFromPoint(entity.angle);
     }
     
+    setupDeveloper()
+    {
+        this.position.setFromPoint(this.core.game.developer.position);
+        this.angle.setFromPoint(this.core.game.developer.angle);
+    }
 }

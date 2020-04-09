@@ -454,17 +454,32 @@ export default class CoreClass
         let n;
         let light;
         let player=this.map.entityList.getPlayer();
+        let developerOn=this.game.developer.on;
          
             // everything overdraws except
             // clear the depth buffer
             
         this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
         
+            // if in developer, clear the background
+            // because we can float outside maps without
+            // skies
+          
+        if (developerOn) {
+            this.gl.clearColor(0.5,0.5,1,0);
+            this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+        }
+        
             // setup the view camera based on
             // the camera settings and the camera entity
             
-        this.camera.setup(player);
-
+        if (!developerOn) {
+            this.camera.setup(player);
+        }
+        else {
+            this.camera.setupDeveloper();
+        }
+        
             // create the perspective matrix
             // note this function has a translate in it for NEAR_Z
 
@@ -549,17 +564,13 @@ export default class CoreClass
             
         this.map.sky.draw();
 
-        if (!this.game.developer.collisionSurfaces) {
-            this.map.meshList.draw(null,false);
-            this.map.meshList.draw(null,true);
-        }
-        else {
-            this.map.meshList.debugDrawCollisionSurfaces();
-        }
+        this.map.meshList.draw(null,false);
+        this.map.meshList.draw(null,true);
+        // this.map.meshList.drawCollisionSurfaces();
 
             // path debugging
             
-        if (this.game.developer.paths) this.map.path.debugDrawPath();
+        if (developerOn) this.map.path.drawPath();
         
             // draw any non held entities
             
@@ -567,18 +578,21 @@ export default class CoreClass
         
             // liquids
             
-        if (!this.game.developer.collisionSurfaces) this.map.liquidList.draw();
+        this.map.liquidList.draw();
         
             // effects
             
-        if (!this.game.developer.collisionSurfaces) this.map.effectList.draw();
+        this.map.effectList.draw();
         
             // and finally held entities,
             // clearing the z buffer first
+            // (skip this if in developer)
             
-        this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
-        this.map.entityList.draw(player);
-
+        if (!developerOn) {
+            this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
+            this.map.entityList.draw(player);
+        }
+        
             // interface
             
         this.interface.draw();

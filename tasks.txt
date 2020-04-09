@@ -2,18 +2,18 @@
 
 - swipe up for grenade
 
-1 - vampire sparkle weapon doesn't hit player
-2 - auto generate paths/hints
+SHADOW MAPS
+ - no shadow UVs yet
+ - always shadow maps (just generate black, check ipad for limits)
+ - shadow map shader ignores lights in color calc, need light "in shadow map" trigger?  (again check iPad for limits)
 
 EDIT MODE
-  - path auto generate hints, part of JSON
-  - get rid of developer, need flag on game.json for edit mode
-  - goes directly to fly mode edit control
+  - bot need to disappear completely
+  - monsters need to all reset when going into developer mode
   - shoot ray to select spot (show mesh in box, color hit polygon?)
   - show effects, lights, monsters, paths
 
 - bots
-   - y targeting seems bad
    - they seem to continue to fight with the dead
    - extra weapon fires (needs config for how often it uses extra weapons)
 

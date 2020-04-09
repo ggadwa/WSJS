@@ -8,7 +8,7 @@ export default class EntityFPSBotClass extends EntityClass
         super(core,name,json,position,angle,data);
         
         this.fighter=true;
-        this.pickup=true;
+        this.canPickup=true;
         
         this.health=0;
         this.healthInitialCount=0;
@@ -99,6 +99,7 @@ export default class EntityFPSBotClass extends EntityClass
         this.lookVector=new PointClass(0,0,0);
         this.lookHitPoint=new PointClass(0,0,0);
         
+        this.firePosition=new PointClass(0,0,0);
         this.drawAngle=new PointClass(0,0,0);
     }
     
@@ -461,7 +462,7 @@ export default class EntityFPSBotClass extends EntityClass
 
     fireWeapon()
     {
-        let weapon;
+        let x,weapon;
         
             // are we turned enough towards player?
             
@@ -497,7 +498,10 @@ export default class EntityFPSBotClass extends EntityClass
         */
             // otherwise shot the held weapon
             
-        weapon=this.carouselWeapons[this.currentCarouselWeaponIdx].firePrimary();
+        this.firePosition.setFromPoint(this.position);
+        this.firePosition.y+=this.eyeOffset;
+            
+        weapon=this.carouselWeapons[this.currentCarouselWeaponIdx].firePrimary(this.firePosition,this.drawAngle);
     }
 
         //
@@ -509,10 +513,6 @@ export default class EntityFPSBotClass extends EntityClass
         let nodeIdx,prevNodeIdx,moveForward;
         let turnDiff,slideLeft,liquidIdx,gravityFactor,fallDist;
         let idleAnimation;
-        
-            // the developer freeze
-            
-        if (this.core.game.developer.freezeBotMonsters) return;
         
             // liquids
             

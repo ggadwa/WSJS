@@ -73,7 +73,7 @@ export default class EntityPickupClass extends EntityClass
         
             // can this entity pickup?
             
-        if (!this.touchEntity.pickup) return;
+        if (!this.touchEntity.canPickup) return;
         
             // pickup and run actions
             

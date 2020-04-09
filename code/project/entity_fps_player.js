@@ -10,7 +10,7 @@ export default class EntityFPSPlayerClass extends EntityClass
         super(core,name,json,position,angle,data);
         
         this.fighter=true;
-        this.pickup=true;
+        this.canPickup=true;
         
         this.health=0;
         this.healthInitialCount=0;
@@ -92,6 +92,7 @@ export default class EntityFPSPlayerClass extends EntityClass
             
         this.movement=new PointClass(0,0,0);
         this.rotMovement=new PointClass(0,0,0);
+        this.firePosition=new PointClass(0,0,0);
     }
         
     initialize()
@@ -452,19 +453,14 @@ export default class EntityFPSPlayerClass extends EntityClass
         
             // apply the damage
             
-        if (!this.core.game.developer.playerNoDamage) {
-            this.armor-=damage;
-            if (this.armor<0) {
-                if (this.interfaceHealthIcon!==null) this.core.interface.pulseElement(this.interfaceHealthIcon,500,5);
-                this.health+=this.armor;
-                this.armor=0;
-            }
-            else {
-                if (this.interfaceArmorIcon!==null) this.core.interface.pulseElement(this.interfaceArmorIcon,500,5);
-            }
+        this.armor-=damage;
+        if (this.armor<0) {
+            if (this.interfaceHealthIcon!==null) this.core.interface.pulseElement(this.interfaceHealthIcon,500,5);
+            this.health+=this.armor;
+            this.armor=0;
         }
         else {
-            if (this.interfaceHealthIcon!==null) this.core.interface.pulseElement(this.interfaceHealthIcon,500,5);
+            if (this.interfaceArmorIcon!==null) this.core.interface.pulseElement(this.interfaceArmorIcon,500,5);
         }
         
             // dead?
@@ -566,7 +562,7 @@ export default class EntityFPSPlayerClass extends EntityClass
         
             // falling
             
-        if ((this.standOnMeshIdx!==-1) && (liquidIdx===-1) && (!this.core.game.developer.playerFly)) {
+        if ((this.standOnMeshIdx!==-1) && (liquidIdx===-1)) {
             if (this.falling) {
                 this.falling=false;
                 fallDist=(this.fallStartY-this.position.y)-this.fallDamageMinDistance;
@@ -638,20 +634,23 @@ export default class EntityFPSPlayerClass extends EntityClass
         fireSecondary=input.mouseButtonFlags[1];
         fireTertiary=input.mouseButtonFlags[2];
         
+        this.firePosition.setFromPoint(this.position);
+        this.firePosition.y+=this.eyeOffset;
+        
         if (this.currentCarouselWeaponIdx!==-1) {
             weapon=this.carouselWeapons[this.currentCarouselWeaponIdx];
 
-            if (firePrimary) weapon.firePrimary();
-            if (fireSecondary) weapon.fireSecondary();
-            if (fireTertiary) weapon.fireTertiary();
+            if (firePrimary) weapon.firePrimary(this.firePosition,this.angle);
+            if (fireSecondary) weapon.fireSecondary(this.firePosition,this.angle);
+            if (fireTertiary) weapon.fireTertiary(this.firePosition,this.angle);
         }
         
         for (n=0;n<this.extraWeapons.length;n++) {
             weapon=this.extraWeapons[n];
             if (weapon.available) {
-                if (firePrimary) weapon.firePrimary();
-                if (fireSecondary) weapon.fireSecondary();
-                if (fireTertiary) weapon.fireTertiary();
+                if (firePrimary) weapon.firePrimary(this.firePosition,this.angle);
+                if (fireSecondary) weapon.fireSecondary(this.firePosition,this.angle);
+                if (fireTertiary) weapon.fireTertiary(this.firePosition,this.angle);
             }
         }
         
@@ -717,7 +716,7 @@ export default class EntityFPSPlayerClass extends EntityClass
             // jumping
            
         if (input.isKeyDown(' ')) {
-            if ((this.standOnMeshIdx!==-1) && (liquidIdx===-1) && (!this.core.game.developer.playerFly)) {
+            if ((this.standOnMeshIdx!==-1) && (liquidIdx===-1)) {
                 this.gravity=this.core.map.gravityMinValue;
                 this.movement.y=this.jumpHeight;
             }
@@ -732,39 +731,24 @@ export default class EntityFPSPlayerClass extends EntityClass
         
             // move
          
-        if (this.core.game.developer.playerFly) {
-            this.movement.moveZWithAcceleration(moveForward,moveBackward,this.flyAcceleration,this.flyDeceleration,this.flyMaxSpeed,this.flyAcceleration,this.flyDeceleration,this.flyMaxSpeed);
+        if (this.lastUnderLiquid) {
+            this.movement.moveZWithAcceleration(moveForward,moveBackward,this.swimAcceleration,this.swimDeceleration,this.swimMaxSpeed,this.swimAcceleration,this.swimDeceleration,this.swimMaxSpeed);
         }
         else {
-            if (this.lastUnderLiquid) {
-                this.movement.moveZWithAcceleration(moveForward,moveBackward,this.swimAcceleration,this.swimDeceleration,this.swimMaxSpeed,this.swimAcceleration,this.swimDeceleration,this.swimMaxSpeed);
-            }
-            else {
-                this.movement.moveZWithAcceleration(moveForward,moveBackward,this.forwardAcceleration,this.forwardDeceleration,this.forwardMaxSpeed,this.backwardAcceleration,this.backwardDeceleration,this.backwardMaxSpeed);
-            }
+            this.movement.moveZWithAcceleration(moveForward,moveBackward,this.forwardAcceleration,this.forwardDeceleration,this.forwardMaxSpeed,this.backwardAcceleration,this.backwardDeceleration,this.backwardMaxSpeed);
         }
+
         this.movement.moveXWithAcceleration(moveLeft,moveRight,this.sideAcceleration,this.sideDeceleration,this.sideMaxSpeed,this.sideAcceleration,this.sideDeceleration,this.sideMaxSpeed);
         
         this.rotMovement.setFromPoint(this.movement);
-        if ((this.core.game.developer.playerFly) || (this.lastUnderLiquid)) {
+        if (this.lastUnderLiquid) {
             this.rotMovement.y=0;       // only Y movement comes from X angle rotation
             this.rotMovement.rotateX(null,this.angle.x);     // if flying or swimming, add in the X rotation
         }
         this.rotMovement.rotateY(null,this.angle.y);
 
-            // if no clipping is on then
-            // just move directly through map
-            
-        if (this.core.game.developer.playerNoClip) {
-            this.position.addPoint(this.rotMovement);
-        }
-
-            // move around the map
-        
-        else {
-            this.movement.y=this.moveInMapY(this.rotMovement,gravityFactor,this.core.game.developer.playerFly);
-            this.moveInMapXZ(this.rotMovement,bump,true);
-        }
+        this.movement.y=this.moveInMapY(this.rotMovement,gravityFactor,false);
+        this.moveInMapXZ(this.rotMovement,bump,true);
 
             // camera swap button
             

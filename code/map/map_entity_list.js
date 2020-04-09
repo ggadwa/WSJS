@@ -319,6 +319,11 @@ export default class MapEntityListClass
     {
         let entity;
         
+            // entities are stalled
+            // when developer is on
+            
+        if (this.core.game.developer.on) return;
+        
             // run the entities
             
         for (entity of this.entities) {

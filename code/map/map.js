@@ -47,7 +47,7 @@ export default class MapClass
 
     initialize()
     {
-        if (!this.meshList.initialize(this.core.shaderList.mapMeshShader)) return(false);
+        if (!this.meshList.initialize(this.json.shadowmap?this.core.shaderList.mapMeshShadowShader:this.core.shaderList.mapMeshShader)) return(false);
         if (!this.liquidList.initialize()) return(false);
         if (!this.lightList.initialize()) return(false);
         if (!this.entityList.initialize()) return(false);

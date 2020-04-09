@@ -350,6 +350,43 @@ export default class ModelEntityAlterClass
         }
     }
     
+    setupNoPoseNodes()
+    {
+        let n;
+        let channels,channel,node;
+        
+            // for no pose, just get the very first animation
+            // and stick to that pose
+            
+        if (this.entity.model.skeleton.animations.length===0) return;
+        channels=this.entity.model.skeleton.animations[0].channels;
+        
+            // each channel changes one node over time
+            
+        for (n=0;n!==channels.length;n++) {
+            channel=channels[n];
+            node=this.nodes[channel.nodeIdx];
+            
+                // calculate the pose
+                
+            channel.getPoseDataForTick(0,this.currentAnimationData);
+            
+                // change the node
+            
+            switch (channel.trsType) {
+                case channel.TRS_TYPE_TRANSLATION:
+                    node.poseTranslation.setFromValues(this.currentAnimationData[0],this.currentAnimationData[1],this.currentAnimationData[2]);
+                    break;
+                case channel.TRS_TYPE_ROTATION:
+                    node.poseRotation.setFromValues(this.currentAnimationData[0],this.currentAnimationData[1],this.currentAnimationData[2],this.currentAnimationData[3]);
+                    break;
+                case channel.TRS_TYPE_SCALE:
+                    node.poseScale.setFromValues(this.currentAnimationData[0],this.currentAnimationData[1],this.currentAnimationData[2]);
+                    break;
+            }
+        }
+    }
+    
     runAnimation()
     {
             // if we are running an animation, then
@@ -369,6 +406,9 @@ export default class ModelEntityAlterClass
             
             this.setupNodesToPose();
         }
+        else {
+            this.setupNoPoseNodes();
+        }
         
             // callback for any custom bone setup
             
@@ -377,6 +417,12 @@ export default class ModelEntityAlterClass
             // now cumulative all the nodes for
             // their matrixes
  
+        this.runAnimationNode(this.nodes[0],null);
+    }
+    
+    runAninimationDeveloper()
+    {
+        this.setupNoPoseNodes();
         this.runAnimationNode(this.nodes[0],null);
     }
     
@@ -511,11 +557,11 @@ export default class ModelEntityAlterClass
     }
         
         //
-        // draw the skeleton for debug purposes
+        // draw the skeleton for development
         // note this is not optimal and slow!
         //
         
-    debugDrawSkeleton()
+    drawSkeleton()
     {
         let n,nNode,node,parentNode;
         let vertices,indexes,vIdx,iIdx,elementIdx;
@@ -682,11 +728,11 @@ export default class ModelEntityAlterClass
     }
     
         //
-        // draw the entity bounds for debug purposes
+        // draw the entity bounds for developer mode
         // note this is not optimal and slow!
         //
         
-    debugDrawBounds()
+    drawBounds()
     {
         let n,rad;
         let vertices,indexes,vIdx,iIdx;
@@ -758,7 +804,7 @@ export default class ModelEntityAlterClass
         
             // always draw it, no matter what
             
-        gl.disable(gl.DEPTH_TEST);
+        //gl.disable(gl.DEPTH_TEST);
 
             // draw the lines
             
@@ -775,7 +821,7 @@ export default class ModelEntityAlterClass
         
             // re-enable depth
             
-        gl.enable(gl.DEPTH_TEST);
+       // gl.enable(gl.DEPTH_TEST);
         
             // tear down the buffers
             

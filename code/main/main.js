@@ -2,6 +2,7 @@ import PointClass from '../utility/point.js';
 import CoreClass from '../main/core.js';
 import GameClass from '../project/game.js';
 import MapClass from '../map/map.js';
+import ShadowmapGeneratorClass from '../light/shadow_map.js';
 
 //
 // main class
@@ -171,9 +172,31 @@ class MainClass
         if (!(await this.core.bitmapList.loadAllBitmaps())) return;
         
         this.core.loadingScreenUpdate();
+
+        if (this.core.map.json.shadowmap) {
+            this.core.loadingScreenAddString('Creating Shadowmap');
+            setTimeout(this.initCreateShadowmap.bind(this),1);
+        }
+        else {
+            this.core.loadingScreenAddString('Creating Entities');
+            setTimeout(this.initLoadEntities.bind(this),1);
+        }
+        
+        this.core.loadingScreenDraw();
+    }
+    
+    initCreateShadowmap()       // supergumba -- this is just testing
+    {
+        let sm=new ShadowmapGeneratorClass(this.core,this.initCreateShadowmapFinish.bind(this));
+        sm.create();
+    }
+    
+    initCreateShadowmapFinish()
+    {
+        this.core.loadingScreenUpdate();
         this.core.loadingScreenAddString('Creating Entities');
         this.core.loadingScreenDraw();
-
+        
         setTimeout(this.initLoadEntities.bind(this),1);
     }
     

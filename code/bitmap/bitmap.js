@@ -683,6 +683,14 @@ export default class BitmapClass
         gl.bindTexture(gl.TEXTURE_2D,this.texture);
     }
     
+    attachAsShadow(shader)
+    {
+        let gl=this.core.gl;
+        
+        gl.activeTexture(gl.TEXTURE5);
+        gl.bindTexture(gl.TEXTURE_2D,this.texture);
+    }
+    
     attachAsLiquid(shader)
     {
         let gl=this.core.gl;
