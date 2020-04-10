@@ -102,7 +102,8 @@ void main(void)
 
         // finally create the pixel
 
-    outputPixel.rgb=((tex.rgb*lightCol)+spec)+(texture(glowTex,fragUV).rgb*glowFactor);
+    //outputPixel.rgb=((tex.rgb*lightCol)+spec)+(texture(glowTex,fragUV).rgb*glowFactor);
+    outputPixel.rgb=texture(shadowTex,shadowUV).rgb;
     outputPixel.a=1.0;
 
         // any masking pixel discards

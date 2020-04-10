@@ -4,7 +4,7 @@ in highp vec3 vertexPosition;
 in highp vec3 vertexNormal;
 in highp vec3 vertexTangent;
 in highp vec2 vertexUV;
-in highp vec3 vertexShadowUV;
+in highp vec2 vertexUVShadow;
 
 uniform highp mat4 perspectiveMatrix;
 uniform highp mat4 viewMatrix;
@@ -32,9 +32,9 @@ void main(void)
     eyeVector.y=dot(-eyePosition,tangentSpaceBinormal);
     eyeVector.z=dot(-eyePosition,tangentSpaceNormal);
 
-        // the varying uv
+        // the varying uvs
 
     fragUV=vertexUV;
-    shadowUV=vertexShadowUV;
+    shadowUV=vertexUVShadow;
 }
 

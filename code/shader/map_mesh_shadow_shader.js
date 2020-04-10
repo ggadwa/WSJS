@@ -20,7 +20,7 @@ export default class MapMeshShadowShaderClass extends ShaderClass
         this.vertexNormalAttribute=null;
         this.vertexTangentAttribute=null;    
         this.vertexUVAttribute=null;
-        this.vertexShadowUVAttribute=null;
+        this.vertexUVShadowAttribute=null;
         this.vertexJointAttribute=null;         // unused in map mesh shader
         this.vertexWeightAttribute=null;        // unused in map mesh shader
 
@@ -56,8 +56,8 @@ export default class MapMeshShadowShaderClass extends ShaderClass
         this.vertexNormalAttribute=gl.getAttribLocation(this.program,'vertexNormal');
         this.vertexTangentAttribute=gl.getAttribLocation(this.program,'vertexTangent');
         this.vertexUVAttribute=gl.getAttribLocation(this.program,'vertexUV');
-        this.vertexShadowUVAttribute=gl.getAttribLocation(this.program,'vertexShadowUV');
-
+        this.vertexUVShadowAttribute=gl.getAttribLocation(this.program,'vertexUVShadow');
+        
         this.perspectiveMatrixUniform=gl.getUniformLocation(this.program,'perspectiveMatrix');
         this.viewMatrixUniform=gl.getUniformLocation(this.program,'viewMatrix');
         this.normalMatrixUniform=gl.getUniformLocation(this.program,'normalMatrix');
@@ -141,7 +141,7 @@ export default class MapMeshShadowShaderClass extends ShaderClass
         gl.enableVertexAttribArray(this.vertexNormalAttribute);
         gl.enableVertexAttribArray(this.vertexTangentAttribute);
         gl.enableVertexAttribArray(this.vertexUVAttribute);
-        gl.enableVertexAttribArray(this.vertexShadowUVAttribute);
+        gl.enableVertexAttribArray(this.vertexUVShadowAttribute);
     }
 
     drawEnd()
@@ -154,7 +154,7 @@ export default class MapMeshShadowShaderClass extends ShaderClass
         gl.disableVertexAttribArray(this.vertexNormalAttribute);
         gl.disableVertexAttribArray(this.vertexTangentAttribute);
         gl.disableVertexAttribArray(this.vertexUVAttribute);
-        gl.disableVertexAttribArray(this.vertexShadowUVAttribute);
+        gl.disableVertexAttribArray(this.vertexUVShadowAttribute);
 
             // no longer using shader
 

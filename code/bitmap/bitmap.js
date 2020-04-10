@@ -9,6 +9,7 @@ export default class BitmapClass
         this.BITMAP_INTERFACE_URL=2;        // this is an interface bitmap, so no mipmaps, etc
         this.BITMAP_COLOR=3;                // bitmap is just an RGB color
         this.BITMAP_GENERATED=4;            // bitmap is generated
+        this.BITMAP_SHADOW=5;               // shadowmap bitmap
     
         this.NORMAL_MAX_SHIFT=31;
         this.NORMAL_NO_SHIFT_CLAMP=0.7;
@@ -132,6 +133,20 @@ export default class BitmapClass
         this.glowFrequency=glowFrequency;
         this.glowMin=glowMin;
         this.glowMax=glowMax;
+        
+        this.buildSimpleName();
+    }
+    
+    initializeShadowmap(colorURL,colorBase)
+    {
+        this.bitmapType=this.BITMAP_SHADOW;
+        
+        this.colorURL=colorURL;
+        this.colorBase=colorBase;
+        this.normalURL=null;
+        this.specularURL=null;
+        this.specularFactor=new ColorClass(this.DEFAULT_SPECULAR,this.DEFAULT_SPECULAR,this.DEFAULT_SPECULAR);
+        this.scale=null;
         
         this.buildSimpleName();
     }
@@ -420,7 +435,7 @@ export default class BitmapClass
             // are created if missing.  This can be built from
             // loading or a file or a base color
         
-        if (this.bitmapType!==this.BITMAP_GENERATED) {
+        if ((this.bitmapType!==this.BITMAP_GENERATED) && (this.bitmapType!==this.BITMAP_SHADOW)) {
             
             if (this.bitmapType===this.BITMAP_COLOR) {
                 this.colorImage=this.createSolidColorImage(Math.trunc(this.colorBase.r*255),Math.trunc(this.colorBase.g*255),Math.trunc(this.colorBase.b*255));
@@ -476,7 +491,7 @@ export default class BitmapClass
             // simple, interface, or color bitmaps exit here
             // as they have no other elements like normals, etc
             
-        if ((this.bitmapType===this.BITMAP_SIMPLE_URL) || (this.bitmapType===this.BITMAP_INTERFACE_URL)) {
+        if ((this.bitmapType===this.BITMAP_SIMPLE_URL) || (this.bitmapType===this.BITMAP_INTERFACE_URL) || (this.bitmapType===this.BITMAP_SHADOW)) {
             this.loaded=true;
             return(true);
         }

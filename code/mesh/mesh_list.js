@@ -344,7 +344,7 @@ export default class MeshListClass
             if (mesh.shadowmap!==null) {
                 if (mesh.shadowmap!==currentShadowmap) {
                     currentShadowmap=mesh.shadowmap;
-                    mesh.shadowmap.attachAsSahdow(this.shader);
+                    mesh.shadowmap.attachAsShadow(this.shader);
                 }
             }
             

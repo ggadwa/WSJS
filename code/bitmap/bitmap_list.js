@@ -110,7 +110,7 @@ export default class BitmapListClass
     addInterface(colorURL)
     {
         let bitmap;
-            
+        
             // already in list?
             
         if (colorURL===null) return(null);  // can come from a json
@@ -155,6 +155,23 @@ export default class BitmapListClass
                     
         bitmap=new BitmapClass(this.core);
         bitmap.initializeGenerated(colorURL,colorImage,normalImage,specularImage,specularFactor,glowImage,glowFrequency,glowMin,glowMax);
+        this.bitmaps.set(colorURL,bitmap);
+        
+        return(bitmap);
+    }
+    
+    addShadowmap(colorImage)
+    {
+        let bitmap;
+        let colorURL;
+                
+        colorURL='_shadow_'+this.generatedUniqueId;
+        this.generatedUniqueId++;
+        
+            // add bitmap to list
+                    
+        bitmap=new BitmapClass(this.core);
+        bitmap.initializeShadowmap(colorURL,colorImage);
         this.bitmaps.set(colorURL,bitmap);
         
         return(bitmap);

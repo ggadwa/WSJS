@@ -277,7 +277,7 @@ export default class GenerateMapClass
         
             // see the random number generator
             
-        seed=(json.autoGenerate.randomSeed===undefined)?Date.now():json.autoGenerate.randomSeed;
+        seed=1586467253050; //(json.autoGenerate.randomSeed===undefined)?Date.now():json.autoGenerate.randomSeed;
         console.info('Random Seed: '+seed);
         
         this.core.setRandomSeed(seed);
@@ -302,7 +302,6 @@ export default class GenerateMapClass
             // other rooms start outside of center
             // room and gravity brings them in until they connect
         
-        roomCount=this.core.randomInt(10,10);
         failCount=25;
         
         while ((rooms.length<roomCount) && (failCount>0)) {

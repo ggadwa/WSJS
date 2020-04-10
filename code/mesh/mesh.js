@@ -27,6 +27,8 @@ export default class MeshClass
         this.weightArray=weightArray;       // expected Float32Array or null (when not used)
         this.indexArray=indexArray;         // expected Uint16/32Array
         
+        this.uvShadowArray=null;
+        
         this.vertexCount=this.vertexArray.length;
         this.indexCount=this.indexArray.length;
         this.trigCount=Math.trunc(this.indexCount/3);
@@ -59,6 +61,7 @@ export default class MeshClass
         this.normalBuffer=null;
         this.tangentBuffer=null;
         this.uvBuffer=null;
+        this.uvShadowBuffer=null;
         this.jointBuffer=null;
         this.weightBuffer=null;
         this.indexBuffer=null;
@@ -112,6 +115,7 @@ export default class MeshClass
         if (this.normalBuffer!==null) gl.deleteBuffer(this.normalBuffer);
         if (this.tangentBuffer!==null) gl.deleteBuffer(this.tangentBuffer);
         if (this.uvBuffer!==null) gl.deleteBuffer(this.uvBuffer);
+        if (this.uvShadowBuffer!==null) gl.deleteBuffer(this.uvShadowBuffer);
 
         if (this.indexBuffer!==null) gl.deleteBuffer(this.indexBuffer);
     }
@@ -506,6 +510,12 @@ export default class MeshClass
         gl.bindBuffer(gl.ARRAY_BUFFER,this.uvBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,this.uvArray,gl.STATIC_DRAW);
         
+        if (this.shadowmap!==null) {
+            this.uvShadowBuffer=gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER,this.uvShadowBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER,this.uvShadowArray,gl.STATIC_DRAW);
+        }
+        
         if (this.jointArray!==null) {
             this.jointBuffer=gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER,this.jointBuffer);
@@ -536,6 +546,11 @@ export default class MeshClass
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.uvBuffer);
         gl.vertexAttribPointer(shader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
+        
+        if (this.shadowmap!==null) {
+            gl.bindBuffer(gl.ARRAY_BUFFER,this.uvShadowBuffer);
+            gl.vertexAttribPointer(shader.vertexUVShadowAttribute,2,gl.FLOAT,false,0,0);
+        }
         
             // any rigging if available
             

@@ -6,6 +6,7 @@ SHADOW MAPS
  - no shadow UVs yet
  - always shadow maps (just generate black, check ipad for limits)
  - shadow map shader ignores lights in color calc, need light "in shadow map" trigger?  (again check iPad for limits)
+ - get rid of BITMAP_GENERATED for shadow bitmaps when they are loaded
 
 EDIT MODE
   - bot need to disappear completely
