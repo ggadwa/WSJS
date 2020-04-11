@@ -277,7 +277,7 @@ export default class GenerateMapClass
         
             // see the random number generator
             
-        seed=1586467253050; //(json.autoGenerate.randomSeed===undefined)?Date.now():json.autoGenerate.randomSeed;
+        seed=1586578018977; // (json.autoGenerate.randomSeed===undefined)?Date.now():json.autoGenerate.randomSeed;
         console.info('Random Seed: '+seed);
         
         this.core.setRandomSeed(seed);

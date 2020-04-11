@@ -236,19 +236,6 @@ export default class ImportMapClass
             }
         }
         
-        if (json.decalBitmaps!==undefined) {
-            for (n=0;n!==json.decalBitmaps.length;n++) {
-                
-                bitmap=this.core.bitmapList.getSimpleName(json.decalBitmaps[n]);                
-                if (bitmap===null) {
-                    console.log('Missing bitmap to set as decal to: '+json.decalBitmaps[n]);
-                    return(false);
-                }
-                
-                this.core.map.meshList.setDecalsForBitmap(bitmap);
-            }
-        }
-        
         return(true);
     }
 }

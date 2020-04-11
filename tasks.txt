@@ -2,12 +2,14 @@
 
 - swipe up for grenade
 
-SHADOW MAPS
- - no shadow UVs yet
- - always shadow maps (just generate black, check ipad for limits)
- - shadow map shader ignores lights in color calc, need light "in shadow map" trigger?  (again check iPad for limits)
- - get rid of BITMAP_GENERATED for shadow bitmaps when they are loaded
 
+- have mesh mark which ones drew so they can be eliminated in shadow pass
+
+SHADOW MAPS
+ - put back in light blocker, light mesh collision list
+ - put back normal eliminations
+
+ 
 EDIT MODE
   - bot need to disappear completely
   - monsters need to all reset when going into developer mode

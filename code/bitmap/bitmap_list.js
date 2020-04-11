@@ -150,8 +150,7 @@ export default class BitmapListClass
         colorURL='_generated_'+this.generatedUniqueId;
         this.generatedUniqueId++;
         
-            // add bitmap to list, these will be loaded
-            // in a later call
+            // add bitmap to list
                     
         bitmap=new BitmapClass(this.core);
         bitmap.initializeGenerated(colorURL,colorImage,normalImage,specularImage,specularFactor,glowImage,glowFrequency,glowMin,glowMax);

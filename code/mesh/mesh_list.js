@@ -11,7 +11,6 @@ export default class MeshListClass
     constructor(core)
     {
         this.core=core;
-        this.shader=null;           // this will be attached later when initialized
 
         this.meshes=[];                     // the meshes themselves
         this.collisionMeshIndexList=[];     // a list of meshes that you can collide with (optimization)
@@ -33,10 +32,8 @@ export default class MeshListClass
         // initialize and release
         //
 
-    initialize(shader)
+    initialize()
     {
-        this.shader=shader;
-        
         return(true);
     }
 
@@ -146,15 +143,6 @@ export default class MeshListClass
         }
     }
     
-    setDecalsForBitmap(bitmap)
-    {
-        let mesh;
-        
-        for (mesh of this.meshes) {
-            if (mesh.bitmap.colorURL===bitmap.colorURL) mesh.decal=true;
-        }
-    }
-    
         //
         // check for mesh list collisions
         //
@@ -234,20 +222,142 @@ export default class MeshListClass
     }
     
         //
-        // draw meshes
+        // draw map
         //
 
-    draw(modelEntityAlter,decal)
+    drawMap()
     {
-        let n,k,mesh;
-        let jointMatrixArray;
-        let currentBitmap,currentShadowmap,currentSkinIdx;
+        let n,mesh;
+        let currentBitmap,currentSkinIdx;
         let gl=this.core.gl;
+        let shader=this.core.shaderList.mapMeshShader;
         let nMesh=this.meshes.length;
         
             // start the shader
         
-        this.shader.drawStart(decal);
+        shader.drawStart();
+        
+            // need to create the normal matrix, which
+            // is used to tranform normals into eye space
+            
+        this.normalMatrix.setInvertTransposeFromMat4(this.core.viewMatrix);
+        gl.uniformMatrix3fv(shader.normalMatrixUniform,false,this.normalMatrix.data);
+
+            // keep track of skin and bitmap
+            // changes to reduce state changes
+
+        currentSkinIdx=-1;
+        currentBitmap=null;
+        
+            // draw the meshes
+
+        for (n=0;n!==nMesh;n++) {
+            mesh=this.meshes[n];
+            
+                // map meshes cull against the view frustum
+                // on a per mesh basis
+            
+            if (!this.core.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) continue;
+            
+                // time to change bitmap
+
+            if (mesh.bitmap!==currentBitmap) {
+                currentBitmap=mesh.bitmap;
+                mesh.bitmap.attachAsTexture(shader);
+            }
+            
+                // draw the mesh
+                // meshes can flag buffers as updates
+                // for movement
+
+            mesh.updateBuffers();
+            mesh.bindMapBuffers(shader);
+            mesh.draw();
+        }
+        
+        shader.drawEnd();
+    }
+    
+        //
+        // draws map shadow pass
+        //
+        
+    drawMapShadow()
+    {
+        let n,mesh;
+        let currentShadowmap;
+        let gl=this.core.gl;
+        let shader=this.core.shaderList.mapMeshShadowShader;
+        let nMesh=this.meshes.length;
+
+            // shadows are drawn on a second pass
+            // so we need to blend
+            
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.DST_COLOR,gl.ZERO);     // multiply them together for final color
+        
+        gl.depthFunc(gl.LEQUAL);
+        gl.depthMask(false);
+
+            // start the shader
+        
+        shader.drawStart(false);
+
+            // keep track of bitmap
+            // changes to reduce state changes
+
+        currentShadowmap=null;
+        
+            // draw the meshes
+
+        for (n=0;n!==nMesh;n++) {
+            mesh=this.meshes[n];
+            
+                // regular map mesh culling
+                
+            if (!this.core.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) continue;
+            
+                // time to change bitmap
+
+            if (mesh.shadowmap!==currentShadowmap) {
+                currentShadowmap=mesh.shadowmap;
+                mesh.shadowmap.attachAsShadow(shader);
+            }
+            
+                // draw the mesh
+                // we don't need to update buffers as
+                // we already did that in the previous pass
+
+            mesh.bindMapShadowBuffers(shader);
+            mesh.drawShadow();
+        }
+        
+        shader.drawEnd();
+        
+            // restore the state
+            
+        gl.disable(gl.BLEND);
+        
+        gl.depthFunc(gl.LESS);
+        gl.depthMask(true);
+    }
+    
+        //
+        // draw model
+        //
+        
+    drawModel(modelEntityAlter)
+    {
+        let n,k,mesh;
+        let jointMatrixArray;
+        let currentBitmap,currentSkinIdx;
+        let gl=this.core.gl;
+        let shader=this.core.shaderList.modelMeshShader;
+        let nMesh=this.meshes.length;
+        
+            // start the shader
+        
+        shader.drawStart();
         
             // if a model then we use the model
             // matrix to position it, models don't
@@ -259,103 +369,65 @@ export default class MeshListClass
             // draw in the camera space, so we have to replace
             // the view here
             
-        if (modelEntityAlter!==null) {
-            gl.uniformMatrix4fv(this.shader.modelMatrixUniform,false,modelEntityAlter.modelMatrix.data);
-            if (modelEntityAlter.inCameraSpace) gl.uniformMatrix4fv(this.shader.viewMatrixUniform,false,this.core.cameraSpaceViewMatrix.data);
-        }
-        
-            // otherwise it's a map mesh, which is pre-positioned
-            // so we don't need a model matrix, but we
-            // need to create the normal matrix, which
-            // is used to tranform normals into eye space
-            
-        else {    
-            this.normalMatrix.setInvertTransposeFromMat4(this.core.viewMatrix);
-            gl.uniformMatrix3fv(this.shader.normalMatrixUniform,false,this.normalMatrix.data);
-        }
+        gl.uniformMatrix4fv(shader.modelMatrixUniform,false,modelEntityAlter.modelMatrix.data);
+        if (modelEntityAlter.inCameraSpace) gl.uniformMatrix4fv(shader.viewMatrixUniform,false,this.core.cameraSpaceViewMatrix.data);
 
             // keep track of skin and bitmap
             // changes to reduce state changes
 
         currentSkinIdx=-1;
         currentBitmap=null;
-        currentShadowmap=null;
         
             // draw the meshes
 
         for (n=0;n!==nMesh;n++) {
             mesh=this.meshes[n];
-            
-                // the decal flag, we use this to draw
-                // meshes that are decal and need to be pushed
-                // a bit closer to the camera
-                
-            if (mesh.decal!==decal) continue;
 
-                // if we are in a model (we have a model
-                // matrix) we have to deal with meshes that are
+                // if we are in a model we have to deal with meshes that are
                 // skinned and not skinned through some variables
                 // and setting or changing the joint skinning matrix
                 
-            if (modelEntityAlter!==null) {
-                
-                    // any hidden model meshes
-                    
-                if (modelEntityAlter.meshHideList[n]===1) continue;
-                
-                    // skinned
-                    
-                if (mesh.noSkinAttachedNodeIdx===-1) {
-                    gl.uniform1i(this.shader.noSkinUniform,0);
-                    
-                    if (currentSkinIdx!==mesh.skinIdx) {
-                        currentSkinIdx=mesh.skinIdx;
-                        
-                        jointMatrixArray=modelEntityAlter.getPoseJointMatrixArray(currentSkinIdx);
-                        for (k=0;k!==jointMatrixArray.length;k++) {
-                            gl.uniformMatrix4fv(this.shader.jointMatrixUniformArray[k],false,jointMatrixArray[k].data);
-                        }
+                // any hidden model meshes
+
+            if (modelEntityAlter.meshHideList[n]===1) continue;
+
+                // skinned
+
+            if (mesh.noSkinAttachedNodeIdx===-1) {
+                gl.uniform1i(shader.noSkinUniform,0);
+
+                if (currentSkinIdx!==mesh.skinIdx) {
+                    currentSkinIdx=mesh.skinIdx;
+
+                    jointMatrixArray=modelEntityAlter.getPoseJointMatrixArray(currentSkinIdx);
+                    for (k=0;k!==jointMatrixArray.length;k++) {
+                        gl.uniformMatrix4fv(shader.jointMatrixUniformArray[k],false,jointMatrixArray[k].data);
                     }
                 }
-                
-                    // not skinned
-                    
-                else {
-                    gl.uniform1i(this.shader.noSkinUniform,1);
-                    gl.uniformMatrix4fv(this.shader.noSkinAttachedNodeMatrixUniform,false,modelEntityAlter.getNodeCurrentPoseMatrix(mesh.noSkinAttachedNodeIdx).data);
-                }
             }
-            
-                // models cull as a single unit, but map meshes
-                // which are precalculated cull against the view frustum
-                // on a per mesh basis
-            
+
+                // not skinned
+
             else {
-                if (!this.core.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) continue;
+                gl.uniform1i(shader.noSkinUniform,1);
+                gl.uniformMatrix4fv(shader.noSkinAttachedNodeMatrixUniform,false,modelEntityAlter.getNodeCurrentPoseMatrix(mesh.noSkinAttachedNodeIdx).data);
             }
             
                 // time to change bitmap
 
             if (mesh.bitmap!==currentBitmap) {
                 currentBitmap=mesh.bitmap;
-                mesh.bitmap.attachAsTexture(this.shader);
-            }
-            
-            if (mesh.shadowmap!==null) {
-                if (mesh.shadowmap!==currentShadowmap) {
-                    currentShadowmap=mesh.shadowmap;
-                    mesh.shadowmap.attachAsShadow(this.shader);
-                }
+                mesh.bitmap.attachAsTexture(shader);
             }
             
                 // draw the mesh
+                // no updatebuffers here, that's only for maps
 
-            mesh.updateBuffers();
-            mesh.bindBuffers(this.shader);
+            mesh.bindModelBuffers(shader);
             mesh.draw();
         }
         
-        this.shader.drawEnd();
+        shader.drawEnd();
     }
     
         //

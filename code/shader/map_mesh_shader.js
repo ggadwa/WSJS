@@ -87,7 +87,7 @@ export default class MapMeshShaderClass extends ShaderClass
         // start/stop map shader drawing
         //
 
-    drawStart(decal)
+    drawStart()
     {
         let n;
         let light,viewLight;
@@ -99,7 +99,7 @@ export default class MapMeshShaderClass extends ShaderClass
             // normal is set on a per mesh level as some have
             // model matrixes which need to be calculated in
 
-        gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,(decal?this.core.decalPerspectiveMatrix.data:this.core.perspectiveMatrix.data));
+        gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,this.core.perspectiveMatrix.data);
         gl.uniformMatrix4fv(this.viewMatrixUniform,false,this.core.viewMatrix.data);
         
             // lighting

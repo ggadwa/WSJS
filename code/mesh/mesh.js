@@ -27,8 +27,6 @@ export default class MeshClass
         this.weightArray=weightArray;       // expected Float32Array or null (when not used)
         this.indexArray=indexArray;         // expected Uint16/32Array
         
-        this.uvShadowArray=null;
-        
         this.vertexCount=this.vertexArray.length;
         this.indexCount=this.indexArray.length;
         this.trigCount=Math.trunc(this.indexCount/3);
@@ -44,6 +42,9 @@ export default class MeshClass
             
         this.shadowmap=null;
         
+        this.vertexShadowArray=null;
+        this.uvShadowArray=null;
+                
             // center and bounds
             
         this.center=new PointClass(0,0,0);
@@ -61,15 +62,13 @@ export default class MeshClass
         this.normalBuffer=null;
         this.tangentBuffer=null;
         this.uvBuffer=null;
-        this.uvShadowBuffer=null;
         this.jointBuffer=null;
         this.weightBuffer=null;
         this.indexBuffer=null;
         
-            // decals
-            
-        this.decal=false;
-
+        this.vertexShadowBuffer=null;
+        this.uvShadowBuffer=null;
+        
             // collision lists
 
         this.noCollisions=false;
@@ -511,6 +510,10 @@ export default class MeshClass
         gl.bufferData(gl.ARRAY_BUFFER,this.uvArray,gl.STATIC_DRAW);
         
         if (this.shadowmap!==null) {
+            this.vertexShadowBuffer=gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexShadowBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER,this.vertexShadowArray,gl.STATIC_DRAW);
+            
             this.uvShadowBuffer=gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER,this.uvShadowBuffer);
             gl.bufferData(gl.ARRAY_BUFFER,this.uvShadowArray,gl.STATIC_DRAW);
@@ -531,7 +534,7 @@ export default class MeshClass
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.indexArray,gl.STATIC_DRAW);
     }
 
-    bindBuffers(shader)
+    bindMapBuffers(shader)
     {
         let gl=this.core.gl;
 
@@ -546,11 +549,38 @@ export default class MeshClass
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.uvBuffer);
         gl.vertexAttribPointer(shader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
-        
-        if (this.shadowmap!==null) {
-            gl.bindBuffer(gl.ARRAY_BUFFER,this.uvShadowBuffer);
-            gl.vertexAttribPointer(shader.vertexUVShadowAttribute,2,gl.FLOAT,false,0,0);
-        }
+
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
+    }
+    
+    bindMapShadowBuffers(shader)
+    {
+        let gl=this.core.gl;
+
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexShadowBuffer);
+        gl.vertexAttribPointer(shader.vertexPositionShadowAttribute,3,gl.FLOAT,false,0,0);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.uvShadowBuffer);
+        gl.vertexAttribPointer(shader.vertexUVShadowAttribute,2,gl.FLOAT,false,0,0);
+
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
+    }
+    
+    bindModelBuffers(shader)
+    {
+        let gl=this.core.gl;
+
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
+        gl.vertexAttribPointer(shader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.normalBuffer);
+        gl.vertexAttribPointer(shader.vertexNormalAttribute,3,gl.FLOAT,false,0,0);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.tangentBuffer);
+        gl.vertexAttribPointer(shader.vertexTangentAttribute,3,gl.FLOAT,false,0,0);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.uvBuffer);
+        gl.vertexAttribPointer(shader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
         
             // any rigging if available
             
@@ -611,5 +641,12 @@ export default class MeshClass
             
         this.core.drawMeshCount++;
         this.core.drawTrigCount+=Math.trunc(this.indexCount/3);
+    }
+    
+    drawShadow()
+    {
+        let gl=this.core.gl;
+        
+        gl.drawArrays(gl.TRIANGLES,0,Math.trunc(this.vertexShadowArray.length/3));
     }
 }

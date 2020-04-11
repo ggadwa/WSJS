@@ -17,7 +17,6 @@ export default class CameraClass
         this.glFOV=55.0;
         this.glNearZ=500;
         this.glFarZ=500000;
-        this.decalZ=10;            // how far to push the Z for decal meshes
 
         this.thirdPersonDistance=0;
         this.thirdPersonLookDegree=0;

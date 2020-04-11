@@ -139,6 +139,30 @@ class MainClass
         this.core.map.meshList.buildCollisionGeometry();
         
         this.core.loadingScreenUpdate();
+
+        if (this.core.map.json.shadowmap) { // supergumba -- testing
+        //if ((this.core.map.json.shadowmap) && (this.core.map.json.autoGenerate!==undefined)) {  // if auto generate and shadow map, create it here
+            this.core.loadingScreenAddString('Creating Shadowmap');
+            this.core.loadingScreenDraw();
+            
+            setTimeout(this.initCreateShadowmap.bind(this),1);
+        }
+        else {
+            this.core.loadingScreenAddString('Loading Models');
+            this.core.loadingScreenDraw();
+            
+            setTimeout(this.initLoadModels.bind(this),1);
+        }
+    }
+    
+    initCreateShadowmap()
+    {
+        (new ShadowmapGeneratorClass(this.core,this.initCreateShadowmapFinish.bind(this))).create();
+    }
+    
+    initCreateShadowmapFinish()
+    {
+        this.core.loadingScreenUpdate();
         this.core.loadingScreenAddString('Loading Models');
         this.core.loadingScreenDraw();
         
@@ -171,28 +195,6 @@ class MainClass
     {
         if (!(await this.core.bitmapList.loadAllBitmaps())) return;
         
-        this.core.loadingScreenUpdate();
-
-        if (this.core.map.json.shadowmap) {
-            this.core.loadingScreenAddString('Creating Shadowmap');
-            setTimeout(this.initCreateShadowmap.bind(this),1);
-        }
-        else {
-            this.core.loadingScreenAddString('Creating Entities');
-            setTimeout(this.initLoadEntities.bind(this),1);
-        }
-        
-        this.core.loadingScreenDraw();
-    }
-    
-    initCreateShadowmap()       // supergumba -- this is just testing
-    {
-        let sm=new ShadowmapGeneratorClass(this.core,this.initCreateShadowmapFinish.bind(this));
-        sm.create();
-    }
-    
-    initCreateShadowmapFinish()
-    {
         this.core.loadingScreenUpdate();
         this.core.loadingScreenAddString('Creating Entities');
         this.core.loadingScreenDraw();

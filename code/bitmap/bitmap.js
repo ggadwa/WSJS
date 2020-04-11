@@ -118,12 +118,6 @@ export default class BitmapClass
         this.bitmapType=this.BITMAP_GENERATED;
         
         this.colorURL=colorURL;
-        this.colorBase=null;
-        this.normalURL=null;
-        this.specularURL=null;
-        this.scale=null;
-        
-        this.colorURL=colorURL;
         this.colorImage=colorImage;
         this.normalImage=normalImage;
         this.specularImage=specularImage;
@@ -137,16 +131,12 @@ export default class BitmapClass
         this.buildSimpleName();
     }
     
-    initializeShadowmap(colorURL,colorBase)
+    initializeShadowmap(colorURL,colorImage)
     {
         this.bitmapType=this.BITMAP_SHADOW;
         
         this.colorURL=colorURL;
-        this.colorBase=colorBase;
-        this.normalURL=null;
-        this.specularURL=null;
-        this.specularFactor=new ColorClass(this.DEFAULT_SPECULAR,this.DEFAULT_SPECULAR,this.DEFAULT_SPECULAR);
-        this.scale=null;
+        this.colorImage=colorImage;
         
         this.buildSimpleName();
     }
@@ -476,14 +466,22 @@ export default class BitmapClass
         gl.bindTexture(gl.TEXTURE_2D,this.texture);
         gl.texImage2D(gl.TEXTURE_2D,0,(this.hasColorImageAlpha?gl.RGBA:gl.RGB),(this.hasColorImageAlpha?gl.RGBA:gl.RGB),gl.UNSIGNED_BYTE,this.colorImage);
         
-        if ((this.bitmapType!==this.BITMAP_INTERFACE_URL) && (this.isImagePowerOf2(this.colorImage))) {
-            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_NEAREST);
-            gl.generateMipmap(gl.TEXTURE_2D);
+        if (this.bitmapType===this.BITMAP_SHADOW) {
+            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
         }
         else {
-            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
+            if ((this.bitmapType!==this.BITMAP_INTERFACE_URL) && (this.isImagePowerOf2(this.colorImage))) {
+                gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_NEAREST);
+                gl.generateMipmap(gl.TEXTURE_2D);
+            }
+            else {
+                gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
+            }
         }
         
         gl.bindTexture(gl.TEXTURE_2D,null);
@@ -702,7 +700,7 @@ export default class BitmapClass
     {
         let gl=this.core.gl;
         
-        gl.activeTexture(gl.TEXTURE5);
+        gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D,this.texture);
     }
     

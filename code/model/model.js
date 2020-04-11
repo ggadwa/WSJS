@@ -30,7 +30,7 @@ export default class ModelClass
     
     initialize()
     {
-        if (!this.meshList.initialize(this.core.shaderList.modelMeshShader)) return(false);
+        if (!this.meshList.initialize()) return(false);
         this.skeleton.initialize();
         
         this.loaded=false;
@@ -94,7 +94,7 @@ export default class ModelClass
         
             // draw the meshlist
         
-        this.meshList.draw(modelEntityAlter,false);
+        this.meshList.drawModel(modelEntityAlter);
         
             // developer bounds drawing
             // note this can't draw held stuff
