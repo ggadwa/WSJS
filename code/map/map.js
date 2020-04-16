@@ -38,6 +38,8 @@ export default class MapClass
         this.path=new MapPathClass(core);
         this.sky=new SkyClass(core);
         
+        this.hasShadowmap=false;
+        
         Object.seal(this);
     }
     

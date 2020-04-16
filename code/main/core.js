@@ -16,8 +16,9 @@ import InputClass from '../main/input.js';
 import CameraClass from '../main/camera.js';
 import NetworkClass from '../main/network.js';
 import SetupClass from '../main/setup.js';
-import DialogSettingsClass from '../main/dialog_settings.js';
-import DialogConnectClass from '../main/dialog_connect.js';
+import DialogSettingsClass from '../dialog/dialog_settings.js';
+import DialogConnectClass from '../dialog/dialog_connect.js';
+import DialogDeveloperClass from '../dialog/dialog_developer.js';
 
 //
 // core class
@@ -114,6 +115,7 @@ export default class CoreClass
         this.setup=null;
         this.settingsDialog=null;
         this.connectDialog=null;
+        this.developerDialog=null;
 
             // main loop
 
@@ -270,6 +272,7 @@ export default class CoreClass
         
         this.settingsDialog=new DialogSettingsClass(this);
         this.connectDialog=new DialogConnectClass(this);
+        this.developerDialog=new DialogDeveloperClass(this);
     }
 
     release()
@@ -351,7 +354,14 @@ export default class CoreClass
             // if we are leaving pause, turn
             // off pause window
             
-        if (!pause) this.settingsDialog.close();
+        if (!pause) {
+            if (!this.game.developer.on) {
+                this.settingsDialog.close();
+            }
+            else {
+                this.developerDialog.close();
+            }
+        }
         
             // if this is the init state, then we
             // start the stamps at 0
@@ -397,7 +407,14 @@ export default class CoreClass
         
             // if going into pause, open the settings
             
-        if (pause) this.settingsDialog.open();
+        if (pause) {
+            if (!this.game.developer.on) {
+                this.settingsDialog.open();
+            }
+            else {
+                this.developerDialog.open();
+            }
+        }
     }
     
         //
@@ -563,7 +580,7 @@ export default class CoreClass
         this.map.sky.draw();
 
         this.map.meshList.drawMap();
-        if (this.map.json.shadowmap) this.map.meshList.drawMapShadow();
+        if (this.map.hasShadowmap) this.map.meshList.drawMapShadow();
         // this.map.meshList.drawCollisionSurfaces();
 
             // path debugging

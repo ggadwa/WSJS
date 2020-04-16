@@ -2,29 +2,16 @@
 
 - swipe up for grenade
 
+- don't have a shadow map switch, just look if shadow map exists
+- get rid of supergumba/testing in main
+
+UPLOADS
+ - need to save a mesh/shadowmap index list, use that load maps
+ - combined vertex/uv bin (with above)
+
 SHADOW MAPS
- - need to write byte stream directly to bitmapList.add(xxx)
  - light light need to contain effect lights
  - have mesh mark which ones drew so they can be eliminated in shadow pass
- - put back in light mesh collision list
- - muck with the uv coordinates to push them in 0.01 or something (constant this)
-
-build time: 26K
-
-LUMINANCE
-const alignment = 1;
-gl.pixelStorei(gl.UNPACK_ALIGNMENT, alignment);
-
-gl.texImage2D(
-    gl.TEXTURE_2D,     // target
-    0,                 // mip level
-    gl.LUMINANCE,      // internal format
-    2,                 // width
-    1,                 // height
-    0,                 // border
-    gl.LUMINANCE,      // format
-    gl.UNSIGNED_BYTE,  // type
-    new Uint8Array([90, 255]));
 
 EDIT MODE
   - bot need to disappear completely
@@ -60,7 +47,6 @@ EDIT MODE
     - need open system for passing message (like firing weapons, etc)
 
 - generator
-    - do not need canvas!  Go straight from data stream
     - nodes don't seem right in certain rooms (like boxes)
     - the random color scheme
 

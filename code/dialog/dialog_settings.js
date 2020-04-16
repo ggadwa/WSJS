@@ -1,5 +1,5 @@
 import SetupClass from '../main/setup.js';
-import DialogBaseClass from '../main/dialog_base.js';
+import DialogBaseClass from '../dialog/dialog_base.js';
 
 export default class DialogSettingsClass extends DialogBaseClass
 {

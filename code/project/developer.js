@@ -318,10 +318,10 @@ export default class DeveloperClass
         let input=this.core.input;
         let setup=this.core.setup;
         
-        moveForward=(input.isKeyDown('w')) || (input.isKeyDown('W'));
-        moveBackward=(input.isKeyDown('s')) || (input.isKeyDown('S'));
-        moveLeft=(input.isKeyDown('a')) || (input.isKeyDown('A'));
-        moveRight=(input.isKeyDown('d')) || (input.isKeyDown('D'));
+        moveForward=(input.isKeyDown('w'));
+        moveBackward=(input.isKeyDown('s'));
+        moveLeft=(input.isKeyDown('a'));
+        moveRight=(input.isKeyDown('d'));
         
         moveFactor=input.isKeyDown('Shift')?this.MOVE_FAST_FACTOR:1.0;
         
@@ -364,7 +364,7 @@ export default class DeveloperClass
         this.movement.z=Math.trunc(((moveForward?this.MOVE_SPEED:0)+(moveBackward?-this.MOVE_SPEED:0))*moveFactor);
         this.movement.x=Math.trunc(((moveLeft?this.SIDE_SPEED:0)+(moveRight?-this.SIDE_SPEED:0))*moveFactor);
         this.movement.y=0;
-
+        
         this.movement.rotateX(null,this.angle.x);     // if flying or swimming, add in the X rotation
         this.movement.rotateY(null,this.angle.y);
 

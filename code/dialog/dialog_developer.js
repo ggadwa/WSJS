@@ -1,7 +1,7 @@
 import SetupClass from '../main/setup.js';
-import DialogBaseClass from '../main/dialog_base.js';
+import DialogBaseClass from '../dialog/dialog_base.js';
 
-export default class DialogConnectClass extends DialogBaseClass
+export default class DialogDeveloperClass extends DialogBaseClass
 {
     constructor(core)
     {
@@ -12,8 +12,11 @@ export default class DialogConnectClass extends DialogBaseClass
         // views
         //
         
-    addMultiplayerControls(viewDiv)
+    addTestControls(viewDiv)
     {
+        this.addInput(viewDiv,'test','Test:','text',null,'blah',null);
+        
+        /*
         this.addInput(viewDiv,'localGame','Local Game:','checkbox',null,this.core.setup.localGame,this.localGameChange.bind(this));
         this.addInput(viewDiv,'botCount','Local Bot Count:','select',['0','1','2','3','4','5','6','7','8','9'],this.core.setup.botCount,null);
         this.addInput(viewDiv,'botSkill','Local Bot Skill:','select',['Easy','Moderate','Normal','Skilled','Hard'],this.core.setup.botSkill,null);
@@ -21,43 +24,40 @@ export default class DialogConnectClass extends DialogBaseClass
         this.addInput(viewDiv,'savedServerURLList','Saved Server URLs:','select',this.core.setup.savedServerURLList,-1,this.savedServerListPick.bind(this));
         
         this.localGameChange();         // to reset disabled items
+            */
     }
     
-    addProfileControls(viewDiv)
+    addTest2Controls(viewDiv)
     {
-        this.addInput(viewDiv,'name','Name:','text',null,this.core.setup.name,null);
-    }
-    
-        //
-        // misc control events
-        //
+        this.addInput(viewDiv,'test2','Test2:','text',null,'blech',null);
         
-    localGameChange()
-    {
-        let checked=document.getElementById('localGame').checked;
-        document.getElementById('serverURL').disabled=checked;
-        document.getElementById('savedServerURLList').disabled=checked;
+        /*
+        this.addInput(viewDiv,'localGame','Local Game:','checkbox',null,this.core.setup.localGame,this.localGameChange.bind(this));
+        this.addInput(viewDiv,'botCount','Local Bot Count:','select',['0','1','2','3','4','5','6','7','8','9'],this.core.setup.botCount,null);
+        this.addInput(viewDiv,'botSkill','Local Bot Skill:','select',['Easy','Moderate','Normal','Skilled','Hard'],this.core.setup.botSkill,null);
+        this.addInput(viewDiv,'serverURL','Server URL:','text',null,this.core.setup.serverURL,null);
+        this.addInput(viewDiv,'savedServerURLList','Saved Server URLs:','select',this.core.setup.savedServerURLList,-1,this.savedServerListPick.bind(this));
+        
+        this.localGameChange();         // to reset disabled items
+            */
     }
     
-    savedServerListPick()
-    {
-        document.getElementById('serverURL').value=document.getElementById('savedServerURLList').value;
-    }
-
         //
         // connect dialog
         //
     
-    open(callback)
+    open()
     {
-        this.createDialog(['Multiplayer','Profile'],0,callback);
+        this.createDialog(['Test','Test2'],0,this.core.setPauseState.bind(this.core,false,false));
         
-        this.addMultiplayerControls(this.getView('Multiplayer'));
-        this.addProfileControls(this.getView('Profile'));
+        this.addTestControls(this.getView('Test'));
+        this.addTest2Controls(this.getView('Test2'));
     }
     
     close()
     {
+        console.info('here');
+        /*
             // change the setup and save
             
         this.core.setup.localGame=document.getElementById('localGame').checked;
@@ -70,7 +70,7 @@ export default class DialogConnectClass extends DialogBaseClass
         this.core.setup.name=document.getElementById('name').value;
         
         this.core.setup.save(this.core);
-        
+        */
             // close the dialog
             
         this.removeDialog();

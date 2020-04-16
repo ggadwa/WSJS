@@ -130,27 +130,27 @@ export default class InputClass
 
     keyDownEvent(event)
     {
-        this.keyFlags.set(event.key,true);
+        this.keyFlags.set(event.key.toLowerCase(),true);
     }
      
     keyUpEvent(event)
     {
-        this.keyFlags.set(event.key,false);
+        this.keyFlags.set(event.key.toLowerCase(),false);
     }
     
     isKeyDown(key)
     {
-        let flag=this.keyFlags.get(key);
+        let flag=this.keyFlags.get(key.toLowerCase());
         return((flag===undefined)?false:flag);
     }
     
     isKeyDownAndClear(key)
     {
-        let flag=this.keyFlags.get(key);
+        let flag=this.keyFlags.get(key.toLowerCase());
         if (flag===undefined) return(false);
         if (!flag) return(false);
         
-        this.keyFlags.set(key,false);
+        this.keyFlags.set(key.toLowerCase(),false);
         return(true);
     }
     

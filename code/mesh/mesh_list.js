@@ -312,6 +312,7 @@ export default class MeshListClass
 
         for (n=0;n!==nMesh;n++) {
             mesh=this.meshes[n];
+            if (mesh.shadowmap===null) continue;
             
                 // regular map mesh culling
                 

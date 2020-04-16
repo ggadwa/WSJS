@@ -159,18 +159,12 @@ export default class BitmapListClass
         return(bitmap);
     }
     
-    addShadowmap(colorImage)
+    addShadowmap(colorURL)
     {
         let bitmap;
-        let colorURL;
                 
-        colorURL='_shadow_'+this.generatedUniqueId;
-        this.generatedUniqueId++;
-        
-            // add bitmap to list
-                    
         bitmap=new BitmapClass(this.core);
-        bitmap.initializeShadowmap(colorURL,colorImage);
+        bitmap.initializeShadowmap(colorURL);
         this.bitmaps.set(colorURL,bitmap);
         
         return(bitmap);

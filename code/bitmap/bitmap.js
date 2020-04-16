@@ -131,14 +131,11 @@ export default class BitmapClass
         this.buildSimpleName();
     }
     
-    initializeShadowmap(colorURL,colorImage)
+    initializeShadowmap(colorURL)
     {
         this.bitmapType=this.BITMAP_SHADOW;
         
         this.colorURL=colorURL;
-        this.colorImage=colorImage;
-        
-        this.buildSimpleName();
     }
     
     release()
@@ -425,7 +422,7 @@ export default class BitmapClass
             // are created if missing.  This can be built from
             // loading or a file or a base color
         
-        if ((this.bitmapType!==this.BITMAP_GENERATED) && (this.bitmapType!==this.BITMAP_SHADOW)) {
+        if (this.bitmapType!==this.BITMAP_GENERATED) {
             
             if (this.bitmapType===this.BITMAP_COLOR) {
                 this.colorImage=this.createSolidColorImage(Math.trunc(this.colorBase.r*255),Math.trunc(this.colorBase.g*255),Math.trunc(this.colorBase.b*255));
@@ -467,8 +464,8 @@ export default class BitmapClass
         gl.texImage2D(gl.TEXTURE_2D,0,(this.hasColorImageAlpha?gl.RGBA:gl.RGB),(this.hasColorImageAlpha?gl.RGBA:gl.RGB),gl.UNSIGNED_BYTE,this.colorImage);
         
         if (this.bitmapType===this.BITMAP_SHADOW) {
-            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST);
-            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
             gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
         }

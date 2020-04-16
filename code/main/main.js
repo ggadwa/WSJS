@@ -2,7 +2,7 @@ import PointClass from '../utility/point.js';
 import CoreClass from '../main/core.js';
 import GameClass from '../project/game.js';
 import MapClass from '../map/map.js';
-import ShadowmapGeneratorClass from '../light/shadow_map.js';
+import ShadowmapLoadClass from '../light/shadow_map_load.js';
 
 //
 // main class
@@ -140,12 +140,14 @@ class MainClass
         
         this.core.loadingScreenUpdate();
 
-        if (this.core.map.json.shadowmap) { // supergumba -- testing
-        //if ((this.core.map.json.shadowmap) && (this.core.map.json.autoGenerate!==undefined)) {  // if auto generate and shadow map, create it here
-            this.core.loadingScreenAddString('Creating Shadowmap');
+            // auto generated maps don't have shadowmaps
+            // so we skip
+            
+        if ((this.core.map.json.autoGenerate===undefined) || (1===1)) { // supergumba -- testing
+            this.core.loadingScreenAddString('Loading Shadowmap');
             this.core.loadingScreenDraw();
             
-            setTimeout(this.initCreateShadowmap.bind(this),1);
+            setTimeout(this.initLoadShadowmap.bind(this),1);
         }
         else {
             this.core.loadingScreenAddString('Loading Models');
@@ -155,18 +157,17 @@ class MainClass
         }
     }
     
-    initCreateShadowmap()
+    async initLoadShadowmap()
     {
-        (new ShadowmapGeneratorClass(this.core,this.initCreateShadowmapFinish.bind(this))).create();
-    }
-    
-    initCreateShadowmapFinish()
-    {
+        let shadowmapLoad=new ShadowmapLoadClass(this.core);
+        
+        if (!(await shadowmapLoad.load())) return;
+        
         this.core.loadingScreenUpdate();
         this.core.loadingScreenAddString('Loading Models');
         this.core.loadingScreenDraw();
-        
-        setTimeout(this.initLoadModels.bind(this),1);
+       
+        setTimeout(this.initLoadModels.bind(this),1);    
     }
     
     async initLoadModels()
