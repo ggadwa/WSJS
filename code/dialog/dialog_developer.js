@@ -1,20 +1,23 @@
 import SetupClass from '../main/setup.js';
 import DialogBaseClass from '../dialog/dialog_base.js';
+import ShadowmapGeneratorClass from '../light/shadow_map_generator.js';
 
 export default class DialogDeveloperClass extends DialogBaseClass
 {
     constructor(core)
     {
         super(core);
+        
+        this.progressPercent=0;
     }
     
         //
         // views
         //
         
-    addTestControls(viewDiv)
+    addDeveloperControls(viewDiv)
     {
-        this.addInput(viewDiv,'test','Test:','text',null,'blah',null);
+        this.addInput(viewDiv,'test1','Test1:','text',null,'blah',null);
         
         /*
         this.addInput(viewDiv,'localGame','Local Game:','checkbox',null,this.core.setup.localGame,this.localGameChange.bind(this));
@@ -27,9 +30,10 @@ export default class DialogDeveloperClass extends DialogBaseClass
             */
     }
     
-    addTest2Controls(viewDiv)
+    addBuilderControls(viewDiv)
     {
-        this.addInput(viewDiv,'test2','Test2:','text',null,'blech',null);
+        this.addButton(viewDiv,'buildPathHints','Build Path Hints',this.buildPathHints.bind(this));
+        this.addButton(viewDiv,'buildShadowmap','Build Shadowmap',this.buildShadowmap.bind(this));
         
         /*
         this.addInput(viewDiv,'localGame','Local Game:','checkbox',null,this.core.setup.localGame,this.localGameChange.bind(this));
@@ -40,6 +44,31 @@ export default class DialogDeveloperClass extends DialogBaseClass
         
         this.localGameChange();         // to reset disabled items
             */
+    }
+    
+        //
+        // buttons
+        //
+        
+    buildPathHints()
+    {
+        console.info('path hints');
+    }
+    
+    buildShadowmap()
+    {
+        this.startProgress();
+        
+        setTimeout(this.startShadowmap.bind(this),1);       // so progress can update
+    }
+    startShadowmap()
+    {
+        (new ShadowmapGeneratorClass(this.core,this,this.finishShadowmap.bind(this))).create();
+    }
+    
+    finishShadowmap()
+    {
+        this.stopProgress();
     }
     
         //
@@ -48,15 +77,14 @@ export default class DialogDeveloperClass extends DialogBaseClass
     
     open()
     {
-        this.createDialog(['Test','Test2'],0,this.core.setPauseState.bind(this.core,false,false));
+        this.createDialog(['Developer','Builders'],0,this.core.setPauseState.bind(this.core,false,false));
         
-        this.addTestControls(this.getView('Test'));
-        this.addTest2Controls(this.getView('Test2'));
+        this.addDeveloperControls(this.getView('Developer'));
+        this.addBuilderControls(this.getView('Builders'));
     }
     
     close()
     {
-        console.info('here');
         /*
             // change the setup and save
             

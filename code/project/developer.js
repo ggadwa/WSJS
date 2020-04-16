@@ -432,10 +432,10 @@ export default class DeveloperClass
         
         nodeIdx=this.findNearestPathNode(this.NEAR_PATH_NODE_DISTANCE);
         if (nodeIdx===-1) {
-            this.core.interface.updateText('wsNode','');
+            this.core.interface.updateText('wsNode','node:');
         }
         else {
-            this.core.interface.updateText('wsNode',nodeIdx);
+            this.core.interface.updateText('wsNode',('node:'+nodeIdx));
         }
             
         str='';
@@ -448,10 +448,10 @@ export default class DeveloperClass
         }
         
         if (str==='') {
-            this.core.interface.updateText('wsMesh','');
+            this.core.interface.updateText('wsMesh','mesh:');
         }
         else {
-            this.core.interface.updateText('wsMesh',str);
+            this.core.interface.updateText('wsMesh',('mesh:'+str));
         }
     }
 
