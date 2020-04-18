@@ -89,6 +89,12 @@ export default class MeshClass
         
         this.setupBounds();
         
+            // some caches for shadowmapping
+            
+        this.shadowmapCacheV0=null;
+        this.shadowmapCacheV10=null;
+        this.shadowmapCacheV20=null;
+        
             // global variables to stop GCd
 
         this.rotPoint=new PointClass(0,0,0);

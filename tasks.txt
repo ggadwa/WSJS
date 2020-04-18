@@ -2,15 +2,13 @@
 
 - swipe up for grenade
 
-- don't have a shadow map switch, just look if shadow map exists
 - get rid of supergumba/testing in main
+- dungeon makes 32 at 1024x1024
 
 UPLOADS
- - need to save a mesh/shadowmap index list, use that load maps
- - combined vertex/uv bin (with above)
+ - way to delete old maps?
 
 SHADOW MAPS
- - light light need to contain effect lights
  - have mesh mark which ones drew so they can be eliminated in shadow pass
 
 EDIT MODE
