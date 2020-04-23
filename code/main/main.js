@@ -143,7 +143,7 @@ class MainClass
             // auto generated maps don't have shadowmaps
             // so we skip
             
-        if ((this.core.map.json.autoGenerate===undefined) || (1===1)) { // supergumba -- testing
+        if (this.core.map.json.autoGenerate===undefined) {
             this.core.loadingScreenAddString('Loading Shadowmap');
             this.core.loadingScreenDraw();
             

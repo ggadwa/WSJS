@@ -103,9 +103,5 @@ export default class ModelClass
             modelEntityAlter.setupModelMatrix(false);
             modelEntityAlter.drawBounds();
         }
-        
-            // add up model draws for stats
-            
-        this.core.drawModelCount++;
     }
 }

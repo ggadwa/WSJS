@@ -145,11 +145,6 @@ export default class CoreClass
         this.fpsCount=0;
         this.fpsStartTimestamp=0;
 
-        this.drawMeshCount=0;
-        this.drawTrigCount=0;
-        this.drawModelCount=0;
-        this.drawEffectCount=0;
-
             // loading screen
 
         this.loadingStrings=[];
@@ -568,25 +563,14 @@ export default class CoreClass
             if (light!==null) this.convertToEyeCoordinates(light.position,light.eyePosition);
         }
         
-            // reset some stats
-            
-        this.drawMeshCount=0;
-        this.drawTrigCount=0;
-        this.drawModelCount=0;
-        this.drawEffectCount=0;
-        
             // draw the sky and map
             
         this.map.sky.draw();
 
         this.map.meshList.drawMap();
-        if (this.map.hasShadowmap) this.map.meshList.drawMapShadow();
+        if ((this.map.hasShadowmap) && (!developerOn)) this.map.meshList.drawMapShadow();
         // this.map.meshList.drawCollisionSurfaces();
 
-            // path debugging
-            
-        if (developerOn) this.map.path.drawPath();
-        
             // draw any non held entities
             
         this.map.entityList.draw(null);
@@ -598,6 +582,7 @@ export default class CoreClass
             // effects
             
         this.map.effectList.draw();
+        if (developerOn) this.map.lightList.draw();
         
             // and finally held entities,
             // clearing the z buffer first
@@ -606,6 +591,13 @@ export default class CoreClass
         if (!developerOn) {
             this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
             this.map.entityList.draw(player);
+        }
+        
+            // path and ray developer
+            
+        if (developerOn) {
+            this.map.path.drawPath();
+            this.game.developer.developerRay.draw();
         }
         
             // interface

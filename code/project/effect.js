@@ -114,7 +114,7 @@ class EffectChunkClass
 
 export default class EffectClass
 {
-    constructor(core,spawnedBy,jsonName,position,data,show)
+    constructor(core,spawnedBy,jsonName,position,data,mapSpawn,show)
     {
         this.CHUNK_BILLBOARD=0;
         this.CHUNK_TRIANGLE=1;
@@ -124,6 +124,7 @@ export default class EffectClass
         this.spawnedBy=spawnedBy;
         this.position=position.copy();
         this.data=data;
+        this.mapSpawn=mapSpawn;
         this.show=show;
         
         this.jsonName=jsonName;
@@ -862,7 +863,6 @@ export default class EffectClass
         gl.vertexAttribPointer(shader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
-        //gl.bufferSubData(gl.ELEMENT_ARRAY_BUFFER,0,this.indexes);
         
             // run through the chunks
             

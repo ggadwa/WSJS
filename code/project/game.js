@@ -1,6 +1,6 @@
 import PointClass from '../utility/point.js';
 import ColorClass from '../utility/color.js';
-import DeveloperClass from '../project/developer.js';
+import DeveloperClass from '../developer/developer.js';
 
 export default class GameClass
 {

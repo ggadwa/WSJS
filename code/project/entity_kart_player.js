@@ -6,9 +6,9 @@ import EntityClass from '../project/entity.js';
 
 export default class EntityKartPlayerClass extends EntityClass
 {
-    constructor(core,name,json,position,angle,data)
+    constructor(core,name,json,position,angle,data,mapSpawn)
     {
-        super(core,name,json,position,angle,data);
+        super(core,name,json,position,angle,data,mapSpawn);
         
         this.engineSound=null;
         this.skidSound=null;
@@ -606,7 +606,7 @@ export default class EntityKartPlayerClass extends EntityClass
     animatedBoneSetup()
     {
     //    this.tempQuat.setFromVectorAndAngle(0,1,0,this.getPeriodicLinear(5000,360));
-    //    this.setModelBoneRotationQuaternion('captain_chest_cover',this.tempQuat);
+    //    this.modelEntityAlter.setBoneRotationQuaternion('captain_chest_cover',this.tempQuat);
     }
 
     drawSetup()
@@ -658,7 +658,11 @@ export default class EntityKartPlayerClass extends EntityClass
             // and finally just call the regular draw position
             // stuff
             
-        this.setModelDrawPosition(this.position,this.drawAngle,this.scale,false);
+        this.modelEntityAlter.position.setFromPoint(this.position);
+        this.modelEntityAlter.angle.setFromPoint(this.drawAngle);
+        this.modelEntityAlter.scale.setFromPoint(this.scale);
+        this.modelEntityAlter.inCameraSpace=false;
+
         return(true);
     }
 }

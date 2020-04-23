@@ -74,9 +74,9 @@ class EntityWeaponFireClass
 
 export default class EntityWeaponClass extends EntityClass
 {
-    constructor(core,name,json,position,angle,data)
+    constructor(core,name,json,position,angle,data,mapSpawn)
     {
-        super(core,name,json,position,angle,data);
+        super(core,name,json,position,angle,data,mapSpawn);
         
         this.FIRE_TYPE_HIT_SCAN=0;
         this.FIRE_TYPE_PROJECTILE=1;

@@ -10,7 +10,7 @@ import NetworkClass from '../main/network.js';
 
 export default class EntityClass
 {
-    constructor(core,name,json,position,angle,data)
+    constructor(core,name,json,position,angle,data,mapSpawn)
     {
         this.TEXT_ALIGN_LEFT=0;     // when we have statics (safari) then use the class static to create these (still don't want people to include other classes)
         this.TEXT_ALIGN_CENTER=1;
@@ -38,6 +38,11 @@ export default class EntityClass
         this.position=position.copy();
         this.angle=angle.copy();
         this.data=data;
+        this.mapSpawn=mapSpawn;
+        
+        this.originalPosition=this.position.copy();
+        this.originalAngle=this.angle.copy();
+        this.originalScale=this.scale.copy();
         
         this.show=true;
         this.heldBy=null;
@@ -131,6 +136,8 @@ export default class EntityClass
         this.eyeOffset=this.json.setup.eyeOffset;
         this.weight=this.json.setup.weight;
         
+        this.originalScale.setFromPoint(this.scale);
+        
             // add any interface elements
             
         if (!this.core.interface.addFromJson(this.json.interface)) return(false);
@@ -179,79 +186,7 @@ export default class EntityClass
     {
         return(this.core.map.liquidList);
     }
-    
-        //
-        // models
-        //
-     
-    setModel(name)
-    {
-        if (this.model!==null) throw('already set model once');
         
-            // cached shared model
-            
-        this.model=this.core.modelList.get(name);
-        if (this.model===undefined) throw('model '+name+' does not exist, needs to be defined in map setup');
-        
-            // this entities person model animation/altering data
-            
-        this.modelEntityAlter=new ModelEntityAlterClass(this.core,this);
-        this.modelEntityAlter.initialize();
-    }
-    
-    showModelMesh(name,show)
-    {
-        return(this.modelEntityAlter.show(name,show));
-    }
-    
-    setModelRotationOrder(rotationOrder)
-    {
-        this.modelEntityAlter.rotationOrder=rotationOrder;
-    }
-    
-    setModelDrawPosition(position,angle,scale,inCameraSpace)
-    {
-        this.modelEntityAlter.position.setFromPoint(position);
-        this.modelEntityAlter.angle.setFromPoint(angle);
-        this.modelEntityAlter.scale.setFromPoint(scale);
-        this.modelEntityAlter.inCameraSpace=(inCameraSpace===undefined)?false:inCameraSpace;
-    }
-    
-    startModelAnimationChunkInFrames(name,framesPerSecond,loopStartFrame,loopEndFrame)
-    {
-        return(this.modelEntityAlter.startAnimationChunkInFrames(name,framesPerSecond,loopStartFrame,loopEndFrame));
-    }
-    
-    queueAnimationStop()
-    {
-        this.modelEntityAlter.queueAnimationStop();
-    }
-    
-    queueModelAnimationChunkInFrames(name,framesPerSecond,loopStartFrame,loopEndFrame)
-    {
-        return(this.modelEntityAlter.queueAnimationChunkInFrames(name,framesPerSecond,loopStartFrame,loopEndFrame));
-    }
-    
-    isModelAnimationRunning()
-    {
-        return(this.modelEntityAlter.isAnimationRunning());
-    }
-    
-    setModelBoneTranslationPoint(name,translation)
-    {
-        this.modelEntityAlter.setBoneTranslationPoint(name,translation);
-    }
-    
-    setModelBoneRotationQuaternion(name,rotation)
-    {
-        this.modelEntityAlter.setBoneRotationQuaternion(name,rotation);
-    }
-    
-    setModelBoneScalePoint(name,scale)
-    {
-        this.modelEntityAlter.setBoneScale(name,scale);
-    }
-    
         //
         // ticks and periodics
         //
@@ -292,7 +227,7 @@ export default class EntityClass
     
     addEntity(spawnedByEntity,jsonName,name,position,angle,data,show,hold)
     {
-        return(this.core.map.entityList.add(spawnedByEntity,jsonName,name,position,angle,data,show,hold));
+        return(this.core.map.entityList.add(spawnedByEntity,jsonName,name,position,angle,data,false,show,hold));
     }
     
     removeEntity(entity)
@@ -341,7 +276,7 @@ export default class EntityClass
     
     addEffect(spawnedByEntity,jsonName,position,data,show)
     {
-        return(this.core.map.effectList.add(spawnedByEntity,jsonName,position,data,show));
+        return(this.core.map.effectList.add(spawnedByEntity,jsonName,position,data,false,show));
     }
     
         //
@@ -1037,7 +972,6 @@ export default class EntityClass
     {
     }
     
-
     /**
      * Override to deal with final entity setup.  This is the first call
      * before the main game starts running, after everything has been prepared
@@ -1092,8 +1026,15 @@ export default class EntityClass
      */    
     drawSetup()
     {
-        this.setModelDrawPosition(this.position,this.angle,this.scale,false);
-        return(true);
+        return(false);
+    }
+    
+    drawSetupDeveloper()
+    {
+        this.modelEntityAlter.position.setFromPoint(this.originalPosition);
+        this.modelEntityAlter.angle.setFromPoint(this.originalAngle);
+        this.modelEntityAlter.scale.setFromPoint(this.originalScale);
+        this.modelEntityAlter.inCameraSpace=false;
     }
     
         //
@@ -1103,17 +1044,26 @@ export default class EntityClass
     draw()
     {
         if (this.model===null) return;
-        if (!this.show) return;
         
-            // call the draw setup and
-            // then if returns true, run the animation
-            
-        if (!this.drawSetup()) return;
+            // if regular drawing, skip if we aren't
+            // showing, or the draw setup returns false
+            // otherwise calc the animation and draw
+            //
+            // if in development mode, always draw at
+            // starting position and skip any non-map spawn
+            // entities (as we only edit the map entities,
+            // now dynamically spawned ones)
         
         if (!this.core.game.developer.on) {
+            if (!this.show) return;
+            
+            if (!this.drawSetup()) return;
             this.modelEntityAlter.runAnimation();
         }
         else {
+            if (!this.mapSpawn) return;
+            
+            this.drawSetupDeveloper();
             this.modelEntityAlter.runAninimationDeveloper();
         }
         

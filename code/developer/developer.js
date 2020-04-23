@@ -2,6 +2,8 @@ import PointClass from '../utility/point.js';
 import ColorClass from '../utility/color.js';
 import BoundClass from '../utility/bound.js';
 import QuaternionClass from '../utility/quaternion.js';
+import DeveloperSpriteClass from '../developer/developer_sprite.js';
+import DeveloperRayClass from '../developer/developer_ray.js';
 import MapPathNodeClass from '../map/map_path_node.js';
 
 export default class DeveloperClass
@@ -24,12 +26,20 @@ export default class DeveloperClass
         this.position=new PointClass(0,0,0);
         this.angle=new PointClass(0,0,0);
         
+            // misc drawing class
+            
+        this.developerSprite=new DeveloperSpriteClass(core);
+        this.developerRay=new DeveloperRayClass(core);
+        
             // pre-allocates
             
         this.movement=new PointClass(0,0,0);
         this.xBound=new BoundClass(0,0);
         this.yBound=new BoundClass(0,0);
         this.zBound=new BoundClass(0,0);
+        
+        this.lightMinBackup=new ColorClass();
+        this.lightMaxBackup=new ColorClass();
         
         Object.seal(this);
     }
@@ -38,21 +48,22 @@ export default class DeveloperClass
     {
         this.core.interface.addText('wsFPS','',this.core.interface.POSITION_MODE_TOP_RIGHT,{"x":-5,"y":23},20,this.core.interface.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1,false);
         
-        this.core.interface.addText('wsMeshCount','',this.core.interface.POSITION_MODE_TOP_RIGHT,{"x":-5,"y":23},20,this.core.interface.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1,true);
-        this.core.interface.addText('wsTrigCount','',this.core.interface.POSITION_MODE_TOP_RIGHT,{"x":-5,"y":46},20,this.core.interface.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1,true);
-        this.core.interface.addText('wsModelCount','',this.core.interface.POSITION_MODE_TOP_RIGHT,{"x":-5,"y":69},20,this.core.interface.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1,true);
-        this.core.interface.addText('wsEffectCount','',this.core.interface.POSITION_MODE_TOP_RIGHT,{"x":-5,"y":92},20,this.core.interface.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1,true);
+        this.core.interface.addText('wsPosition','',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-95},20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
+        this.core.interface.addText('wsAngle','',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-72},20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
+        this.core.interface.addText('wsNode','',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-49},20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
+        this.core.interface.addText('wsMesh','',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-26},20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
+        this.core.interface.addText('wsMessage','',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-3},20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
         
-        this.core.interface.addText('wsPosition','',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-72},20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
-        this.core.interface.addText('wsAngle','',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-49},20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
-        this.core.interface.addText('wsNode','',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-26},20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
-        this.core.interface.addText('wsMesh','',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-3},20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
+        if (!this.developerSprite.initialize()) return(false);
+        if (!this.developerRay.initialize()) return(false);
 
         return(true);
     }
     
     release()
     {
+        this.developerRay.release();
+        this.developerSprite.release();
     }
     
         //
@@ -399,27 +410,16 @@ export default class DeveloperClass
         
     clearInterfaceOutput()
     {
-        this.core.interface.updateText('wsMeshCount','');
-        this.core.interface.updateText('wsTrigCount','');
-        this.core.interface.updateText('wsModelCount','');
-        this.core.interface.updateText('wsEffectCount','');
-        
         this.core.interface.updateText('wsPosition','');
         this.core.interface.updateText('wsAngle','');
         this.core.interface.updateText('wsNode','');
         this.core.interface.updateText('wsMesh','');
+        this.core.interface.updateText('wsMessage','');
     }
     
     setInterfaceOutput()
     {
         let n,nodeIdx,str;
-        
-            // draw counts
-            
-        this.core.interface.updateText('wsMeshCount',('mesh:'+this.core.drawMeshCount));
-        this.core.interface.updateText('wsTrigCount',('trig:'+this.core.drawTrigCount));
-        this.core.interface.updateText('wsModelCount',('model:'+this.core.drawModelCount));
-        this.core.interface.updateText('wsEffectCount',('effect:'+this.core.drawEffectCount));
         
             // world info
             
@@ -453,6 +453,47 @@ export default class DeveloperClass
         else {
             this.core.interface.updateText('wsMesh',('mesh:'+str));
         }
+    }
+    
+        //
+        // enter/exit developer mode
+        //
+        
+    developerModeEnter()
+    {
+        this.on=true;
+        
+            // attach developer camera to play location
+            
+        this.playerToDeveloper();
+        
+            // highlight the map
+            
+        this.lightMinBackup.setFromColor(this.core.map.lightList.lightMin);
+        this.lightMaxBackup.setFromColor(this.core.map.lightList.lightMax);
+        
+        this.core.map.lightList.lightMin.setFromValues(1,1,1);
+        this.core.map.lightList.lightMax.setFromValues(1,1,1);
+        
+        console.info('developer mode: on');
+    }
+    
+    developerModeExit()
+    {
+        this.on=false;
+        
+            // reset the player to camera location
+            // and clear input
+            
+        this.developerToPlayer();
+        this.clearInterfaceOutput();
+        
+            // turn off highlight
+            
+        this.core.map.lightList.lightMin.setFromColor(this.lightMinBackup);
+        this.core.map.lightList.lightMax.setFromColor(this.lightMaxBackup);
+        
+        console.info('developer mode: off');
     }
 
         //
@@ -491,22 +532,20 @@ export default class DeveloperClass
             
         if (input.isKeyDownAndClear('PageUp')) {
             if (this.on) {
-                this.on=false;
-                this.developerToPlayer();
-                this.clearInterfaceOutput();
-                console.info('developer mode: off');
+                this.developerModeExit();
             }
             else {
-                this.on=true;
-                this.playerToDeveloper();
-                console.info('developer mode: on');
+                this.developerModeEnter();
             }
         }
         
             // if in developer mode, we can move
-            // the player
+            // the developer position
             
-        if (this.on) this.move();
+        if (this.on) {
+            this.move();
+            this.developerRay.run(this.position,this.angle);
+        }
 
         return;
         

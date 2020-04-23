@@ -149,4 +149,22 @@ export default class MapLightListClass
         }
     }
     
+        //
+        // draw all lights
+        // this is used for developer
+        //
+        
+    draw()
+    {
+        let light,bitmap;
+        
+        if (!this.core.game.developer.on) return;
+            
+        bitmap=this.core.bitmapList.get('../developer/sprites/light.png');
+            
+        for (light of this.lights) {
+            this.core.game.developer.developerSprite.drawBillboardSprite(bitmap,light.position);
+        }
+    }
+    
 }

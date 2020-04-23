@@ -3,9 +3,9 @@ import EntityClass from '../project/entity.js';
 
 export default class EntityProjectileClass extends EntityClass
 {
-    constructor(core,name,json,position,angle,data)
+    constructor(core,name,json,position,angle,data,mapSpawn)
     {
-        super(core,name,json,position,angle,data);
+        super(core,name,json,position,angle,data,mapSpawn);
         
         this.lifeTimestamp=0;
         this.speed=0;

@@ -70,11 +70,29 @@ export default class ShadowmapLoadClass
         for (n=0;n!==nMesh;n++) {
             mesh=map.meshList.meshes[n];
             
-                // the bitmap
+                // bitmap index and counts
                 
             bitmapIdx=dataView.getInt32(offset);
             offset+=4;
+                
+            vertexCount=dataView.getInt32(offset);
+            offset+=4;
             
+            uvCount=dataView.getInt32(offset);
+            offset+=4;
+            
+                // if no vertexes, than this is
+                // a mesh we can skip
+                
+            if (vertexCount===0) {
+                mesh.shadowmap=null;
+                mesh.vertexShadowArray=null;
+                mesh.uvShadowArray=null;
+                continue;
+            }
+            
+                // other set the bitmap
+                
             bitmap=bitmaps.get(bitmapIdx);
             if (bitmap===undefined) {
                 colorURL='models/_'+this.core.map.json.name+'/shadowmap_'+bitmapIdx+'.png';
@@ -84,14 +102,6 @@ export default class ShadowmapLoadClass
             
             mesh.shadowmap=bitmap;
             
-                // the counts
-                
-            vertexCount=dataView.getInt32(offset);
-            offset+=4;
-            
-            uvCount=dataView.getInt32(offset);
-            offset+=4;
-            
                 // vertex and uvs
                 
             mesh.vertexShadowArray=new Float32Array(vertexCount);
@@ -100,8 +110,6 @@ export default class ShadowmapLoadClass
                 mesh.vertexShadowArray[k]=dataView.getFloat32(offset);
                 offset+=4;
             }
-            
-                // the uv
                 
             mesh.uvShadowArray=new Float32Array(uvCount);
             

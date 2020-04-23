@@ -39,11 +39,11 @@ export default class MapEffectListClass
         // effect list
         //
 
-    add(spawnedBy,jsonName,position,data,show)
+    add(spawnedBy,jsonName,position,data,mapSpawn,show)
     {
         let effect;
         
-        effect=new EffectClass(this.core,spawnedBy,jsonName,position,data,show);
+        effect=new EffectClass(this.core,spawnedBy,jsonName,position,data,mapSpawn,show);
         if (!effect.initialize()) return(false);
         
         this.effects.push(effect);
@@ -107,7 +107,7 @@ export default class MapEffectListClass
             effectShow=true;
             if (effectDef.show!==undefined) effectShow=effectDef.show;
 
-            if (!this.add(null,effectDef.json,effectPosition,effectDef.data,effectShow)) return(false);
+            if (!this.add(null,effectDef.json,effectPosition,effectDef.data,true,effectShow)) return(false);
         }
         
         return(true);
@@ -191,13 +191,29 @@ export default class MapEffectListClass
         
     draw()
     {
-        let effect;
+        let effect,bitmap;
         
-        for (effect of this.effects) {
-            if ((effect.show) && (effect.setupOK)) {
-                effect.draw();
-                this.core.drawEffectCount++;
+            // regular effect drawing
+            // if the effects are shown, then draw them
+            
+        if (!this.core.game.developer.on) {
+        
+            for (effect of this.effects) {
+                if ((effect.show) && (effect.setupOK)) effect.draw();
             }
+            
+            return;
+        }
+        
+            // developer draw, just draw icons
+            // for where effects are (only draw for
+            // map spawned effects because that's all
+            // we edit)
+            
+        bitmap=this.core.bitmapList.get('../developer/sprites/effect.png');
+            
+        for (effect of this.effects) {
+            if (effect.mapSpawn) this.core.game.developer.developerSprite.drawBillboardSprite(bitmap,effect.position);
         }
     }
 

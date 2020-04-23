@@ -55,6 +55,8 @@ export default class MeshClass
         this.originalXBound=new BoundClass(0,0);
         this.originalYBound=new BoundClass(0,0);
         this.originalZBound=new BoundClass(0,0);
+        
+        this.moveable=false;            // a flag so we can detect which meshes have movements attached
 
             // gl buffers
 
@@ -644,9 +646,6 @@ export default class MeshClass
         let gl=this.core.gl;
         
         gl.drawElements(gl.TRIANGLES,this.indexCount,(this.need32BitIndexes?gl.UNSIGNED_INT:gl.UNSIGNED_SHORT),0);
-            
-        this.core.drawMeshCount++;
-        this.core.drawTrigCount+=Math.trunc(this.indexCount/3);
     }
     
     drawShadow()

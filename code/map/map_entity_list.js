@@ -43,7 +43,7 @@ export default class MapEntityListClass
     {
         this.clear();
     }
-    
+        
         //
         // setups network flags to tell if remotes got an update in a loop cycle
         //
@@ -61,7 +61,7 @@ export default class MapEntityListClass
         // list items
         //
         
-    add(spawnedByEntity,jsonName,name,position,angle,data,show,hold)
+    add(spawnedByEntity,jsonName,name,position,angle,data,mapSpawn,show,hold)
     {
         let json,entity,entityClass;
         
@@ -114,7 +114,7 @@ export default class MapEntityListClass
         
             // create the entity
             
-        entity=new entityClass(this.core,name,json,position,angle,data);
+        entity=new entityClass(this.core,name,json,position,angle,data,mapSpawn);
         
         entity.spawnedBy=spawnedByEntity;
         if (hold) entity.heldBy=spawnedByEntity;
@@ -201,7 +201,7 @@ export default class MapEntityListClass
             
                 // add the entity
                 
-            entity=this.add(null,entityDef.json,entityName,entityPosition,entityAngle,entityData,true,false);
+            entity=this.add(null,entityDef.json,entityName,entityPosition,entityAngle,entityData,true,true,false);
             if (entity===null) return(false);
             
                 // random positions
@@ -217,6 +217,8 @@ export default class MapEntityListClass
         }
             
             // load any bots if it's a local multiplayer game
+            // these are dynamic entities, which means they
+            // don't show up in edit mode
             
         if (!((this.core.isMultiplayer) && (this.core.setup.localGame))) return(true);
 
@@ -350,4 +352,5 @@ export default class MapEntityListClass
             entity.draw();
         }
     }
+
 }

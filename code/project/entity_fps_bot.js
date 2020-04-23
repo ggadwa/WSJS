@@ -3,9 +3,9 @@ import EntityClass from '../project/entity.js';
 
 export default class EntityFPSBotClass extends EntityClass
 {
-    constructor(core,name,json,position,angle,data)
+    constructor(core,name,json,position,angle,data,mapSpawn)
     {
-        super(core,name,json,position,angle,data);
+        super(core,name,json,position,angle,data,mapSpawn);
         
         this.fighter=true;
         this.canPickup=true;
@@ -484,12 +484,12 @@ export default class EntityFPSBotClass extends EntityClass
                     this.grenadePauseTick=this.getTimestamp()+this.GRENADE_PAUSE_TICK;
 
                     if (this.currentWeapon===this.WEAPON_BERETTA) {
-                        this.startModelAnimationChunkInFrames(null,30,51,91);
-                        this.queueModelAnimationChunkInFrames(null,30,406,442);
+                        this.modelEntityAlter.startAnimationChunkInFrames(null,30,51,91);
+                        this.modelEntityAlter.queueAnimationChunkInFrames(null,30,406,442);
                     }
                     else {
-                        this.startModelAnimationChunkInFrames(null,30,820,860);
-                        this.queueModelAnimationChunkInFrames(null,30,960,996);
+                        this.modelEntityAlter.startAnimationChunkInFrames(null,30,820,860);
+                        this.modelEntityAlter.queueAnimationChunkInFrames(null,30,960,996);
                     }
                     return;
                 }
@@ -503,7 +503,7 @@ export default class EntityFPSBotClass extends EntityClass
             
         weapon=this.carouselWeapons[this.currentCarouselWeaponIdx].firePrimary(this.firePosition,this.drawAngle);
     }
-
+    
         //
         // mainline bot run
         //
@@ -644,7 +644,7 @@ export default class EntityFPSBotClass extends EntityClass
             }
             else {
                 this.pausedTriggerName=null;
-                this.startModelAnimationChunkInFrames(null,30,960,996);
+                this.modelEntityAlter.startAnimationChunkInFrames(null,30,960,996);
             }
         }
         

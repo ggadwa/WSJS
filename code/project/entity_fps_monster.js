@@ -9,9 +9,9 @@ import EntityClass from '../project/entity.js';
 
 export default class EntityFPSMonsterClass extends EntityClass
 {
-    constructor(core,name,json,position,angle,data)
+    constructor(core,name,json,position,angle,data,mapSpawn)
     {
-        super(core,name,json,position,angle,data);
+        super(core,name,json,position,angle,data,mapSpawn);
         
         this.fighter=true;
         
@@ -246,7 +246,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.dead=true;
         this.passThrough=true;
         this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.deathAnimation[0],this.deathAnimation[1]);
-        this.queueAnimationStop();
+        this.modelEntityAlter.queueAnimationStop();
         
         this.core.soundList.playJson(this.position,this.deathSound);
         
@@ -516,5 +516,15 @@ export default class EntityFPSMonsterClass extends EntityClass
             if (this.position.z<this.trapMeshZBound.min) this.position.z=this.trapMeshZBound.min;
             if (this.position.z>this.trapMeshZBound.max) this.position.z=this.trapMeshZBound.max;
         }
+    }
+    
+    drawSetup()
+    {
+        this.modelEntityAlter.position.setFromPoint(this.position);
+        this.modelEntityAlter.angle.setFromPoint(this.angle);
+        this.modelEntityAlter.scale.setFromPoint(this.scale);
+        this.modelEntityAlter.inCameraSpace=false;
+        
+        return(true);
     }
 }

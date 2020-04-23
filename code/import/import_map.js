@@ -107,6 +107,7 @@ export default class ImportMapClass
                         continue;
                     }
                     meshIdxList.push(idx);
+                    this.core.map.meshList.meshes[idx].moveable=true;
                 }
                 
                 reverseMeshIdxList=null;
@@ -121,6 +122,7 @@ export default class ImportMapClass
                             continue;
                         }
                         reverseMeshIdxList.push(idx);
+                        this.core.map.meshList.meshes[idx].moveable=true;
                     }
                 }
                     
