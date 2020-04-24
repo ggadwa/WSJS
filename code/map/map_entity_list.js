@@ -339,9 +339,11 @@ export default class MapEntityListClass
         
     draw(heldBy)
     {
-        let entity;
+        let n,entity;
+        
+        for (n=0;n!==this.entities.length;n++) {
+            entity=this.entities[n];
 
-        for (entity of this.entities) {
             if (heldBy!==null) {
                 if (entity.heldBy!==heldBy) continue;
             }
@@ -349,7 +351,7 @@ export default class MapEntityListClass
                 if (entity.heldBy!==null) continue;
             }
             
-            entity.draw();
+            entity.draw(this.core.game.developer.isEntitySelected(n));
         }
     }
 

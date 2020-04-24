@@ -300,7 +300,7 @@ export default class CollisionClass
             pushedEntity=false;
             
             for (n=0;n!==nEntity;n++) {
-                checkEntity=this.core.map.entityList.get(n);
+                checkEntity=this.core.map.entityList.entities[n];
                 if (checkEntity===entity) continue;
                 if ((!checkEntity.show) || (checkEntity.heldBy!==null)) continue;
                 
@@ -394,7 +394,7 @@ export default class CollisionClass
         let nEntity=this.core.map.entityList.entities.length;
 
         for (n=0;n!==nEntity;n++) {
-            checkEntity=this.core.map.entityList.get(n);
+            checkEntity=this.core.map.entityList.entities[n];
             if (checkEntity===entity) continue;
             if ((!checkEntity.show) || (checkEntity.heldBy!==null)) continue;
 
@@ -512,7 +512,7 @@ export default class CollisionClass
             entityBot=entity.position.y+fallY;
 
             for (n=0;n!==nEntity;n++) {
-                checkEntity=this.core.map.entityList.get(n);
+                checkEntity=this.core.map.entityList.entities[n];
                 if (checkEntity===entity) continue;
                 if ((!checkEntity.show) || (checkEntity.passThrough) || (checkEntity.heldBy!==null)) continue;
 
@@ -624,7 +624,7 @@ export default class CollisionClass
             entityBot=entity.position.y+riseY;
 
             for (n=0;n!==nEntity;n++) {
-                checkEntity=this.core.map.entityList.get(n);
+                checkEntity=this.core.map.entityList.entities[n];
                 if (checkEntity===entity) continue;
                 if ((!checkEntity.show) || (checkEntity.passThrough) || (checkEntity.heldBy!==null)) continue;
 
@@ -746,7 +746,7 @@ export default class CollisionClass
             // check entities
             
         for (n=0;n!==nEntity;n++) {
-            checkEntity=this.core.map.entityList.get(n);
+            checkEntity=this.core.map.entityList.entities[n];
             if (checkEntity===entity) continue;
             if (checkEntity===entity.heldBy) continue;         // skip source entity and anything holding source entity
             if ((!checkEntity.show) || (checkEntity.passThrough) || (checkEntity.heldBy!==null)) continue;
@@ -954,7 +954,7 @@ export default class CollisionClass
             // check other entities
 
         for (n=0;n!==nEntity;n++) {
-            checkEntity=this.core.map.entityList.get(n);
+            checkEntity=this.core.map.entityList.entities[n];
             if (checkEntity===entity) continue;
             if ((!checkEntity.show) || (checkEntity.heldBy!==null)) continue;
 

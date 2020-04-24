@@ -67,7 +67,7 @@ export default class DeveloperSpriteClass
         gl.deleteBuffer(this.vertexUVBuffer);
     }
     
-    drawBillboardSprite(bitmap,position)
+    drawBillboardSprite(bitmap,position,selected)
     {
         let gl=this.core.gl;
         let shader=this.core.shaderList.effectShader;
@@ -122,7 +122,7 @@ export default class DeveloperSpriteClass
         
         shader.drawStart();
         
-        gl.uniform4f(shader.colorAlphaUniform,1,1,1,1);
+        gl.uniform4f(shader.colorAlphaUniform,1,1,(selected?0:1),1);
         
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,this.vertexes,gl.DYNAMIC_DRAW);

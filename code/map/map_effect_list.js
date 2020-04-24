@@ -191,7 +191,7 @@ export default class MapEffectListClass
         
     draw()
     {
-        let effect,bitmap;
+        let n,effect,bitmap;
         
             // regular effect drawing
             // if the effects are shown, then draw them
@@ -212,8 +212,9 @@ export default class MapEffectListClass
             
         bitmap=this.core.bitmapList.get('../developer/sprites/effect.png');
             
-        for (effect of this.effects) {
-            if (effect.mapSpawn) this.core.game.developer.developerSprite.drawBillboardSprite(bitmap,effect.position);
+        for (n=0;n!==this.effects.length;n++) {
+            effect=this.effects[n];
+            if (effect.mapSpawn) this.core.game.developer.developerSprite.drawBillboardSprite(bitmap,effect.position,this.core.game.developer.isEffectSelected(n));
         }
     }
 

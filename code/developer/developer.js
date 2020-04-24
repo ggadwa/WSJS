@@ -22,9 +22,19 @@ export default class DeveloperClass
         this.NEAR_PATH_NODE_DISTANCE=5000;
         this.CONTACT_MESH_RADIUS=100;
         
+        this.SELECT_ITEM_NONE=-1;
+        this.SELECT_ITEM_ENTITY=0;
+        this.SELECT_ITEM_EFFECT=1;
+        this.SELECT_ITEM_LIGHT=2;
+        this.SELECT_ITEM_NODE=3;
+        
         this.on=false;
         this.position=new PointClass(0,0,0);
         this.angle=new PointClass(0,0,0);
+        
+        this.selectItemType=this.SELECT_ITEM_NONE;
+        this.selectItemIndex=0;
+        this.selectVector=new PointClass(0,0,0);
         
             // misc drawing class
             
@@ -50,9 +60,9 @@ export default class DeveloperClass
         
         this.core.interface.addText('wsPosition','',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-95},20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
         this.core.interface.addText('wsAngle','',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-72},20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
-        this.core.interface.addText('wsNode','',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-49},20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
-        this.core.interface.addText('wsMesh','',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-26},20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
-        this.core.interface.addText('wsMessage','',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-3},20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
+        this.core.interface.addText('wsMesh','',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-49},20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
+        this.core.interface.addText('wsTarget','target:',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-26},20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
+        this.core.interface.addText('wsSelect','select:',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-3},20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
         
         if (!this.developerSprite.initialize()) return(false);
         if (!this.developerRay.initialize()) return(false);
@@ -319,6 +329,70 @@ export default class DeveloperClass
     }
     
         //
+        // selection getters
+        //
+        
+    getSelectPosition(itemType,itemIndex)
+    {
+        let entity;
+        let position=new PointClass(0,0,0);
+        
+        switch (itemType) {
+            case this.SELECT_ITEM_ENTITY:
+                entity=this.core.map.entityList.entities[itemIndex];
+                position.setFromValues(entity.originalPosition.x,(entity.originalPosition.y-Math.trunc(entity.height*0.5)),entity.originalPosition.z);
+                break;
+            case this.SELECT_ITEM_EFFECT:
+                position.setFromPoint(this.core.map.effectList.effects[itemIndex].position);
+                break;
+            case this.SELECT_ITEM_LIGHT:
+                position.setFromPoint(this.core.map.lightList.lights[itemIndex].position);
+                break;
+            case this.SELECT_ITEM_NODE:
+                position.setFromPoint(this.core.map.path.nodes[itemIndex].position);
+                break;
+        }
+        
+        return(position);
+    }
+    
+    getSelectLastIndex(itemType)
+    {
+        switch (itemType) {
+            case this.SELECT_ITEM_ENTITY:
+                return(this.core.map.entityList.entities.length);
+            case this.SELECT_ITEM_EFFECT:
+                return(this.core.map.effectList.effects.length);
+            case this.SELECT_ITEM_LIGHT:
+                return(this.core.map.lightList.lights.length);
+            case this.SELECT_ITEM_NODE:
+                return(this.core.map.path.nodes.length);
+        }
+        
+        return(0);
+    }
+    
+    getSelectName(itemType,itemIndex)
+    {
+        let key;
+        
+        switch (itemType) {
+            case this.SELECT_ITEM_ENTITY:
+                return('[entity '+itemIndex+'] '+this.core.map.entityList.entities[itemIndex].name);
+            case this.SELECT_ITEM_EFFECT:
+                return('[effect '+itemIndex+'] '+this.core.map.effectList.effects[itemIndex].jsonName);
+            case this.SELECT_ITEM_LIGHT:
+                return('[light '+itemIndex+']');
+            case this.SELECT_ITEM_NODE:
+                key=this.core.map.path.nodes[itemIndex].key;
+                if (key===null) key='';
+                return('[node '+itemIndex+'] '+key);
+        }
+        
+        return('');
+    }
+    
+        //
         // developer movement
         //
         
@@ -382,6 +456,43 @@ export default class DeveloperClass
         this.position.addPoint(this.movement);
     }
     
+    select()
+    {
+        let prev,next;
+        let input=this.core.input;
+        
+            // click to select
+            
+        if (input.mouseButtonFlags[0]) {
+            if (this.developerRay.targetItemType!==this.SELECT_ITEM_NONE) {
+                this.selectItemType=this.developerRay.targetItemType;
+                this.selectItemIndex=this.developerRay.targetItemIndex;
+                this.core.interface.updateText('wsSelect',('select:'+this.getSelectName(this.selectItemType,this.selectItemIndex)));
+            }
+        }
+        
+            // [ and ] to change selection
+            
+        prev=input.isKeyDownAndClear('[');
+        next=input.isKeyDownAndClear(']');
+        
+        if ((this.selectItemType!==this.SELECT_ITEM_NONE) && (prev||next)) {
+            this.selectVector.setFromSubPoint(this.position,this.getSelectPosition(this.selectItemType,this.selectItemIndex));
+
+            if (prev) {
+                this.selectItemIndex--;
+                if (this.selectItemIndex<0) this.selectItemIndex=this.getSelectLastIndex(this.selectItemType)-1;
+            }
+            if (next) {
+                this.selectItemIndex++;
+                if (this.selectItemIndex>=this.getSelectLastIndex(this.selectItemType)) this.selectItemIndex=0;
+            }
+
+            this.position.setFromAddPoint(this.getSelectPosition(this.selectItemType,this.selectItemIndex),this.selectVector);
+            this.core.interface.updateText('wsSelect',('select:'+this.getSelectName(this.selectItemType,this.selectItemIndex)));
+        }
+    }
+    
         //
         // developer on/off
         //
@@ -412,14 +523,14 @@ export default class DeveloperClass
     {
         this.core.interface.updateText('wsPosition','');
         this.core.interface.updateText('wsAngle','');
-        this.core.interface.updateText('wsNode','');
         this.core.interface.updateText('wsMesh','');
-        this.core.interface.updateText('wsMessage','');
+        this.core.interface.updateText('wsTarget','target:');
+        this.core.interface.updateText('wsSelect','select:');
     }
     
     setInterfaceOutput()
     {
-        let n,nodeIdx,str;
+        let n,str;
         
             // world info
             
@@ -430,14 +541,6 @@ export default class DeveloperClass
         let yBound=new BoundClass((this.position.y-this.CONTACT_MESH_RADIUS),(this.position.y+this.CONTACT_MESH_RADIUS));
         let zBound=new BoundClass((this.position.z-this.CONTACT_MESH_RADIUS),(this.position.z+this.CONTACT_MESH_RADIUS));
         
-        nodeIdx=this.findNearestPathNode(this.NEAR_PATH_NODE_DISTANCE);
-        if (nodeIdx===-1) {
-            this.core.interface.updateText('wsNode','node:');
-        }
-        else {
-            this.core.interface.updateText('wsNode',('node:'+nodeIdx));
-        }
-            
         str='';
 
         for (n=0;n!==this.core.map.meshList.meshes.length;n++) {
@@ -495,6 +598,31 @@ export default class DeveloperClass
         
         console.info('developer mode: off');
     }
+    
+        //
+        // selections
+        //
+        
+    isEntitySelected(idx)
+    {
+        return((this.selectItemType===this.SELECT_ITEM_ENTITY) && (this.selectItemIndex===idx));
+    }
+        
+    isEffectSelected(idx)
+    {
+        return((this.selectItemType===this.SELECT_ITEM_EFFECT) && (this.selectItemIndex===idx));
+    }
+        
+    isLightSelected(idx)
+    {
+        return((this.selectItemType===this.SELECT_ITEM_LIGHT) && (this.selectItemIndex===idx));
+    }
+    
+    getSelectedNodeIndex()
+    {
+        if (this.selectItemType!==this.SELECT_ITEM_NODE) return(-1);
+        return(this.selectItemIndex);
+    }
 
         //
         // mainline
@@ -539,13 +667,18 @@ export default class DeveloperClass
             }
         }
         
-            // if in developer mode, we can move
-            // the developer position
+            // exit if not in developer mode
             
-        if (this.on) {
-            this.move();
-            this.developerRay.run(this.position,this.angle);
-        }
+        if (!this.on) return;
+        
+            // move and select
+            
+        this.move();
+        this.select();
+        
+            // run the targetting
+            
+        this.developerRay.run(this.position,this.angle);
 
         return;
         

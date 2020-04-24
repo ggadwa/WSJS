@@ -81,7 +81,7 @@ export default class ModelClass
         // draw model
         //
 
-    draw(entity)
+    draw(entity,selected)
     {
         let modelEntityAlter=entity.modelEntityAlter;
         
@@ -101,7 +101,7 @@ export default class ModelClass
             
         if ((this.core.game.developer.on) && (entity.heldBy===null)) {
             modelEntityAlter.setupModelMatrix(false);
-            modelEntityAlter.drawBounds();
+            modelEntityAlter.drawBounds(selected);
         }
     }
 }

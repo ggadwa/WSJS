@@ -7,11 +7,10 @@ SHADOW MAPS
  - uploads need to delete old map/folder
 
 EDIT MODE
-  - space to select nearest thing, put in message
-  - [ and ] to select prev/next of current selected thing (jump to it from same distance, always point at it)
-  - shoot ray to select spot (show mesh in box, color hit polygon?)
+  - [/] need to skip non map spawn entities
+  - why are bots in [ ] list
+  - right click to start split
   - no movements
-  - do we need effect counts/etc?
 
 - multiplayer needs a complete rebuild
 

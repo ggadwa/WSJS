@@ -1041,7 +1041,7 @@ export default class EntityClass
         // draw entity
         //
     
-    draw()
+    draw(selected)
     {
         if (this.model===null) return;
         
@@ -1069,6 +1069,6 @@ export default class EntityClass
         
             // draw the model
             
-        this.model.draw(this);
+        this.model.draw(this,selected);
     }
 }

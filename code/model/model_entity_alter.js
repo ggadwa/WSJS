@@ -732,7 +732,7 @@ export default class ModelEntityAlterClass
         // note this is not optimal and slow!
         //
         
-    drawBounds()
+    drawBounds(selected)
     {
         let n,rad;
         let vertices,indexes,vIdx,iIdx;
@@ -812,7 +812,14 @@ export default class ModelEntityAlterClass
         
             // the lines
             
-        gl.uniform3f(shader.colorUniform,0.2,0.2,1.0);
+        if (selected) {
+            gl.uniform3f(shader.colorUniform,1,1,0);
+        }
+        else
+        {
+            gl.uniform3f(shader.colorUniform,0.2,0.2,1.0);
+        }
+        
         gl.drawElements(gl.LINES,(((36*2)*2)+(4*2)),gl.UNSIGNED_SHORT,0);
         
             // the nodes
