@@ -372,6 +372,12 @@ export default class DeveloperClass
         return(0);
     }
     
+    isSelectVisible(itemType,itemIndex)
+    {
+        if (itemType!==this.SELECT_ITEM_ENTITY) return(true);
+        return(this.core.map.entityList.entities[itemIndex].mapSpawn);
+    }
+    
     getSelectName(itemType,itemIndex)
     {
         let key;
@@ -480,12 +486,18 @@ export default class DeveloperClass
             this.selectVector.setFromSubPoint(this.position,this.getSelectPosition(this.selectItemType,this.selectItemIndex));
 
             if (prev) {
-                this.selectItemIndex--;
-                if (this.selectItemIndex<0) this.selectItemIndex=this.getSelectLastIndex(this.selectItemType)-1;
+                while (true) {
+                    this.selectItemIndex--;
+                    if (this.selectItemIndex<0) this.selectItemIndex=this.getSelectLastIndex(this.selectItemType)-1;
+                    if (this.isSelectVisible(this.selectItemType,this.selectItemIndex)) break;
+                }
             }
             if (next) {
-                this.selectItemIndex++;
-                if (this.selectItemIndex>=this.getSelectLastIndex(this.selectItemType)) this.selectItemIndex=0;
+                while (true) {
+                    this.selectItemIndex++;
+                    if (this.selectItemIndex>=this.getSelectLastIndex(this.selectItemType)) this.selectItemIndex=0;
+                    if (this.isSelectVisible(this.selectItemType,this.selectItemIndex)) break;
+                }
             }
 
             this.position.setFromAddPoint(this.getSelectPosition(this.selectItemType,this.selectItemIndex),this.selectVector);

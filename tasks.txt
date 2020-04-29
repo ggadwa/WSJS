@@ -3,12 +3,13 @@
 - swipe up for grenade
 
 SHADOW MAPS
+ - the normal elimination isn't right, it's eliminating stuff it shouldn't
+
+ - shadows seem to have triangles missing?
  - try to connect longest side with longest side of triangle
  - uploads need to delete old map/folder
 
 EDIT MODE
-  - [/] need to skip non map spawn entities
-  - why are bots in [ ] list
   - right click to start split
   - no movements
 

@@ -224,7 +224,7 @@ export default class MapEntityListClass
 
         for (n=0;n!==this.core.setup.botCount;n++) {
             nameIdx=n%this.core.game.json.bot.names.length;
-            entity=this.add(null,this.core.game.json.bot.json,this.core.game.json.bot.names[nameIdx],new PointClass(0,0,0),new PointClass(0,0,0),null,true,false);
+            entity=this.add(null,this.core.game.json.bot.json,this.core.game.json.bot.names[nameIdx],new PointClass(0,0,0),new PointClass(0,0,0),null,false,true,false);
             if (entity===null) return(false);
         }
 
