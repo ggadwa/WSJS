@@ -203,6 +203,27 @@ export default class DialogBaseClass
         rowDiv.appendChild(buttonDiv);        
         parentDiv.appendChild(rowDiv);
     }
+    
+        //
+        // messages
+        //
+        
+    displayMessage(message)
+    {
+        let messageDiv=document.createElement('div');
+        
+        messageDiv.className='dialogMessage';
+        messageDiv.innerText=message;
+        
+        document.body.appendChild(messageDiv);
+        
+        setTimeout(this.displayMessageClear.bind(this,messageDiv),5000);
+    }
+    
+    displayMessageClear(messageDiv)
+    {
+        document.body.removeChild(messageDiv);
+    }
 
         //
         // progress

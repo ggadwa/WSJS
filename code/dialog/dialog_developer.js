@@ -1,6 +1,8 @@
 import SetupClass from '../main/setup.js';
 import DialogBaseClass from '../dialog/dialog_base.js';
-import ShadowmapGeneratorClass from '../light/shadow_map_generator.js';
+import UploadClass from '../main/upload.js';
+import ShadowmapLightClass from '../generate/shadowmap/shadowmap_light.js';
+import ShadowmapMeshClass from '../generate/shadowmap/shadowmap_mesh.js';
 
 export default class DialogDeveloperClass extends DialogBaseClass
 {
@@ -8,7 +10,7 @@ export default class DialogDeveloperClass extends DialogBaseClass
     {
         super(core);
         
-        this.progressPercent=0;
+        this.shadowmapThread=null;
     }
     
         //
@@ -57,18 +59,129 @@ export default class DialogDeveloperClass extends DialogBaseClass
     
     buildShadowmap()
     {
-        this.startProgress();
+        let n,nMesh,data;
+        let light,effect;
+        let map=this.core.map;
         
-        setTimeout(this.startShadowmap.bind(this),1);       // so progress can update
-    }
-    startShadowmap()
-    {
-        (new ShadowmapGeneratorClass(this.core,this,this.finishShadowmap.bind(this))).create();
+            // already building?
+            
+        if (this.shadowmapThread!==null) {
+            this.displayMessage('Currently in Shadowmap Build');
+            return;
+        }
+
+            // we need to make a parallel object of
+            // all the data because our regular data has DOM
+            // elements in it and those can't be passed to
+            // workers, we also do all pre-calculation here
+            
+        data={};
+        
+            // need to save this from map json
+            
+        data.shadowMapHighlightBitmaps=map.json.shadowMapHighlightBitmaps;
+        
+            // pre-calc the meshes
+            
+        data.meshes=[];
+        
+        nMesh=map.meshList.meshes.length;
+            
+        for (n=0;n!==nMesh;n++) {
+            data.meshes.push(new ShadowmapMeshClass(map.meshList.meshes[n]));
+        }
+        
+            // pre-calc lights and the meshes they
+            // collide with
+            
+        data.lights=[];
+        
+        for (n=0;n!==map.lightList.lights.length;n++) {
+            light=new ShadowmapLightClass(data.meshes,map.json.shadowMapSkinBitmaps,map.lightList.lights[n]);
+            light.calculateCollisionList();
+            data.lights.push(light);
+        }
+        
+        for (n=0;n!==map.effectList.effects.length;n++) {
+            effect=map.effectList.effects[n];
+            if (effect.light===null) continue;
+            
+            light=new ShadowmapLightClass(data.meshes,map.json.shadowMapSkinBitmaps,effect.light);
+            light.calculateCollisionList();
+            data.lights.push(light);
+        }
+        
+        this.displayMessage('Starting background shadowmap build');
+        
+        this.shadowmapThread=new Worker('../../code/generate/shadowmap/shadowmap_thread.js',{type:"module"});
+        this.shadowmapThread.addEventListener('message',this.buildShadowmapFinish.bind(this),false);
+        this.shadowmapThread.postMessage(data);
     }
     
-    finishShadowmap()
+    buildShadowmapFinish(message)
     {
-        this.stopProgress();
+        let n,k;
+        let shadowmap;
+        let canvas,ctx,imgData,pIdx,pixel;
+        let upload,fileName,data,pixelSize;
+        let textureSize=message.data.textureSize;
+        let bin=message.data.bin;
+        let shadowmapList=message.data.shadowmapList;
+        
+        this.shadowmapThread.terminate();
+        this.shadowmapThread=null;
+        
+            // upload the data
+            
+        console.info('Uploading');
+        
+        this.displayMessage('Shadowmap uploading ('+shadowmapList.length+' maps)');
+            
+        upload=new UploadClass(this.core);
+        
+            // turn shadowmaps into canvases
+            // and then upload as png
+        
+        canvas=document.createElement('canvas');
+        canvas.width=textureSize;
+        canvas.height=textureSize;
+        
+        ctx=canvas.getContext('2d');
+            
+        pixelSize=textureSize*textureSize;
+        
+        for (n=0;n!==shadowmapList.length;n++) {
+            shadowmap=shadowmapList[n];
+            
+                // render unto canvas
+                
+            imgData=ctx.getImageData(0,0,textureSize,textureSize);
+
+            pIdx=0;
+
+            for (k=0;k!==pixelSize;k++) {
+                pixel=shadowmap.lumData[k]*255.0;
+                imgData.data[pIdx++]=pixel;
+                imgData.data[pIdx++]=pixel;
+                imgData.data[pIdx++]=pixel;
+                imgData.data[pIdx++]=255;
+            }
+
+            ctx.putImageData(imgData,0,0);
+            
+                // upload as png
+            
+            fileName='shadowmap_'+n+'.png';
+            data=canvas.toDataURL();
+            data=data.substring(data.indexOf(',')+1);
+            upload.upload(fileName,data);   // already in base64
+        }
+        
+            // the bin
+            
+        upload.upload('shadowmap.bin',bin);
+        
+        this.displayMessage('Shadowmap build completed');
     }
     
         //

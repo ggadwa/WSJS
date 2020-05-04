@@ -3,15 +3,14 @@
 - swipe up for grenade
 
 SHADOW MAPS
- - the normal elimination isn't right, it's eliminating stuff it shouldn't
-
- - shadows seem to have triangles missing?
- - try to connect longest side with longest side of triangle
+ - still have seams
  - uploads need to delete old map/folder
 
 EDIT MODE
   - right click to start split
   - no movements
+
+- bouncing up on bits of pillar in castle map is bad, should not be able to stand on those
 
 - multiplayer needs a complete rebuild
 
