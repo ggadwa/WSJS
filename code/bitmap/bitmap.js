@@ -76,7 +76,7 @@ export default class BitmapClass
         this.normalURL=null;
         this.metallicRoughnessURL=null;
         this.emissiveURL=null;
-        this.emissiveFactor=null;
+        this.emissiveFactor=new ColorClass(1,1,1);
         this.scale=null;
         
         this.buildSimpleName();
@@ -91,7 +91,7 @@ export default class BitmapClass
         this.normalURL=null;
         this.metallicRoughnessURL=null;
         this.emissiveURL=null;
-        this.emissiveFactor=null;
+        this.emissiveFactor=new ColorClass(1,1,1);
         this.scale=null;
         
         this.buildSimpleName();
@@ -106,7 +106,7 @@ export default class BitmapClass
         this.normalURL=null;
         this.metallicRoughnessURL=null;
         this.emissiveURL=null;
-        this.emissiveFactor=null;
+        this.emissiveFactor=new ColorClass(1,1,1);
         this.scale=null;
         
         this.buildSimpleName();

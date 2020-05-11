@@ -35,6 +35,7 @@ export default class ImportGLTFClass
         
         if (this.json.name=='dual_castles') url='../models/'+this.json.name+'/'+this.json.name+'.gltf';
         if (this.json.name=='dungeon') url='../models/'+this.json.name+'/'+this.json.name+'.gltf';
+        if (this.json.name=='circuit_race') url='../models/'+this.json.name+'/'+this.json.name+'.gltf';
         
         try {
             resp=await fetch(url);
@@ -632,7 +633,7 @@ export default class ImportGLTFClass
                         // the texture
                         
                     baseColorTexture=materialNode.pbrMetallicRoughness.baseColorTexture;
-
+                    
                     uri=this.jsonData.images[baseColorTexture.index].uri;
                     colorURL=uri.startsWith('data:image')?uri:(prefixURL+uri);
                     
@@ -669,7 +670,7 @@ export default class ImportGLTFClass
             uri=this.jsonData.images[emissiveTexture.index].uri;
             emissiveURL=uri.startsWith('data:image')?uri:(prefixURL+uri);
             
-            if (materialNode.emissiveFactor!==undefined) emissiveFactor=new ColorClass(materialNode.emissiveFactor[0],materialNode.emissiveFactor[1],materialNode.emissiveFactor[2]);
+            if (materialNode.emissiveFactor!==undefined) emissiveFactor.setFromValues(materialNode.emissiveFactor[0],materialNode.emissiveFactor[1],materialNode.emissiveFactor[2]);
         }
         
             // create the bitmap and
@@ -756,16 +757,6 @@ export default class ImportGLTFClass
                     
                 bitmap=this.findMaterialForMesh(meshNode,primitiveNode);
                 if (bitmap===null) return(false);
-                
-                    // is it in the skip list?
-                    
-                if (this.json.meshSkipMeshes!==undefined) {
-                    if (this.json.meshSkipMeshes.indexOf(meshNode.name)!==-1) continue;
-                }
-                    
-                if (this.json.meshSkipBitmaps!==undefined) {
-                    if (this.json.meshSkipBitmaps.indexOf(bitmap.simpleName)!==-1) continue;
-                }
                 
                     // get all the arrays
                   

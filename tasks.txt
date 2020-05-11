@@ -7,18 +7,13 @@ BLENDER
  - get rid of loadGLTFJson hack (no scene, use name of folder)
  - make metallic/roughness only way, error if missing
  - generate_bitmap_base / addGenerated needs to change -- search all for "specular" and "glow"
-
-- get rid of all skip meshes
-
-        "meshSkipBitmaps":["light_glow_color","web_color"],
-        "meshSkipMeshes":["border_brick_72","doors_big_left_07","doors_big_right_07","doors_base_big_07","doors_big_left_08","doors_big_right_08","doors_base_big_010","doors_big_left_010","doors_big_right_010","doors_base_big_010","doors_big_left_013","doors_big_right_013","doors_base_big_013","doors_big_left_015","doors_big_right_015","doors_base_big_015","doors_small_04","doors_base_small_04"],
-
+ - need emission for race track lights
+ - replace a lot of textures on circuit race
 
 SHADOW MAPS
  - turn off cube eliminator (or fix first)
  - do we need the uv changes?
  - try mipmaps again
- - add lights behind castles
  - sort lights by intensity
  - still have seams
  - uploads need to delete old map/folder
