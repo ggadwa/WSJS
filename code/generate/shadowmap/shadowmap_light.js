@@ -18,10 +18,9 @@ export default class ShadowmapLightClass
         this.invertIntensity=mapLight.invertIntensity;
         this.exponent=mapLight.exponent;
         
-            // for sorting, we want to always
-            // consider the closest lights first
+            // if being used on this trig
             
-        this.distance=0;
+        this.inUse=false;
         
             // some ray trace optimization values
             

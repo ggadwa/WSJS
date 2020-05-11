@@ -3,6 +3,7 @@ import BoundClass from '../../utility/bound.js';
 import ColorClass from '../../utility/color.js';
 import Matrix4Class from '../../utility/matrix4.js';
 import ShadowmapBitmapClass from './shadowmap_bitmap.js';
+import ShadowmapMeshRunClass from './shadowmap_mesh_run.js';
 
     //
     // the worker setup
@@ -12,12 +13,9 @@ self.addEventListener("message",run);
 
 function run(message)
 {
-    let timestamp,returnData;
+    let returnData;
     
-    timestamp=Date.now();
     returnData=(new ShadowmapGeneratorClass(message.data)).run();
-    console.info('time='+(Date.now()-timestamp));
-    
     self.postMessage(returnData);
 }
 
@@ -41,7 +39,7 @@ class ShadowmapGeneratorClass
         this.SHADOWMAP_CHUNK_SIZE=Math.trunc(this.SHADOWMAP_TEXTURE_SIZE/this.SHADOWMAP_CHUNK_SPLIT);    // square pixel size of chunks
         this.SHADOWMAP_CHUNK_PER_TEXTURE=(this.SHADOWMAP_CHUNK_SPLIT*this.SHADOWMAP_CHUNK_SPLIT)*2;        // how many chunks in a single texture (two triangles)
 
-        this.SHADOW_MIN_VALUE=0.3;
+        this.SHADOW_MIN_VALUE=75;
         
         this.RENDER_NORMAL=0;
         this.RENDER_ALL_BLACK=1;
@@ -183,11 +181,11 @@ class ShadowmapGeneratorClass
         return((t>0.05)&&(t<1.0));
     }
 
-    rayTraceMap(meshIdx,trigIdx,lightList,vrt)
+    rayTraceMap(meshIdx,trigIdx,vrt)
     {
         let n,nLight,trigCount;
         let light;
-        let k,p,hit,mesh,nMesh;
+        let k,p,hit,cubeHit,mesh,nMesh;
         let dist;
         
             // we use the passed in light list which is a cut down
@@ -195,10 +193,11 @@ class ShadowmapGeneratorClass
             // removing any lights that are facing away from the
             // front side of the triangle
 
-        nLight=lightList.length;
+        nLight=this.data.lights.length;
 
         for (n=0;n!==nLight;n++) {
-            light=lightList[n];
+            light=this.data.lights[n];
+            if (!light.inUse) continue;
 
                 // light within light range?
 
@@ -235,12 +234,29 @@ class ShadowmapGeneratorClass
             for (k=0;k!==nMesh;k++) {
                 mesh=this.data.meshes[light.collideMeshes[k]];
                 
-                    // only deal with meshes in the ray to light bound
-                    // do x/z first these are probably quicker eliminations
+                    // do a quick elimination for things outside
+                    // the light/vertex bounded box
                     
                 if ((mesh.xBound.min>=this.lightBoundX.max) || (mesh.xBound.max<=this.lightBoundX.min)) continue;
-                if ((mesh.zBound.min>=this.lightBoundZ.max) || (mesh.zBound.max<=this.lightBoundZ.min)) continue;
                 if ((mesh.yBound.min>=this.lightBoundY.max) || (mesh.yBound.max<=this.lightBoundY.min)) continue;
+                if ((mesh.zBound.min>=this.lightBoundZ.max) || (mesh.zBound.max<=this.lightBoundZ.min)) continue;
+                
+                    // if mesh is larger than 12 (6 sides to cube, 2
+                    // triangles each) than do a cube based check first
+                    // for easier eliminations (order: min_x,max_x,min_y,max_y,min_z,max_z)
+                    
+                if (mesh.trigCount>12) {
+                    cubeHit=false;
+                    
+                    for (p=0;p!==12;p++) {
+                        if (this.rayTraceTriangle(vrt,this.lightVector,mesh.cubeCacheV0[p],mesh.cubeCacheV10[p],mesh.cubeCacheV20[p])) {
+                            cubeHit=true;
+                            break;
+                        }
+                    }
+                    
+                    if (!cubeHit) continue;
+                }
 
                     // do all the trigs
                     
@@ -274,21 +290,20 @@ class ShadowmapGeneratorClass
 
     renderTriangle(shadowmap,meshIdx,trigIdx,v0,v1,v2,normal,t0,t1,t2)
     {
-        let n,k,x,y,lx,rx,ty,by,pIdx;
+        let n,x,y,lx,rx,ty,by,pIdx;
         let tlx,blx,trx,brx;
         let dist0,dist1,dist2,allBlack,allWhite;
-        let light,lightList,normalOK,insertIdx;
+        let light,normalOK,hasLight;
         let lumData=shadowmap.lumData;
         
             // create a light list to check the
             // triangle against
             
-        lightList=this.data.lights;
+        hasLight=false;
         
-        lightList=[];
-
         for (n=0;n!==this.data.lights.length;n++) {
             light=this.data.lights[n];
+            light.inUse=false;
             
                 // only consider a light if it collides
                 // with this mesh
@@ -322,25 +337,13 @@ class ShadowmapGeneratorClass
                 }
             }
             
-            if (!normalOK) continue;
-            
-            light.distance=dist0;
-
-            insertIdx=lightList.length;
-
-            for (k=0;k!==lightList.length;k++) {
-                if (dist0<lightList[k].distance) {
-                    insertIdx=k;
-                    break;
-                }
-            }
-
-            lightList.splice(insertIdx,0,light);
+            light.inUse=normalOK;
+            hasLight=hasLight||normalOK;
         }
         
             // if no lights, it's all black
             
-        if (lightList.length===0) return(this.RENDER_ALL_BLACK);
+        if (!hasLight) return(this.RENDER_ALL_BLACK);
         
             // flag to see if we only wrote black or white lum values
             
@@ -388,8 +391,8 @@ class ShadowmapGeneratorClass
                 this.rayPoint.setFromValues(x,y,0);    
                 this.rayPoint.matrixMultiply(this.transformMat);
                 
-                if (this.rayTraceMap(meshIdx,trigIdx,lightList,this.rayPoint)) {
-                    lumData[pIdx]=1.0;
+                if (this.rayTraceMap(meshIdx,trigIdx,this.rayPoint)) {
+                    lumData[pIdx]=255;
                     allBlack=false;
                 }
                 else {
@@ -407,14 +410,16 @@ class ShadowmapGeneratorClass
 
     renderMesh(meshIdx)
     {
-        let n,renderResult,resetOnce,originalChunkIdx;
+        let n,renderResult,runIdx;
         let rv0,rv1,rv2,dist0,dist1,dist2;
         let vertexShadowArray,uvShadowArray;
         let mesh,shadowmap,highlight;
         
         mesh=this.data.meshes[meshIdx];
         
-        console.info('Ray tracing mesh '+meshIdx+'/'+this.data.meshes.length);
+        mesh.shadowMapIndex=0;
+        mesh.vertexShadowArray=null;
+        mesh.uvShadowArray=null;
         
             // moveable or highlighted meshes are skipped
                 
@@ -422,251 +427,148 @@ class ShadowmapGeneratorClass
         if (this.data.shadowMapHighlightBitmaps!==undefined) highlight=(this.data.shadowMapHighlightBitmaps.indexOf(mesh.bitmapName)!==-1);
 
         if ((mesh.moveable) || (highlight)) {
-            mesh.shadowMapIndex=0;
-            mesh.vertexShadowArray=null;
-            mesh.uvShadowArray=null;
+            console.info('['+this.data.threadIdx+'] skipping highlighted mesh '+((meshIdx-this.data.startMeshIdx)+1)+'/'+(this.data.endMeshIdx-this.data.startMeshIdx)+" ("+mesh.name+")");
             return;
         }
         
+        console.info('['+this.data.threadIdx+'] ray tracing mesh '+((meshIdx-this.data.startMeshIdx)+1)+'/'+(this.data.endMeshIdx-this.data.startMeshIdx)+" ("+mesh.name+")");
+        
+            // start a run
+        
+        shadowmap=this.shadowmapList[this.shadowmapIdx];
+        
+        mesh.shadowmapRuns=[];
+        mesh.shadowmapRuns.push(new ShadowmapMeshRunClass(this.shadowmapIdx,0,0));
+        
+        runIdx=0;
+
             // we use regular arrays so we
             // can do push, converting them to
             // floats at the end
             
         vertexShadowArray=[];
         uvShadowArray=[];
-        
-            // we need to put the entire mesh into
-            // one shadow map, but we don't know how many
-            // triangles we will have so we start filling
-            // and fail and start over if we go over
-            
-        resetOnce=false;
-        
-        while (true) {
-            
-            shadowmap=this.shadowmapList[this.shadowmapIdx];
-            originalChunkIdx=shadowmap.chunkIdx;
 
-                // run through the triangles
-                // if no lights hit a triangle, it's
-                // autoset to chunk 0, the all black trig
+            // run through the triangles
+            // if no lights hit a triangle, it's
+            // autoset to chunk 0, the all black trig
 
-            for (n=0;n!==mesh.trigCount;n++) {
+        for (n=0;n!==mesh.trigCount;n++) {
 
-                    // get vertexes for the 3D world triangle
-                    // and a single normal
+                // get vertexes for the 3D world triangle
+                // and a single normal
 
-                this.getMeshTriangleVertexes(mesh,n,this.v0,this.v1,this.v2,this.normal);
-                        
-                    // rotate triangles so hypontenuses line up
-                    // so we have best surface to draw on (the draw
-                    // triangles always have the hypontenuse at p2->p0)
+            this.getMeshTriangleVertexes(mesh,n,this.v0,this.v1,this.v2,this.normal);
 
-                dist0=this.distance(this.v0,this.v1);
-                dist1=this.distance(this.v1,this.v2);
-                dist2=this.distance(this.v2,this.v0);
+                // rotate triangles so hypontenuses line up
+                // so we have best surface to draw on (the draw
+                // triangles always have the hypontenuse at p2->p0)
 
-                if ((dist0>dist1) && (dist0>dist2)) {
-                    rv0=this.v1;
-                    rv1=this.v2;
-                    rv2=this.v0;            
-                }
-                else {
-                    if ((dist1>dist0) && (dist1>dist2)) {
-                        rv0=this.v2;
-                        rv1=this.v0;
-                        rv2=this.v1;
-                    }
-                    else {
-                        rv0=this.v0;
-                        rv1=this.v1;
-                        rv2=this.v2;
-                    }
-                }
+            dist0=this.distance(this.v0,this.v1);
+            dist1=this.distance(this.v1,this.v2);
+            dist2=this.distance(this.v2,this.v0);
 
-                    // and the vertexes for the 2D chunk shadowmap
-
-                shadowmap.getChunkDrawCoordinates(shadowmap.chunkIdx,this.t0,this.t1,this.t2);
-
-                    // render the triangle
-
-                renderResult=this.renderTriangle(shadowmap,meshIdx,n,rv0,rv1,rv2,this.normal,this.t0,this.t1,this.t2);
-
-                    // if all white, then skip any triangles
-                    // as they won't draw anything
-
-                if (renderResult===this.RENDER_ALL_WHITE) continue;
-
-                    // advance chunk if not all black (which means
-                    // we used a chunk instead of the default all black chunk
-
-                if (renderResult===this.RENDER_ALL_BLACK) {
-                    shadowmap.getChunkUVCoordinates(0,this.t0,this.t1,this.t2);
-                }
-                else {
-                    shadowmap.getChunkUVCoordinates(shadowmap.chunkIdx,this.t0,this.t1,this.t2);
-                    shadowmap.chunkIdx++;
-                    
-                        // did we overfill this shadowmap and need
-                        // to start over on a new one?
-                        
-                    if (shadowmap.chunkIdx>=this.SHADOWMAP_CHUNK_PER_TEXTURE) break;
-                }
-
-                    // add the shadow map pass triangle
-
-                vertexShadowArray.push(rv0.x,rv0.y,rv0.z);
-                uvShadowArray.push((this.t0.x/this.SHADOWMAP_TEXTURE_SIZE),(this.t0.y/this.SHADOWMAP_TEXTURE_SIZE));
-
-                vertexShadowArray.push(rv1.x,rv1.y,rv1.z);
-                uvShadowArray.push((this.t1.x/this.SHADOWMAP_TEXTURE_SIZE),(this.t1.y/this.SHADOWMAP_TEXTURE_SIZE));
-
-                vertexShadowArray.push(rv2.x,rv2.y,rv2.z);
-                uvShadowArray.push((this.t2.x/this.SHADOWMAP_TEXTURE_SIZE),(this.t2.y/this.SHADOWMAP_TEXTURE_SIZE));
+            if ((dist0>dist1) && (dist0>dist2)) {
+                rv0=this.v1;
+                rv1=this.v2;
+                rv2=this.v0;            
             }
+            else {
+                if ((dist1>dist0) && (dist1>dist2)) {
+                    rv0=this.v2;
+                    rv1=this.v0;
+                    rv2=this.v1;
+                }
+                else {
+                    rv0=this.v0;
+                    rv1=this.v1;
+                    rv2=this.v2;
+                }
+            }
+
+                // and the vertexes for the 2D chunk shadowmap
+
+            shadowmap.getChunkDrawCoordinates(shadowmap.chunkIdx,this.t0,this.t1,this.t2);
+
+                // render the triangle
+
+            renderResult=this.renderTriangle(shadowmap,meshIdx,n,rv0,rv1,rv2,this.normal,this.t0,this.t1,this.t2);
+
+                // if all white, then skip any triangles
+                // as they won't draw anything
+
+            if (renderResult===this.RENDER_ALL_WHITE) continue;
             
-                // did we go over and need to repeat?
-                // we only do this once, otherwise it's a mesh too
-                // big to fit into one shadow map and we just only do
-                // the trigs that fit
+                // advance chunk if not all black (which means
+                // we used a chunk instead of the default all black chunk
+
+            if (renderResult===this.RENDER_ALL_BLACK) {
+                shadowmap.getChunkUVCoordinates(0,this.t0,this.t1,this.t2);
+            }
+            else {
+                shadowmap.getChunkUVCoordinates(shadowmap.chunkIdx,this.t0,this.t1,this.t2);
+                shadowmap.chunkIdx++;
+            }
+
+                // add the shadow map pass triangle
                 
+            mesh.shadowmapRuns[runIdx].endTrigIdx=n+1;
+
+            vertexShadowArray.push(rv0.x,rv0.y,rv0.z);
+            uvShadowArray.push((this.t0.x/this.SHADOWMAP_TEXTURE_SIZE),(this.t0.y/this.SHADOWMAP_TEXTURE_SIZE));
+
+            vertexShadowArray.push(rv1.x,rv1.y,rv1.z);
+            uvShadowArray.push((this.t1.x/this.SHADOWMAP_TEXTURE_SIZE),(this.t1.y/this.SHADOWMAP_TEXTURE_SIZE));
+
+            vertexShadowArray.push(rv2.x,rv2.y,rv2.z);
+            uvShadowArray.push((this.t2.x/this.SHADOWMAP_TEXTURE_SIZE),(this.t2.y/this.SHADOWMAP_TEXTURE_SIZE));
+
+                // are we at the end of this shadowmap
+                // and need to start a new one (and therefore
+                // a new run)
+
             if (shadowmap.chunkIdx>=this.SHADOWMAP_CHUNK_PER_TEXTURE) {
-                if (resetOnce) {
-                    console.info('mesh '+meshIdx+':'+mesh.name+' has too many triangles for shadowmap');
-                    break;
-                }
-                else {
-                    resetOnce=true;
-
-                        // put the map back to it's earlier state
-
-                    for (n=originalChunkIdx;n<shadowmap.chunkIdx;n++) {
-                        shadowmap.fillChunk(n,this.SHADOW_MIN_VALUE);
-                    }
-                    shadowmap.chunkIdx=originalChunkIdx;
-
-                        // now move onto a new map
-
-                    this.shadowmapIdx=this.shadowmapList.length;
-                    this.shadowmapList.push(new ShadowmapBitmapClass(this));
-
-                    console.info('reset='+this.shadowmapIdx);
-
-                    continue;
-                }
+                this.shadowmapIdx=this.shadowmapList.length;
+                
+                shadowmap=new ShadowmapBitmapClass(this);
+                this.shadowmapList.push(shadowmap);
+                
+                mesh.shadowmapRuns.push(new ShadowmapMeshRunClass(this.shadowmapIdx,(n+1),(n+1)));
+                runIdx++;
             }
+        }
+        
+            // check the last run to make sure it wasn't empty
             
-            break;
+        runIdx=mesh.shadowmapRuns.length-1;
+        if (mesh.shadowmapRuns[runIdx].startTrigIdx===mesh.shadowmapRuns[runIdx].endTrigIdx) {
+            mesh.shadowmapRuns.slice(runIdx,1);
         }
         
             // now add the vertex and uvs
             
         if (vertexShadowArray.length===0) {
-            mesh.shadowMapIndex=0;
+            mesh.shadowmapRuns=null;
             mesh.vertexShadowArray=null;
             mesh.uvShadowArray=null;
         }
         else {
-                // map meshes have a temporary index for
-                // the light map.  we don't create the light
-                // maps into the very end (as they can be shared)
-                // so this is used for tracking it until than
-
-            mesh.shadowMapIndex=this.shadowmapIdx;
             mesh.vertexShadowArray=new Float32Array(vertexShadowArray);
             mesh.uvShadowArray=new Float32Array(uvShadowArray);
         }
     }
     
         //
-        // build shadowmap model bin
-        // mesh count (int)
-        //   bitmap index (int)
-        //   vertex byte count (int)
-        //   uv byte count (int)
-        //   vertexes (array of 3 floats)
-        //   uvs (array of 2 floats)
-        //
-        
-    buildShadowMapModelBin()
-    {
-        let n,k,len,offset,mesh;
-        let data,dataView;
-        let byteBuffer,str;
-        let nMesh=this.data.meshes.length;
-        
-            // calculate the length
-            
-        len=4;      // mesh count
-        
-        for (n=0;n!==nMesh;n++) {
-            mesh=this.data.meshes[n];
-            
-            len+=12;        // bitmap index and vertex/uv byte count
-            if (mesh.vertexShadowArray!==null) len+=((mesh.vertexShadowArray.length*4)+(mesh.uvShadowArray.length*4)); // vertex and UVs
-        }
-        
-            // fill the data
-            
-        data=new ArrayBuffer(len);
-        
-        dataView=new DataView(data,0,len);
-        
-        dataView.setInt32(0,nMesh);
-        
-        offset=4;
-        
-        for (n=0;n!==nMesh;n++) {
-            mesh=this.data.meshes[n];
-            
-            if (mesh.vertexShadowArray===null) {
-                dataView.setInt32(offset,0);
-                offset+=4;
-                dataView.setInt32(offset,0);
-                offset+=4;
-                dataView.setInt32(offset,0);
-                offset+=4;
-            }
-            else {
-                dataView.setInt32(offset,mesh.shadowMapIndex);
-                offset+=4;
-                dataView.setInt32(offset,mesh.vertexShadowArray.length);
-                offset+=4;
-                dataView.setInt32(offset,mesh.uvShadowArray.length);
-                offset+=4;
-
-                for (k=0;k!==mesh.vertexShadowArray.length;k++) {
-                    dataView.setFloat32(offset,mesh.vertexShadowArray[k]);
-                    offset+=4;
-                }
-                for (k=0;k!==mesh.uvShadowArray.length;k++) {
-                    dataView.setFloat32(offset,mesh.uvShadowArray[k]);
-                    offset+=4;
-                }
-            }
-        }
-        
-            // now do the base64 conversion
-            
-        byteBuffer=new Uint8Array(data);
-        str='';
-        
-        for (n=0;n!==byteBuffer.byteLength;n++) {
-            str+=String.fromCharCode(byteBuffer[n]);
-        }
-        
-        return(btoa(str));
-    }
-    
-        //
         // create shadowmaps
-        // creation has to be done by a timer because this
-        // is too slow and browsers will bounce the script
         //
 
     run()
     {
-        let n,bin;
+        let n;
+        let startMeshIdx=this.data.startMeshIdx;
+        let endMeshIdx=this.data.endMeshIdx;
+        
+        console.info('['+this.data.threadIdx+'] started');
         
             // start the shadowmap bitmap cache
             // with the initial shadow map
@@ -675,17 +577,19 @@ class ShadowmapGeneratorClass
         this.shadowmapList.push(new ShadowmapBitmapClass(this));
         
             // ray trace the meshes
+            // for this thread
             
-        for (n=0;n!==this.data.meshes.length;n++) {
+        for (n=startMeshIdx;n<endMeshIdx;n++) {
             this.renderMesh(n);
         }
+        
+        console.info('['+this.data.threadIdx+'] completed');
         
             // create the shadow map data and pass
             // out of worker to be uploaded
             // (uses canvas DOM, so can't be done here)
             
-        bin=this.buildShadowMapModelBin();         // already in base64
-        postMessage({textureSize:this.SHADOWMAP_TEXTURE_SIZE,bin:bin,shadowmapList:this.shadowmapList});        
+        postMessage({threadIdx:this.data.threadIdx,startMeshIdx:startMeshIdx,endMeshIdx:endMeshIdx,textureSize:this.SHADOWMAP_TEXTURE_SIZE,meshes:this.data.meshes,shadowmapList:this.shadowmapList});        
     }
 }
 

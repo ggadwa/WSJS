@@ -14,9 +14,8 @@ export default class BitmapClass
         this.NORMAL_MAX_SHIFT=31;
         this.NORMAL_NO_SHIFT_CLAMP=0.7;
         
-        this.DEFAULT_SPECULAR=5;
-        this.SPECULAR_CONTRAST=150;
-        this.SPECULAR_CONTRAST_CLAMP=0.4;
+        this.METALLIC_CONTRAST=150;
+        this.METALLIC_CONTRAST_CLAMP=0.4;
 
         this.core=core;
         
@@ -25,27 +24,23 @@ export default class BitmapClass
         this.colorURL=null;
         this.colorBase=null;
         this.normalURL=null;
-        this.specularURL=null;
-        this.specularFactor=null;
-        this.glowURL=null;
+        this.metallicRoughnessURL=null;
+        this.emissiveURL=null;
+        this.emissiveFactor=null;
         this.scale=null;
         
         this.colorImage=null;
         this.normalImage=null;
-        this.specularImage=null;
-        this.glowImage=null;
+        this.metallicRoughnessImage=null;
+        this.emissiveImage=null;
         
         this.texture=null;
         this.normalMap=null;
-        this.specularMap=null;
-        this.glowMap=null;
+        this.metallicRoughnessMap=null;
+        this.emissiveMap=null;
         this.mask=null;
 
         this.hasColorImageAlpha=false;
-        
-        this.glowFrequency=0;
-        this.glowMin=0.0;
-        this.glowMax=1.0;
         
         this.simpleName=null;
         this.loaded=false;
@@ -57,15 +52,16 @@ export default class BitmapClass
         // initialize and release bitmap
         //
 
-    initializeNormalURL(colorURL,normalURL,specularURL,specularFactor,scale)
+    initializeNormalURL(colorURL,normalURL,metallicRoughnessURL,emissiveURL,emissiveFactor,scale)
     {
         this.bitmapType=this.BITMAP_NORMAL_URL;
         
         this.colorURL=colorURL;
         this.colorBase=null;
         this.normalURL=normalURL;
-        this.specularURL=specularURL;
-        this.specularFactor=(specularFactor!==null)?specularFactor:new ColorClass(this.DEFAULT_SPECULAR,this.DEFAULT_SPECULAR,this.DEFAULT_SPECULAR);
+        this.metallicRoughnessURL=metallicRoughnessURL;
+        this.emissiveURL=emissiveURL;
+        this.emissiveFactor=(emissiveFactor!==null)?emissiveFactor:new ColorClass(1,1,1);
         this.scale=scale;
         
         this.buildSimpleName();
@@ -78,8 +74,9 @@ export default class BitmapClass
         this.colorURL=colorURL;
         this.colorBase=null;
         this.normalURL=null;
-        this.specularURL=null;
-        this.specularFactor=null;
+        this.metallicRoughnessURL=null;
+        this.emissiveURL=null;
+        this.emissiveFactor=null;
         this.scale=null;
         
         this.buildSimpleName();
@@ -92,8 +89,9 @@ export default class BitmapClass
         this.colorURL=colorURL;
         this.colorBase=null;
         this.normalURL=null;
-        this.specularURL=null;
-        this.specularFactor=null;
+        this.metallicRoughnessURL=null;
+        this.emissiveURL=null;
+        this.emissiveFactor=null;
         this.scale=null;
         
         this.buildSimpleName();
@@ -106,27 +104,24 @@ export default class BitmapClass
         this.colorURL=colorURL;
         this.colorBase=colorBase;
         this.normalURL=null;
-        this.specularURL=null;
-        this.specularFactor=new ColorClass(this.DEFAULT_SPECULAR,this.DEFAULT_SPECULAR,this.DEFAULT_SPECULAR);
+        this.metallicRoughnessURL=null;
+        this.emissiveURL=null;
+        this.emissiveFactor=null;
         this.scale=null;
         
         this.buildSimpleName();
     }
     
-    initializeGenerated(colorURL,colorImage,normalImage,specularImage,specularFactor,glowImage,glowFrequency,glowMin,glowMax)
+    initializeGenerated(colorURL,colorImage,normalImage,metallicRoughnessImage,emissiveImage,emissiveFactor)
     {
         this.bitmapType=this.BITMAP_GENERATED;
         
         this.colorURL=colorURL;
         this.colorImage=colorImage;
         this.normalImage=normalImage;
-        this.specularImage=specularImage;
-        this.specularFactor=specularFactor;
-        this.glowImage=glowImage;
-        
-        this.glowFrequency=glowFrequency;
-        this.glowMin=glowMin;
-        this.glowMax=glowMax;
+        this.metallicRoughnessImage=metallicRoughnessImage;
+        this.emissiveImage=emissiveImage;
+        this.emissiveFactor=emissiveFactor;
         
         this.buildSimpleName();
     }
@@ -144,14 +139,14 @@ export default class BitmapClass
 
         if (this.texture!==null) gl.deleteTexture(this.texture);
         if (this.normalMap!==null) gl.deleteTexture(this.normalMap);
-        if (this.specularMap!==null) gl.deleteTexture(this.specularMap);
-        if (this.glowMap!==null) gl.deleteTexture(this.glowMap);
+        if (this.metallicRoughnessMap!==null) gl.deleteTexture(this.metallicRoughnessMap);
+        if (this.emissiveMap!==null) gl.deleteTexture(this.emissiveMap);
         if (this.mask!==null) gl.deleteTexture(this.mask);
         
         this.colorImage=null;
         this.normalImage=null;
-        this.specularImage=null;
-        this.glowImage=null;
+        this.metallicRoughnessImage=null;
+        this.emissiveImage=null;
         this.mask=null;
         
         this.loaded=false;
@@ -248,8 +243,8 @@ export default class BitmapClass
         let f,rg;
         let canvas,ctx,imgData,data;
         
-            // creating a specular map
-            // from a contrast value
+            // creating a normal map
+            // from a color values
             
         canvas=document.createElement('canvas');
         canvas.width=this.colorImage.width;
@@ -300,13 +295,13 @@ export default class BitmapClass
         return(canvas);
     }
     
-    createSpecularFromColorImage()
+    createMetallicRoughnessFromColorImage()
     {
         let n,nPixel,idx;
         let f,i,min,max,expandFactor,contrastFactor;
         let canvas,ctx,imgData,data;
         
-            // creating a specular map
+            // creating a metallic map
             // from a contrast value
             
         canvas=document.createElement('canvas');
@@ -325,7 +320,7 @@ export default class BitmapClass
 
             // get the contrast factor
             
-        contrastFactor=(259*(this.SPECULAR_CONTRAST+255))/(255*(259-this.SPECULAR_CONTRAST));
+        contrastFactor=(259*(this.METALLIC_CONTRAST+255))/(255*(259-this.METALLIC_CONTRAST));
         
             // find a min-max across the entire map, we do this
             // so we can readjust the contrast to be 0..1
@@ -368,11 +363,11 @@ export default class BitmapClass
             if (f<0) f=0;
             if (f>255) f=255;
             
-            i=Math.trunc(f*this.SPECULAR_CONTRAST_CLAMP);
+            i=Math.trunc(f*this.METALLIC_CONTRAST_CLAMP);
                     
-            data[idx++]=i;
-            data[idx++]=i;
-            data[idx++]=i;
+            data[idx++]=0;
+            data[idx++]=0;
+            data[idx++]=i;      // blue channel has metallic in it
             data[idx++]=255;
         } 
 		
@@ -559,19 +554,19 @@ export default class BitmapClass
         
         gl.bindTexture(gl.TEXTURE_2D,null);
 
-            // specular bitmap
+            // metallic-roughness bitmap
             
         if ((this.bitmapType!==this.BITMAP_GENERATED) || (this.bitmapType===this.BITMAP_COLOR)) {
-            this.specularImage=null;
+            this.metallicRoughnessImage=null;
 
-            if (this.specularURL!==null) {
-                await this.loadImagePromise(this.specularURL)
+            if (this.metallicRoughnessURL!==null) {
+                await this.loadImagePromise(this.metallicRoughnessURL)
                     .then
                         (
                                 // resolved
 
                             value=>{
-                                    this.specularImage=value;
+                                    this.metallicRoughnessImage=value;
                             },
 
                                 // rejected
@@ -581,17 +576,17 @@ export default class BitmapClass
                             }
                         );
                 
-                if (this.specularImage===null) return(false);
+                if (this.metallicRoughnessImage===null) return(false);
             }
         }
         
-        if (this.specularImage===null) this.specularImage=this.createSpecularFromColorImage();
+        if (this.metallicRoughnessImage===null) this.metallicRoughnessImage=this.createMetallicRoughnessFromColorImage();
         
-        this.specularMap=gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D,this.specularMap);
-        gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,this.specularImage);
+        this.metallicRoughnessMap=gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D,this.metallicRoughnessMap);
+        gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,this.metallicRoughnessImage);
         
-        if ((this.isImagePowerOf2(this.specularImage))) {
+        if ((this.isImagePowerOf2(this.metallicRoughnessImage))) {
             gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
             gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_NEAREST);
             gl.generateMipmap(gl.TEXTURE_2D);
@@ -603,21 +598,21 @@ export default class BitmapClass
         
         gl.bindTexture(gl.TEXTURE_2D,null);
         
-            // glow bitmap
+            // emissive bitmap
             // these do not have to exist, if missing,
-            // will use fake glowmap
+            // will use fake emissive map
         
         if ((this.bitmapType!==this.BITMAP_GENERATED) || (this.bitmapType===this.BITMAP_COLOR)) {
-            this.glowImage=null;
+            this.emissiveImage=null;
 
-            if (this.glowURL!==null) {
-                await this.loadImagePromise(this.glowURL)
+            if (this.emissiveURL!==null) {
+                await this.loadImagePromise(this.emissiveURL)
                     .then
                         (
                                 // resolved
 
                             value=>{
-                                    this.glowImage=value;
+                                    this.emissiveImage=value;
                             },
 
                                 // rejected
@@ -627,17 +622,17 @@ export default class BitmapClass
                             }
                         );
                 
-                if (this.glowImage===null) return(false);
+                if (this.emissiveImage===null) return(false);
             }
         }
         
-        if (this.glowImage===null) this.glowImage=this.createSolidColorImage(0,0,0);
+        if (this.emissiveImage===null) this.emissiveImage=this.createSolidColorImage(0,0,0);
         
-        this.glowMap=gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D,this.glowMap);
-        gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,this.glowImage);
+        this.emissiveMap=gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D,this.emissiveMap);
+        gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,this.emissiveImage);
         
-        if ((this.isImagePowerOf2(this.glowImage))) {
+        if ((this.isImagePowerOf2(this.emissiveImage))) {
             gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
             gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_NEAREST);
             gl.generateMipmap(gl.TEXTURE_2D);
@@ -660,20 +655,11 @@ export default class BitmapClass
     
     attachAsTexture(shader)
     {
-        let glowFactor;
         let gl=this.core.gl;
 
             // uniforms
 
-        gl.uniform3f(shader.specularFactorUniform,this.specularFactor.r,this.specularFactor.g,this.specularFactor.b);
-        
-        if (this.glowFrequency!==0) {
-            glowFactor=this.glowMin+Math.abs(Math.cos(this.core.timestamp/this.glowFrequency)*(this.glowMax-this.glowMin));
-            gl.uniform1f(shader.glowFactorUniform,glowFactor);
-        }
-        else {
-            gl.uniform1f(shader.glowFactorUniform,0.0);
-        }
+        gl.uniform3f(shader.emissiveFactorUniform,this.emissiveFactor.r,this.emissiveFactor.g,this.emissiveFactor.b);
         
             // the textures
             
@@ -681,10 +667,10 @@ export default class BitmapClass
         gl.bindTexture(gl.TEXTURE_2D,this.mask);
             
         gl.activeTexture(gl.TEXTURE3);
-        gl.bindTexture(gl.TEXTURE_2D,this.glowMap);
+        gl.bindTexture(gl.TEXTURE_2D,this.emissiveMap);
 
         gl.activeTexture(gl.TEXTURE2);
-        gl.bindTexture(gl.TEXTURE_2D,this.specularMap);
+        gl.bindTexture(gl.TEXTURE_2D,this.metallicRoughnessMap);
 
         gl.activeTexture(gl.TEXTURE1);
         gl.bindTexture(gl.TEXTURE_2D,this.normalMap);

@@ -10,7 +10,14 @@ export default class DialogDeveloperClass extends DialogBaseClass
     {
         super(core);
         
-        this.shadowmapThread=null;
+        this.SHADOWMAP_THREAD_COUNT=8;
+        
+        this.shadowmapThreads=null;
+        
+        this.shadowmapGlobalShadowmapList=null;
+        this.shadowmapGlobalMeshes=null;
+        
+        this.shadowmapTimestamp=0;
     }
     
         //
@@ -49,7 +56,7 @@ export default class DialogDeveloperClass extends DialogBaseClass
     }
     
         //
-        // buttons
+        // path hint build
         //
         
     buildPathHints()
@@ -57,15 +64,20 @@ export default class DialogDeveloperClass extends DialogBaseClass
         console.info('path hints');
     }
     
+        //
+        // shadowmap build
+        //
+    
     buildShadowmap()
     {
         let n,nMesh,data;
+        let thread,perThreadMeshCount;
         let light,effect;
         let map=this.core.map;
         
             // already building?
             
-        if (this.shadowmapThread!==null) {
+        if (this.shadowmapThreads!==null) {
             this.displayMessage('Currently in Shadowmap Build');
             return;
         }
@@ -111,31 +123,203 @@ export default class DialogDeveloperClass extends DialogBaseClass
             data.lights.push(light);
         }
         
+        //data.lights.length=5;   // testing
+        
+            // use these global variables to contain
+            // all the thread results
+            
+        this.shadowmapGlobalShadowmapList=[];
+        this.shadowmapGlobalMeshes=[];
+        
+            // start the threads
+        
         this.displayMessage('Starting background shadowmap build');
         
-        this.shadowmapThread=new Worker('../../code/generate/shadowmap/shadowmap_thread.js',{type:"module"});
-        this.shadowmapThread.addEventListener('message',this.buildShadowmapFinish.bind(this),false);
-        this.shadowmapThread.postMessage(data);
+        this.shadowmapTimestamp=Date.now();
+        
+        this.shadowmapThreads=[];
+        perThreadMeshCount=Math.trunc(nMesh/this.SHADOWMAP_THREAD_COUNT);
+        
+        for (n=0;n!==this.SHADOWMAP_THREAD_COUNT;n++) {
+            /* testing
+            if (n!==4) {
+                this.shadowmapThreads.push(null);
+                continue;
+            }
+            */
+            thread=new Worker('../../code/generate/shadowmap/shadowmap_thread.js',{type:"module"});
+            thread.addEventListener('message',this.buildShadowmapThreadFinish.bind(this),false);
+            
+            data.threadIdx=n;
+            data.startMeshIdx=n*perThreadMeshCount;
+            data.endMeshIdx=(n===(this.SHADOWMAP_THREAD_COUNT-1))?nMesh:(data.startMeshIdx+perThreadMeshCount);
+            thread.postMessage(data);
+            
+            this.shadowmapThreads.push(thread);
+        }
     }
     
-    buildShadowmapFinish(message)
+    buildShadowmapBinData(meshes)
+    {
+        let n,k,len,offset,mesh;
+        let data,dataView;
+        let nMesh=meshes.length;
+
+            // shadowmap model bin
+            // mesh count (int)
+            //   run count (int)
+            //   vertex byte count (int)
+            //   uv byte count (int)
+            //   runs
+            //     bitmap index (int)
+            //     trig start index (int)
+            //     trig end index (int)
+            //   vertexes (array of 3 floats)
+            //   uvs (array of 2 floats)
+
+            // calculate the length
+            
+        len=4;      // mesh count
+        
+        for (n=0;n!==nMesh;n++) {
+            mesh=meshes[n];
+            
+            len+=12;        // bitmap index and vertex/uv byte count
+            if (mesh.vertexShadowArray!==null) len+=((mesh.shadowmapRuns.length*12)+(mesh.vertexShadowArray.length*4)+(mesh.uvShadowArray.length*4)); // runs, vertexes and UVs
+        }
+        
+            // fill the data
+            
+        data=new ArrayBuffer(len);
+        
+        dataView=new DataView(data,0,len);
+        
+        dataView.setInt32(0,nMesh);
+        
+        offset=4;
+        
+        for (n=0;n!==nMesh;n++) {
+            mesh=meshes[n];
+            
+            if (mesh.vertexShadowArray===null) {
+                dataView.setInt32(offset,0);
+                offset+=4;
+                dataView.setInt32(offset,0);
+                offset+=4;
+                dataView.setInt32(offset,0);
+                offset+=4;
+            }
+            else {
+                dataView.setInt32(offset,mesh.shadowmapRuns.length);
+                offset+=4;
+                dataView.setInt32(offset,mesh.vertexShadowArray.length);
+                offset+=4;
+                dataView.setInt32(offset,mesh.uvShadowArray.length);
+                offset+=4;
+                
+                for (k=0;k!==mesh.shadowmapRuns.length;k++) {
+                    dataView.setInt32(offset,mesh.shadowmapRuns[k].shadowmapIdx);
+                    offset+=4;
+                    dataView.setInt32(offset,mesh.shadowmapRuns[k].startTrigIdx);
+                    offset+=4;
+                    dataView.setInt32(offset,mesh.shadowmapRuns[k].endTrigIdx);
+                    offset+=4;
+                }
+
+                for (k=0;k!==mesh.vertexShadowArray.length;k++) {
+                    dataView.setFloat32(offset,mesh.vertexShadowArray[k]);
+                    offset+=4;
+                }
+                for (k=0;k!==mesh.uvShadowArray.length;k++) {
+                    dataView.setFloat32(offset,mesh.uvShadowArray[k]);
+                    offset+=4;
+                }
+            }
+        }
+        
+        return(data);
+    }
+    
+    base64EncodeData(data)
+    {
+        let n;
+        let byteBuffer,str;
+            
+        byteBuffer=new Uint8Array(data);
+        str='';
+        
+        for (n=0;n!==byteBuffer.byteLength;n++) {
+            str+=String.fromCharCode(byteBuffer[n]);
+        }
+        
+        return(btoa(str));
+    }
+    
+    buildShadowmapThreadFinish(message)
     {
         let n,k;
-        let shadowmap;
+        let thread,shadowmap,offsetIdx;
         let canvas,ctx,imgData,pIdx,pixel;
-        let upload,fileName,data,pixelSize;
+        let upload,fileName,mesh,data,bin,pixelSize;
+        let threadIdx=message.data.threadIdx;
+        let startMeshIdx=message.data.startMeshIdx;
+        let endMeshIdx=message.data.endMeshIdx;
         let textureSize=message.data.textureSize;
-        let bin=message.data.bin;
+        let meshes=message.data.meshes;
         let shadowmapList=message.data.shadowmapList;
         
-        this.shadowmapThread.terminate();
-        this.shadowmapThread=null;
+            // end the thread
+            
+        thread=this.shadowmapThreads[threadIdx];
+        thread.terminate();
+        
+        this.shadowmapThreads[threadIdx]=null;
+        
+            // move the data
+            // we need to change the shadowmap offsets
+            // as the shadowmap list grows for each finished thread
+            
+        offsetIdx=this.shadowmapGlobalShadowmapList.length;
+        
+        for (n=0;n!==shadowmapList.length;n++) {
+            this.shadowmapGlobalShadowmapList.push(shadowmapList[n]);
+        }
+            
+        for (n=startMeshIdx;n<endMeshIdx;n++) {
+            mesh=meshes[n];
+            
+            if (mesh.vertexShadowArray!==null) {
+                for (k=0;k!==mesh.shadowmapRuns.length;k++) {
+                    mesh.shadowmapRuns[k].shadowmapIdx+=offsetIdx;
+                }
+            }
+            
+            this.shadowmapGlobalMeshes[n]=mesh;
+        }
+        
+        this.shadowmapThreads[threadIdx]=null;
+        
+            // are we finished?
+            
+        for (n=0;n!==this.SHADOWMAP_THREAD_COUNT;n++) {
+            if (this.shadowmapThreads[n]!==null) return;
+        }
+        
+            // finished, clear out the threads
+            // and upload
+            
+        this.shadowmapThreads=null;
+        
+            // build the bin data
+            
+        data=this.buildShadowmapBinData(this.shadowmapGlobalMeshes);
+        bin=this.base64EncodeData(data);
         
             // upload the data
             
         console.info('Uploading');
         
-        this.displayMessage('Shadowmap uploading ('+shadowmapList.length+' maps)');
+        this.displayMessage('Shadowmap uploading ('+this.shadowmapGlobalShadowmapList.length+' maps)');
             
         upload=new UploadClass(this.core);
         
@@ -150,8 +334,8 @@ export default class DialogDeveloperClass extends DialogBaseClass
             
         pixelSize=textureSize*textureSize;
         
-        for (n=0;n!==shadowmapList.length;n++) {
-            shadowmap=shadowmapList[n];
+        for (n=0;n!==this.shadowmapGlobalShadowmapList.length;n++) {
+            shadowmap=this.shadowmapGlobalShadowmapList[n];
             
                 // render unto canvas
                 
@@ -160,7 +344,7 @@ export default class DialogDeveloperClass extends DialogBaseClass
             pIdx=0;
 
             for (k=0;k!==pixelSize;k++) {
-                pixel=shadowmap.lumData[k]*255.0;
+                pixel=shadowmap.lumData[k];     // lumData is a byte, 0..255
                 imgData.data[pIdx++]=pixel;
                 imgData.data[pIdx++]=pixel;
                 imgData.data[pIdx++]=pixel;
@@ -180,6 +364,8 @@ export default class DialogDeveloperClass extends DialogBaseClass
             // the bin
             
         upload.upload('shadowmap.bin',bin);
+        
+        console.info('time='+(Date.now()-this.shadowmapTimestamp));
         
         this.displayMessage('Shadowmap build completed');
     }

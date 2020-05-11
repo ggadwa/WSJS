@@ -33,6 +33,9 @@ export default class ImportGLTFClass
         let resp;
         let url='../models/'+this.json.name+'/scene.gltf';
         
+        if (this.json.name=='dual_castles') url='../models/'+this.json.name+'/'+this.json.name+'.gltf';
+        if (this.json.name=='dungeon') url='../models/'+this.json.name+'/'+this.json.name+'.gltf';
+        
         try {
             resp=await fetch(url);
             if (!resp.ok) return(Promise.reject('Unable to load '+url+'; '+resp.statusText));
@@ -544,12 +547,14 @@ export default class ImportGLTFClass
     
     findMaterialForMesh(meshNode,primitiveNode)
     {
-        let n,bitmap,uri,diffuseTexture,diffuseFactor,glossTexture,specularFactorProp,glowDef;
+        let n,bitmap,uri,diffuseTexture,diffuseFactor;
+        let baseColorTexture,metallicRoughnessTexture,emissiveTexture;
         let colorURL=null;
         let colorBase=null;
         let normalURL=null;
-        let specularURL=null;
-        let specularFactor=null;
+        let metallicRoughnessURL=null;
+        let emissiveURL=null;
+        let emissiveFactor=null;
         let scale=null;
         let prefixURL='models/'+this.json.name+'/';
         let materialNode=this.jsonData.materials[primitiveNode.material];
@@ -561,9 +566,9 @@ export default class ImportGLTFClass
             normalURL=uri.startsWith('data:image')?uri:(prefixURL+uri);
         }
         
-            // default specular
+            // default emissive
             
-        specularFactor=new ColorClass(5.0,5.0,5.0);
+        emissiveFactor=new ColorClass(1,1,1);
                 
             // now any color texture
             // check specularGlossiness first
@@ -595,7 +600,7 @@ export default class ImportGLTFClass
                             colorBase=new ColorClass((diffuseFactor[0]*5),(diffuseFactor[1]*5),(diffuseFactor[2]*5));   // add some normal spec in there, we normally want textures so this is a stop-gap
                         }
                     }
-
+/*
                         // get the specular
 
                     glossTexture=materialNode.extensions.KHR_materials_pbrSpecularGlossiness.specularGlossinessTexture;
@@ -609,6 +614,8 @@ export default class ImportGLTFClass
                             specularFactor=new ColorClass(specularFactorProp,specularFactorProp,specularFactorProp);
                         }
                     }
+                         * */
+
                 }
             }
         }
@@ -621,8 +628,23 @@ export default class ImportGLTFClass
                 
             if (materialNode.pbrMetallicRoughness!==undefined) {
                 if (materialNode.pbrMetallicRoughness.baseColorTexture!==undefined) {
-                    uri=this.jsonData.images[materialNode.pbrMetallicRoughness.baseColorTexture.index].uri;
+                    
+                        // the texture
+                        
+                    baseColorTexture=materialNode.pbrMetallicRoughness.baseColorTexture;
+
+                    uri=this.jsonData.images[baseColorTexture.index].uri;
                     colorURL=uri.startsWith('data:image')?uri:(prefixURL+uri);
+                    
+                        // check for scale
+                        
+                    if (baseColorTexture.extensions!==undefined) {
+                        if (baseColorTexture.extensions.KHR_texture_transform!==undefined) {
+                            if (baseColorTexture.extensions.KHR_texture_transform.scale!==undefined) {
+                                scale=baseColorTexture.extensions.KHR_texture_transform.scale;
+                            }
+                        }
+                    }
                 }
                 else {
                     if (materialNode.pbrMetallicRoughness.baseColorFactor!==undefined) {
@@ -630,13 +652,31 @@ export default class ImportGLTFClass
                     }
                 }
             }
+                        
+                // get the metallic/roughness
+
+            metallicRoughnessTexture=materialNode.pbrMetallicRoughness.metallicRoughnessTexture;
+            if (metallicRoughnessTexture!==undefined) {
+                uri=this.jsonData.images[metallicRoughnessTexture.index].uri;
+                metallicRoughnessURL=uri.startsWith('data:image')?uri:(prefixURL+uri);
+            }              
+        }
+        
+            // emissives
+            
+        if (materialNode.emissiveTexture!==undefined) {    
+            emissiveTexture=materialNode.emissiveTexture;
+            uri=this.jsonData.images[emissiveTexture.index].uri;
+            emissiveURL=uri.startsWith('data:image')?uri:(prefixURL+uri);
+            
+            if (materialNode.emissiveFactor!==undefined) emissiveFactor=new ColorClass(materialNode.emissiveFactor[0],materialNode.emissiveFactor[1],materialNode.emissiveFactor[2]);
         }
         
             // create the bitmap and
             // add to list to be loaded later
             
         if (colorURL!==null) {
-            bitmap=this.core.bitmapList.add(colorURL,normalURL,specularURL,specularFactor,scale);
+            bitmap=this.core.bitmapList.add(colorURL,normalURL,metallicRoughnessURL,emissiveURL,emissiveFactor,scale);
         }
         else {
             if (colorBase!==null) {
@@ -645,22 +685,6 @@ export default class ImportGLTFClass
             else {
                 console.log('Could not find texture for mesh '+meshNode.name+' in material '+materialNode.name+' in '+this.json.name);
                 return(null);
-            }
-        }
-        
-            // any glow subsitutions?
-        
-        if (this.json.glows!==undefined) {
-            for (n=0;n!==this.json.glows.length;n++) {
-                glowDef=this.json.glows[n];
-                
-                if (bitmap.simpleName===glowDef.bitmap) {
-                    bitmap.glowURL=glowDef.url;
-                    bitmap.glowFrequency=glowDef.frequency;
-                    bitmap.glowMin=glowDef.min;
-                    bitmap.glowMax=glowDef.max;
-                    break;
-                }
             }
         }
         

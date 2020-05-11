@@ -40,8 +40,7 @@ export default class MeshClass
         
             // possible shadow map
             
-        this.shadowmap=null;
-        
+        this.shadowmapRuns=null;
         this.vertexShadowArray=null;
         this.uvShadowArray=null;
                 
@@ -511,7 +510,7 @@ export default class MeshClass
         gl.bindBuffer(gl.ARRAY_BUFFER,this.uvBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,this.uvArray,gl.STATIC_DRAW);
         
-        if (this.shadowmap!==null) {
+        if (this.shadowmapRuns!==null) {
             this.vertexShadowBuffer=gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexShadowBuffer);
             gl.bufferData(gl.ARRAY_BUFFER,this.vertexShadowArray,gl.STATIC_DRAW);
@@ -642,10 +641,10 @@ export default class MeshClass
         gl.drawElements(gl.TRIANGLES,this.indexCount,(this.need32BitIndexes?gl.UNSIGNED_INT:gl.UNSIGNED_SHORT),0);
     }
     
-    drawShadow()
+    drawShadowChunk(startTrigIdx,endTrigIdx)
     {
         let gl=this.core.gl;
         
-        gl.drawArrays(gl.TRIANGLES,0,Math.trunc(this.vertexShadowArray.length/3));
+        gl.drawArrays(gl.TRIANGLES,(startTrigIdx*3),((endTrigIdx-startTrigIdx)*3));
     }
 }

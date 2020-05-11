@@ -284,7 +284,7 @@ export default class MeshListClass
         
     drawMapShadow()
     {
-        let n,mesh;
+        let n,k,nRun,mesh,run;
         let currentShadowmap;
         let gl=this.core.gl;
         let shader=this.core.shaderList.mapMeshShadowShader;
@@ -312,25 +312,32 @@ export default class MeshListClass
 
         for (n=0;n!==nMesh;n++) {
             mesh=this.meshes[n];
-            if (mesh.shadowmap===null) continue;
+            if (mesh.shadowmapRuns===null) continue;
             
                 // regular map mesh culling
                 
             if (!this.core.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) continue;
             
-                // time to change bitmap
-
-            if (mesh.shadowmap!==currentShadowmap) {
-                currentShadowmap=mesh.shadowmap;
-                mesh.shadowmap.attachAsShadow(shader);
-            }
-            
-                // draw the mesh
-                // we don't need to update buffers as
-                // we already did that in the previous pass
-
+                // do the runs
+                
             mesh.bindMapShadowBuffers(shader);
-            mesh.drawShadow();
+                
+            nRun=mesh.shadowmapRuns.length;
+            
+            for (k=0;k!==nRun;k++) {
+                run=mesh.shadowmapRuns[k];
+
+                    // time to change bitmap
+
+                if (run.bitmap!==currentShadowmap) {
+                    currentShadowmap=run.bitmap;
+                    run.bitmap.attachAsShadow(shader);
+                }
+
+                    // draw the mesh
+                
+                mesh.drawShadowChunk(run.startTrigIdx,run.endTrigIdx);
+            }
         }
         
         shader.drawEnd();

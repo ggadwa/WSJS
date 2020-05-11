@@ -1,3 +1,5 @@
+import MeshShadowmapRunClass from '../mesh/mesh_shadowmap_run.js';
+
 export default class ShadowmapLoadClass
 {
     constructor(core)
@@ -26,9 +28,10 @@ export default class ShadowmapLoadClass
 
     async load()
     {
-        let n,nMesh,mesh,offset;
-        let k,vertexCount,uvCount;
+        let n,k,nMesh,mesh,offset;
+        let runCount,vertexCount,uvCount;
         let bitmapIdx,bitmaps,bitmap,colorURL;
+        let startTrigIdx,endTrigIdx;
         let binData,dataView;
         let map=this.core.map;
         
@@ -70,9 +73,9 @@ export default class ShadowmapLoadClass
         for (n=0;n!==nMesh;n++) {
             mesh=map.meshList.meshes[n];
             
-                // bitmap index and counts
+                // counts
                 
-            bitmapIdx=dataView.getInt32(offset);
+            runCount=dataView.getInt32(offset);
             offset+=4;
                 
             vertexCount=dataView.getInt32(offset);
@@ -81,26 +84,41 @@ export default class ShadowmapLoadClass
             uvCount=dataView.getInt32(offset);
             offset+=4;
             
+            console.info('mesh='+n+', runcount='+runCount+', vertexCount='+vertexCount+', uvCount='+uvCount);
+            
                 // if no vertexes, than this is
                 // a mesh we can skip
                 
-            if (vertexCount===0) {
-                mesh.shadowmap=null;
+            if (runCount===0) {
+                mesh.shadowmapRuns=null;
                 mesh.vertexShadowArray=null;
                 mesh.uvShadowArray=null;
                 continue;
             }
             
-                // other set the bitmap
+                // the runs
                 
-            bitmap=bitmaps.get(bitmapIdx);
-            if (bitmap===undefined) {
-                colorURL='models/_'+this.core.map.json.name+'/shadowmap_'+bitmapIdx+'.png';
-                bitmap=this.core.bitmapList.addShadowmap(colorURL);
-                bitmaps.set(bitmapIdx,bitmap);
-            }
+            mesh.shadowmapRuns=[];
             
-            mesh.shadowmap=bitmap;
+            for (k=0;k!==runCount;k++) {
+                bitmapIdx=dataView.getInt32(offset);
+                offset+=4;
+                
+                startTrigIdx=dataView.getInt32(offset);
+                offset+=4;
+                
+                endTrigIdx=dataView.getInt32(offset);
+                offset+=4;
+                
+                bitmap=bitmaps.get(bitmapIdx);
+                if (bitmap===undefined) {
+                    colorURL='models/_'+this.core.map.json.name+'/shadowmap_'+bitmapIdx+'.png';
+                    bitmap=this.core.bitmapList.addShadowmap(colorURL);
+                    bitmaps.set(bitmapIdx,bitmap);
+                }
+                
+                mesh.shadowmapRuns.push(new MeshShadowmapRunClass(bitmap,startTrigIdx,endTrigIdx));
+            }
             
                 // vertex and uvs
                 

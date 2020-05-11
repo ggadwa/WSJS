@@ -34,7 +34,7 @@ export default class BitmapListClass
         // add and get a bitmap
         //
         
-    add(colorURL,normalURL,specularURL,specularFactor,scale)
+    add(colorURL,normalURL,metallicRoughnessURL,emissiveURL,emissiveFactor,scale)
     {
         let bitmap;
         
@@ -46,7 +46,7 @@ export default class BitmapListClass
             // in a later call
                     
         bitmap=new BitmapClass(this.core);
-        bitmap.initializeNormalURL(colorURL,normalURL,specularURL,specularFactor,scale);
+        bitmap.initializeNormalURL(colorURL,normalURL,metallicRoughnessURL,emissiveURL,emissiveFactor,scale);
         this.bitmaps.set(colorURL,bitmap);
         
         return(bitmap);
@@ -138,7 +138,7 @@ export default class BitmapListClass
         }
     }
     
-    addGenerated(colorImage,normalImage,specularImage,specularFactor,glowImage,glowFrequency,glowMin,glowMax)
+    addGenerated(colorImage,normalImage,metallicRoughnessImage,emissiveImage,emissiveFactor)
     {
         let bitmap;
         let colorURL;
@@ -153,7 +153,7 @@ export default class BitmapListClass
             // add bitmap to list
                     
         bitmap=new BitmapClass(this.core);
-        bitmap.initializeGenerated(colorURL,colorImage,normalImage,specularImage,specularFactor,glowImage,glowFrequency,glowMin,glowMax);
+        bitmap.initializeGenerated(colorURL,colorImage,normalImage,metallicRoughnessImage,emissiveImage,emissiveFactor);
         this.bitmaps.set(colorURL,bitmap);
         
         return(bitmap);

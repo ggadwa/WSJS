@@ -430,6 +430,8 @@ export default class EntityKartPlayerClass extends EntityClass
         let nodeIdx,nodeIdx2,nextNodeIdx,spliceIdx,entity;
         let entityList=this.getEntityList();
         let placeList=[];
+        
+        return;
 
             // this is a bit complicated, we assume there
             // is a path where the goalNodeIdx is right on the goal

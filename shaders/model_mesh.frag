@@ -2,12 +2,11 @@
 
 uniform lowp sampler2D baseTex;
 uniform lowp sampler2D normalTex;
-uniform lowp sampler2D specularTex;
-uniform lowp sampler2D glowTex;
+uniform lowp sampler2D metallicRoughnessTex;
+uniform lowp sampler2D emissiveTex;
 uniform lowp sampler2D maskTex;
 
-uniform mediump vec3 specularFactor;
-uniform mediump float glowFactor;
+uniform mediump vec3 emissiveFactor;
 
 uniform lowp vec3 lightMin,lightMax;
 
@@ -40,11 +39,11 @@ void main(void)
     lowp vec3 bumpMap=normalize((texture(normalTex,fragUV.xy).rgb*2.0)-1.0);
     lowp float bump=0.0;
 
-        // the spec map
+        // the metallic-roughness map
 
-    lowp vec3 spec=vec3(0.0,0.0,0.0),specHalfVector;
-    lowp vec3 specMap=texture(specularTex,fragUV.xy).rgb;
-    lowp float specFactor;
+    lowp vec3 metallicRoughnessMap=texture(metallicRoughnessTex,fragUV).rgb;
+    lowp vec3 metallicHalfVector;
+    lowp float metallic;
 
         // lights
 
@@ -79,13 +78,10 @@ void main(void)
             bumpLightVertexVector=normalize(lightVertexVector);
             bump+=(dot(bumpLightVertexVector,bumpMap)*att);
 
-                // per-light spec count
+                // per-light metallic
 
-            specHalfVector=normalize(normalize(eyeVector)+bumpLightVertexVector);
-            specFactor=max(dot(bumpMap,specHalfVector),0.0);
-            spec.r+=((specMap.r*pow(specFactor,specularFactor.r))*att);
-            spec.g+=((specMap.g*pow(specFactor,specularFactor.g))*att);
-            spec.b+=((specMap.b*pow(specFactor,specularFactor.b))*att);
+            metallicHalfVector=normalize(normalize(eyeVector)+bumpLightVertexVector);
+            metallic+=((metallicRoughnessMap.b*pow(max(dot(bumpMap,metallicHalfVector),0.0),5.0))*att);
         }
     }
 
@@ -93,14 +89,9 @@ void main(void)
 
     lightCol=clamp((lightCol*bump),lightMin,lightMax);
 
-        // finish the spec by making sure
-        // it's dimmed in dark areas
-
-    spec=min(spec,1.0)*lightCol;
-
         // finally create the pixel
 
-    outputPixel.rgb=((tex.rgb*lightCol)+spec)+(texture(glowTex,fragUV.xy).rgb*glowFactor);
+    outputPixel.rgb=((tex.rgb*lightCol)+(min(metallic,1.0)*lightCol))+(texture(emissiveTex,fragUV.xy).rgb*emissiveFactor);
     outputPixel.a=1.0;
 
         // any masking pixel discards

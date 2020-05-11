@@ -26,7 +26,7 @@ export default class ShadowmapBitmapClass
 
             // the luminosity data
 
-        this.lumData=new Float32Array(shadowmapGenerator.SHADOWMAP_TEXTURE_SIZE*shadowmapGenerator.SHADOWMAP_TEXTURE_SIZE);
+        this.lumData=new Uint8ClampedArray(shadowmapGenerator.SHADOWMAP_TEXTURE_SIZE*shadowmapGenerator.SHADOWMAP_TEXTURE_SIZE);
 
             // clear to min shadow color
 
@@ -53,6 +53,7 @@ export default class ShadowmapBitmapClass
     {
         let x,y;
         let firstTrig=cIdx&0x1;
+        
         cIdx=cIdx>>1;
         
         x=(cIdx%this.chunkPerRow)*this.chunkSize;

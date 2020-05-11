@@ -25,8 +25,7 @@ export default class MapMeshShaderClass extends ShaderClass
         this.viewMatrixUniform=null;
         this.normalMatrixUniform=null;
         
-        this.specularFactorUniform=null;
-        this.glowFactorUniform=null; 
+        this.emissiveFactorUniform=null; 
 
         this.lightMinUniform=null;
         this.lightMaxUniform=null;
@@ -58,8 +57,7 @@ export default class MapMeshShaderClass extends ShaderClass
         this.viewMatrixUniform=gl.getUniformLocation(this.program,'viewMatrix');
         this.normalMatrixUniform=gl.getUniformLocation(this.program,'normalMatrix');
 
-        this.specularFactorUniform=gl.getUniformLocation(this.program,'specularFactor');
-        this.glowFactorUniform=gl.getUniformLocation(this.program,'glowFactor');
+        this.emissiveFactorUniform=gl.getUniformLocation(this.program,'emissiveFactor');
         
         this.lightMinUniform=gl.getUniformLocation(this.program,'lightMin');
         this.lightMaxUniform=gl.getUniformLocation(this.program,'lightMax');
@@ -76,8 +74,8 @@ export default class MapMeshShaderClass extends ShaderClass
 
         gl.uniform1i(gl.getUniformLocation(this.program,'baseTex'),0);
         gl.uniform1i(gl.getUniformLocation(this.program,'normalTex'),1);
-        gl.uniform1i(gl.getUniformLocation(this.program,'specularTex'),2);
-        gl.uniform1i(gl.getUniformLocation(this.program,'glowTex'),3);
+        gl.uniform1i(gl.getUniformLocation(this.program,'metallicRoughnessTex'),2);
+        gl.uniform1i(gl.getUniformLocation(this.program,'emissiveTex'),3);
         gl.uniform1i(gl.getUniformLocation(this.program,'maskTex'),4);
 
         gl.useProgram(null);
