@@ -14,6 +14,9 @@ export default class DialogBaseClass
         this.progressFrameDiv=null;
         this.progressDiv=null;
         this.progressTitleDiv=null;
+        
+        this.messageDiv=null;
+        this.messageTimeout=null;
     }
     
         //
@@ -210,19 +213,32 @@ export default class DialogBaseClass
         
     displayMessage(message)
     {
-        let messageDiv=document.createElement('div');
+            // already in a message or new message
+            
+        if (this.messageDiv!==null) {
+            clearTimeout(this.messageTimeout);
+            
+            this.messageDiv.innerText=message;
+        }
+        else {
+            this.messageDiv=document.createElement('div');
+            this.messageDiv.className='dialogMessage';
+            
+            this.messageDiv.innerText=message;
+            
+            document.body.appendChild(this.messageDiv);
+        }
         
-        messageDiv.className='dialogMessage';
-        messageDiv.innerText=message;
+            // clear timeout
         
-        document.body.appendChild(messageDiv);
-        
-        setTimeout(this.displayMessageClear.bind(this,messageDiv),5000);
+        this.messageTimeout=setTimeout(this.displayMessageClear.bind(this),5000);
     }
     
-    displayMessageClear(messageDiv)
+    displayMessageClear()
     {
-        document.body.removeChild(messageDiv);
+        document.body.removeChild(this.messageDiv);
+        
+        this.messageDiv=null;
     }
 
         //

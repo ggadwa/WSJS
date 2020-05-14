@@ -36,6 +36,7 @@ export default class ImportGLTFClass
         if (this.json.name=='dual_castles') url='../models/'+this.json.name+'/'+this.json.name+'.gltf';
         if (this.json.name=='dungeon') url='../models/'+this.json.name+'/'+this.json.name+'.gltf';
         if (this.json.name=='circuit_race') url='../models/'+this.json.name+'/'+this.json.name+'.gltf';
+        if (this.json.name=='ratkin_skeleton') url='../models/'+this.json.name+'/'+this.json.name+'.gltf';
         
         try {
             resp=await fetch(url);
@@ -563,7 +564,7 @@ export default class ImportGLTFClass
             // first find any normal texture
             
         if (materialNode.normalTexture!==undefined) {
-            uri=this.jsonData.images[materialNode.normalTexture.index].uri;
+            uri=this.jsonData.images[this.jsonData.textures[materialNode.normalTexture.index].source].uri;
             normalURL=uri.startsWith('data:image')?uri:(prefixURL+uri);
         }
         
@@ -634,7 +635,7 @@ export default class ImportGLTFClass
                         
                     baseColorTexture=materialNode.pbrMetallicRoughness.baseColorTexture;
                     
-                    uri=this.jsonData.images[baseColorTexture.index].uri;
+                    uri=this.jsonData.images[this.jsonData.textures[baseColorTexture.index].source].uri;
                     colorURL=uri.startsWith('data:image')?uri:(prefixURL+uri);
                     
                         // check for scale
@@ -658,7 +659,7 @@ export default class ImportGLTFClass
 
             metallicRoughnessTexture=materialNode.pbrMetallicRoughness.metallicRoughnessTexture;
             if (metallicRoughnessTexture!==undefined) {
-                uri=this.jsonData.images[metallicRoughnessTexture.index].uri;
+                uri=this.jsonData.images[this.jsonData.textures[metallicRoughnessTexture.index].source].uri;
                 metallicRoughnessURL=uri.startsWith('data:image')?uri:(prefixURL+uri);
             }              
         }
@@ -667,7 +668,7 @@ export default class ImportGLTFClass
             
         if (materialNode.emissiveTexture!==undefined) {    
             emissiveTexture=materialNode.emissiveTexture;
-            uri=this.jsonData.images[emissiveTexture.index].uri;
+            uri=this.jsonData.images[this.jsonData.textures[emissiveTexture.index].source].uri;
             emissiveURL=uri.startsWith('data:image')?uri:(prefixURL+uri);
             
             if (materialNode.emissiveFactor!==undefined) emissiveFactor.setFromValues(materialNode.emissiveFactor[0],materialNode.emissiveFactor[1],materialNode.emissiveFactor[2]);

@@ -4,11 +4,10 @@
 - explosions seem to hurt too much
 
 BLENDER
+ - break up circuit road
  - get rid of loadGLTFJson hack (no scene, use name of folder)
  - make metallic/roughness only way, error if missing
  - generate_bitmap_base / addGenerated needs to change -- search all for "specular" and "glow"
- - need emission for race track lights
- - replace a lot of textures on circuit race
 
 SHADOW MAPS
  - turn off cube eliminator (or fix first)
@@ -19,26 +18,10 @@ SHADOW MAPS
  - uploads need to delete old map/folder
 
 
-                {"position":{"x":0,"y":100000,"z":0},"color":{"r":0.2,"g":0.2,"b":0.2},"intensity":300000,"exponent":0.0,"ambient":true},
-
-                {"mesh":"blue_crystal_87","color":{"r":0.3,"g":0.3,"b":0.8},"intensity":80000,"exponent":1.0},
-                {"mesh":"blue_crystal_69","color":{"r":0.3,"g":0.3,"b":0.8},"intensity":90000,"exponent":1.0},
-                {"mesh":"blue_crystal_39","color":{"r":0.3,"g":0.3,"b":0.8},"intensity":80000,"exponent":1.0},
-                {"mesh":"blue_crystal_09","color":{"r":0.3,"g":0.3,"b":0.8},"intensity":90000,"exponent":1.0},
-                {"position":{"x":-342,"y":21545,"z":201566},"color":{"r":0.4,"g":0.4,"b":0.8},"intensity":150000,"exponent":1.5},
-                {"position":{"x":127552,"y":22390,"z":125862},"color":{"r":0.4,"g":0.4,"b":0.8},"intensity":170000,"exponent":1.5},
-
-                {"mesh":"red_crystal_33","color":{"r":0.8,"g":0.3,"b":0.3},"intensity":80000,"exponent":1.0},
-                {"mesh":"red_crystal_82","color":{"r":0.8,"g":0.3,"b":0.3},"intensity":90000,"exponent":1.0},
-                {"mesh":"red_crystal_49","color":{"r":0.8,"g":0.3,"b":0.3},"intensity":80000,"exponent":1.0},
-                {"mesh":"red_crystal_73","color":{"r":0.8,"g":0.3,"b":0.3},"intensity":90000,"exponent":1.0},
-                {"position":{"x":-2819,"y":25306,"z":-222607},"color":{"r":0.8,"g":0.4,"b":0.4},"intensity":150000,"exponent":1.5},
-                {"position":{"x":-126357,"y":21545,"z":-116208},"color":{"r":0.8,"g":0.4,"b":0.4},"intensity":170000,"exponent":1.5}
-
-
 EDIT MODE
   - right click to start split
   - no movements
+  - stop all sounds
 
 - bouncing up on bits of pillar in castle map is bad, should not be able to stand on those
 

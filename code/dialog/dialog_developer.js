@@ -70,18 +70,25 @@ export default class DialogDeveloperClass extends DialogBaseClass
     
     buildShadowmap()
     {
-        let n,nMesh,data;
-        let thread,perThreadMeshCount;
-        let light,effect;
-        let map=this.core.map;
-        
             // already building?
             
         if (this.shadowmapThreads!==null) {
             this.displayMessage('Currently in Shadowmap Build');
             return;
         }
-
+        
+        this.displayMessage('Starting Up Shadowmap Build');
+        
+        setTimeout(this.buildShadowmapSetup.bind(this),1);
+    }
+    
+    buildShadowmapSetup()
+    {
+        let n,k,nMesh,data;
+        let thread,perThreadMeshCount;
+        let light,effect,lightIdx;
+        let map=this.core.map;
+        
             // we need to make a parallel object of
             // all the data because our regular data has DOM
             // elements in it and those can't be passed to
@@ -104,14 +111,27 @@ export default class DialogDeveloperClass extends DialogBaseClass
         }
         
             // pre-calc lights and the meshes they
-            // collide with
+            // collide with, we always insert the list
+            // with the biggest lights last as they have
+            // the most meshes to check, hopefully you'll find
+            // a path to the smaller light and early exit
             
         data.lights=[];
         
         for (n=0;n!==map.lightList.lights.length;n++) {
             light=new ShadowmapLightClass(data.meshes,map.json.shadowMapSkinBitmaps,map.lightList.lights[n]);
             light.calculateCollisionList();
-            data.lights.push(light);
+            
+            lightIdx=data.lights.length;
+            
+            for (k=0;k<data.lights.length;k++) {
+                if (light.intensity<data.lights[k].intensity) {
+                    lightIdx=k;
+                    break;
+                }
+            }
+            
+            data.lights.splice(lightIdx,0,light);
         }
         
         for (n=0;n!==map.effectList.effects.length;n++) {
@@ -120,7 +140,17 @@ export default class DialogDeveloperClass extends DialogBaseClass
             
             light=new ShadowmapLightClass(data.meshes,map.json.shadowMapSkinBitmaps,effect.light);
             light.calculateCollisionList();
-            data.lights.push(light);
+            
+            lightIdx=data.lights.length;
+            
+            for (k=0;k<data.lights.length;k++) {
+                if (light.intensity<data.lights[k].intensity) {
+                    lightIdx=k;
+                    break;
+                }
+            }
+            
+            data.lights.splice(lightIdx,0,light);
         }
         
         //data.lights.length=5;   // testing
