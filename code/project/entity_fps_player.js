@@ -528,6 +528,11 @@ export default class EntityFPSPlayerClass extends EntityClass
             gravityFactor=1.0;
         }
         
+            // update any UI
+            
+        if (this.interfaceHealthCount!==null) this.core.interface.updateText(this.interfaceHealthCount,this.health);
+        if (this.interfaceArmorCount!==null) this.core.interface.updateText(this.interfaceArmorCount,this.armor);
+        
             // dead
             
         if (this.respawnTick!==0) {
@@ -545,11 +550,6 @@ export default class EntityFPSPlayerClass extends EntityClass
             
             return;
         }
-        
-            // update any UI
-            
-        if (this.interfaceHealthCount!==null) this.core.interface.updateText(this.interfaceHealthCount,this.health);
-        if (this.interfaceArmorCount!==null) this.core.interface.updateText(this.interfaceArmorCount,this.armor);
         
             // the telefrag trigger
             // we defer this because it can happen during a spawn
@@ -716,7 +716,7 @@ export default class EntityFPSPlayerClass extends EntityClass
             // jumping
            
         if (input.isKeyDown(' ')) {
-            if ((this.standOnMeshIdx!==-1) && (liquidIdx===-1)) {
+            if ((this.standOnMeshIdx!==-1) && (!this.lastUnderLiquid)) {
                 this.gravity=this.core.map.gravityMinValue;
                 this.movement.y=this.jumpHeight;
             }

@@ -37,6 +37,8 @@ export default class ImportGLTFClass
         if (this.json.name=='dungeon') url='../models/'+this.json.name+'/'+this.json.name+'.gltf';
         if (this.json.name=='circuit_race') url='../models/'+this.json.name+'/'+this.json.name+'.gltf';
         if (this.json.name=='ratkin_skeleton') url='../models/'+this.json.name+'/'+this.json.name+'.gltf';
+        if (this.json.name=='tank_blue') url='../models/'+this.json.name+'/'+this.json.name+'.gltf';
+        if (this.json.name=='tank_shell') url='../models/'+this.json.name+'/'+this.json.name+'.gltf';
         
         try {
             resp=await fetch(url);

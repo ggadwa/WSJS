@@ -4,8 +4,10 @@
 
 export default class MapMovementListClass
 {
-    constructor()
+    constructor(core)
     {
+        this.core=core;
+        
         this.movements=[];
     }
     
@@ -44,6 +46,8 @@ export default class MapMovementListClass
     {
         let n;
         let nMovement=this.movements.length;
+        
+        if (this.core.game.developer.on) return;
         
         for (n=0;n!==nMovement;n++) {
             this.movements[n].run();

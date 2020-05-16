@@ -1,26 +1,27 @@
+
+*** DO METALLIC/ROUGHNESS TRANSLATIONS
+     - remove loadGLTFJson naming hack
+     - move alpha to cut out
+     - error if not m/r
+     - generate_bitmap_base / addGenerated needs to change -- search all for "specular" and "glow"
+
+- dungeon death pit
+
+- use custom meshes for liquid volumes/hurt volumes/effects/  use lights for lights
+
 - should bitmaps have "/textures" in them or this assumed? (need to work around map textures)
 
 - swipe up for grenade
-- explosions seem to hurt too much
-
-BLENDER
- - break up circuit road
- - get rid of loadGLTFJson hack (no scene, use name of folder)
- - make metallic/roughness only way, error if missing
- - generate_bitmap_base / addGenerated needs to change -- search all for "specular" and "glow"
+- delete rest of old demo scripts
 
 SHADOW MAPS
- - turn off cube eliminator (or fix first)
- - do we need the uv changes?
+ - need to draw to small triangle and smear (use an alpha channel and march towards middle)
  - try mipmaps again
- - sort lights by intensity
- - still have seams
  - uploads need to delete old map/folder
 
 
 EDIT MODE
   - right click to start split
-  - no movements
   - stop all sounds
 
 - bouncing up on bits of pillar in castle map is bad, should not be able to stand on those

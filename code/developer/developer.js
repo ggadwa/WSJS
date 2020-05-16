@@ -17,7 +17,7 @@ export default class DeveloperClass
         this.MAX_TURN_SPEED=10;
         this.MAX_LOOK_SPEED=5;
         this.MAX_LOOK_ANGLE=90;
-        this.MOVE_FAST_FACTOR=3.0;
+        this.MOVE_FAST_FACTOR=10.0;
         
         this.NEAR_PATH_NODE_DISTANCE=5000;
         this.CONTACT_MESH_RADIUS=100;

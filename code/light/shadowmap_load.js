@@ -84,8 +84,6 @@ export default class ShadowmapLoadClass
             uvCount=dataView.getInt32(offset);
             offset+=4;
             
-            console.info('mesh='+n+', runcount='+runCount+', vertexCount='+vertexCount+', uvCount='+uvCount);
-            
                 // if no vertexes, than this is
                 // a mesh we can skip
                 

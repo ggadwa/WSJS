@@ -15,6 +15,8 @@ export default class ShadowmapBitmapClass
         this.shadowmapGenerator=shadowmapGenerator;
         
             // some constants
+            
+        this.CHUNK_UV_REDUCE=0.99;
         
         this.shadowMapSize=shadowmapGenerator.SHADOWMAP_TEXTURE_SIZE;
         this.chunkSize=shadowmapGenerator.SHADOWMAP_CHUNK_SIZE;
@@ -103,20 +105,19 @@ export default class ShadowmapBitmapClass
     getChunkUVCoordinates(cIdx,p0,p1,p2)
     {
         let cx,cy;
-        let uvReduce=0.95;
         
             // get the draw coordinates
             
         this.getChunkDrawCoordinates(cIdx,p0,p1,p2);
         
             // and reduce
-            
+    
         cx=Math.trunc((p0.x+p1.x+p2.x)/3);
         cy=Math.trunc((p0.y+p1.y+p2.y)/3);
         
-        this.getChunkUVCoordinatesReduceVertex(p0,cx,cy,uvReduce);
-        this.getChunkUVCoordinatesReduceVertex(p1,cx,cy,uvReduce);
-        this.getChunkUVCoordinatesReduceVertex(p2,cx,cy,uvReduce);
+        this.getChunkUVCoordinatesReduceVertex(p0,cx,cy,this.CHUNK_UV_REDUCE);
+        this.getChunkUVCoordinatesReduceVertex(p1,cx,cy,this.CHUNK_UV_REDUCE);
+        this.getChunkUVCoordinatesReduceVertex(p2,cx,cy,this.CHUNK_UV_REDUCE);
     }
     
     fillChunk(cIdx,lum)

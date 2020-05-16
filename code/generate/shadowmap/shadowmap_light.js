@@ -42,10 +42,10 @@ export default class ShadowmapLightClass
             mesh=this.meshes[n];
             if (mesh.moveable) continue;
             
-                // skipped meshes
+                // non-blocking meshes
             
-            if (this.shadowMapSkinBitmaps!==undefined) {
-                if (this.shadowMapSkipBitmaps.indexOf(mesh.bitmapName)!==-1) continue;
+            if (this.shadowMapNonBlockingBitmaps!==undefined) {
+                if (this.shadowMapNonBlockingBitmaps.indexOf(mesh.bitmapName)!==-1) continue;
             }
             
                 // check if center in light globe

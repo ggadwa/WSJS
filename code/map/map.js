@@ -32,7 +32,7 @@ export default class MapClass
         this.liquidList=new MapLiquidListClass(core);
         this.lightList=new MapLightListClass(core);
         this.entityList=new MapEntityListClass(core);
-        this.movementList=new MapMovementListClass();
+        this.movementList=new MapMovementListClass(core);
         this.effectList=new MapEffectListClass(core);
         this.cubeList=new MapCubeListClass(core);
         this.path=new MapPathClass(core);

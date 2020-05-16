@@ -244,7 +244,7 @@ class ShadowmapGeneratorClass
                     // if mesh is larger than 12 (6 sides to cube, 2
                     // triangles each) than do a cube based check first
                     // for easier eliminations (order: min_x,max_x,min_y,max_y,min_z,max_z)
-                    
+   
                 if (mesh.trigCount>12) {
                     cubeHit=false;
                     
@@ -320,7 +320,7 @@ class ShadowmapGeneratorClass
                 // check all the vertex normals
                 // only eliminate if all vertexes are
                 // behind
-  
+
             this.lightVectorNormal.setFromValues((light.position.x-v0.x),(light.position.y-v0.y),(light.position.z-v0.z));
             this.lightVectorNormal.normalize();
             normalOK=(this.lightVectorNormal.dot(normal)>=0.0);
@@ -438,9 +438,9 @@ class ShadowmapGeneratorClass
         shadowmap=this.shadowmapList[this.shadowmapIdx];
         
         mesh.shadowmapRuns=[];
-        mesh.shadowmapRuns.push(new ShadowmapMeshRunClass(this.shadowmapIdx,0,0));
         
         runIdx=0;
+        mesh.shadowmapRuns.push(new ShadowmapMeshRunClass(this.shadowmapIdx,0,0));
 
             // we use regular arrays so we
             // can do push, converting them to
@@ -495,9 +495,13 @@ class ShadowmapGeneratorClass
             renderResult=this.renderTriangle(shadowmap,meshIdx,n,rv0,rv1,rv2,this.normal,this.t0,this.t1,this.t2);
 
                 // if all white, then skip any triangles
-                // as they won't draw anything
+                // as they won't draw anything (we need to put back
+                // the original no draw color)
 
-            if (renderResult===this.RENDER_ALL_WHITE) continue;
+            if (renderResult===this.RENDER_ALL_WHITE) {
+                shadowmap.fillChunk(shadowmap.chunkIdx,this.SHADOW_MIN_VALUE);
+                continue;
+            }
             
                 // advance chunk if not all black (which means
                 // we used a chunk instead of the default all black chunk
@@ -533,8 +537,8 @@ class ShadowmapGeneratorClass
                 shadowmap=new ShadowmapBitmapClass(this);
                 this.shadowmapList.push(shadowmap);
                 
+                runIdx=mesh.shadowmapRuns.length;
                 mesh.shadowmapRuns.push(new ShadowmapMeshRunClass(this.shadowmapIdx,(n+1),(n+1)));
-                runIdx++;
             }
         }
         
