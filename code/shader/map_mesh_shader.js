@@ -25,6 +25,11 @@ export default class MapMeshShaderClass extends ShaderClass
         this.viewMatrixUniform=null;
         this.normalMatrixUniform=null;
         
+        this.hasMaskUniform=null;
+        this.hasNormalUniform=null;
+        this.hasMetallicRoughnessUniform=null;
+        this.hasEmissiveUniform=null;
+        
         this.emissiveFactorUniform=null; 
 
         this.lightMinUniform=null;
@@ -56,6 +61,11 @@ export default class MapMeshShaderClass extends ShaderClass
         this.perspectiveMatrixUniform=gl.getUniformLocation(this.program,'perspectiveMatrix');
         this.viewMatrixUniform=gl.getUniformLocation(this.program,'viewMatrix');
         this.normalMatrixUniform=gl.getUniformLocation(this.program,'normalMatrix');
+        
+        this.hasMaskUniform=gl.getUniformLocation(this.program,'hasMask');
+        this.hasNormalUniform=gl.getUniformLocation(this.program,'hasNormal');
+        this.hasMetallicRoughnessUniform=gl.getUniformLocation(this.program,'hasMetallicRoughness');
+        this.hasEmissiveUniform=gl.getUniformLocation(this.program,'hasEmissive');
 
         this.emissiveFactorUniform=gl.getUniformLocation(this.program,'emissiveFactor');
         

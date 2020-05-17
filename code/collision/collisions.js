@@ -285,11 +285,10 @@ export default class CollisionClass
                             // collision but a bump
                             
                         bumpY=-1;
-                        if (mesh.bump) {
-                            if ((collisionTrig.yBound.max-this.entityTestPnt.y)<=this.core.map.bumpHeight) {
-                                bumpY=collisionTrig.yBound.max;
-                                entity.collideWallMeshIdx=-1;
-                            }
+
+                        if ((collisionTrig.yBound.max-this.entityTestPnt.y)<=this.core.map.bumpHeight) {
+                            bumpY=collisionTrig.yBound.max;
+                            entity.collideWallMeshIdx=-1;
                         }
                     }
                 }

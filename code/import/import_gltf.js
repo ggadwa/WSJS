@@ -31,14 +31,7 @@ export default class ImportGLTFClass
     async loadGLTFJson()
     {
         let resp;
-        let url='../models/'+this.json.name+'/scene.gltf';
-        
-        if (this.json.name=='dual_castles') url='../models/'+this.json.name+'/'+this.json.name+'.gltf';
-        if (this.json.name=='dungeon') url='../models/'+this.json.name+'/'+this.json.name+'.gltf';
-        if (this.json.name=='circuit_race') url='../models/'+this.json.name+'/'+this.json.name+'.gltf';
-        if (this.json.name=='ratkin_skeleton') url='../models/'+this.json.name+'/'+this.json.name+'.gltf';
-        if (this.json.name=='tank_blue') url='../models/'+this.json.name+'/'+this.json.name+'.gltf';
-        if (this.json.name=='tank_shell') url='../models/'+this.json.name+'/'+this.json.name+'.gltf';
+        let url='../models/'+this.json.name+'/'+this.json.name+'.gltf';
         
         try {
             resp=await fetch(url);
@@ -551,7 +544,7 @@ export default class ImportGLTFClass
     
     findMaterialForMesh(meshNode,primitiveNode)
     {
-        let n,bitmap,uri,diffuseTexture,diffuseFactor;
+        let n,bitmap,uri;
         let baseColorTexture,metallicRoughnessTexture,emissiveTexture;
         let colorURL=null;
         let colorBase=null;
@@ -574,96 +567,43 @@ export default class ImportGLTFClass
             
         emissiveFactor=new ColorClass(1,1,1);
                 
-            // now any color texture
-            // check specularGlossiness first
+            // we only use metallicRoughness
+            
+        if (materialNode.pbrMetallicRoughness===undefined) {
+            console.log('Mesh '+meshNode.name+' in material '+materialNode.name+' is not pbrMetallicRoughness type.');
+            return(null);
+        }
         
-        if (colorURL===null) {
-            if (materialNode.extensions!==undefined) {
-                if (materialNode.extensions.KHR_materials_pbrSpecularGlossiness!==undefined) {
+            // the base color
+            
+        if (materialNode.pbrMetallicRoughness.baseColorTexture!==undefined) {
+            baseColorTexture=materialNode.pbrMetallicRoughness.baseColorTexture;
 
-                        // find the glossy base color
+            uri=this.jsonData.images[this.jsonData.textures[baseColorTexture.index].source].uri;
+            colorURL=uri.startsWith('data:image')?uri:(prefixURL+uri);
 
-                    diffuseTexture=materialNode.extensions.KHR_materials_pbrSpecularGlossiness.diffuseTexture;
-                    if (diffuseTexture!==undefined) {
-                        uri=this.jsonData.images[diffuseTexture.index].uri;
-                        colorURL=uri.startsWith('data:image')?uri:(prefixURL+uri);
-                        
-                            // check for any scale
-                            
-                        if (diffuseTexture.extensions!==undefined) {
-                            if (diffuseTexture.extensions.KHR_texture_transform!==undefined) {
-                                if (diffuseTexture.extensions.KHR_texture_transform.scale!==undefined) {
-                                    scale=diffuseTexture.extensions.KHR_texture_transform.scale;
-                                }
-                            }
-                        }
+                // check for scale
+
+            if (baseColorTexture.extensions!==undefined) {
+                if (baseColorTexture.extensions.KHR_texture_transform!==undefined) {
+                    if (baseColorTexture.extensions.KHR_texture_transform.scale!==undefined) {
+                        scale=baseColorTexture.extensions.KHR_texture_transform.scale;
                     }
-                    else {
-                        diffuseFactor=materialNode.extensions.KHR_materials_pbrSpecularGlossiness.diffuseFactor;
-                        if (diffuseFactor!==undefined) {
-                            colorBase=new ColorClass((diffuseFactor[0]*5),(diffuseFactor[1]*5),(diffuseFactor[2]*5));   // add some normal spec in there, we normally want textures so this is a stop-gap
-                        }
-                    }
-/*
-                        // get the specular
-
-                    glossTexture=materialNode.extensions.KHR_materials_pbrSpecularGlossiness.specularGlossinessTexture;
-                    if (glossTexture!==undefined) {
-                        uri=this.jsonData.images[glossTexture.index].uri;
-                        specularURL=uri.startsWith('data:image')?uri:(prefixURL+uri);
-
-                        specularFactorProp=materialNode.extensions.KHR_materials_pbrSpecularGlossiness.glossinessFactor;        // our specular factor comes from the gloss factor
-                        if (specularFactorProp!==undefined) {
-                            specularFactorProp*=10;     // a factor of 0.5 = 5, which is regular specular
-                            specularFactor=new ColorClass(specularFactorProp,specularFactorProp,specularFactorProp);
-                        }
-                    }
-                         * */
-
                 }
             }
         }
-        
-            // check metallicRoughness next
-            
-        if (colorURL===null) {
-            
-                // check for base color
-                
-            if (materialNode.pbrMetallicRoughness!==undefined) {
-                if (materialNode.pbrMetallicRoughness.baseColorTexture!==undefined) {
-                    
-                        // the texture
-                        
-                    baseColorTexture=materialNode.pbrMetallicRoughness.baseColorTexture;
-                    
-                    uri=this.jsonData.images[this.jsonData.textures[baseColorTexture.index].source].uri;
-                    colorURL=uri.startsWith('data:image')?uri:(prefixURL+uri);
-                    
-                        // check for scale
-                        
-                    if (baseColorTexture.extensions!==undefined) {
-                        if (baseColorTexture.extensions.KHR_texture_transform!==undefined) {
-                            if (baseColorTexture.extensions.KHR_texture_transform.scale!==undefined) {
-                                scale=baseColorTexture.extensions.KHR_texture_transform.scale;
-                            }
-                        }
-                    }
-                }
-                else {
-                    if (materialNode.pbrMetallicRoughness.baseColorFactor!==undefined) {
-                        colorBase=new ColorClass(materialNode.pbrMetallicRoughness.baseColorFactor[0],materialNode.pbrMetallicRoughness.baseColorFactor[1],materialNode.pbrMetallicRoughness.baseColorFactor[2]);
-                    }
-                }
+        else {
+            if (materialNode.pbrMetallicRoughness.baseColorFactor!==undefined) {
+                colorBase=new ColorClass(materialNode.pbrMetallicRoughness.baseColorFactor[0],materialNode.pbrMetallicRoughness.baseColorFactor[1],materialNode.pbrMetallicRoughness.baseColorFactor[2]);
             }
-                        
-                // get the metallic/roughness
+        }
 
-            metallicRoughnessTexture=materialNode.pbrMetallicRoughness.metallicRoughnessTexture;
-            if (metallicRoughnessTexture!==undefined) {
-                uri=this.jsonData.images[this.jsonData.textures[metallicRoughnessTexture.index].source].uri;
-                metallicRoughnessURL=uri.startsWith('data:image')?uri:(prefixURL+uri);
-            }              
+            // the metallic/roughness
+
+        metallicRoughnessTexture=materialNode.pbrMetallicRoughness.metallicRoughnessTexture;
+        if (metallicRoughnessTexture!==undefined) {
+            uri=this.jsonData.images[this.jsonData.textures[metallicRoughnessTexture.index].source].uri;
+            metallicRoughnessURL=uri.startsWith('data:image')?uri:(prefixURL+uri);
         }
         
             // emissives
@@ -698,6 +638,22 @@ export default class ImportGLTFClass
     }
     
         //
+        // custom property lookup
+        //
+        
+    hasCustomProperty(materialNode,meshNode,propName)
+    {
+        if (materialNode.extras!==undefined) {
+            if (materialNode.extras[propName]!==undefined) return(true);
+        }
+        if (meshNode.extras!==undefined) {
+            if (meshNode.extras[propName]!==undefined) return(true);
+        }
+        
+        return(false);
+    }
+    
+        //
         // decode meshes
         //
         
@@ -707,7 +663,7 @@ export default class ImportGLTFClass
         let vertexArray,normalArray,tangentArray,uvArray,indexArray;
         let jointArray,weightArray,fakeArrayLen,noSkinAttachedNodeIdx,skinIdx;
         let nIdx,forceTangentRebuild;
-        let mesh,bitmap,curBitmapName;
+        let mesh,materialNode,bitmap,curBitmapName;
         let v=new PointClass(0,0,0);
         let normal=new PointClass(0,0,0);
         let tangent=new PointClass(0,0,0);
@@ -875,6 +831,11 @@ export default class ImportGLTFClass
                     
                 mesh=new MeshClass(this.core,meshNode.name,bitmap,noSkinAttachedNodeIdx,skinIdx,vertexArray,normalArray,tangentArray,uvArray,jointArray,weightArray,indexArray);
                 meshes.push(mesh);
+                
+                    // and handle any custom properties
+                    
+                materialNode=this.jsonData.materials[primitiveNode.material];
+                if (this.hasCustomProperty(materialNode,meshNode,'wsjsNoCollision')) mesh.noCollisions=true;
             }
         }
 

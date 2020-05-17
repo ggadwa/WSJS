@@ -29,6 +29,11 @@ export default class ModelMeshShaderClass extends ShaderClass
         this.noSkinUniform=null;
         this.noSkinAttachedNodeMatrixUniform=null;
         this.jointMatrixUniformArray=[];
+        
+        this.hasMaskUniform=null;
+        this.hasNormalUniform=null;
+        this.hasMetallicRoughnessUniform=null;
+        this.hasEmissiveUniform=null;
 
         this.emissiveFactorUniform=null;
 
@@ -71,6 +76,11 @@ export default class ModelMeshShaderClass extends ShaderClass
             name='jointMatrix['+n+']';
             this.jointMatrixUniformArray.push(gl.getUniformLocation(this.program,name));
         }
+        
+        this.hasMaskUniform=gl.getUniformLocation(this.program,'hasMask');
+        this.hasNormalUniform=gl.getUniformLocation(this.program,'hasNormal');
+        this.hasMetallicRoughnessUniform=gl.getUniformLocation(this.program,'hasMetallicRoughness');
+        this.hasEmissiveUniform=gl.getUniformLocation(this.program,'hasEmissive');
 
         this.emissiveFactorUniform=gl.getUniformLocation(this.program,'emissiveFactor');
         

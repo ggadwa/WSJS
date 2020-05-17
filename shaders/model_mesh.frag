@@ -6,6 +6,7 @@ uniform lowp sampler2D metallicRoughnessTex;
 uniform lowp sampler2D emissiveTex;
 uniform lowp sampler2D maskTex;
 
+uniform bool hasMask,hasNormal,hasMetallicRoughness,hasEmissive;
 uniform mediump vec3 emissiveFactor;
 
 uniform lowp vec3 lightMin,lightMax;
@@ -28,20 +29,22 @@ void main(void)
     lowp float att;
     highp float intensity,dist;
     highp vec3 lightVector,lightVertexVector;
+    lowp vec3 bumpMap,metallicRoughnessMap;
+    lowp vec4 tex,pixel;
 
         // the texture fragment
 
-    lowp vec4 tex=texture(baseTex,fragUV);
+    tex=texture(baseTex,fragUV);
 
         // the bump map
-
+    
+    if (hasNormal) bumpMap=normalize((texture(normalTex,fragUV.xy).rgb*2.0)-1.0);
     highp vec3 bumpLightVertexVector;
-    lowp vec3 bumpMap=normalize((texture(normalTex,fragUV.xy).rgb*2.0)-1.0);
     lowp float bump=0.0;
 
         // the metallic-roughness map
 
-    lowp vec3 metallicRoughnessMap=texture(metallicRoughnessTex,fragUV).rgb;
+    if (hasMetallicRoughness) metallicRoughnessMap=texture(metallicRoughnessTex,fragUV).rgb;
     lowp vec3 metallicHalfVector;
     lowp float metallic;
 
@@ -69,35 +72,49 @@ void main(void)
             att+=pow(att,lights[n].colorExponent.w);
             lightCol+=(lights[n].colorExponent.rgb*att);
 
-                // per-light bump calc (in tangent space)
+            if (hasNormal||hasMetallicRoughness) {
 
-            lightVertexVector.x=dot(lightVector,tangentSpaceTangent);
-            lightVertexVector.y=dot(lightVector,tangentSpaceBinormal);
-            lightVertexVector.z=dot(lightVector,tangentSpaceNormal);
+                    // lights in tangent space
 
-            bumpLightVertexVector=normalize(lightVertexVector);
-            bump+=(dot(bumpLightVertexVector,bumpMap)*att);
+                lightVertexVector.x=dot(lightVector,tangentSpaceTangent);
+                lightVertexVector.y=dot(lightVector,tangentSpaceBinormal);
+                lightVertexVector.z=dot(lightVector,tangentSpaceNormal);
 
-                // per-light metallic
+                    // per-light bump
 
-            metallicHalfVector=normalize(normalize(eyeVector)+bumpLightVertexVector);
-            metallic+=((metallicRoughnessMap.b*pow(max(dot(bumpMap,metallicHalfVector),0.0),5.0))*att);
+                bumpLightVertexVector=normalize(lightVertexVector);
+                if (hasNormal) bump+=(dot(bumpLightVertexVector,bumpMap)*att);
+
+                    // per-light metallic
+
+                if (hasMetallicRoughness) {
+                    metallicHalfVector=normalize(normalize(eyeVector)+bumpLightVertexVector);
+                    metallic+=((metallicRoughnessMap.b*pow(max(dot(bumpMap,metallicHalfVector),0.0),5.0))*att);
+                }
+            }
         }
     }
 
         // calculate the final lighting
 
-    lightCol=clamp((lightCol*bump),lightMin,lightMax);
+    if (hasNormal) lightCol*=bump;
+    lightCol=clamp(lightCol,lightMin,lightMax);
 
         // finally create the pixel
 
-    outputPixel.rgb=((tex.rgb*lightCol)+(min(metallic,1.0)*lightCol))+(texture(emissiveTex,fragUV.xy).rgb*emissiveFactor);
-    outputPixel.a=1.0;
+    pixel.rgb=(tex.rgb*lightCol);
+    if (hasMetallicRoughness) pixel.rgb+=(min(metallic,1.0)*lightCol);
+    if (hasEmissive) pixel.rgb+=(texture(emissiveTex,fragUV.xy).rgb*emissiveFactor);
+    pixel.a=1.0;
+
+    outputPixel=pixel;
 
         // any masking pixel discards
         // have to do this at very end because some drivers
         // get weird about this (or so I've read)
 
-    if (texture(maskTex,fragUV).a==0.0) discard;
+    if (hasMask) {
+        if (texture(maskTex,fragUV).a==0.0) discard;
+    }
 }
 

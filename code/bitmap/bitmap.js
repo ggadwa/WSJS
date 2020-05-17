@@ -26,7 +26,7 @@ export default class BitmapClass
         this.normalURL=null;
         this.metallicRoughnessURL=null;
         this.emissiveURL=null;
-        this.emissiveFactor=null;
+        this.emissiveFactor=new ColorClass(1,1,1);
         this.scale=null;
         
         this.colorImage=null;
@@ -34,11 +34,11 @@ export default class BitmapClass
         this.metallicRoughnessImage=null;
         this.emissiveImage=null;
         
-        this.texture=null;
-        this.normalMap=null;
-        this.metallicRoughnessMap=null;
-        this.emissiveMap=null;
-        this.mask=null;
+        this.colorTexture=null;
+        this.normalTexture=null;
+        this.metallicRoughnessTexture=null;
+        this.emissiveTexture=null;
+        this.maskTexture=null;
 
         this.hasColorImageAlpha=false;
         
@@ -61,7 +61,7 @@ export default class BitmapClass
         this.normalURL=normalURL;
         this.metallicRoughnessURL=metallicRoughnessURL;
         this.emissiveURL=emissiveURL;
-        this.emissiveFactor=(emissiveFactor!==null)?emissiveFactor:new ColorClass(1,1,1);
+        if (emissiveFactor!==null) this.emissiveFactor=emissiveFactor;
         this.scale=scale;
         
         this.buildSimpleName();
@@ -72,12 +72,6 @@ export default class BitmapClass
         this.bitmapType=this.BITMAP_SIMPLE_URL;
         
         this.colorURL=colorURL;
-        this.colorBase=null;
-        this.normalURL=null;
-        this.metallicRoughnessURL=null;
-        this.emissiveURL=null;
-        this.emissiveFactor=new ColorClass(1,1,1);
-        this.scale=null;
         
         this.buildSimpleName();
     }
@@ -87,12 +81,6 @@ export default class BitmapClass
         this.bitmapType=this.BITMAP_INTERFACE_URL;
         
         this.colorURL=colorURL;
-        this.colorBase=null;
-        this.normalURL=null;
-        this.metallicRoughnessURL=null;
-        this.emissiveURL=null;
-        this.emissiveFactor=new ColorClass(1,1,1);
-        this.scale=null;
         
         this.buildSimpleName();
     }
@@ -103,11 +91,6 @@ export default class BitmapClass
         
         this.colorURL=colorURL;
         this.colorBase=colorBase;
-        this.normalURL=null;
-        this.metallicRoughnessURL=null;
-        this.emissiveURL=null;
-        this.emissiveFactor=new ColorClass(1,1,1);
-        this.scale=null;
         
         this.buildSimpleName();
     }
@@ -137,17 +120,16 @@ export default class BitmapClass
     {
         let gl=this.core.gl;
 
-        if (this.texture!==null) gl.deleteTexture(this.texture);
-        if (this.normalMap!==null) gl.deleteTexture(this.normalMap);
-        if (this.metallicRoughnessMap!==null) gl.deleteTexture(this.metallicRoughnessMap);
-        if (this.emissiveMap!==null) gl.deleteTexture(this.emissiveMap);
-        if (this.mask!==null) gl.deleteTexture(this.mask);
+        if (this.colorTexture!==null) gl.deleteTexture(this.colorTexture);
+        if (this.normalTexture!==null) gl.deleteTexture(this.normalTexture);
+        if (this.metallicRoughnessTexture!==null) gl.deleteTexture(this.metallicRoughnessTexture);
+        if (this.emissiveTexture!==null) gl.deleteTexture(this.emissiveTexture);
+        if (this.maskTexture!==null) gl.deleteTexture(this.maskTexture);
         
         this.colorImage=null;
         this.normalImage=null;
         this.metallicRoughnessImage=null;
         this.emissiveImage=null;
-        this.mask=null;
         
         this.loaded=false;
     }
@@ -237,145 +219,6 @@ export default class BitmapClass
         return(canvas);
     }
     
-    createNormalFromColorImage()
-    {
-        let n,pixelCount,idx;
-        let f,rg;
-        let canvas,ctx,imgData,data;
-        
-            // creating a normal map
-            // from a color values
-            
-        canvas=document.createElement('canvas');
-        canvas.width=this.colorImage.width;
-        canvas.height=this.colorImage.height;
-        ctx=canvas.getContext('2d');
-        
-            // add the original image
-            
-        ctx.drawImage(this.colorImage,0,0);
-        
-	imgData=ctx.getImageData(0,0,canvas.width,canvas.height);
-        data=imgData.data;
-
-            // get a gray scale for the pixel,
-            // the darker it is, the more the normal
-            // points away
-            
-        idx=0;
-        pixelCount=canvas.width*canvas.height;
-        
-        for (n=0;n!=pixelCount;n++) {
-            f=((data[idx]+data[idx+1]+data[idx+2])*0.33)/255;
-            
-                // if below a certain darkness, then no
-                // normal
-                
-            if (f>this.NORMAL_NO_SHIFT_CLAMP) {
-                data[idx++]=127;
-                data[idx++]=127;
-                data[idx++]=255;
-                data[idx++]=255;
-                
-                continue;
-            }
-            
-                // otherwise clamp it
-                
-            rg=127-Math.trunc((f*this.NORMAL_MAX_SHIFT)/this.NORMAL_NO_SHIFT_CLAMP);
-            
-            data[idx++]=rg;
-            data[idx++]=rg;
-            data[idx++]=255;
-            data[idx++]=255;
-        }
-		
-	ctx.putImageData(imgData,0,0);
-        
-        return(canvas);
-    }
-    
-    createMetallicRoughnessFromColorImage()
-    {
-        let n,nPixel,idx;
-        let f,i,min,max,expandFactor,contrastFactor;
-        let canvas,ctx,imgData,data;
-        
-            // creating a metallic map
-            // from a contrast value
-            
-        canvas=document.createElement('canvas');
-        canvas.width=this.colorImage.width;
-        canvas.height=this.colorImage.height;
-        ctx=canvas.getContext('2d');
-        
-            // add the original image
-            
-        ctx.drawImage(this.colorImage,0,0);
-        
-	imgData=ctx.getImageData(0,0,canvas.width,canvas.height);
-        data=imgData.data;
-        
-        nPixel=canvas.width*canvas.height;
-
-            // get the contrast factor
-            
-        contrastFactor=(259*(this.METALLIC_CONTRAST+255))/(255*(259-this.METALLIC_CONTRAST));
-        
-            // find a min-max across the entire map, we do this
-            // so we can readjust the contrast to be 0..1
-            
-        min=max=(data[0]+data[1]+data[2])*0.33
-
-        idx=0;
-        
-        for (n=0;n!==nPixel;n++) {
-            f=(data[idx]+data[idx+1]+data[idx+2])*0.33;
-            if (f<min) min=f;
-            if (f>max) max=f;
-
-            idx+=4;
-        }
-        
-        if (min>=max) {
-            expandFactor=0;
-            min=0;
-        }
-        else {
-            expandFactor=255.0/(max-min);
-        }
-        
-            // now run the contrast
-            
-        idx=0;
-        
-        for (n=0;n!==nPixel;n++) {
-            
-                // get the pixel back into 0..1
-                
-            f=(data[idx]+data[idx+1]+data[idx+2])*0.33;
-            f=(f-min)*expandFactor;
-            
-                // apply the contrast and
-                // clamp it
-                
-            f=((contrastFactor*(f-128))+128);
-            if (f<0) f=0;
-            if (f>255) f=255;
-            
-            i=Math.trunc(f*this.METALLIC_CONTRAST_CLAMP);
-                    
-            data[idx++]=0;
-            data[idx++]=0;
-            data[idx++]=i;      // blue channel has metallic in it
-            data[idx++]=255;
-        } 
-		
-	ctx.putImageData(imgData,0,0);
-        
-        return(canvas);
-    }
-    
         //
         // load texture
         //
@@ -454,8 +297,8 @@ export default class BitmapClass
             // force the alpha into the rgb so alphas
             // don't muddy up during mipmapping
             
-        this.texture=gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D,this.texture);
+        this.colorTexture=gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D,this.colorTexture);
         gl.texImage2D(gl.TEXTURE_2D,0,(this.hasColorImageAlpha?gl.RGBA:gl.RGB),(this.hasColorImageAlpha?gl.RGBA:gl.RGB),gl.UNSIGNED_BYTE,this.colorImage);
         
         if (this.bitmapType===this.BITMAP_SHADOW) {
@@ -487,28 +330,24 @@ export default class BitmapClass
         }
         
             // if there is an alpha, build the mask
-            // into a different texture so we can use
-            // nearest, otherwise it's all black with a 1 alpha
-            // so no masking
+            // into an opacity texture (we need to use
+            // nearest here)
             
         if (this.hasColorImageAlpha) {
             maskImage=this.colorImage;
-        }
-        else {
-            maskImage=this.createSolidColorImage(0,0,0);      // alpha will be 1
-        }
         
-        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,true);
-            
-        this.mask=gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D,this.mask);
-        gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,maskImage);
-        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);
-        gl.generateMipmap(gl.TEXTURE_2D);
-        gl.bindTexture(gl.TEXTURE_2D,null);
-        
-        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,false);
+            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,true);
+
+            this.maskTexture=gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D,this.maskTexture);
+            gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,maskImage);
+            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);
+            gl.generateMipmap(gl.TEXTURE_2D);
+            gl.bindTexture(gl.TEXTURE_2D,null);
+
+            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,false);
+        }
         
             // normal bitmap
         
@@ -536,24 +375,25 @@ export default class BitmapClass
             }
         }    
         
-        if (this.normalImage===null) this.normalImage=this.createNormalFromColorImage();
-        
-        this.normalMap=gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D,this.normalMap);
-        gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,this.normalImage);
-        
-        if ((this.isImagePowerOf2(this.normalImage))) {
-            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_NEAREST);
-            gl.generateMipmap(gl.TEXTURE_2D);
-        }
-        else {
-            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
-        }
-        
-        gl.bindTexture(gl.TEXTURE_2D,null);
+        if (this.normalImage!==null) {
 
+            this.normalTexture=gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D,this.normalTexture);
+            gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,this.normalImage);
+
+            if ((this.isImagePowerOf2(this.normalImage))) {
+                gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_NEAREST);
+                gl.generateMipmap(gl.TEXTURE_2D);
+            }
+            else {
+                gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
+            }
+
+            gl.bindTexture(gl.TEXTURE_2D,null);
+        }
+        
             // metallic-roughness bitmap
             
         if ((this.bitmapType!==this.BITMAP_GENERATED) || (this.bitmapType===this.BITMAP_COLOR)) {
@@ -580,23 +420,24 @@ export default class BitmapClass
             }
         }
         
-        if (this.metallicRoughnessImage===null) this.metallicRoughnessImage=this.createMetallicRoughnessFromColorImage();
+        if (this.metallicRoughnessImage!==null) {
         
-        this.metallicRoughnessMap=gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D,this.metallicRoughnessMap);
-        gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,this.metallicRoughnessImage);
-        
-        if ((this.isImagePowerOf2(this.metallicRoughnessImage))) {
-            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_NEAREST);
-            gl.generateMipmap(gl.TEXTURE_2D);
+            this.metallicRoughnessTexture=gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D,this.metallicRoughnessTexture);
+            gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,this.metallicRoughnessImage);
+
+            if ((this.isImagePowerOf2(this.metallicRoughnessImage))) {
+                gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_NEAREST);
+                gl.generateMipmap(gl.TEXTURE_2D);
+            }
+            else {
+                gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
+            }
+
+            gl.bindTexture(gl.TEXTURE_2D,null);
         }
-        else {
-            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
-        }
-        
-        gl.bindTexture(gl.TEXTURE_2D,null);
         
             // emissive bitmap
             // these do not have to exist, if missing,
@@ -626,23 +467,24 @@ export default class BitmapClass
             }
         }
         
-        if (this.emissiveImage===null) this.emissiveImage=this.createSolidColorImage(0,0,0);
+        if (this.emissiveImage!==null) {
         
-        this.emissiveMap=gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D,this.emissiveMap);
-        gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,this.emissiveImage);
-        
-        if ((this.isImagePowerOf2(this.emissiveImage))) {
-            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_NEAREST);
-            gl.generateMipmap(gl.TEXTURE_2D);
+            this.emissiveTexture=gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D,this.emissiveTexture);
+            gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,this.emissiveImage);
+
+            if ((this.isImagePowerOf2(this.emissiveImage))) {
+                gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_NEAREST);
+                gl.generateMipmap(gl.TEXTURE_2D);
+            }
+            else {
+                gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
+            }
+
+            gl.bindTexture(gl.TEXTURE_2D,null);
         }
-        else {
-            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
-        }
-        
-        gl.bindTexture(gl.TEXTURE_2D,null);
         
         this.loaded=true;
         
@@ -661,22 +503,58 @@ export default class BitmapClass
 
         gl.uniform3f(shader.emissiveFactorUniform,this.emissiveFactor.r,this.emissiveFactor.g,this.emissiveFactor.b);
         
-            // the textures
+            // mask
+        
+        if (this.maskTexture!==null) {
+            gl.uniform1i(shader.hasMaskUniform,1);
+
+            gl.activeTexture(gl.TEXTURE4);
+            gl.bindTexture(gl.TEXTURE_2D,this.maskTexture);
+        }
+        else {
+            gl.uniform1i(shader.hasMaskUniform,0);
+        }
+        
+            // emissive
             
-        gl.activeTexture(gl.TEXTURE4);
-        gl.bindTexture(gl.TEXTURE_2D,this.mask);
+        if (this.emissiveTexture!==null) {
+            gl.uniform1i(shader.hasEmissiveUniform,1);
+
+            gl.activeTexture(gl.TEXTURE3);
+            gl.bindTexture(gl.TEXTURE_2D,this.emissiveTexture);
+        }
+        else {
+            gl.uniform1i(shader.hasEmissiveUniform,0);
+        }
+        
+            // metallic-roughness
             
-        gl.activeTexture(gl.TEXTURE3);
-        gl.bindTexture(gl.TEXTURE_2D,this.emissiveMap);
+        if (this.metallicRoughnessTexture!==null) {
+            gl.uniform1i(shader.hasMetallicRoughnessUniform,1);
 
-        gl.activeTexture(gl.TEXTURE2);
-        gl.bindTexture(gl.TEXTURE_2D,this.metallicRoughnessMap);
+            gl.activeTexture(gl.TEXTURE2);
+            gl.bindTexture(gl.TEXTURE_2D,this.metallicRoughnessTexture);
+        }
+        else {
+            gl.uniform1i(shader.hasMetallicRoughnessUniform,0);
+        }
 
-        gl.activeTexture(gl.TEXTURE1);
-        gl.bindTexture(gl.TEXTURE_2D,this.normalMap);
+            // normal
+            
+        if (this.normalTexture!==null) {
+            gl.uniform1i(shader.hasNormalUniform,1);
 
+            gl.activeTexture(gl.TEXTURE1);
+            gl.bindTexture(gl.TEXTURE_2D,this.normalTexture);
+        }
+        else {
+            gl.uniform1i(shader.hasNormalUniform,0);
+        }
+
+            // the color
+            
         gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D,this.texture);
+        gl.bindTexture(gl.TEXTURE_2D,this.colorTexture);
     }
     
     attachAsShadow(shader)
@@ -684,7 +562,7 @@ export default class BitmapClass
         let gl=this.core.gl;
         
         gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D,this.texture);
+        gl.bindTexture(gl.TEXTURE_2D,this.colorTexture);
     }
     
     attachAsLiquid(shader)
@@ -692,7 +570,7 @@ export default class BitmapClass
         let gl=this.core.gl;
 
         gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D,this.texture);
+        gl.bindTexture(gl.TEXTURE_2D,this.colorTexture);
     }
     
     attachAsInterface()
@@ -700,7 +578,7 @@ export default class BitmapClass
         let gl=this.core.gl;
 
         gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D,this.texture);
+        gl.bindTexture(gl.TEXTURE_2D,this.colorTexture);
     }
     
     attachAsParticle()
@@ -708,7 +586,7 @@ export default class BitmapClass
         let gl=this.core.gl;
 
         gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D,this.texture);
+        gl.bindTexture(gl.TEXTURE_2D,this.colorTexture);
     }
     
     attachAsSky()
@@ -716,6 +594,6 @@ export default class BitmapClass
         let gl=this.core.gl;
 
         gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D,this.texture);
+        gl.bindTexture(gl.TEXTURE_2D,this.colorTexture);
     }
 }

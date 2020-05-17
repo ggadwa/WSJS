@@ -413,7 +413,7 @@ class ShadowmapGeneratorClass
         let n,renderResult,runIdx;
         let rv0,rv1,rv2,dist0,dist1,dist2;
         let vertexShadowArray,uvShadowArray;
-        let mesh,shadowmap,highlight;
+        let mesh,shadowmap;
         
         mesh=this.data.meshes[meshIdx];
         
@@ -421,12 +421,10 @@ class ShadowmapGeneratorClass
         mesh.vertexShadowArray=null;
         mesh.uvShadowArray=null;
         
-            // moveable or highlighted meshes are skipped
+            // meshes that are moveable, have an emissive
+            // texture, or have a mask texture are skipped
                 
-        highlight=false;
-        if (this.data.shadowMapHighlightBitmaps!==undefined) highlight=(this.data.shadowMapHighlightBitmaps.indexOf(mesh.bitmapName)!==-1);
-
-        if ((mesh.moveable) || (highlight)) {
+        if ((mesh.moveable) || (mesh.bitmap.emissiveTexture!==null) || (mesh.bitmap.maskTexture!==null)) {
             console.info('['+this.data.threadIdx+'] skipping highlighted mesh '+((meshIdx-this.data.startMeshIdx)+1)+'/'+(this.data.endMeshIdx-this.data.startMeshIdx)+" ("+mesh.name+")");
             return;
         }

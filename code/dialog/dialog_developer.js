@@ -96,10 +96,6 @@ export default class DialogDeveloperClass extends DialogBaseClass
             
         data={};
         
-            // need to save this from map json
-            
-        data.shadowMapHighlightBitmaps=map.json.shadowMapHighlightBitmaps;
-        
             // pre-calc the meshes
             
         data.meshes=[];

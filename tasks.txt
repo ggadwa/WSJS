@@ -1,9 +1,27 @@
 
 *** DO METALLIC/ROUGHNESS TRANSLATIONS
-     - remove loadGLTFJson naming hack
-     - move alpha to cut out
-     - error if not m/r
      - generate_bitmap_base / addGenerated needs to change -- search all for "specular" and "glow"
+
+
+- shadowmap blocking (NoCollision) and no shadowmap (has emissive, or has a mask) instead of flags
+
+wsjsNoCollision
+wsjsSkyBox[implement]
+wsjsEffect
+wsjsDataXXX
+
+wsjsLiquidWaveSize":1000
+wsjsLiquidWavePeriod":10000
+wjjsLiquidWaveHeight":50
+wjjsLiquidShift: [u,v]
+wsjsLiquidTint: [r,g,b]
+wsjsLiquidGravityFactor: 0.1
+
+
+- can we get rid of bitmap simple name after we get rid of all the bitmap collision/etc lists?
+
+
+GET rid of triangle effect & web effect
 
 - dungeon death pit
 
@@ -24,6 +42,9 @@ EDIT MODE
   - right click to start split
   - stop all sounds
 
+PHYSICS
+  - fix wacky bumping
+
 - bouncing up on bits of pillar in castle map is bad, should not be able to stand on those
 
 - multiplayer needs a complete rebuild
@@ -41,9 +62,6 @@ EDIT MODE
 - eventually clean up entity and unecessary pass through APIs
 - need to test failures (missing bitmap, missing json, bad json, etc)
 
-- need to go over all the auto generate options
-
-
 - make a 2D demo
 
 - need to do some optimizations
@@ -54,26 +72,4 @@ EDIT MODE
     - need to transmit show/hide meshes --> TEST
     - predictions
     - need open system for passing message (like firing weapons, etc)
-
-- generator
-    - nodes don't seem right in certain rooms (like boxes)
-    - the random color scheme
-
-    - lights
-       - regular
-       - color changing
-       - chasing (4 that go on and off)
-
-    - bitmaps
-       - pipe, needs random line & random screw line
-
-    - decorations
-       - don't repeat decorations for connected rooms
-       - pool decorations
-       - moving blocks (half size of segmentSize, in random circular motion)
-       - better uv for pillars
-       - control panel decorations
-       - connectors for pipes
-
-
 

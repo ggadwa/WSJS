@@ -95,55 +95,6 @@ export default class MeshListClass
     }
     
         //
-        // set collision/bump types for meshes
-        //
-        
-    setNoCollisionsForBitmap(bitmap)
-    {
-        let mesh;
-        
-        for (mesh of this.meshes) {
-            if (mesh.bitmap.colorURL===bitmap.colorURL) mesh.noCollisions=true;
-        }
-    }
-    
-    setNoCollisionsForMeshes(name)
-    {
-        let mesh;
-        
-        for (mesh of this.meshes) {
-            if (mesh.name.startsWith(name)) mesh.noCollisions=true;
-        }
-    }
-    
-    setSimpleCollisionsForBitmap(bitmap)
-    {
-        let mesh;
-        
-        for (mesh of this.meshes) {
-            if (mesh.bitmap.colorURL===bitmap.colorURL) mesh.simpleCollisions=true;
-        }
-    }
-    
-    setSimpleCollisionsForMeshes(name)
-    {
-        let mesh;
-        
-        for (mesh of this.meshes) {
-            if (mesh.name.startsWith(name)) mesh.simpleCollisions=true;
-        }
-    }
-        
-    setNoBumpForMeshes(name)
-    {
-        let mesh;
-        
-        for (mesh of this.meshes) {
-            if (mesh.name.startsWith(name)) mesh.bump=false;
-        }
-    }
-    
-        //
         // check for mesh list collisions
         //
 
@@ -501,13 +452,7 @@ export default class MeshListClass
             }
             
             if (idx!==0) {
-                if (mesh.simpleCollisions) {
-                    gl.uniform3f(shader.colorUniform,1.0,1.0,0.0);
-                }
-                else {
-                    gl.uniform3f(shader.colorUniform,0.0,1.0,0.0);
-                }
-
+                gl.uniform3f(shader.colorUniform,0.0,1.0,0.0);
                 gl.bufferSubData(gl.ARRAY_BUFFER,0,vertexes,0,idx);
                 gl.drawArrays(gl.TRIANGLES,0,idx);
             }
@@ -532,13 +477,7 @@ export default class MeshListClass
             }
                 
             if (idx!==0) {
-                if (mesh.simpleCollisions) {
-                    gl.uniform3f(shader.colorUniform,1.0,0.0,1.0);
-                }
-                else {
-                    gl.uniform3f(shader.colorUniform,0.0,0.0,1.0);
-                }
-                
+                gl.uniform3f(shader.colorUniform,0.0,0.0,1.0);
                 gl.bufferSubData(gl.ARRAY_BUFFER,0,vertexes,0,idx);
                 gl.drawArrays(gl.TRIANGLES,0,idx);
             }
@@ -563,13 +502,7 @@ export default class MeshListClass
             }
                 
             if (idx!==0) {
-                if (mesh.simpleCollisions) {
-                    gl.uniform3f(shader.colorUniform,1.0,0.4,0.0);
-                }
-                else {
-                    gl.uniform3f(shader.colorUniform,1.0,0.0,0.0);
-                }
-                
+                gl.uniform3f(shader.colorUniform,1.0,0.4,0.0);
                 gl.bufferSubData(gl.ARRAY_BUFFER,0,vertexes,0,idx);
                 gl.drawArrays(gl.TRIANGLES,0,idx);
             }

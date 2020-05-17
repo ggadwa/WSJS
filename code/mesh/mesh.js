@@ -73,8 +73,6 @@ export default class MeshClass
             // collision lists
 
         this.noCollisions=false;
-        this.simpleCollisions=false;
-        this.bump=true;
         
         this.collisionWallTrigs=[];
         this.collisionFloorTrigs=[];
@@ -248,39 +246,7 @@ export default class MeshClass
             // webs or bushes, etc
             
         if (this.noCollisions) return(false);
-        
-             // other messages can be simple collisions,
-            // which means they collide on their bounds
-            
-        if (this.simpleCollisions) {
-            
-                // top and bottom
-                
-            this.collisionFloorTrigs.push(new CollisionTrigClass(new PointClass(this.xBound.min,this.yBound.max,this.zBound.min),new PointClass(this.xBound.max,this.yBound.max,this.zBound.min),new PointClass(this.xBound.max,this.yBound.max,this.zBound.max),new PointClass(0,1,0)));
-            this.collisionFloorTrigs.push(new CollisionTrigClass(new PointClass(this.xBound.min,this.yBound.max,this.zBound.min),new PointClass(this.xBound.max,this.yBound.max,this.zBound.max),new PointClass(this.xBound.min,this.yBound.max,this.zBound.max),new PointClass(0,1,0)));
-            
-            this.collisionCeilingTrigs.push(new CollisionTrigClass(new PointClass(this.xBound.min,this.yBound.min,this.zBound.min),new PointClass(this.xBound.max,this.yBound.min,this.zBound.min),new PointClass(this.xBound.max,this.yBound.min,this.zBound.max),new PointClass(0,-1,0)));
-            this.collisionCeilingTrigs.push(new CollisionTrigClass(new PointClass(this.xBound.min,this.yBound.min,this.zBound.min),new PointClass(this.xBound.max,this.yBound.min,this.zBound.max),new PointClass(this.xBound.min,this.yBound.min,this.zBound.max),new PointClass(0,-1,0)));
-
-                // left and right
-                
-            this.collisionWallTrigs.push(new CollisionTrigClass(new PointClass(this.xBound.min,this.yBound.max,this.zBound.max),new PointClass(this.xBound.min,this.yBound.max,this.zBound.min),new PointClass(this.xBound.min,this.yBound.min,this.zBound.min),new PointClass(-1,0,0)));
-            this.collisionWallTrigs.push(new CollisionTrigClass(new PointClass(this.xBound.min,this.yBound.max,this.zBound.max),new PointClass(this.xBound.min,this.yBound.min,this.zBound.min),new PointClass(this.xBound.min,this.yBound.min,this.zBound.max),new PointClass(-1,0,0)));
-
-            this.collisionWallTrigs.push(new CollisionTrigClass(new PointClass(this.xBound.max,this.yBound.max,this.zBound.max),new PointClass(this.xBound.max,this.yBound.max,this.zBound.min),new PointClass(this.xBound.max,this.yBound.min,this.zBound.min),new PointClass(1,0,0)));
-            this.collisionWallTrigs.push(new CollisionTrigClass(new PointClass(this.xBound.max,this.yBound.max,this.zBound.max),new PointClass(this.xBound.max,this.yBound.min,this.zBound.min),new PointClass(this.xBound.max,this.yBound.min,this.zBound.max),new PointClass(1,0,0)));
-
-                // front and back
-                
-            this.collisionWallTrigs.push(new CollisionTrigClass(new PointClass(this.xBound.max,this.yBound.max,this.zBound.min),new PointClass(this.xBound.min,this.yBound.max,this.zBound.min),new PointClass(this.xBound.min,this.yBound.min,this.zBound.min),new PointClass(0,0,-1)));
-            this.collisionWallTrigs.push(new CollisionTrigClass(new PointClass(this.xBound.max,this.yBound.max,this.zBound.min),new PointClass(this.xBound.min,this.yBound.min,this.zBound.min),new PointClass(this.xBound.max,this.yBound.min,this.zBound.min),new PointClass(0,0,-1)));
-
-            this.collisionWallTrigs.push(new CollisionTrigClass(new PointClass(this.xBound.max,this.yBound.max,this.zBound.max),new PointClass(this.xBound.min,this.yBound.max,this.zBound.max),new PointClass(this.xBound.min,this.yBound.min,this.zBound.max),new PointClass(0,0,1)));
-            this.collisionWallTrigs.push(new CollisionTrigClass(new PointClass(this.xBound.max,this.yBound.max,this.zBound.max),new PointClass(this.xBound.min,this.yBound.min,this.zBound.max),new PointClass(this.xBound.max,this.yBound.min,this.zBound.max),new PointClass(0,0,1)));
-
-            return(true);
-        }
-       
+               
             // run through the triangles
             // and find any that make a wall to
             // create collision lines and floors

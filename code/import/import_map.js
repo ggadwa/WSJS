@@ -190,53 +190,6 @@ export default class ImportMapClass
         if (json.maxFloorCeilingDetectionFactor!==undefined) {
             this.core.map.meshList.maxFloorCeilingDetectionFactor=1.0-json.maxFloorCeilingDetectionFactor;     // 0 = walls facing straight up only, to 1 which is pretty much anything
         }
-
-            // and finally a number of mesh specific settings,
-            // based either on bitmap associated or a prefix to a mesh name
-            
-        if (json.noCollideBitmaps!==undefined) {
-            for (n=0;n!==json.noCollideBitmaps.length;n++) {
-                
-                bitmap=this.core.bitmapList.getSimpleName(json.noCollideBitmaps[n]);                
-                if (bitmap===null) {
-                    console.log('Missing bitmap to set no collisions to: '+json.noCollideBitmaps[n]);
-                    return(false);
-                }
-                
-                this.core.map.meshList.setNoCollisionsForBitmap(bitmap);
-            }
-        }
-        
-        if (json.noCollideMeshes!==undefined) {
-            for (n=0;n!==json.noCollideMeshes.length;n++) {
-                this.core.map.meshList.setNoCollisionsForBitmap(json.noCollideMeshes[n]);
-            }
-        }
-        
-        if (json.simpleCollideBitmaps!==undefined) {
-            for (n=0;n!==json.simpleCollideBitmaps.length;n++) {
-                
-                bitmap=this.core.bitmapList.getSimpleName(json.simpleCollideBitmaps[n]);                
-                if (bitmap===null) {
-                    console.log('Missing bitmap to set no collisions to: '+json.simpleCollideBitmaps[n]);
-                    return(false);
-                }
-                
-                this.core.map.meshList.setSimpleCollisionsForBitmap(bitmap);
-            }
-        }
-            
-        if (json.simpleCollideMeshes!==undefined) {
-            for (n=0;n!==json.simpleCollideMeshes.length;n++) {
-                this.core.map.meshList.setSimpleCollisionsForMeshes(json.simpleCollideMeshes[n]);
-            }
-        }
-        
-        if (json.meshNoBumpMeshes!==undefined) {
-            for (n=0;n!==json.meshNoBumpMeshes.length;n++) {
-                this.core.map.meshList.setNoBumpForMeshes(json.meshNoBumpMeshes[n]);
-            }
-        }
         
         return(true);
     }
