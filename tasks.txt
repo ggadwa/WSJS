@@ -1,7 +1,7 @@
 
 *** DO METALLIC/ROUGHNESS TRANSLATIONS
      - generate_bitmap_base / addGenerated needs to change -- search all for "specular" and "glow"
-
+   - do all bitmaps by a class/overrides
 
 - shadowmap blocking (NoCollision) and no shadowmap (has emissive, or has a mask) instead of flags
 
@@ -47,9 +47,9 @@ PHYSICS
 
 - bouncing up on bits of pillar in castle map is bad, should not be able to stand on those
 
-- multiplayer needs a complete rebuild
 
-- bots
+
+BOTS
    - they seem to continue to fight with the dead
    - extra weapon fires (needs config for how often it uses extra weapons)
 
@@ -60,16 +60,33 @@ PHYSICS
 - bots/remotes (no need for game json for remotes)
 
 - eventually clean up entity and unecessary pass through APIs
-- need to test failures (missing bitmap, missing json, bad json, etc)
 
-- make a 2D demo
 
-- need to do some optimizations
 
-- networking
+NETWORKING
+    - multiplayer needs a complete rebuild
     - entities need boxes passed (radius/height) --> TEST
     - need map_sync message (timestamp + map movements - round robin out to first player) todo partially implemented
     - need to transmit show/hide meshes --> TEST
     - predictions
     - need open system for passing message (like firing weapons, etc)
 
+GENERATOR
+    - nodes don't seem right in certain rooms (like boxes)
+    - the random color scheme
+    - lights
+       - regular
+       - color changing
+       - chasing (4 that go on and off)
+    - bitmaps
+       - pipe, needs random line & random screw line
+    - decorations
+       - don't repeat decorations for connected rooms
+       - pool decorations
+       - moving blocks (half size of segmentSize, in random circular motion)
+       - better uv for pillars
+       - control panel decorations
+       - connectors for pipes
+
+DEMO
+    - made a 2D demo
