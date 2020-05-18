@@ -167,12 +167,6 @@ export default class DialogDeveloperClass extends DialogBaseClass
         perThreadMeshCount=Math.trunc(nMesh/this.SHADOWMAP_THREAD_COUNT);
         
         for (n=0;n!==this.SHADOWMAP_THREAD_COUNT;n++) {
-            /* testing
-            if (n!==4) {
-                this.shadowmapThreads.push(null);
-                continue;
-            }
-            */
             thread=new Worker('../../code/generate/shadowmap/shadowmap_thread.js',{type:"module"});
             thread.addEventListener('message',this.buildShadowmapThreadFinish.bind(this),false);
             

@@ -295,6 +295,7 @@ class ShadowmapGeneratorClass
         let dist0,dist1,dist2,allBlack,allWhite;
         let light,normalOK,hasLight;
         let lumData=shadowmap.lumData;
+        let smearData=shadowmap.smearData;
         
             // create a light list to check the
             // triangle against
@@ -399,6 +400,8 @@ class ShadowmapGeneratorClass
                     allWhite=false;
                 }
                 
+                smearData[pIdx]=1;          // mark where we drew, and use that later to smear margins
+                
                 pIdx++;
             }
         }
@@ -424,7 +427,7 @@ class ShadowmapGeneratorClass
             // meshes that are moveable, have an emissive
             // texture, or have a mask texture are skipped
                 
-        if ((mesh.moveable) || (mesh.bitmap.emissiveTexture!==null) || (mesh.bitmap.maskTexture!==null)) {
+        if ((mesh.moveable) || (mesh.hasEmissiveTexture) || (mesh.hasMaskTexture)) {
             console.info('['+this.data.threadIdx+'] skipping highlighted mesh '+((meshIdx-this.data.startMeshIdx)+1)+'/'+(this.data.endMeshIdx-this.data.startMeshIdx)+" ("+mesh.name+")");
             return;
         }
@@ -505,10 +508,10 @@ class ShadowmapGeneratorClass
                 // we used a chunk instead of the default all black chunk
 
             if (renderResult===this.RENDER_ALL_BLACK) {
-                shadowmap.getChunkUVCoordinates(0,this.t0,this.t1,this.t2);
+                shadowmap.getChunkDrawCoordinates(0,this.t0,this.t1,this.t2);
             }
             else {
-                shadowmap.getChunkUVCoordinates(shadowmap.chunkIdx,this.t0,this.t1,this.t2);
+                shadowmap.smearChunk(shadowmap.chunkIdx);       // smear the margins so opengl draws without seams
                 shadowmap.chunkIdx++;
             }
 
