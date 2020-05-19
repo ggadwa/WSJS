@@ -836,7 +836,6 @@ export default class ImportGLTFClass
                     
                 materialNode=this.jsonData.materials[primitiveNode.material];
                 if (this.hasCustomProperty(materialNode,meshNode,'wsjsNoCollision')) mesh.noCollisions=true;
-                if (mesh.noCollisions) console.info(mesh.name+'>no collision');
             }
         }
 

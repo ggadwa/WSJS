@@ -522,9 +522,16 @@ export default class DeveloperClass
     {
         let player=this.core.map.entityList.getPlayer();
         
+            // reset position to camera
+            
         player.position.setFromPoint(this.position);
         player.position.y-=player.eyeOffset;
         player.angle.setFromPoint(this.angle);
+        
+            // always max the player heath
+            
+        player.health=player.healthMaxCount;
+        player.armor=player.armorMaxCount;
     }
     
         //

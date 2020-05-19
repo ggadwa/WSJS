@@ -57,8 +57,6 @@ export default class ShadowmapLoadClass
         
             // translate the data
             
-        console.info('has shadowmap');
-        
         dataView=new DataView(binData,0,binData.length);
         
         nMesh=dataView.getInt32(0);

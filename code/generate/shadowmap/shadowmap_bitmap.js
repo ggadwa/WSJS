@@ -16,10 +16,9 @@ export default class ShadowmapBitmapClass
         
             // some constants
             
-        this.CHUNK_UV_REDUCE=0.99;
         this.CHUNK_SMEAR_MARGIN=2;
         
-        this.shadowMapSize=shadowmapGenerator.SHADOWMAP_TEXTURE_SIZE;
+        this.shadowmapSize=shadowmapGenerator.SHADOWMAP_TEXTURE_SIZE;
         this.chunkSize=shadowmapGenerator.SHADOWMAP_CHUNK_SIZE;
         this.chunkPerRow=Math.trunc(shadowmapGenerator.SHADOWMAP_TEXTURE_SIZE/this.chunkSize);
         
@@ -41,7 +40,7 @@ export default class ShadowmapBitmapClass
 
             // chunk 0 is the all black chunk,
             
-        this.fillChunk(0,shadowmapGenerator.SHADOW_MIN_VALUE);
+        this.clearChunk(0);
             
             // so first free chunk is 1
             
@@ -69,14 +68,14 @@ export default class ShadowmapBitmapClass
             // on 3d triangle
             
         if (firstTrig) {
-            p0.setFromValues((x+margin),((y+this.chunkSize)-margin),0);
+            p0.setFromValues((x+margin),((y+this.chunkSize)-(margin*2)),0);
             p1.setFromValues((x+margin),(y+margin),0);
-            p2.setFromValues(((x+this.chunkSize)-margin),(y+margin),0);
+            p2.setFromValues(((x+this.chunkSize)-(margin*2)),(y+margin),0);
         }
         else {
-            p0.setFromValues(((x+this.chunkSize)-margin),(y+margin),0);
+            p0.setFromValues(((x+this.chunkSize)-margin),(y+(margin*2)),0);
             p1.setFromValues(((x+this.chunkSize)-margin),((y+this.chunkSize)-margin),0);
-            p2.setFromValues((x+margin),((y+this.chunkSize)-margin),0);
+            p2.setFromValues((x+(margin*2)),((y+this.chunkSize)-margin),0);
         }
     }
     
@@ -85,7 +84,7 @@ export default class ShadowmapBitmapClass
         this.getChunkCoordinates(cIdx,p0,p1,p2,this.CHUNK_SMEAR_MARGIN);
     }
     
-    fillChunk(cIdx,lum)
+    clearChunk(cIdx)
     {
         let pIdx;
         let x,y,ty,by,lx,rx,tlx,blx,trx,brx;
@@ -116,11 +115,12 @@ export default class ShadowmapBitmapClass
             lx=tlx+Math.trunc(((blx-tlx)*(y-ty))/(by-ty));
             rx=trx+Math.trunc(((brx-trx)*(y-ty))/(by-ty));
             
-            pIdx=(y*this.shadowMapSize)+lx;
+            pIdx=(y*this.shadowmapSize)+lx;
                 
             for (x=lx;x<rx;x++) {
-                this.lumData[pIdx]=lum;
-                this.smearData[pIdx++]=0;
+                this.lumData[pIdx]=this.shadowmapGenerator.SHADOW_MIN_VALUE;
+                this.smearData[pIdx]=0;
+                pIdx++;
             }
         }
     }
@@ -140,7 +140,7 @@ export default class ShadowmapBitmapClass
             
         cx=Math.trunc((p0.x+p1.x+p2.x)/3);
         cy=Math.trunc((p0.y+p1.y+p2.y)/3);
-
+        
             // and smear any margin pixels
         
         if (cIdx&0x1) {
@@ -164,7 +164,7 @@ export default class ShadowmapBitmapClass
             lx=tlx+Math.trunc(((blx-tlx)*(y-ty))/(by-ty));
             rx=trx+Math.trunc(((brx-trx)*(y-ty))/(by-ty));
             
-            pIdx=(y*this.shadowMapSize)+lx;
+            pIdx=(y*this.shadowmapSize)+lx;
                 
             for (x=lx;x<rx;x++) {
                 
@@ -179,8 +179,6 @@ export default class ShadowmapBitmapClass
                     // otherwise it's on the margins, so
                     // go inside to find the smear pixel
                     
-                    // find a normal towards the center
-
                 dx=cx-x;
                 dy=cy-y;
 
@@ -200,20 +198,103 @@ export default class ShadowmapBitmapClass
                 dx=x;
                 dy=y;
                 
-                for (n=0;n!==(this.CHUNK_SMEAR_MARGIN*2);n++) {
+                for (n=0;n<this.chunkSize;n++) {
                     dx+=nx;
                     dy+=ny;
 
-                    pIdx2=(Math.trunc(dy)*this.shadowMapSize)+Math.trunc(dx);
+                    pIdx2=(Math.trunc(dy)*this.shadowmapSize)+Math.trunc(dx);
                     if (this.smearData[pIdx2]!==0) break;
                 }
                     
                     // and smear it
                     
                 this.lumData[pIdx]=this.lumData[pIdx2];
-                this.smearData[pIdx]=1;
                 
                 pIdx++;
+            }
+        }
+    }
+    
+    blurChunk(cIdx)
+    {
+        let pIdx,blurData,lum,count;
+        let x,y,ty,by,lx,rx,tlx,blx,trx,brx;
+        let p0=new PointClass(0,0,0);
+        let p1=new PointClass(0,0,0);
+        let p2=new PointClass(0,0,0);
+        
+            // get a copy to read from
+            
+        blurData=new Uint8ClampedArray(this.lumData);
+        
+            // blur all pixels
+            
+        this.getChunkCoordinates(cIdx,p0,p1,p2,this.CHUNK_SMEAR_MARGIN);
+        
+        if (cIdx&0x1) {
+            ty=p1.y;
+            by=p0.y;
+            
+            tlx=blx=p1.x;
+            trx=p2.x;
+            brx=p0.x;
+        }
+        else {
+            ty=p0.y;
+            by=p1.y;
+            
+            tlx=p0.x;
+            blx=p2.x;
+            trx=brx=p0.x;
+        }
+        
+        for (y=ty;y<by;y++) {
+            lx=tlx+Math.trunc(((blx-tlx)*(y-ty))/(by-ty));
+            rx=trx+Math.trunc(((brx-trx)*(y-ty))/(by-ty));
+            
+            pIdx=(y*this.shadowmapSize)+lx;
+                
+            for (x=lx;x<rx;x++) {
+                
+                    // get the average lum
+                    
+                count=1;
+                lum=blurData[pIdx];
+                
+                if (y>ty) {
+                    if (x>lx) {
+                        lum+=blurData[(pIdx-this.shadowmapSize)-1];
+                        count++;
+                    }
+                    lum+=blurData[pIdx-this.shadowmapSize];
+                    count++;
+                    if (x<(rx-1)) {
+                        lum+=blurData[(pIdx-this.shadowmapSize)+1];
+                        count++;
+                    }
+                }
+                if (x>lx) {
+                    lum+=blurData[pIdx-1];
+                    count++;
+                }
+                if (x<(rx-1)) {
+                    lum+=blurData[pIdx+1];
+                    count++;
+                }
+                if (y<(by-1)) {
+                    if (x>lx) {
+                        lum+=blurData[(pIdx+this.shadowmapSize)-1];
+                        count++;
+                    }
+                    lum+=blurData[pIdx+this.shadowmapSize];
+                    count++;
+                    if (x<(rx-1)) {
+                        lum+=blurData[(pIdx+this.shadowmapSize)+1];
+                        count++;
+                    }
+                }
+                
+                this.lumData[pIdx++]=Math.trunc(lum/count);
             }
         }
     }

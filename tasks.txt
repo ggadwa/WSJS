@@ -3,12 +3,11 @@
      - generate_bitmap_base / addGenerated needs to change -- search all for "specular" and "glow"
    - do all bitmaps by a class/overrides
 
-- shadowmap blocking (NoCollision) and no shadowmap (has emissive, or has a mask) instead of flags
 
 wsjsNoCollision
-wsjsSkyBox[implement]
-wsjsEffect
-wsjsDataXXX
+wsjsSkyBox[implement, on object, object needs mesh]
+wsjsEffect[on object]
+wsjsDataXXX[used along with effect, etc, becomes the data json]
 
 wsjsLiquidWaveSize":1000
 wsjsLiquidWavePeriod":10000
@@ -16,6 +15,11 @@ wjjsLiquidWaveHeight":50
 wjjsLiquidShift: [u,v]
 wsjsLiquidTint: [r,g,b]
 wsjsLiquidGravityFactor: 0.1
+
+
+dragon queen
+ - don't fire projectile if in melee range
+ - needs meleeMovementFreezeTick/projectileMovementFreezeTick/hurtMovementFreezeTick/projectileFirePosition (x=0,y=player height*0.5,z=radius*2)
 
 
 - can we get rid of bitmap simple name after we get rid of all the bitmap collision/etc lists?
@@ -33,8 +37,6 @@ GET rid of triangle effect & web effect
 - delete rest of old demo scripts
 
 SHADOW MAPS
- - need to draw to small triangle and smear (use an alpha channel and march towards middle)
- - try mipmaps again
  - uploads need to delete old map/folder
 
 

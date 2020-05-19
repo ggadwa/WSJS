@@ -500,7 +500,7 @@ class ShadowmapGeneratorClass
                 // the original no draw color)
 
             if (renderResult===this.RENDER_ALL_WHITE) {
-                shadowmap.fillChunk(shadowmap.chunkIdx,this.SHADOW_MIN_VALUE);
+                shadowmap.clearChunk(shadowmap.chunkIdx);
                 continue;
             }
             
@@ -512,6 +512,7 @@ class ShadowmapGeneratorClass
             }
             else {
                 shadowmap.smearChunk(shadowmap.chunkIdx);       // smear the margins so opengl draws without seams
+                shadowmap.blurChunk(shadowmap.chunkIdx);        // and blur it
                 shadowmap.chunkIdx++;
             }
 
