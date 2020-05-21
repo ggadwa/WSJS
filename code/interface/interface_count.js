@@ -113,7 +113,7 @@ export default class InterfaceCountClass
                 
             // setup the bitmap
             
-        this.bitmap.attachAsInterface();
+        this.bitmap.attach();
         
             // setup the buffers
 

@@ -1,5 +1,6 @@
 import PointClass from '../utility/point.js';
 import Matrix4Class from '../utility/matrix4.js';
+import MapPathNodeClass from '../map/map_path_node.js';
 
 //
 // map path class
@@ -22,34 +23,14 @@ export default class MapPathClass
     }
     
         //
-        // some utility functions called after load
-        // to setup some path data for hints and keys
+        // build the key nodes into a separate
+        // quick to look list
         //
-        
-    fixBrokenLinks()
-    {
-        let n,k,node,linkNode;
-        
-        for (n=0;n!==this.nodes.length;n++) {
-            node=this.nodes[n];
             
-            for (k=0;k!==node.links.length;k++) {
-                linkNode=this.nodes[node.links[k]];
-                if (!linkNode.links.includes(n)) linkNode.links.push(n);
-            }
-        }
-    }
-    
     preparePaths()
     {
         let n,node;
-        
-            // before we start, fix any links that
-            // that aren't followed back
-            
-        this.fixBrokenLinks();
-        
-            // now recurse for path hints
+
             // and build a list of key nodes
         
         this.keyNodes=[];
@@ -61,25 +42,59 @@ export default class MapPathClass
     }
     
         //
-        // builds the hints which shows which link
-        // to take to get to a key the fastest, this is
-        // usually called from the developer tools
+        // load paths
         //
         
-    buildPathHints()
+    async loadPathJson()
     {
-        let n;
+        let resp;
+        let url='../paths/'+this.core.map.json.name+'.json';
         
-            // before we start, fix any links that
-            // that aren't followed back
-            
-        this.fixBrokenLinks();
-        
-            // now recurse for path hints
-        
-        for (n=0;n!==this.nodes.length;n++) {
-            this.nodes[n].buildPathHints(this.nodes);
+        try {
+            resp=await fetch(url);
+            if (!resp.ok) return(Promise.reject('Unable to load '+url+'; '+resp.statusText));
+            return(await resp.json());
         }
+        catch (e) {
+            return(Promise.reject('Unable to load '+url+'; '+e.message));
+        }
+    }
+
+    async load()
+    {
+        let n,paths;
+        let pathDef,pathNode;
+        let map=this.core.map;
+        
+            // paths aren't required, so just
+            // skip out if missing
+            
+        paths=null;
+        
+        await this.loadPathJson()
+            .then
+                (
+                    value=>{
+                        paths=value;
+                    },
+                    value=>{}
+                );
+
+        if (paths===null) return(true);
+        
+            // decode it
+            
+        for (n=0;n!==paths.length;n++) {
+            pathDef=paths[n];
+
+            pathNode=new MapPathNodeClass(map.path.nodes.length,new PointClass(pathDef.position.x,pathDef.position.y,pathDef.position.z),pathDef.links,pathDef.key,new Int16Array(pathDef.pathHints),pathDef.data);
+            map.path.nodes.push(pathNode);
+        }
+
+            // fix any broken links and build
+            // a key list
+            
+        this.preparePaths();
     }
     
         //

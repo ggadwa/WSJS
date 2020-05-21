@@ -198,7 +198,7 @@ export default class MeshListClass
 
             if (mesh.bitmap!==currentBitmap) {
                 currentBitmap=mesh.bitmap;
-                mesh.bitmap.attachAsTexture(shader);
+                mesh.bitmap.attach(shader);
             }
             
                 // draw the mesh
@@ -360,7 +360,7 @@ export default class MeshListClass
 
             if (mesh.bitmap!==currentBitmap) {
                 currentBitmap=mesh.bitmap;
-                mesh.bitmap.attachAsTexture(shader);
+                mesh.bitmap.attach(shader);
             }
             
                 // draw the mesh

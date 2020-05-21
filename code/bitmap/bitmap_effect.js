@@ -1,7 +1,7 @@
 import ColorClass from '../utility/color.js';
 import BitmapClass from '../bitmap/bitmap.js';
 
-export default class BitmapInterfaceClass extends BitmapClass
+export default class BitmapEffectClass extends BitmapClass
 {
     constructor(core,colorURL)
     {

@@ -18,6 +18,9 @@ export default class DialogDeveloperClass extends DialogBaseClass
         this.shadowmapGlobalMeshes=null;
         
         this.shadowmapTimestamp=0;
+        
+        this.pathHintThread=null;
+        this.pathHintTimestamp=0;
     }
     
         //
@@ -61,7 +64,45 @@ export default class DialogDeveloperClass extends DialogBaseClass
         
     buildPathHints()
     {
-        console.info('path hints');
+        let thread;
+        
+            // already building?
+            
+        if (this.pathHintThread!==null) {
+            this.displayMessage('Currently in path build');
+            return;
+        }
+        
+            // start the build thread
+            
+        this.displayMessage('Starting background path hint build');
+        
+        this.pathHintTimestamp=Date.now();
+        
+        thread=new Worker('../../code/generate/path/path_thread.js',{type:"module"});
+        thread.addEventListener('message',this.buildPathHintsThreadFinish.bind(this),false);
+            
+        thread.postMessage({nodes:this.core.map.path.nodes});
+    }
+    
+    buildPathHintsThreadFinish(message)
+    {
+        let upload;
+        let json=message.data.json;
+        
+            // end the thread
+            
+        this.pathHintThread.terminate();
+        this.pathHintThread=null;
+        
+            // upload the path
+            
+        upload=new UploadClass(this.core);
+        upload.upload('PTH',0,btoa(json));
+            
+        console.info('time='+(Date.now()-this.pathHintTimestamp));
+        
+        this.displayMessage('Path hint build completed');
     }
     
         //
@@ -73,12 +114,14 @@ export default class DialogDeveloperClass extends DialogBaseClass
             // already building?
             
         if (this.shadowmapThreads!==null) {
-            this.displayMessage('Currently in Shadowmap Build');
+            this.displayMessage('Currently in shadowmap build');
             return;
         }
         
-        this.displayMessage('Starting Up Shadowmap Build');
+        this.displayMessage('Starting up shadowmap build');
         
+        this.shadowmapTimestamp=Date.now();
+                
         setTimeout(this.buildShadowmapSetup.bind(this),1);
     }
     
@@ -160,8 +203,6 @@ export default class DialogDeveloperClass extends DialogBaseClass
             // start the threads
         
         this.displayMessage('Starting background shadowmap build');
-        
-        this.shadowmapTimestamp=Date.now();
         
         this.shadowmapThreads=[];
         perThreadMeshCount=Math.trunc(nMesh/this.SHADOWMAP_THREAD_COUNT);
@@ -280,7 +321,7 @@ export default class DialogDeveloperClass extends DialogBaseClass
         let n,k;
         let thread,shadowmap,offsetIdx;
         let canvas,ctx,imgData,pIdx,pixel;
-        let upload,fileName,mesh,data,bin,pixelSize;
+        let upload,mesh,data,bin,pixelSize;
         let threadIdx=message.data.threadIdx;
         let startMeshIdx=message.data.startMeshIdx;
         let endMeshIdx=message.data.endMeshIdx;
@@ -375,15 +416,14 @@ export default class DialogDeveloperClass extends DialogBaseClass
             
                 // upload as png
             
-            fileName='shadowmap_'+n+'.png';
             data=canvas.toDataURL();
             data=data.substring(data.indexOf(',')+1);
-            upload.upload(fileName,'SM',data);   // already in base64
+            upload.upload('SMP',n,data);   // already in base64
         }
         
             // the bin
             
-        upload.upload('shadowmap.bin','SM',bin);
+        upload.upload('SBN',0,bin);
         
         console.info('time='+(Date.now()-this.shadowmapTimestamp));
         

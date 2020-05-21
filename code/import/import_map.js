@@ -5,7 +5,6 @@ import LightClass from '../light/light.js';
 import MoveClass from '../map/move.js';
 import MovementClass from '../map/movement.js';
 import MapCubeClass from '../map/map_cube.js';
-import MapPathNodeClass from '../map/map_path_node.js';
 import ImportGLTFClass from '../import/import_gltf.js';
 
 export default class ImportMapClass
@@ -23,12 +22,8 @@ export default class ImportMapClass
         let light,lightDef,lightAmbient;
         let movement,meshIdxList,reverseMeshIdxList,movementDef;
         let moveDef,movePoint,moveRotate,rotateOffset,centerOffset;
-        let pathNode,pathDef;
         let cube,cubeDef;
         let importMesh;
-        
-            // remember the scale for importing
-            
         
             // import the map itself
           
@@ -127,27 +122,14 @@ export default class ImportMapClass
                 this.core.map.movementList.add(movement);
             }
         }
-        
-            // paths
-            
-        if (json.paths!==undefined) {
-            for (n=0;n!==json.paths.length;n++) {
-                pathDef=json.paths[n];
-                
-                pathNode=new MapPathNodeClass(this.core.map.path.nodes.length,new PointClass(pathDef.position.x,pathDef.position.y,pathDef.position.z),pathDef.links,pathDef.key,new Int16Array(pathDef.pathHints),pathDef.data);
-                this.core.map.path.nodes.push(pathNode);
-            }
-            
-            this.core.map.path.preparePaths();
-        }
-        
+
             // cubes
             
         if (json.cubes!==undefined) {
             for (n=0;n!==json.cubes.length;n++) {
                 cubeDef=json.cubes[n];
                 
-                cube=new MapCubeClass(new BoundClass(cubeDef.xBound.min,cubeDef.xBound.max),new BoundClass(cubeDef.yBound.min,cubeDef.yBound.max),new BoundClass(cubeDef.zBound.min,cubeDef.zBound.max),cubeDef.key,cubeDef.data);
+                cube=new MapCubeClass(cubeDef.key,null,new BoundClass(cubeDef.xBound.min,cubeDef.xBound.max),new BoundClass(cubeDef.yBound.min,cubeDef.yBound.max),new BoundClass(cubeDef.zBound.min,cubeDef.zBound.max),cubeDef.data);
                 this.core.map.cubeList.add(cube);
             }
         }
@@ -157,6 +139,10 @@ export default class ImportMapClass
         if (json.maxFloorCeilingDetectionFactor!==undefined) {
             this.core.map.meshList.maxFloorCeilingDetectionFactor=1.0-json.maxFloorCeilingDetectionFactor;     // 0 = walls facing straight up only, to 1 which is pretty much anything
         }
+        
+            // paths json
+            
+        this.core.map.path.load();
         
         return(true);
     }

@@ -5,13 +5,13 @@ export default class UploadClass
         this.core=core;
     }
 
-    async upload(fileName,uploadType,data)
+    async upload(uploadName,uploadIndex,data)
     {
         let idx;
         let path,url;
         let resp;
         
-        console.info('uploading='+fileName+'>'+data.length);
+        console.info('uploading='+uploadName+'('+uploadIndex+')>'+data.length);
         
             // get the upload path
             
@@ -21,7 +21,7 @@ export default class UploadClass
         
         url=window.location.protocol+'//'+window.location.host+path;
         if (!url.endsWith('/')) url+='/';
-        url+=encodeURIComponent(this.core.map.json.name)+'/'+uploadType+'/'+fileName;
+        url+=encodeURIComponent(this.core.map.json.name)+'/'+uploadName+'/'+uploadIndex;
         
             // upload
             
@@ -29,7 +29,7 @@ export default class UploadClass
             resp=await fetch(url,{method:'POST',headers:{'Content-Type':'application/octet-stream'},body:data});
         }
         catch (e) {
-            throw new Error('Unable to post to server '+fileName+'; '+e.message);
+            throw new Error('Unable to post to server '+uploadName+'; '+e.message);
         }
     }
 }

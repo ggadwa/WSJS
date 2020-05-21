@@ -11,6 +11,8 @@ import ModelAnimationClass from '../model/model_animation.js';
 import ModelAnimationChannelClass from '../model/model_animation_channel.js';
 import ModelAnimationChannelPoseClass from '../model/model_animation_channel_pose.js';
 import ModelSkeletonClass from '../model/model_skeleton.js';
+import BitmapPBRClass from '../bitmap/bitmap_pbr.js';
+import BitmapColorClass from '../bitmap/bitmap_color.js';
 
 export default class ImportGLTFClass
 {
@@ -621,11 +623,19 @@ export default class ImportGLTFClass
             // add to list to be loaded later
             
         if (colorURL!==null) {
-            bitmap=this.core.bitmapList.add(colorURL,normalURL,metallicRoughnessURL,emissiveURL,emissiveFactor,scale);
+            bitmap=this.core.bitmapList.get(colorURL);
+            if (bitmap===undefined) {
+                bitmap=new BitmapPBRClass(this.core,colorURL,normalURL,metallicRoughnessURL,emissiveURL,emissiveFactor,scale);
+                this.core.bitmapList.add(bitmap);
+            }
         }
         else {
             if (colorBase!==null) {
-                bitmap=this.core.bitmapList.addColor(colorBase);        // this is meant as a fallback, games should use real PBR materials
+                bitmap=this.core.bitmapList.get(materialNode.name);
+                if (bitmap===undefined) {
+                    bitmap=new BitmapColorClass(this.core,materialNode.name,colorBase);
+                    this.core.bitmapList.add(bitmap);
+                }
             }
             else {
                 console.log('Could not find texture for mesh '+meshNode.name+' in material '+materialNode.name+' in '+this.json.name);
@@ -675,6 +685,15 @@ export default class ImportGLTFClass
             map.sky.on=true;
             map.sky.size=obj.size;
             map.sky.bitmap=mesh.bitmap;
+            
+            return(true);
+        }
+        
+            // cubes
+            
+        value=this.getCustomProperty(materialNode,meshNode,'wsjsCube');
+        if (value!==null) {
+            obj=JSON.parse(value);
             
             return(true);
         }

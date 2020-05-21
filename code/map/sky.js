@@ -203,7 +203,7 @@ export default class SkyClass
         
             // the sky texture
             
-        this.bitmap.attachAsTexture(shader);
+        this.bitmap.attach(shader);
         
         gl.disable(gl.DEPTH_TEST);
         gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);

@@ -1,29 +1,21 @@
 
-BITMAP FIXES
-  * do shadowmap
-  * do generated
-  * move over skybox to blender
-  * do skybox
-  * get rid of sky shader
-  * move over liquids to blender
-  * do liquids
-  * get rid of liquid shaders
-  - interface
-  - do rest of bitmaps into classes
-  - addBM2() -> add()
-  - glow to emissive in generator / metallic/roughness
-
-
 
 - do cubes
-- paths as binary files in another directory
+   - cubes can do actions
+   - add instantKill to actions
+
+- write paths
+   - paths in thread
 
 wsjsLight/wsjsEffect/wsjsEntity
 
 
 - dungeon death pit
 
-- use custom meshes for liquid volumes/hurt volumes/effects/  use lights for lights
+{"name":"kill_pit_1","actions":[{"action":"kill"}],"data":{}}
+{"name":"goal","actions":[],"data":{}}
+
+- use custom meshes for liquid volumes/cubes/effects/lights
 
 - swipe up for grenade
 - delete rest of old demo scripts

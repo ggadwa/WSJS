@@ -14,6 +14,16 @@ wsjsSky                     Mesh is a sky box definition.  Material determines t
                                     "size":50000
                                 }
 
+wsjsCube                    Mesh is a cube definition.  Mesh bounds determine cube volume
+                                {
+                                    "name":"health_spot_1",
+                                    "actions":
+                                        [
+                                            {"action":"addHealth","count":10}
+                                        ],
+                                    "data":{}
+                                }
+
 wsjsLiquid                  Mesh is a liquid definition.  Mesh bounds determine liquid volume & material determines texture
                                 {
                                     "waveSize":5000,

@@ -894,7 +894,7 @@ export default class EffectClass
 
             if (chunk.bitmap!==currentBitmap) {
                 currentBitmap=chunk.bitmap;
-                chunk.bitmap.attachAsParticle();
+                chunk.bitmap.attach();
             }
             
                 // draw the chunk

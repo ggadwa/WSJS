@@ -111,7 +111,7 @@ export default class InterfaceTouchButtonClass
             // draw the button
             
         bitmap=this.core.bitmapList.get(this.bitmapName);
-        bitmap.attachAsInterface();
+        bitmap.attach();
         gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_SHORT,0);
 
             // remove the buffers

@@ -31,7 +31,7 @@ export default class DeveloperRayClass
         
             // some developer bitmaps
             
-        this.core.bitmapList.addSimple('../developer/sprites/target.png');
+        this.core.bitmapList.addEffect('../developer/sprites/target.png');
     }
     
         //

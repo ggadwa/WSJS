@@ -406,14 +406,14 @@ export default class EntityKartPlayerClass extends EntityClass
             
         cube=this.findCubeContainingEntity();
         if (cube!==null) {
-            if (cube.key==='goal') {
+            if (cube.name==='goal') {
                 if (this.hitMidpoint) {
                     this.hitMidpoint=false;
                     this.lap++;
                 }
             }
             else {
-                if (cube.key==='mid') {
+                if (cube.name==='mid') {
                     this.hitMidpoint=true;
                 }
             }
@@ -598,7 +598,7 @@ export default class EntityKartPlayerClass extends EntityClass
         }
         
         //let cube=this.findCubeContainingEntity();
-        //if (cube!==null) console.info('in cube='+cube.key);
+        //if (cube!==null) console.info('in cube='+cube.name);
     }
     
         //

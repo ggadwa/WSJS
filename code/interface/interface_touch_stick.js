@@ -195,11 +195,11 @@ export default class InterfaceTouchStickClass
             // draw the outer ring
             
         bitmap=this.core.bitmapList.get(this.ringBitmapName);
-        bitmap.attachAsInterface();
+        bitmap.attach();
         gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_SHORT,0);
         
         bitmap=this.core.bitmapList.get(this.thumbBitmapName);
-        bitmap.attachAsInterface();
+        bitmap.attach();
         gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_SHORT,(6*2));
 
             // remove the buffers

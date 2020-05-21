@@ -29,8 +29,6 @@ class ShadowmapGeneratorClass
     {
         this.data=data;
         
-        this.debugTimestamp=0;
-        
             // constants
             
         this.SHADOWMAP_TEXTURE_SIZE=2048; //2048;

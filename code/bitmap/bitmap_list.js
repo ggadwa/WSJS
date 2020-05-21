@@ -1,5 +1,7 @@
 import ColorClass from '../utility/color.js';
 import BitmapClass from '../bitmap/bitmap.js';
+import BitmapEffectClass from '../bitmap/bitmap_effect.js';
+import BitmapInterfaceClass from '../bitmap/bitmap_interface.js';
 
 //
 // core bitmap list class
@@ -31,71 +33,25 @@ export default class BitmapListClass
     }
     
         //
-        // add and get a bitmap
+        // add and get
         //
         
-    add(colorURL,normalURL,metallicRoughnessURL,emissiveURL,emissiveFactor,scale)
+    add(bitmap)
+    {
+        this.bitmaps.set(bitmap.colorURL,bitmap);
+    }
+    
+    addEffect(colorURL)
     {
         let bitmap;
         
-            // already in list?
-            
-        if (this.bitmaps.has(colorURL)) return(this.bitmaps.get(colorURL));
-            
-            // add bitmap to list, these will be loaded
-            // in a later call
-                    
-        bitmap=new BitmapClass(this.core);
-        bitmap.initializeNormalURL(colorURL,normalURL,metallicRoughnessURL,emissiveURL,emissiveFactor,scale);
-        this.bitmaps.set(colorURL,bitmap);
-        
-        return(bitmap);
+        if (!this.bitmaps.has(colorURL)) {
+            bitmap=new BitmapEffectClass(this.core,colorURL);
+            this.bitmaps.set(colorURL,bitmap);
+        }
     }
     
-    addColor(colorBase)
-    {
-        let bitmap;
-        let hex,colorURL;
-                
-            // make up a name from the color
-        
-        hex=(Math.trunc(colorBase.r*255)<<16)+(Math.trunc(colorBase.g*255)<<8)+Math.trunc(colorBase.b*255);
-        colorURL='_rgb_'+hex.toString(16);
-            
-            // already in list?
-            
-        if (this.bitmaps.has(colorURL)) return(this.bitmaps.get(colorURL));
-        
-            // add bitmap to list, these will be loaded
-            // in a later call
-                    
-        bitmap=new BitmapClass(this.core);
-        bitmap.initializeColor(colorURL,colorBase);
-        this.bitmaps.set(colorURL,bitmap);
-        
-        return(bitmap);
-    }
-    
-    addSimple(colorURL)
-    {
-        let bitmap;
-            
-            // already in list?
-            
-        if (colorURL===null) return(null);  // can come from a json
-        if (this.bitmaps.has(colorURL)) return(this.bitmaps.get(colorURL));
-        
-            // add bitmap to list, these will be loaded
-            // in a later call
-                    
-        bitmap=new BitmapClass(this.core);
-        bitmap.initializeSimpleURL(colorURL);
-        this.bitmaps.set(colorURL,bitmap);
-        
-        return(bitmap);
-    }
-    
-    addSimpleFromJson(arr)
+    addEffectFromJson(arr)
     {
         let obj;
         
@@ -103,27 +59,18 @@ export default class BitmapListClass
         
         for (obj of arr)
         {
-            this.addSimple(obj.bitmap);
+            this.addEffect(obj.bitmap);
         }
     }
     
     addInterface(colorURL)
     {
         let bitmap;
-        
-            // already in list?
             
-        if (colorURL===null) return(null);  // can come from a json
-        if (this.bitmaps.has(colorURL)) return(this.bitmaps.get(colorURL));
-        
-            // add bitmap to list, these will be loaded
-            // in a later call
-                    
-        bitmap=new BitmapClass(this.core);
-        bitmap.initializeInterfaceURL(colorURL);
-        this.bitmaps.set(colorURL,bitmap);
-        
-        return(bitmap);
+        if (!this.bitmaps.has(colorURL)) {
+            bitmap=new BitmapInterfaceClass(this.core,colorURL);
+            this.bitmaps.set(colorURL,bitmap);
+        }
     }
     
     addInterfaceFromJson(arr)
@@ -136,11 +83,6 @@ export default class BitmapListClass
         {
             this.addInterface(obj.bitmap);
         }
-    }
-    
-    addBM2(bitmap)
-    {
-        this.bitmaps.set(bitmap.colorURL,bitmap);
     }
     
     get(colorURL)
@@ -189,9 +131,9 @@ export default class BitmapListClass
         for (key of keys)
         {
             effectDef=game.jsonEffectCache[key];
-            this.addSimpleFromJson(effectDef.billboards);
-            this.addSimpleFromJson(effectDef.particles);
-            this.addSimpleFromJson(effectDef.triangles);
+            this.addEffectFromJson(effectDef.billboards);
+            this.addEffectFromJson(effectDef.particles);
+            this.addEffectFromJson(effectDef.triangles);
         }
      
             // gather all the promises

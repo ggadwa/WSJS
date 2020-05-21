@@ -153,7 +153,7 @@ export default class DeveloperClass
     pathEditor()
     {
         let n,k,nodeIdx;
-        let node,links,str;
+        let node,links;
         let path=this.core.map.path;
         let input=this.core.input;
         let player=this.core.map.entityList.getPlayer();
@@ -302,29 +302,6 @@ export default class DeveloperClass
                 path.nodes[path.editorParentNodeIdx].position.setFromPoint(player.position);
                 console.info('Moved node '+path.editorParentNodeIdx);
             }
-        }
-        
-            // \ key displays json of path
-            
-        if (input.isKeyDownAndClear('\\')) {
-            this.core.setPauseState(true,false);
-            
-            console.info('Generating hints, wait ...');
-            path.buildPathHints();
-            
-            str='    "paths":\n';
-            str+='        [\n';
-            
-            for (n=0;n!==path.nodes.length;n++) {
-                str+='            ';
-                str+=JSON.stringify(path.nodes[n],this.pathJSONReplacer.bind(this));
-                if (n!==(path.nodes.length-1)) str+=',';
-                str+='\n';
-            }
-            
-            str+='        ],\n';
-            
-            console.info(str);
         }
     }
     
@@ -722,7 +699,6 @@ export default class DeveloperClass
                 console.info('p adds new node to path');
                 console.info('[ deleted selected node');
                 console.info('] moves selected node to player');
-                console.info('\\ output new path JSON');
             }
         }
         

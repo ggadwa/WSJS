@@ -19,8 +19,8 @@ export default class DeveloperSpriteClass
         
             // some developer bitmaps
             
-        this.core.bitmapList.addSimple('../developer/sprites/effect.png');
-        this.core.bitmapList.addSimple('../developer/sprites/light.png');
+        this.core.bitmapList.addEffect('../developer/sprites/effect.png');
+        this.core.bitmapList.addEffect('../developer/sprites/light.png');
     }
 
     initialize()
@@ -131,7 +131,7 @@ export default class DeveloperSpriteClass
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexUVBuffer);
         gl.vertexAttribPointer(shader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
         
-        bitmap.attachAsParticle();
+        bitmap.attach(shader);
         
         gl.drawArrays(gl.TRIANGLES,0,6);
         

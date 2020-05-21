@@ -3,7 +3,7 @@ import BoundClass from '../utility/bound.js';
 import CoreClass from '../main/core.js';
 import EntityClass from '../project/entity.js';
 
-export default class ProjectEntityRemoteClass
+export default class EntityRemoteClass
 {
     constructor(core,remoteId,name)
     {

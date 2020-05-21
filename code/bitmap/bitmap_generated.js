@@ -17,23 +17,6 @@ export default class BitmapGeneratedClass extends BitmapClass
         Object.seal(this);
     }
     
-    release()
-    {
-        let gl=this.core.gl;
-
-        if (this.colorTexture!==null) gl.deleteTexture(this.colorTexture);
-        if (this.normalTexture!==null) gl.deleteTexture(this.normalTexture);
-        if (this.metallicRoughnessTexture!==null) gl.deleteTexture(this.metallicRoughnessTexture);
-        if (this.emissiveTexture!==null) gl.deleteTexture(this.emissiveTexture);
-        
-        this.colorImage=null;
-        this.normalImage=null;
-        this.metallicRoughnessImage=null;
-        this.emissiveImage=null;
-        
-        this.loaded=false;
-    }
-            
     async load()
     {
         let gl=this.core.gl;

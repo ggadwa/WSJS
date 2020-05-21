@@ -305,9 +305,10 @@ export default class EntityClass
                 case 'addArmor':
                     entity.addArmor(this.core.game.lookupValue(action.count,this.data,0));
                     break;
+                case 'kill':
+                    entity.die(null,false);
+                    break;
             }
-            
-            
         }
     }
     

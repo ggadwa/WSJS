@@ -140,7 +140,7 @@ export default class MapLiquidListClass
 
             if (liquid.bitmap!==currentBitmap) {
                 currentBitmap=liquid.bitmap;
-                liquid.bitmap.attachAsTexture(shader);
+                liquid.bitmap.attach(shader);
             }
 
                 // draw the liquid

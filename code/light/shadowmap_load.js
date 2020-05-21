@@ -110,7 +110,7 @@ export default class ShadowmapLoadClass
                 bitmap=bitmaps.get(bitmapIdx);
                 if (bitmap===undefined) {
                     bitmap=new BitmapShadowmapClass(this.core,('shadowmaps/'+this.core.map.json.name+'/shadowmap_'+bitmapIdx+'.png'));
-                    this.core.bitmapList.addBM2(bitmap);
+                    this.core.bitmapList.add(bitmap);
                     bitmaps.set(bitmapIdx,bitmap);      // internal list so we can keep track of bitmaps we loaded
                 }
                 

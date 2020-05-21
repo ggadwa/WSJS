@@ -132,7 +132,7 @@ export default class InterfaceElementClass
         
             // setup the bitmap
             
-        this.bitmap.attachAsInterface();
+        this.bitmap.attach();
         if (this.color===null) {
             gl.uniform4f(shader.colorUniform,1,1,1,this.alpha);
         }

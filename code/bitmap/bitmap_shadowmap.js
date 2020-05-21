@@ -9,27 +9,11 @@ export default class BitmapShadowmapClass extends BitmapClass
         
         this.colorURL=colorURL;
         
+        this.loaded=false;
+        
         Object.seal(this);
     }
 
-    initializeShadowmap(colorURL)
-    {
-        this.bitmapType=this.BITMAP_SHADOW;
-        
-        this.colorURL=colorURL;
-    }
-    
-    release()
-    {
-        let gl=this.core.gl;
-
-        if (this.colorTexture!==null) gl.deleteTexture(this.colorTexture);
-        
-        this.colorImage=null;
-        
-        this.loaded=false;
-    }
-            
     async load()
     {
         let gl=this.core.gl;
