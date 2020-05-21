@@ -8,7 +8,7 @@ import BoundClass from '../utility/bound.js';
 
 export default class MapLiquidClass
 {
-    constructor(core,bitmap,waveSize,wavePeriod,waveHeight,waveUVStamp,uShift,vShift,gravityFactor,tint,xBound,yBound,zBound)
+    constructor(core,bitmap,waveSize,wavePeriod,waveHeight,waveUVStamp,uvShift,gravityFactor,tint,soundIn,soundOut,xBound,yBound,zBound)
     {
         this.core=core;
         this.bitmap=bitmap;
@@ -16,10 +16,11 @@ export default class MapLiquidClass
         this.wavePeriod=wavePeriod;
         this.waveHeight=waveHeight;
         this.waveUVStamp=waveUVStamp;
-        this.uShift=uShift;
-        this.vShift=vShift;
+        this.uvShift=uvShift;
         this.gravityFactor=gravityFactor;
         this.tint=tint;
+        this.soundIn=soundIn;
+        this.soundOut=soundOut;
         
             // setup size
             
@@ -34,6 +35,8 @@ export default class MapLiquidClass
 
         this.vertexBuffer=null;
         this.uvBuffer=null;
+        this.normalBuffer=null;
+        this.tangentBuffer=null;
         this.indexBuffer=null;
         
         this.vertices=null;
@@ -57,8 +60,24 @@ export default class MapLiquidClass
 
         if (this.vertexBuffer!==null) gl.deleteBuffer(this.vertexBuffer);
         if (this.uvBuffer!==null) gl.deleteBuffer(this.uvBuffer);
+        if (this.normalBuffer!==null) gl.deleteBuffer(this.normalBuffer);
+        if (this.tangentBuffer!==null) gl.deleteBuffer(this.tangentBuffer);
         
         if (this.indexBuffer!==null) gl.deleteBuffer(this.indexBuffer);
+    }
+    
+        //
+        // sounds
+        //
+        
+    playSoundIn(position)
+    {
+        if (this.soundIn!==null) this.core.soundList.playJson(position,this.soundIn);
+    }
+    
+    playSoundOut(position)
+    {
+        if (this.soundOut!==null) this.core.soundList.playJson(position,this.soundOut);
     }
     
         //
@@ -81,11 +100,11 @@ export default class MapLiquidClass
         uvIdx=0;
         
         vz=this.zBound.min;
-        gz=((Math.abs(vz)/this.waveSize)*this.waveUVStamp)+(this.core.timestamp*this.vShift);
+        gz=((Math.abs(vz)/this.waveSize)*this.waveUVStamp)+(this.core.timestamp*this.uvShift.y);
         gz=gz-Math.trunc(gz);
         offRow=Math.trunc(vz/this.waveSize)&0x1;
         
-        gxStart=((Math.abs(this.xBound.min)/this.waveSize)*this.waveUVStamp)+(this.core.timestamp*this.uShift);
+        gxStart=((Math.abs(this.xBound.min)/this.waveSize)*this.waveUVStamp)+(this.core.timestamp*this.uvShift.x);
         gxStart=gxStart-Math.trunc(gxStart);
         offColStart=Math.trunc(this.xBound.min/this.waveSize)&0x1;
         
@@ -98,7 +117,7 @@ export default class MapLiquidClass
             
             for (x=0;x!==(this.xBlockSize+1);x++) {
                 this.vertices[vIdx++]=vx;
-                if (this.uShift>this.vShift) {
+                if (this.uvShift.u>this.uvShift.v) {
                     this.vertices[vIdx++]=((offCol&0x1)===0)?(this.yBound.max-offY):(this.yBound.max+offY);
                 }
                 else {
@@ -124,14 +143,17 @@ export default class MapLiquidClass
     
     setupBuffers()
     {
-        let x,z,iIdx,vIdx,vTopIdx,vBotIdx;
+        let n,x,z,iIdx,vIdx,vTopIdx,vBotIdx;
         let nVertex,nSegment,indexes;
+        let normals,tangents;
         let gl=this.core.gl;
         
             // create the buffers
             
         this.vertexBuffer=gl.createBuffer();
         this.uvBuffer=gl.createBuffer();
+        this.normalBuffer=gl.createBuffer();
+        this.tangentBuffer=gl.createBuffer();
         this.indexBuffer=gl.createBuffer();
         
             // get liquid vertex size
@@ -154,6 +176,29 @@ export default class MapLiquidClass
         
         gl.bindBuffer(gl.ARRAY_BUFFER,this.uvBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,this.uvs,gl.DYNAMIC_DRAW);
+        
+            // the normals and tangents stay the same
+            
+        normals=new Float32Array(nVertex*3);
+        tangents=new Float32Array(nVertex*3);
+            
+        vIdx=0;
+        
+        for (n=0;n!==nVertex;n++) {
+            normals[vIdx]=0;
+            normals[vIdx+1]=1;
+            normals[vIdx+2]=0;
+            tangents[vIdx]=1;
+            tangents[vIdx+1]=0;
+            tangents[vIdx+2]=0;
+            vIdx+=3;
+        }
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.normalBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,normals,gl.STATIC_DRAW);
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.tangentBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,tangents,gl.STATIC_DRAW);
         
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
         
@@ -192,6 +237,7 @@ export default class MapLiquidClass
     
     bindBuffers()
     {
+        let shader=this.core.shaderList.mapMeshShader;
         let gl=this.core.gl;
 
             // water vertices and UVs are always moving
@@ -199,11 +245,19 @@ export default class MapLiquidClass
             
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
         gl.bufferSubData(gl.ARRAY_BUFFER,0,this.vertices);
-        gl.vertexAttribPointer(this.core.shaderList.mapLiquidShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
+        gl.vertexAttribPointer(shader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
         
         gl.bindBuffer(gl.ARRAY_BUFFER,this.uvBuffer);
         gl.bufferSubData(gl.ARRAY_BUFFER,0,this.uvs);
-        gl.vertexAttribPointer(this.core.shaderList.mapLiquidShader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
+        gl.vertexAttribPointer(shader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
+        
+            // normals and tangents are static
+            
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.normalBuffer);
+        gl.vertexAttribPointer(shader.vertexNormalAttribute,3,gl.FLOAT,false,0,0);
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.tangentBuffer);
+        gl.vertexAttribPointer(shader.vertexTangentAttribute,3,gl.FLOAT,false,0,0);
 
             // indexes are static
             

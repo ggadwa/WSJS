@@ -32,6 +32,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.projectileFireTick=0;
         this.nextProjectileTick=0;
         this.projectileStartTick=-1;
+        this.projectileFirePosition=null;
         this.projectileJson=null;
         this.projectileData=null;
         this.projectileRequiresSight=true;
@@ -49,11 +50,12 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.angleYProjectileRange=5;
         this.angleYMeleeRange=15;
         this.damageFlinchWaitTick=500;
+        this.meleeMovementFreezeTick=0;
+        this.projectileMovementFreezeTick=0;
+        this.damageMovementFreezeTick=0;
         this.jumpWaitTick=0;
         this.nextJumpTick=0;
         this.jumpHeight=0;
-        this.trapMeshName=null;
-        this.trapMeshShrink=null;
         this.nextDamageTick=0;
        
         this.idleAnimation=null;
@@ -67,17 +69,17 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.hurtSound=null;
         this.meleeSound=null;
         this.deathSound=null;
-        this.liquidInSound=null;
-        this.liquidOutSound=null;
         this.fallSound=null;
         this.fallSoundWaitTick=0;
         
         this.fallSoundNextTick=0;
         
-        this.lastInLiquid=false;
+        this.lastInLiquidIdx=-1;
         
         this.slideDirection=0;
         this.slideNextTick=0;
+        
+        this.movementFreezeNextTick=0;
         
             // pre-allocations
 
@@ -90,9 +92,6 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.fireAngle=new PointClass(0,0,0);
         this.fireVector=new PointClass(0,0,0);
         this.fireHitPoint=new PointClass(0,0,0);
-        
-        this.trapMeshXBound=new BoundClass(0,0);
-        this.trapMeshZBound=new BoundClass(0,0);
     }
 
     initialize()
@@ -111,6 +110,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.projectileDistance=this.core.game.lookupValue(this.json.config.projectileDistance,this.data,0);
         this.projectileWaitTick=this.core.game.lookupValue(this.json.config.projectileWaitTick,this.data,0);
         this.projectileFireTick=this.core.game.lookupValue(this.json.config.projectileFireTick,this.data,0);
+        this.projectileFirePosition=this.core.game.lookupPointValue(this.json.config.projectileFirePosition,0,0,0);
         this.projectileJson=this.core.game.lookupValue(this.json.config.projectileJson,this.data,null);
         this.projectileData=this.json.config.projectileData;
         this.projectileRequiresSight=this.core.game.lookupValue(this.json.config.projectileRequiresSight,this.data,0);
@@ -131,6 +131,9 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.angleYProjectileRange=this.core.game.lookupValue(this.json.config.angleYProjectileRange,this.data,0);
         this.angleYMeleeRange=this.core.game.lookupValue(this.json.config.angleYMeleeRange,this.data,0);
         this.damageFlinchWaitTick=this.core.game.lookupValue(this.json.config.damageFlinchWaitTick,this.data,0);
+        this.meleeMovementFreezeTick=this.core.game.lookupValue(this.json.config.meleeMovementFreezeTick,this.data,0);
+        this.projectileMovementFreezeTick=this.core.game.lookupValue(this.json.config.projectileMovementFreezeTick,this.data,0);
+        this.damageMovementFreezeTick=this.core.game.lookupValue(this.json.config.damageMovementFreezeTick,this.data,0);
         this.fallSoundWaitTick=this.core.game.lookupValue(this.json.config.fallSoundWaitTick,this.data,0);
         
         this.idleAnimation=this.core.game.lookupAnimationValue(this.json.config.idleAnimation);
@@ -145,20 +148,13 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.hurtSound=this.core.game.lookupSoundValue(this.json.config.hurtSound);
         this.meleeSound=this.core.game.lookupSoundValue(this.json.config.meleeSound);
         this.deathSound=this.core.game.lookupSoundValue(this.json.config.deathSound);
-        this.liquidInSound=this.core.game.lookupSoundValue(this.json.config.liquidInSound);
-        this.liquidOutSound=this.core.game.lookupSoundValue(this.json.config.liquidOutSound);
         this.fallSound=this.core.game.lookupSoundValue(this.json.config.fallSound);
-        
-        this.trapMeshName=this.json.config.trapMeshName;
-        this.trapMeshShrink=this.json.config.trapMeshShrink;
 
         return(true);
     }
     
     ready()
     {
-        let meshList,mesh;
-        
         super.ready();
         
             // sleeping with all health
@@ -167,26 +163,11 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.awoke=false;
         this.dead=false;
         
-            // if there is a trap mesh, get it's bounds
-            
-        if (this.trapMeshName!==null) {
-            meshList=this.getMeshList();
-            mesh=meshList.meshes[meshList.find(this.trapMeshName)];
-            this.trapMeshXBound.setFromBound(mesh.xBound);
-            this.trapMeshZBound.setFromBound(mesh.zBound);
-            
-            if (this.trapMeshShrink!==null) {
-                this.trapMeshXBound.min+=this.trapMeshShrink.x;
-                this.trapMeshXBound.max-=this.trapMeshShrink.x;
-                this.trapMeshZBound.min+=this.trapMeshShrink.z;
-                this.trapMeshZBound.max-=this.trapMeshShrink.z;
-            }
-        }
-        
             // misc
             
-        this.lastInLiquid=false;
+        this.lastInLiquidIdx=-1;
         this.slideNextTick=0;
+        this.movementFreezeNextTick=0;
             
             // start idle animation
         
@@ -227,6 +208,10 @@ export default class EntityFPSMonsterClass extends EntityClass
         
         this.health-=damage;
         if (!this.awoke) this.wakeUp();
+        
+            // any freezes
+            
+        this.movementFreezeNextTick=this.core.timestamp+this.damageMovementFreezeTick;
         
             // just damage
             
@@ -280,6 +265,10 @@ export default class EntityFPSMonsterClass extends EntityClass
             // pause to start actual melee
             
         this.meleeStartTick=this.core.timestamp+this.meleeDamageTick;
+        
+            // any movement freezes
+            
+        this.movementFreezeNextTick=this.core.timestamp+this.meleeMovementFreezeTick;
     }
     
     meleeHit(player)
@@ -290,13 +279,9 @@ export default class EntityFPSMonsterClass extends EntityClass
     
     projectileSetupFire(player)
     {
-            // get fire position outside of radius
-            // and in middle of monster height
-            
-        this.firePosition.setFromValues(0,0,(this.radius*2));
+        this.firePosition.setFromPoint(this.projectileFirePosition);
         this.firePosition.rotateY(null,this.angle.y);
         this.firePosition.addPoint(this.position);
-        this.firePosition.y+=Math.trunc(this.height*0.5);
         
         this.fireAngle.setFromPoint(this.angle);
         this.fireAngle.x=this.position.getLookAngleTo(player.position);
@@ -304,7 +289,9 @@ export default class EntityFPSMonsterClass extends EntityClass
     
     projectileStart(player,distToPlayer)
     {
-        if ((distToPlayer>this.projectileDistance) || (this.core.timestamp<this.nextProjectileTick)) return;
+            // don't fire if past projectile distance, or less than melee distance
+            
+        if ((distToPlayer>this.projectileDistance) || (distToPlayer<this.meleeDistance) || (this.core.timestamp<this.nextProjectileTick)) return;
         
             // does it sight the player?
             
@@ -314,8 +301,8 @@ export default class EntityFPSMonsterClass extends EntityClass
             this.fireVector.setFromValues(0,0,this.projectileDistance);
             this.fireVector.rotateX(null,this.fireAngle.x);
             this.fireVector.rotateY(null,this.fireAngle.y);
-
-            if (!this.rayCollision(this.firePosition,this.fireVector,this.fireHitPoint,null,null)) return;
+            
+            if (!this.collision.rayCollision(this,this.firePosition,this.fireVector,this.fireHitPoint)) return;
             if (this.hitEntity!==player) return;
         }
         
@@ -331,6 +318,10 @@ export default class EntityFPSMonsterClass extends EntityClass
             // pause for fire animation
             
         this.projectileStartTick=this.core.timestamp+this.projectileFireTick;
+        
+            // any movement freezes
+            
+        this.movementFreezeNextTick=this.core.timestamp+this.projectileMovementFreezeTick;
     }
     
     projectileFire(player)
@@ -366,20 +357,21 @@ export default class EntityFPSMonsterClass extends EntityClass
     run()
     {
         let angleDif;
-        let player,distToPlayer,liquidIdx,gravityFactor;
+        let player,distToPlayer,liquid,liquidIdx,gravityFactor;
         
             // liquids
             
-        liquidIdx=this.getInLiquidIndex();
+        liquidIdx=this.core.map.liquidList.getLiquidForPoint(this.position);
         
         if (liquidIdx!==-1) {
-            if (!this.lastInLiquid) this.core.soundList.playJson(this.position,this.liquidInSound);
-            this.lastInLiquid=true;
-            gravityFactor=this.core.map.liquidList.liquids[liquidIdx].gravityFactor;
+            liquid=this.core.map.liquidList.liquids[liquidIdx];
+            if (this.lastInLiquidIdx===-1) liquid.playSoundIn(this.position);
+            this.lastInLiquidIdx=liquidIdx;
+            gravityFactor=liquid.gravityFactor;
         }
         else {
-            if (this.lastInLiquid) this.core.soundList.playJson(this.position,this.liquidOutSound);
-            this.lastInLiquid=false;
+            if (this.lastInLiquidIdx!==-1) this.core.map.liquidList.liquids[this.lastInLiquidIdx].playSoundOut(this.position);
+            this.lastInLiquidIdx=-1;
             gravityFactor=1.0;
         }
         
@@ -463,7 +455,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         
             // chase player (don't move if in flinch)
 
-        if (this.core.timestamp>this.nextDamageTick) {
+        if (this.core.timestamp>this.movementFreezeNextTick) {
             
                 // not in a back slide
                 
@@ -506,15 +498,6 @@ export default class EntityFPSMonsterClass extends EntityClass
                     this.movement.y=this.sideMovement.y;
                 }
             }
-        }
-        
-            // any bounding?
-            
-        if (this.trapMeshName!==null) {
-            if (this.position.x<this.trapMeshXBound.min) this.position.x=this.trapMeshXBound.min;
-            if (this.position.x>this.trapMeshXBound.max) this.position.x=this.trapMeshXBound.max;
-            if (this.position.z<this.trapMeshZBound.min) this.position.z=this.trapMeshZBound.min;
-            if (this.position.z>this.trapMeshZBound.max) this.position.z=this.trapMeshZBound.max;
         }
     }
     

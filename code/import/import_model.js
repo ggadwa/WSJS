@@ -18,7 +18,7 @@ export default class ImportModelClass
         let importMesh;
         
         importMesh=new ImportGLTFClass(this.core,json);
-        return(await importMesh.import(this.model.meshList,this.model.skeleton));
+        return(await importMesh.import(null,this.model.meshList,this.model.skeleton,false));
     }
 
 }

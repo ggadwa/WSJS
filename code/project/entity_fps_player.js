@@ -61,15 +61,13 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.hitIndicator=false;
         this.hitIndicatorFlashTick=0;
         
-        this.liquidInSound=null;
-        this.liquidOutSound=null;
         this.hurtSound=null;
         this.dieSound=null;
         
         this.nextDamageTick=0;
         this.falling=false;
         this.fallStartY=0;
-        this.lastInLiquid=false;
+        this.lastInLiquidIdx=-1;
         this.lastUnderLiquid=false;
         
         this.lastWheelClick=0;
@@ -148,13 +146,11 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.hitIndicator=this.core.game.lookupValue(this.json.config.hitIndicator,this.data,null);
         this.hitIndicatorFlashTick=this.core.game.lookupValue(this.json.config.hitIndicatorFlashTick,this.data,0);
         
-        this.liquidInSound=this.core.game.lookupSoundValue(this.json.config.liquidInSound);
-        this.liquidOutSound=this.core.game.lookupSoundValue(this.json.config.liquidOutSound);
         this.hurtSound=this.core.game.lookupSoundValue(this.json.config.hurtSound);
         this.dieSound=this.core.game.lookupSoundValue(this.json.config.dieSound);
         
         this.nextDamageTick=0;
-        this.lastInLiquid=false;
+        this.lastInLiquidIdx=-1;
         this.lastUnderLiquid=false;
         
         this.lastWheelClick=0;
@@ -491,7 +487,7 @@ export default class EntityFPSPlayerClass extends EntityClass
     {
         let n,x,y;
         let moveForward,moveBackward,moveLeft,moveRight;
-        let liquidIdx,bump,gravityFactor,fallDist;
+        let liquid,liquidIdx,bump,gravityFactor,fallDist;
         let weapon,firePrimary,fireSecondary,fireTertiary;
         let turnAdd,lookAdd,startWeaponIdx;
         let mouseWheelClick;
@@ -509,7 +505,7 @@ export default class EntityFPSPlayerClass extends EntityClass
             if ((this.lastUnderLiquid) && (this.angle.x<0)) {
                 this.gravity=this.core.map.gravityMinValue;
                 this.movement.y=this.jumpWaterHeight;
-                if ((this.lastInLiquid) && (this.liquidOutSound!==null)) this.core.soundList.playJson(this.position,this.liquidOutSound);
+                if (this.lastInLiquidIdx!==-1) this.core.map.liquidList.liquids[this.lastInLiquidIdx].playSoundOut(this.position);
             }
             
             this.lastUnderLiquid=false;
@@ -518,13 +514,14 @@ export default class EntityFPSPlayerClass extends EntityClass
         liquidIdx=this.core.map.liquidList.getLiquidForPoint(this.position);
         
         if (liquidIdx!==-1) {
-            if ((!this.lastInLiquid) && (this.liquidInSound!==null)) this.core.soundList.playJson(this.position,this.liquidInSound);
-            this.lastInLiquid=true;
-            gravityFactor=this.core.map.liquidList.liquids[liquidIdx].gravityFactor;
+            liquid=this.core.map.liquidList.liquids[liquidIdx];
+            if (this.lastInLiquidIdx===-1) liquid.playSoundIn(this.position);
+            this.lastInLiquidIdx=liquidIdx;
+            gravityFactor=liquid.gravityFactor;
         }
         else {
-            if ((this.lastInLiquid) && (this.liquidOutSound!==null)) this.core.soundList.playJson(this.position,this.liquidOutSound);
-            this.lastInLiquid=false;
+            if (this.lastInLiquidIdx!==-1) this.core.map.liquidList.liquids[this.lastInLiquidIdx].playSoundOut(this.position);
+            this.lastInLiquidIdx=-1;
             gravityFactor=1.0;
         }
         

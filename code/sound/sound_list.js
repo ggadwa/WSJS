@@ -168,8 +168,6 @@ export default class SoundListClass
             this.addSoundBySoundNameAttribute(entityDef.config.secondary);
             this.addSoundBySoundNameAttribute(entityDef.config.tertiary);
             
-            this.addSoundByNameAttribute(entityDef.config.liquidInSound);
-            this.addSoundByNameAttribute(entityDef.config.liquidOutSound);
             this.addSoundByNameAttribute(entityDef.config.hurtSound);
             this.addSoundByNameAttribute(entityDef.config.dieSound);
             this.addSoundByNameAttribute(entityDef.config.pickupSound);
@@ -196,6 +194,10 @@ export default class SoundListClass
             effectDef=game.jsonEffectCache[key];
             this.addSoundBySoundNameAttribute(effectDef);
         }
+        
+        // supergumba -- temporary
+        
+        this.addSound('splash');
             
             // load the sounds
             

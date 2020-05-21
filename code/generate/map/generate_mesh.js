@@ -804,7 +804,6 @@ export default class GenerateMeshClass
         tangentArray=this.buildTangents(vertexArray,uvArray,indexArray);
         
         mesh=new MeshClass(this.core,name,bitmap,-1,-1,new Float32Array(vertexArray),new Float32Array(normalArray),tangentArray,new Float32Array(uvArray),null,null,new Uint16Array(indexArray));
-        mesh.simpleCollisions=true;
         this.core.map.meshList.add(mesh);
     }
     
@@ -1019,7 +1018,6 @@ export default class GenerateMeshClass
         tangentArray=this.buildTangents(vertexArray,uvArray,indexArray);
         
         mesh=new MeshClass(this.core,name,bitmap,-1,-1,new Float32Array(vertexArray),new Float32Array(normalArray),tangentArray,new Float32Array(uvArray),null,null,new Uint16Array(indexArray));
-        mesh.simpleCollisions=true;
         this.core.map.meshList.add(mesh);
     }
     

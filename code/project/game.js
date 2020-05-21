@@ -106,6 +106,12 @@ export default class GameClass
         if ((value==undefined) || (value===null)) return(null);
         return(value);
     }
+    
+    lookupPointValue(value,valueDefaultX,valueDefaultY,valueDefaultZ)
+    {
+        if ((value==undefined) || (value===null)) return(new PointClass(valueDefaultX,valueDefaultY,valueDefaultZ));
+        return(new PointClass(value[0],value[1],value[2]));
+    }
 
         //
         // game initialize/release

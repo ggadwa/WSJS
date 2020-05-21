@@ -144,22 +144,6 @@ export default class MeshListClass
     }
     
         //
-        // only use on maps as they aren't rigged
-        // animations have inverseBindMatrixes which have
-        // transposes in them so you can only scale them
-        // in model matrixes
-        //
-        
-    scaleMeshes(scale)
-    {
-        let mesh;
-
-        for (mesh of this.meshes) {
-            mesh.scale(scale);
-        }
-    }
-    
-        //
         // setup all the mesh buffers
         //
 
@@ -282,7 +266,7 @@ export default class MeshListClass
 
                 if (run.bitmap!==currentShadowmap) {
                     currentShadowmap=run.bitmap;
-                    run.bitmap.attachAsShadow(shader);
+                    run.bitmap.attach(shader);
                 }
 
                     // draw the mesh

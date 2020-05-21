@@ -5,7 +5,7 @@ export default class UploadClass
         this.core=core;
     }
 
-    async upload(fileName,data)
+    async upload(fileName,uploadType,data)
     {
         let idx;
         let path,url;
@@ -21,7 +21,7 @@ export default class UploadClass
         
         url=window.location.protocol+'//'+window.location.host+path;
         if (!url.endsWith('/')) url+='/';
-        url+=encodeURIComponent(this.core.map.json.name)+'/'+fileName;
+        url+=encodeURIComponent(this.core.map.json.name)+'/'+uploadType+'/'+fileName;
         
             // upload
             

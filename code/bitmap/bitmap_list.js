@@ -138,58 +138,14 @@ export default class BitmapListClass
         }
     }
     
-    addGenerated(colorImage,normalImage,metallicRoughnessImage,emissiveImage,emissiveFactor)
+    addBM2(bitmap)
     {
-        let bitmap;
-        let colorURL;
-                
-            // generated bitmaps are always generated once
-            // so they are guarenteed to be unique, we just need
-            // fake colorURL for them
-        
-        colorURL='_generated_'+this.generatedUniqueId;
-        this.generatedUniqueId++;
-        
-            // add bitmap to list
-                    
-        bitmap=new BitmapClass(this.core);
-        bitmap.initializeGenerated(colorURL,colorImage,normalImage,metallicRoughnessImage,emissiveImage,emissiveFactor);
-        this.bitmaps.set(colorURL,bitmap);
-        
-        return(bitmap);
-    }
-    
-    addShadowmap(colorURL)
-    {
-        let bitmap;
-                
-        bitmap=new BitmapClass(this.core);
-        bitmap.initializeShadowmap(colorURL);
-        this.bitmaps.set(colorURL,bitmap);
-        
-        return(bitmap);
+        this.bitmaps.set(bitmap.colorURL,bitmap);
     }
     
     get(colorURL)
     {
         return(this.bitmaps.get(colorURL));
-    }
-    
-        //
-        // we can search out bitmaps by a "simple" name which removes
-        // any extra URL gunk -- this is basically used for interface elements
-        // or mass setting of meshes based on attached bitmaps
-        //
-    
-    getSimpleName(name)
-    {
-        let key,value;
-        
-        for ([key,value] of this.bitmaps) {
-            if (value.simpleName===name) return(value);
-        }
-        
-        return(null);
     }
     
         //

@@ -1,7 +1,7 @@
 import PointClass from '../../utility/point.js';
 import RectClass from '../../utility/rect.js';
 import ColorClass from '../../utility/color.js';
-import BitmapClass from '../../bitmap/bitmap.js';
+import BitmapGeneratedClass from '../../bitmap/bitmap_generated.js';
 import CoreClass from '../../main/core.js';
 
 //
@@ -32,9 +32,7 @@ export default class GenerateBitmapBaseClass
             // defaults
             
         this.specularFactor=new ColorClass(5,5,5);
-        this.glowFrequency=0;
-        this.glowMin=0.0;
-        this.glowMax=1.0;
+        this.emissiveFactor=new ColorClass(1,1,1);
 
             // some precalced normals
 
@@ -111,7 +109,7 @@ export default class GenerateBitmapBaseClass
                 
         // can't seal as this is a parent class
     }
-        
+    
         //
         // colors
         //
@@ -2286,6 +2284,8 @@ export default class GenerateBitmapBaseClass
     
     generate(variationMode)
     {
+        let bitmap;
+        
             // setup all the bitmap parts
             // and get the image bytes for drawing
             
@@ -2330,7 +2330,10 @@ export default class GenerateBitmapBaseClass
         
             // add the bitmap object
             
-        return(this.core.bitmapList.addGenerated(this.colorCanvas,this.normalCanvas,this.specularCanvas,this.specularFactor,this.glowCanvas,this.glowFrequency,this.glowMin,this.glowMax));
+        bitmap=new BitmapGeneratedClass(this.core,('generated_'+this.constructor.name),this.colorCanvas,this.normalCanvas,this.specularCanvas,this.glowCanvas,this.emissiveFactor);
+        this.core.bitmapList.addBM2(bitmap);
+        
+        return(bitmap);
     }
     
 }

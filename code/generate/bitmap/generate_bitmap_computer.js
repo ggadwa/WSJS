@@ -455,11 +455,9 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
         this.generateComputerComponents(offset,0,this.colorImgData.width,offset,panelInsideColor,panelInsideEdgeSize);        // front and back
         this.draw3DFrameRect(0,offset,offset,this.colorImgData.height,panelEdgeSize,panelColor,true);       // top and bottom
         
-            // set the glow frequency
+            // set the emissive
             
-        this.glowFrequency=500;
-        this.glowMin=0.6;
-        this.glowMax=0.8;
+        this.emissiveFactor=new ColorClass(1,1,1);
         
             // finish with the specular
 

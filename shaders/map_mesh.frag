@@ -105,7 +105,7 @@ void main(void)
     pixel.rgb=(tex.rgb*lightCol);
     if (hasMetallicRoughness) pixel.rgb+=(min(metallic,1.0)*lightCol);
     if (hasEmissive) pixel.rgb+=(texture(emissiveTex,fragUV.xy).rgb*emissiveFactor);
-    pixel.a=1.0;
+    pixel.a=tex.a;
 
     outputPixel=pixel;
 

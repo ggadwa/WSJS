@@ -2,7 +2,6 @@ import PointClass from '../utility/point.js';
 import BoundClass from '../utility/bound.js';
 import ColorClass from '../utility/color.js';
 import LightClass from '../light/light.js';
-import MapLiquidClass from '../map/map_liquid.js';
 import MoveClass from '../map/move.js';
 import MovementClass from '../map/movement.js';
 import MapCubeClass from '../map/map_cube.js';
@@ -20,30 +19,21 @@ export default class ImportMapClass
     
     async load(json)
     {
-        let n,k,scale,idx;
+        let n,k,idx;
         let light,lightDef,lightAmbient;
-        let liquid,liquidDef,liquidBitmap;
         let movement,meshIdxList,reverseMeshIdxList,movementDef;
         let moveDef,movePoint,moveRotate,rotateOffset,centerOffset;
         let pathNode,pathDef;
         let cube,cubeDef;
-        let bitmap;
         let importMesh;
+        
+            // remember the scale for importing
+            
         
             // import the map itself
           
         importMesh=new ImportGLTFClass(this.core,json);
-        if (!(await importMesh.import(this.core.map.meshList,null))) return(false);
-        
-            // maps don't have rigging, so we need to recalculate
-            // all the node matrixes and TRS and then scale to
-            // the size we want (animations cover that for rigged
-            // models)
-            
-        scale=json.scale;
-        if (scale===undefined) scale=1;
-        
-        this.core.map.meshList.scaleMeshes(scale);
+        if (!(await importMesh.import(this.core.map,this.core.map.meshList,null))) return(false);
         
             // the lights
             
@@ -79,18 +69,6 @@ export default class ImportMapClass
             }
         }
         
-            // the liquids
-            
-        if (json.liquids!==undefined) {
-            for (n=0;n!==json.liquids.length;n++) {
-                liquidDef=json.liquids[n];
-                
-                liquidBitmap=this.core.bitmapList.addSimple(liquidDef.bitmap);
-                liquid=new MapLiquidClass(this.core,liquidBitmap,liquidDef.waveSize,liquidDef.wavePeriod,liquidDef.waveHeight,liquidDef.waveUVStamp,liquidDef.uShift,liquidDef.vShift,liquidDef.gravityFactor,new ColorClass(liquidDef.tint.r,liquidDef.tint.g,liquidDef.tint.b),new BoundClass(liquidDef.xBound.min,liquidDef.xBound.max),new BoundClass(liquidDef.yBound.min,liquidDef.yBound.max),new BoundClass(liquidDef.zBound.min,liquidDef.zBound.max))
-                this.core.map.liquidList.add(liquid);
-            }
-        }
-       
             // the movements
             
         if (json.movements!==undefined) {
@@ -148,17 +126,6 @@ export default class ImportMapClass
 
                 this.core.map.movementList.add(movement);
             }
-        }
-        
-            // the sky
-            
-        if (json.skyBox===undefined) {
-            this.core.map.sky.on=false;
-        }
-        else {
-            this.core.map.sky.on=true;
-            this.core.map.sky.size=json.skyBox.size;
-            this.core.map.sky.bitmap=this.core.bitmapList.addSimple(json.skyBox.bitmap);
         }
         
             // paths

@@ -1,7 +1,5 @@
 import MapMeshShaderClass from '../shader/map_mesh_shader.js';
 import MapMeshShadowShaderClass from '../shader/map_mesh_shadow_shader.js';
-import MapLiquidShaderClass from '../shader/map_liquid_shader.js';
-import SkyShaderClass from '../shader/sky_shader.js';
 import ModelMeshShaderClass from '../shader/model_mesh_shader.js';
 import DebugShaderClass from '../shader/debug_shader.js';
 import EffectShaderClass from '../shader/effect_shader.js';
@@ -21,8 +19,6 @@ export default class ShaderListClass
         
         this.mapMeshShader=null;
         this.mapMeshShadowShader=null;
-        this.mapLiquidShader=null;
-        this.skyShader=null;
         this.modelMeshShader=null;
         this.debugShader=null;
         this.effectShader=null;
@@ -41,8 +37,6 @@ export default class ShaderListClass
     {
         this.mapMeshShader=null;
         this.mapMeshShadowShader=null;
-        this.mapLiquidShader=null;
-        this.skyShader=null;
         this.modelMeshShader=null;
         this.debugShader=null;
         this.effectShader=null;
@@ -56,8 +50,6 @@ export default class ShaderListClass
     {
         if (this.mapMeshShader!==null) this.mapMeshShader.release();
         if (this.mapMeshShadowShader!==null) this.mapMeshShadowShader.release();
-        if (this.mapLiquidShader!==null) this.mapLiquidShader.release();
-        if (this.skyShader!==null) this.skyShader.release();
         if (this.modelMeshShader!==null) this.modelMeshShader.release();
         if (this.debugShader!==null) this.debugShader.release();
         if (this.effectShader!==null) this.effectShader.release();
@@ -80,14 +72,6 @@ export default class ShaderListClass
         this.mapMeshShadowShader.initialize();
         if (!(await this.mapMeshShadowShader.load())) return(false);
 
-        this.mapLiquidShader=new MapLiquidShaderClass(this.core);
-        this.mapLiquidShader.initialize();
-        if (!(await this.mapLiquidShader.load())) return(false);
-
-        this.skyShader=new SkyShaderClass(this.core);
-        this.skyShader.initialize();
-        if (!(await this.skyShader.load())) return(false);
-    
         this.modelMeshShader=new ModelMeshShaderClass(this.core);
         this.modelMeshShader.initialize();
         if (!(await this.modelMeshShader.load())) return(false);

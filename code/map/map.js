@@ -85,6 +85,15 @@ export default class MapClass
         this.effectList.clear();
         this.cubeList.clear();
     }
+    
+        //
+        // get import scale
+        //
+        
+    getImportScale()
+    {
+        return((this.json.scale!==undefined)?this.json.scale:1);
+    }
 
         //
         // setup all the mesh buffers

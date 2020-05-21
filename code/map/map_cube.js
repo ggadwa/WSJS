@@ -12,7 +12,7 @@ export default class MapCubeClass
         this.key=key;
         this.data=(data===undefined)?null:data;
     }
-
+    
     entityInCube(entity)
     {
         if ((entity.position.x<this.xBound.min) || (entity.position.x>this.xBound.max)) return(false);

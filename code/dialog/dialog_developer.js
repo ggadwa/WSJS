@@ -378,12 +378,12 @@ export default class DialogDeveloperClass extends DialogBaseClass
             fileName='shadowmap_'+n+'.png';
             data=canvas.toDataURL();
             data=data.substring(data.indexOf(',')+1);
-            upload.upload(fileName,data);   // already in base64
+            upload.upload(fileName,'SM',data);   // already in base64
         }
         
             // the bin
             
-        upload.upload('shadowmap.bin',bin);
+        upload.upload('shadowmap.bin','SM',bin);
         
         console.info('time='+(Date.now()-this.shadowmapTimestamp));
         

@@ -111,6 +111,7 @@ export default class MapLiquidListClass
         let n,liquid;
         let nLiquid=this.liquids.length;
         let currentBitmap;
+        let shader=this.core.shaderList.mapMeshShader;
         let gl=this.core.gl;
         
             // change the blend
@@ -120,7 +121,7 @@ export default class MapLiquidListClass
         
         gl.depthMask(false);
 
-        this.core.shaderList.mapLiquidShader.drawStart();
+        shader.drawStart();
 
             // setup liquid drawing
 
@@ -139,7 +140,7 @@ export default class MapLiquidListClass
 
             if (liquid.bitmap!==currentBitmap) {
                 currentBitmap=liquid.bitmap;
-                liquid.bitmap.attachAsLiquid(this.core.shaderList.mapLiquidShader);
+                liquid.bitmap.attachAsTexture(shader);
             }
 
                 // draw the liquid
@@ -151,7 +152,7 @@ export default class MapLiquidListClass
         
             // reset the blend
             
-        this.core.shaderList.mapLiquidShader.drawEnd();
+        shader.drawEnd();
         
         gl.disable(gl.BLEND);
         gl.depthMask(true);

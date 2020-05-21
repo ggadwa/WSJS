@@ -42,10 +42,9 @@ export default class BitmapClass
 
         this.hasColorImageAlpha=false;
         
-        this.simpleName=null;
         this.loaded=false;
         
-        Object.seal(this);
+        // no seal, these are extended
     }
 
         //
@@ -63,8 +62,6 @@ export default class BitmapClass
         this.emissiveURL=emissiveURL;
         if (emissiveFactor!==null) this.emissiveFactor=emissiveFactor;
         this.scale=scale;
-        
-        this.buildSimpleName();
     }
     
     initializeSimpleURL(colorURL)
@@ -72,8 +69,6 @@ export default class BitmapClass
         this.bitmapType=this.BITMAP_SIMPLE_URL;
         
         this.colorURL=colorURL;
-        
-        this.buildSimpleName();
     }
     
     initializeInterfaceURL(colorURL)
@@ -81,8 +76,6 @@ export default class BitmapClass
         this.bitmapType=this.BITMAP_INTERFACE_URL;
         
         this.colorURL=colorURL;
-        
-        this.buildSimpleName();
     }
     
     initializeColor(colorURL,colorBase)
@@ -91,8 +84,6 @@ export default class BitmapClass
         
         this.colorURL=colorURL;
         this.colorBase=colorBase;
-        
-        this.buildSimpleName();
     }
     
     initializeGenerated(colorURL,colorImage,normalImage,metallicRoughnessImage,emissiveImage,emissiveFactor)
@@ -105,8 +96,6 @@ export default class BitmapClass
         this.metallicRoughnessImage=metallicRoughnessImage;
         this.emissiveImage=emissiveImage;
         this.emissiveFactor=emissiveFactor;
-        
-        this.buildSimpleName();
     }
     
     initializeShadowmap(colorURL)
@@ -133,29 +122,7 @@ export default class BitmapClass
         
         this.loaded=false;
     }
-    
-        //
-        // a name used by some json to pick out meshes
-        // by textures
-        //
         
-    buildSimpleName()
-    {
-        let idx;
-        
-                // reduce down to name, skipping
-                // any URL or extensions, this is a specific
-                // instance used to hook things up to materials
-        
-        this.simpleName=this.colorURL;
-        if (this.simpleName===null) return;
-        
-        idx=this.simpleName.lastIndexOf('/');
-        if (idx!==-1) this.simpleName=this.simpleName.substring(idx+1);
-        idx=this.simpleName.lastIndexOf('.');
-        if (idx!==-1) this.simpleName=this.simpleName.substring(0,idx);
-    }
-    
         //
         // bitmap utilities
         //
@@ -557,22 +524,6 @@ export default class BitmapClass
         gl.bindTexture(gl.TEXTURE_2D,this.colorTexture);
     }
     
-    attachAsShadow(shader)
-    {
-        let gl=this.core.gl;
-        
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D,this.colorTexture);
-    }
-    
-    attachAsLiquid(shader)
-    {
-        let gl=this.core.gl;
-
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D,this.colorTexture);
-    }
-    
     attachAsInterface()
     {
         let gl=this.core.gl;
@@ -582,14 +533,6 @@ export default class BitmapClass
     }
     
     attachAsParticle()
-    {
-        let gl=this.core.gl;
-
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D,this.colorTexture);
-    }
-    
-    attachAsSky()
     {
         let gl=this.core.gl;
 

@@ -1,0 +1,43 @@
+GLTF Extras
+
+These are extra bits of data (usually JSON) stored at either the mesh (for changing a single mesh) or the material
+(for changing all meshes attached to that material) in the engine.  In Blender these would be custom properties on
+the mesh (NOT the object) or the material.
+
+
+Name                        Description
+----                        -----------
+wsjsNoCollision             Mesh has no collision (value ignored)
+
+wsjsSky                     Mesh is a sky box definition.  Material determines the texture
+                                {
+                                    "size":50000
+                                }
+
+wsjsLiquid                  Mesh is a liquid definition.  Mesh bounds determine liquid volume & material determines texture
+                                {
+                                    "waveSize":5000,
+                                    "wavePeriod":4000,
+                                    "waveHeight":400,
+                                    "waveUVStamp":0.1,
+                                    "uvShift":[0,0.0005],
+                                    "tint":[0.2,0.2,1.0],
+                                    "gravityFactor":0.1,
+                                    "soundIn":{"name":"splash","rate":1.0,"randomRateAdd":0,"distance":40000,"loopStart":0,"loopEnd":0,"loop":false},
+                                    "soundOut":{"name":"splash","rate":0.8,"randomRateAdd":0,"distance":40000,"loopStart":0,"loopEnd":0,"loop":false}
+                                }
+
+wsjsLight                   Mesh is a light definition.  Center is center point of light
+                                {
+                                    "color":{"r":0.2,"g":0.2,"b":0.2},
+                                    "intensity":500000,
+                                    "exponent":0.0,
+                                    "ambient":true
+                                }
+
+wsjsEffect                  Mesh is an effect definition.  Center is center point of effect
+                                {
+                                    "name":"fire",
+                                    "data":{"intensity":23000}
+                                }
+

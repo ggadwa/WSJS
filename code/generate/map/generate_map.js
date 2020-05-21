@@ -277,7 +277,7 @@ export default class GenerateMapClass
         
             // see the random number generator
             
-        seed=1586578018977; // (json.autoGenerate.randomSeed===undefined)?Date.now():json.autoGenerate.randomSeed;
+        seed=(json.autoGenerate.randomSeed===undefined)?Date.now():json.autoGenerate.randomSeed;
         console.info('Random Seed: '+seed);
         
         this.core.setRandomSeed(seed);
@@ -426,17 +426,6 @@ export default class GenerateMapClass
             
         this.generateRandomNodes(rooms,segmentSize);
 
-            // the sky
-            
-        if (json.skyBox===undefined) {
-            this.core.map.sky.on=false;
-        }
-        else {
-            this.core.map.sky.on=true;
-            this.core.map.sky.size=json.skyBox.size;
-            this.core.map.sky.bitmap=this.core.bitmapList.addSimple(json.skyBox.bitmap);
-        }
-        
         return(true);
     }
 }

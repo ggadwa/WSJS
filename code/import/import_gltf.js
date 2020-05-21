@@ -3,6 +3,7 @@ import ColorClass from '../utility/color.js';
 import QuaternionClass from '../utility/quaternion.js';
 import Matrix4Class from '../utility/matrix4.js';
 import MeshClass from '../mesh/mesh.js';
+import MapLiquidClass from '../map/map_liquid.js';
 import ModelNodeClass from '../model/model_node.js';
 import ModelSkinClass from '../model/model_skin.js';
 import ModelJointClass from '../model/model_joint.js';
@@ -641,15 +642,55 @@ export default class ImportGLTFClass
         // custom property lookup
         //
         
-    hasCustomProperty(materialNode,meshNode,propName)
+    getCustomProperty(materialNode,meshNode,propName)
     {
         if (materialNode.extras!==undefined) {
-            if (materialNode.extras[propName]!==undefined) return(true);
+            if (materialNode.extras[propName]!==undefined) return(materialNode.extras[propName]);
         }
         if (meshNode.extras!==undefined) {
-            if (meshNode.extras[propName]!==undefined) return(true);
+            if (meshNode.extras[propName]!==undefined) return(meshNode.extras[propName]);
         }
         
+        return(null);
+    }
+    
+        //
+        // special informational meshes
+        // 
+        // we can create meshes that have custom properities (extras)
+        // that turn into different objects, like liquids or skyboxes, or
+        // just contain logic that is used elsewhere in the engine
+        //
+        
+    decodeMapMeshInformational(map,materialNode,meshNode,mesh)
+    {
+        let value,obj,liquid;
+        
+            // skyboxes
+            
+        value=this.getCustomProperty(materialNode,meshNode,'wsjsSky');
+        if (value!==null) {
+            obj=JSON.parse(value);
+            
+            map.sky.on=true;
+            map.sky.size=obj.size;
+            map.sky.bitmap=mesh.bitmap;
+            
+            return(true);
+        }
+        
+            // liquids
+            
+        value=this.getCustomProperty(materialNode,meshNode,'wsjsLiquid');
+        if (value!==null) {
+            obj=JSON.parse(value);
+            
+            liquid=new MapLiquidClass(this.core,mesh.bitmap,obj.waveSize,obj.wavePeriod,obj.waveHeight,obj.waveUVStamp,new PointClass(obj.uvShift[0],obj.uvShift[1],0),obj.gravityFactor,new ColorClass(obj.tint[0],obj.tint[1],obj.tint[2]),obj.soundIn,obj.soundOut,mesh.xBound,mesh.yBound,mesh.zBound);
+            map.liquidList.add(liquid);
+            
+            return(true);
+        }
+
         return(false);
     }
     
@@ -657,7 +698,7 @@ export default class ImportGLTFClass
         // decode meshes
         //
         
-    decodeMesh(meshList,skeleton)
+    decodeMesh(map,meshList,skeleton)
     {
         let n,k,t,meshesNode,meshNode,primitiveNode;
         let vertexArray,normalArray,tangentArray,uvArray,indexArray;
@@ -682,12 +723,6 @@ export default class ImportGLTFClass
         
         for (n=0;n!==meshesNode.length;n++) {
             meshNode=meshesNode[n];
-            
-                // mesh skipping
-               
-            if (this.json.meshSkip!==undefined) {
-                if (this.json.meshSkip.includes(meshNode.name)) continue;
-            }
             
                 // always store a matrix for each mesh
                 // from the nodes, this is mostly used by
@@ -830,12 +865,25 @@ export default class ImportGLTFClass
                     // type at this point (like Float32Array, etc)
                     
                 mesh=new MeshClass(this.core,meshNode.name,bitmap,noSkinAttachedNodeIdx,skinIdx,vertexArray,normalArray,tangentArray,uvArray,jointArray,weightArray,indexArray);
-                meshes.push(mesh);
                 
-                    // and handle any custom properties
+                    // maps don't have rigging, so we need to
+                    // fix the import scale here
+                    
+                if (map!==null) mesh.scale(map.getImportScale());
+                    
+                    // handle any custom properties and
+                    // informational meshes
                     
                 materialNode=this.jsonData.materials[primitiveNode.material];
-                if (this.hasCustomProperty(materialNode,meshNode,'wsjsNoCollision')) mesh.noCollisions=true;
+                if (this.getCustomProperty(materialNode,meshNode,'wsjsNoCollision')!==null) mesh.noCollisions=true;
+                
+                if (map!==null) {
+                    if (this.decodeMapMeshInformational(map,materialNode,meshNode,mesh)) continue;     // mesh is information so it's not part of model
+                }
+                
+                    // finally add it to model
+                    
+                meshes.push(mesh);
             }
         }
 
@@ -934,7 +982,7 @@ export default class ImportGLTFClass
         // main importer
         //
         
-    async import(meshList,skeleton)
+    async import(map,meshList,skeleton)
     {
         this.jsonData=null;
         this.binData=null;
@@ -975,7 +1023,7 @@ export default class ImportGLTFClass
             if (!this.decodeSkeleton(skeleton)) return(false);
         }
         
-        if (!this.decodeMesh(meshList,skeleton)) return(false);
+        if (!this.decodeMesh(map,meshList,skeleton)) return(false);
         
         if (skeleton!==null) {
             if (!this.decodeAnimations(skeleton)) return(false);

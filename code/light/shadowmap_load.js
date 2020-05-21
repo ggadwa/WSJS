@@ -1,3 +1,4 @@
+import BitmapShadowmapClass from '../bitmap/bitmap_shadowmap.js';
 import MeshShadowmapRunClass from '../mesh/mesh_shadowmap_run.js';
 
 export default class ShadowmapLoadClass
@@ -14,7 +15,7 @@ export default class ShadowmapLoadClass
     async loadShadowmapBin()
     {
         let resp;
-        let url='../models/_'+this.core.map.json.name+'/shadowmap.bin';
+        let url='../shadowmaps/'+this.core.map.json.name+'/shadowmap.bin';
         
         try {
             resp=await fetch(url);
@@ -30,7 +31,7 @@ export default class ShadowmapLoadClass
     {
         let n,k,nMesh,mesh,offset;
         let runCount,vertexCount,uvCount;
-        let bitmapIdx,bitmaps,bitmap,colorURL;
+        let bitmapIdx,bitmaps,bitmap;
         let startTrigIdx,endTrigIdx;
         let binData,dataView;
         let map=this.core.map;
@@ -108,9 +109,9 @@ export default class ShadowmapLoadClass
                 
                 bitmap=bitmaps.get(bitmapIdx);
                 if (bitmap===undefined) {
-                    colorURL='models/_'+this.core.map.json.name+'/shadowmap_'+bitmapIdx+'.png';
-                    bitmap=this.core.bitmapList.addShadowmap(colorURL);
-                    bitmaps.set(bitmapIdx,bitmap);
+                    bitmap=new BitmapShadowmapClass(this.core,('shadowmaps/'+this.core.map.json.name+'/shadowmap_'+bitmapIdx+'.png'));
+                    this.core.bitmapList.addBM2(bitmap);
+                    bitmaps.set(bitmapIdx,bitmap);      // internal list so we can keep track of bitmaps we loaded
                 }
                 
                 mesh.shadowmapRuns.push(new MeshShadowmapRunClass(bitmap,startTrigIdx,endTrigIdx));

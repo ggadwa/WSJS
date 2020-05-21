@@ -47,6 +47,12 @@ export default class BoundClass
         this.min-=growValue;
         this.max+=growValue;
     }
+    
+    scale(scaleValue)
+    {
+        this.min*=scaleValue;
+        this.max*=scaleValue;
+    }
                 
     getMidPoint()
     {
@@ -83,5 +89,10 @@ export default class BoundClass
     copy()
     {
         return(new BoundClass(this.min,this.max));
+    }
+    
+    toString()
+    {
+        return('('+this.min+','+this.max+')');
     }
 }
