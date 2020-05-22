@@ -44,7 +44,7 @@ export default class DialogDeveloperClass extends DialogBaseClass
     
     addBuilderControls(viewDiv)
     {
-        this.addButton(viewDiv,'buildPathHints','Build Path Hints',this.buildPathHints.bind(this));
+        this.addButton(viewDiv,'buildPathHints','Save and Compile Paths',this.buildPathHints.bind(this));
         this.addButton(viewDiv,'buildShadowmap','Build Shadowmap',this.buildShadowmap.bind(this));
         
         /*
@@ -64,8 +64,6 @@ export default class DialogDeveloperClass extends DialogBaseClass
         
     buildPathHints()
     {
-        let thread;
-        
             // already building?
             
         if (this.pathHintThread!==null) {
@@ -79,16 +77,16 @@ export default class DialogDeveloperClass extends DialogBaseClass
         
         this.pathHintTimestamp=Date.now();
         
-        thread=new Worker('../../code/generate/path/path_thread.js',{type:"module"});
-        thread.addEventListener('message',this.buildPathHintsThreadFinish.bind(this),false);
+        this.pathHintThread=new Worker('../../code/generate/path/path_thread.js',{type:"module"});
+        this.pathHintThread.addEventListener('message',this.buildPathHintsThreadFinish.bind(this),false);
             
-        thread.postMessage({nodes:this.core.map.path.nodes});
+        this.pathHintThread.postMessage({nodes:this.core.map.path.nodes});
     }
     
     buildPathHintsThreadFinish(message)
     {
         let upload;
-        let json=message.data.json;
+        let json=message.json;
         
             // end the thread
             

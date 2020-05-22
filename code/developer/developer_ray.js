@@ -8,7 +8,7 @@ export default class DeveloperRayClass
     {
         this.core=core;
         
-        this.LOOK_DISTANCE=50000;
+        this.LOOK_DISTANCE=80000;
         this.ICON_CLICK_SIZE=500;
         
         this.targetItemType=-1;
@@ -93,6 +93,8 @@ export default class DeveloperRayClass
                 if (collisionTrig.rayTrace(pnt,vector,this.rayIntersectPnt)) {
                     dist=pnt.distance(this.rayIntersectPnt);
                     if ((dist<currentDist) || (currentDist===-1)) {
+                        this.targetItemType=this.core.game.developer.SELECT_ITEM_MESH;
+                        this.targetItemIndex=n;
                         hitPnt.setFromPoint(this.rayIntersectPnt);
                         currentDist=dist;
                     }
@@ -110,6 +112,8 @@ export default class DeveloperRayClass
                 if (collisionTrig.rayTrace(pnt,vector,this.rayIntersectPnt)) {
                     dist=pnt.distance(this.rayIntersectPnt);
                     if ((dist<currentDist) || (currentDist===-1)) {
+                        this.targetItemType=this.core.game.developer.SELECT_ITEM_MESH;
+                        this.targetItemIndex=n;
                         hitPnt.setFromPoint(this.rayIntersectPnt);
                         currentDist=dist;
                     }
@@ -127,6 +131,8 @@ export default class DeveloperRayClass
                 if (collisionTrig.rayTrace(pnt,vector,this.rayIntersectPnt)) {
                     dist=pnt.distance(this.rayIntersectPnt);
                     if ((dist<currentDist) || (currentDist===-1)) {
+                        this.targetItemType=this.core.game.developer.SELECT_ITEM_MESH;
+                        this.targetItemIndex=n;
                         hitPnt.setFromPoint(this.rayIntersectPnt);
                         currentDist=dist;
                     }

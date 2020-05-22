@@ -27,10 +27,13 @@ export default class DeveloperClass
         this.SELECT_ITEM_EFFECT=1;
         this.SELECT_ITEM_LIGHT=2;
         this.SELECT_ITEM_NODE=3;
+        this.SELECT_ITEM_MESH=4;
         
         this.on=false;
+        this.lookDownLock=false;
         this.position=new PointClass(0,0,0);
         this.angle=new PointClass(0,0,0);
+        this.fpsAngle=new PointClass(0,0,0);
         
         this.selectItemType=this.SELECT_ITEM_NONE;
         this.selectItemIndex=0;
@@ -75,46 +78,7 @@ export default class DeveloperClass
         this.developerRay.release();
         this.developerSprite.release();
     }
-    
-        //
-        // position info
-        //
         
-    positionInfo()
-    {
-        let n,nodeIdx,str;
-        let nMesh=this.core.map.meshList.meshes.length;
-        let player=this.core.map.entityList.getPlayer();
-        let xBound=new BoundClass(player.position.x-100,player.position.x+100);
-        let yBound=new BoundClass(player.position.y+(player.eyeOffset+100),player.position.y+player.eyeOffset);
-        let zBound=new BoundClass(player.position.z-100,player.position.z+100);
-
-            // position and angle
-            
-        console.info('pos='+player.position);
-        console.info('ang='+player.angle);
-
-            // nodes
-            
-        nodeIdx=this.findNearestPathNode(5000);
-        if (nodeIdx!==-1) console.info('node='+this.core.map.path.nodes[nodeIdx].nodeIdx);
-            
-            // meshes
-            
-        str='';
-
-        for (n=0;n!==nMesh;n++) {
-            if (this.core.map.meshList.meshes[n].boxBoundCollision(xBound,yBound,zBound)) {
-                if (str!=='') str+='|';
-                str+=this.core.map.meshList.meshes[n].name;
-            }
-        }
-        
-        if (str!=='') console.info('hit mesh='+str);
-        
-        if (player.standOnMeshIdx!==-1) console.info('stand mesh='+this.core.map.meshList.meshes[player.standOnMeshIdx].name);
-    }
-    
         //
         // paths
         //
@@ -154,9 +118,9 @@ export default class DeveloperClass
     {
         let n,k,nodeIdx;
         let node,links;
+        let rayEndPoint=this.developerRay.lookEndPoint;
         let path=this.core.map.path;
         let input=this.core.input;
-        let player=this.core.map.entityList.getPlayer();
         
             // i key picks a new parent from closest node
             
@@ -190,7 +154,7 @@ export default class DeveloperClass
             }
             
             nodeIdx=path.nodes.length;
-            path.nodes.push(new MapPathNodeClass(nodeIdx,player.position.copy(),[path.editorSplitStartNodeIdx,path.editorSplitEndNodeIdx],null,null,null));
+            path.nodes.push(new MapPathNodeClass(nodeIdx,rayEndPoint.copy(),[path.editorSplitStartNodeIdx,path.editorSplitEndNodeIdx],null,null,null));
             
             links=path.nodes[path.editorSplitStartNodeIdx].links;
             links[links.indexOf(path.editorSplitEndNodeIdx)]=nodeIdx;
@@ -227,6 +191,9 @@ export default class DeveloperClass
             }
             
                 // otherwise create a new node
+                // if the ray has hit something
+                
+            if (this.developerRay.targetItemType===this.SELECT_ITEM_NONE) return;
                 
             nodeIdx=path.nodes.length;
             
@@ -236,7 +203,7 @@ export default class DeveloperClass
                 path.nodes[path.editorParentNodeIdx].links.push(nodeIdx);
             }
             
-            path.nodes.push(new MapPathNodeClass(nodeIdx,player.position.copy(),links,null,null,null));
+            path.nodes.push(new MapPathNodeClass(nodeIdx,rayEndPoint.copy(),links,null,null,null));
             
             path.editorParentNodeIdx=nodeIdx;
             
@@ -295,11 +262,11 @@ export default class DeveloperClass
             }
         }
         
-            // ] key moves selected node to player
+            // ] key moves selected node to ray end
 
-        if (input.isKeyDownAndClear(']')) {
+        if (input.isKeyDownAndClear('y')) {
             if (path.editorParentNodeIdx!==-1) {
-                path.nodes[path.editorParentNodeIdx].position.setFromPoint(player.position);
+                path.nodes[path.editorParentNodeIdx].position.setFromPoint(rayEndPoint);
                 console.info('Moved node '+path.editorParentNodeIdx);
             }
         }
@@ -328,6 +295,9 @@ export default class DeveloperClass
             case this.SELECT_ITEM_NODE:
                 position.setFromPoint(this.core.map.path.nodes[itemIndex].position);
                 break;
+            case this.SELECT_ITEM_MESH:
+                position.setFromPoint(this.core.map.meshList.meshes[itemIndex].center);
+                break;
         }
         
         return(position);
@@ -344,6 +314,8 @@ export default class DeveloperClass
                 return(this.core.map.lightList.lights.length);
             case this.SELECT_ITEM_NODE:
                 return(this.core.map.path.nodes.length);
+            case this.SELECT_ITEM_MESH:
+                return(this.core.map.meshList.meshes.length);
         }
         
         return(0);
@@ -370,6 +342,8 @@ export default class DeveloperClass
                 key=this.core.map.path.nodes[itemIndex].key;
                 if (key===null) key='';
                 return('[node '+itemIndex+'] '+key);
+            case this.SELECT_ITEM_MESH:
+                return('[mesh '+this.core.map.meshList.meshes[itemIndex].name+']');
         }
         
         return('');
@@ -379,10 +353,10 @@ export default class DeveloperClass
         // developer movement
         //
         
-    move()
+    fpsMove()
     {
         let moveForward,moveBackward,moveLeft,moveRight,moveFactor;
-        let x,y,turnAdd,lookAdd;
+        let x,y,turnAdd,lookAdd,yAdd;
         let input=this.core.input;
         let setup=this.core.setup;
         
@@ -428,15 +402,73 @@ export default class DeveloperClass
                 if (this.angle.x>=this.MAX_LOOK_ANGLE) this.angle.x=this.MAX_LOOK_ANGLE;
             }
         }
+        
+            // up-down movement
+            
+        yAdd=0;
+        
+        if (input.isKeyDown('q')) yAdd=this.MOVE_SPEED*moveFactor;
+        if (input.isKeyDown('e')) yAdd=-(this.MOVE_SPEED*moveFactor);
+        
+            // movement
 
         this.movement.z=Math.trunc(((moveForward?this.MOVE_SPEED:0)+(moveBackward?-this.MOVE_SPEED:0))*moveFactor);
         this.movement.x=Math.trunc(((moveLeft?this.SIDE_SPEED:0)+(moveRight?-this.SIDE_SPEED:0))*moveFactor);
         this.movement.y=0;
         
-        this.movement.rotateX(null,this.angle.x);     // if flying or swimming, add in the X rotation
+        this.movement.rotateX(null,this.angle.x);
         this.movement.rotateY(null,this.angle.y);
+        
+        this.movement.y+=yAdd;
 
         this.position.addPoint(this.movement);
+    }
+    
+    lookDownMove()
+    {
+        let movePosZ,moveNegZ,moveNegX,movePosX;
+        let moveFactor,yAdd;
+        let input=this.core.input;
+        
+        movePosZ=(input.isKeyDown('w'));
+        moveNegZ=(input.isKeyDown('s'));
+        movePosX=(input.isKeyDown('a'));
+        moveNegX=(input.isKeyDown('d'));
+        
+        moveFactor=input.isKeyDown('Shift')?this.MOVE_FAST_FACTOR:1.0;
+        
+            // up-down keys
+            
+        yAdd=0;
+        
+        if (input.isKeyDown('q')) yAdd=this.MOVE_SPEED*moveFactor;
+        if (input.isKeyDown('e')) yAdd=-(this.MOVE_SPEED*moveFactor);
+        
+            // movement
+
+        this.movement.z=Math.trunc(((movePosZ?this.MOVE_SPEED:0)+(moveNegZ?-this.MOVE_SPEED:0))*moveFactor);
+        this.movement.x=Math.trunc(((movePosX?this.SIDE_SPEED:0)+(moveNegX?-this.SIDE_SPEED:0))*moveFactor);
+        this.movement.y=yAdd;
+
+        this.position.addPoint(this.movement);
+    }
+    
+    moveSwitch()
+    {
+        let input=this.core.input;
+        
+        if (input.isKeyDownAndClear('home')) {
+            this.fpsAngle.setFromPoint(this.angle);
+            this.angle.setFromValues(89,0,0);
+            this.lookDownLock=true;
+            return;
+        }
+        
+        if (input.isKeyDownAndClear('delete')) {
+            this.angle.setFromPoint(this.fpsAngle);
+            this.lookDownLock=false;
+            return;
+        }        
     }
     
     select()
@@ -503,7 +535,12 @@ export default class DeveloperClass
             
         player.position.setFromPoint(this.position);
         player.position.y-=player.eyeOffset;
-        player.angle.setFromPoint(this.angle);
+        if (this.lookDownLock) {
+            player.angle.setFromPoint(this.fpsAngle);
+        }
+        else {
+            player.angle.setFromPoint(this.angle);
+        }
         
             // always max the player heath
             
@@ -565,6 +602,8 @@ export default class DeveloperClass
             // attach developer camera to play location
             
         this.playerToDeveloper();
+        
+        this.lookDownLock=false;
         
             // highlight the map
             
@@ -669,44 +708,27 @@ export default class DeveloperClass
         
             // move and select
             
-        this.move();
+        this.moveSwitch();
+        if (!this.lookDownLock) {
+            this.fpsMove();
+        }
+        else {
+            this.lookDownMove();
+        }
         this.select();
+        this.pathEditor();
         
             // run the targetting
             
         this.developerRay.run(this.position,this.angle);
 
-        return;
-        
-            // backspace prints out position info
-            
-        if (input.isKeyDownAndClear('Backspace')) {
-            this.positionInfo();
-            return;
-        }
-        
-        
-            // delete turns on path editor
-            
-        if (input.isKeyDownAndClear('Delete')) {
-            //this.paths=!this.paths;
-            //console.info('path editor='+this.paths);
-            
-            if (this.paths) {
+/*
                 console.info('u add key to nearest node');
                 console.info('i select nearest node');
                 console.info('o start path splitting');
                 console.info('p adds new node to path');
                 console.info('[ deleted selected node');
                 console.info('] moves selected node to player');
-            }
-        }
-        
-        
-        
-        
-            // path editing
-            
-        //if (this.paths) this.pathEditor();
+*/
     }
 }

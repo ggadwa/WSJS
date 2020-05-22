@@ -4,8 +4,8 @@
    - cubes can do actions
    - add instantKill to actions
 
-- write paths
-   - paths in thread
+- car path threads
+- need a lock for look down, use 7 for now
 
 wsjsLight/wsjsEffect/wsjsEntity
 
