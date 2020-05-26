@@ -2,7 +2,7 @@
 // single move class
 //
 
-export default class MoveClass
+export default class MeshMoveClass
 {
     constructor(lifeTick,movePnt,rotateAngle,pauseType,pauseData,sound,triggerName)
     {

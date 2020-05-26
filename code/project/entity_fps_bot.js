@@ -508,7 +508,7 @@ export default class EntityFPSBotClass extends EntityClass
     {
         let nodeIdx,prevNodeIdx,moveForward;
         let turnDiff,slideLeft,liquid,liquidIdx,gravityFactor,fallDist;
-        let idleAnimation;
+        let idleAnimation,cube;
         
             // liquids
             
@@ -711,6 +711,11 @@ export default class EntityFPSBotClass extends EntityClass
         }
         
         this.stuckPoint.setFromPoint(this.position);
+        
+            // any cube actions
+            
+        cube=this.core.map.cubeList.findCubeContainingEntity(this);
+        if (cube!==null) this.runActions(this,cube.actions);
     }
     
     drawSetup()

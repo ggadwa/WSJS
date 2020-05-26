@@ -274,12 +274,12 @@ export default class MapEntityListClass
         // multi entity routines
         //
         
-    meshPush(meshIdx,movePnt,rotateAng)
+    meshPush(mesh,movePnt,rotateAng)
     {
         let entity;
         
         for (entity of this.entities) {
-            entity.meshPush(meshIdx,movePnt,rotateAng);
+            entity.meshPush(mesh,movePnt,rotateAng);
         }
     }
     

@@ -16,8 +16,7 @@ export default class MapPathClass
         this.keyNodes=[];
         
             // some path editor values
-            
-        this.editorParentNodeIdx=-1;
+
         this.editorSplitStartNodeIdx=-1;
         this.editorSplitEndNodeIdx=-1;
     }
@@ -104,7 +103,7 @@ export default class MapPathClass
         
     drawPath()
     {
-        let n,k,nNode,nLine,node,linkNode;
+        let n,k,nNode,nLine,node,linkNode,selNodeIdx;
         let vertices,indexes,vIdx,iIdx,elementIdx;
         let lineElementOffset,lineVertexStartIdx;
         let vertexBuffer,indexBuffer;
@@ -248,9 +247,11 @@ export default class MapPathClass
         }
             // and overdraw for selected nodes
             
-        if (this.editorParentNodeIdx!==-1) {
+        selNodeIdx=this.core.game.developer.getSelectNode();
+        
+        if (selNodeIdx!==-1) {
             gl.uniform3f(shader.colorUniform,1.0,1.0,0.0);
-            gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_SHORT,((this.editorParentNodeIdx*6)*2));
+            gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_SHORT,((selNodeIdx*6)*2));
         }
         
         if (this.editorSplitStartNodeIdx!==-1) {

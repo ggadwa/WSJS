@@ -55,6 +55,9 @@ export default class MeshClass
         this.originalYBound=new BoundClass(0,0);
         this.originalZBound=new BoundClass(0,0);
         
+            // moving
+            
+        this.movement=null;
         this.moveable=false;            // a flag so we can detect which meshes have movements attached
 
             // gl buffers

@@ -116,23 +116,11 @@ export default class DeveloperClass
     
     pathEditor()
     {
-        let n,k,nodeIdx;
+        let n,k,nodeIdx,selNodeIdx;
         let node,links;
         let rayEndPoint=this.developerRay.lookEndPoint;
         let path=this.core.map.path;
         let input=this.core.input;
-        
-            // i key picks a new parent from closest node
-            
-        if (input.isKeyDownAndClear('i')) {
-            nodeIdx=this.findNearestPathNode(1000000);
-            if (nodeIdx===-1) return;
-            
-            path.editorParentNodeIdx=nodeIdx;
-            
-            console.info('Reset to parent node '+nodeIdx);
-            return;
-        }
         
             // o splits a path at two nodes,
             // hit o on each node, then o for new node
@@ -162,7 +150,9 @@ export default class DeveloperClass
             links=path.nodes[path.editorSplitEndNodeIdx].links;
             links[links.indexOf(path.editorSplitStartNodeIdx)]=nodeIdx;
             
-            path.editorParentNodeIdx=nodeIdx;
+            this.selectItemType=this.SELECT_ITEM_NODE;
+            this.selectItemIndex=nodeIdx;
+            
             path.editorSplitStartNodeIdx=-1;
             path.editorSplitEndNodeIdx=-1;
 
@@ -178,11 +168,12 @@ export default class DeveloperClass
                 
             nodeIdx=this.findNearestPathNode(this.NEAR_PATH_NODE_DISTANCE);
             if (nodeIdx!==-1) {
-                if (path.editorParentNodeIdx!==-1) {
-                    path.nodes[nodeIdx].links.push(path.editorParentNodeIdx);
-                    path.nodes[path.editorParentNodeIdx].links.push(nodeIdx);
+                selNodeIdx=this.getSelectNode();
+                if (selNodeIdx!==-1) {
+                    path.nodes[nodeIdx].links.push(selNodeIdx);
+                    path.nodes[selNodeIdx].links.push(nodeIdx);
                     
-                    path.editorParentNodeIdx=nodeIdx;
+                    this.selectedItemIndex=nodeIdx;
                     
                     console.info('Connected node '+nodeIdx);
                 }
@@ -198,14 +189,16 @@ export default class DeveloperClass
             nodeIdx=path.nodes.length;
             
             links=[];
-            if (path.editorParentNodeIdx!==-1) {
-                links.push(path.editorParentNodeIdx);
-                path.nodes[path.editorParentNodeIdx].links.push(nodeIdx);
+            selNodeIdx=this.getSelectNode();
+            if (selNodeIdx!==-1) {
+                links.push(selNodeIdx);
+                path.nodes[selNodeIdx].links.push(nodeIdx);
             }
             
             path.nodes.push(new MapPathNodeClass(nodeIdx,rayEndPoint.copy(),links,null,null,null));
             
-            path.editorParentNodeIdx=nodeIdx;
+            this.selectItemType=this.SELECT_ITEM_NODE;
+            this.selectItemIndex=nodeIdx;
             
             console.info('Added node '+nodeIdx);
             return;
@@ -216,7 +209,8 @@ export default class DeveloperClass
         if (input.isKeyDownAndClear('u')) {
             nodeIdx=this.findNearestPathNode(this.NEAR_PATH_NODE_DISTANCE);
             if (nodeIdx!==-1) {
-                path.editorParentNodeIdx=nodeIdx;
+                this.selectItemType=this.SELECT_ITEM_NODE;
+                this.selectItemIndex=nodeIdx;
                 
                 if (path.nodes[nodeIdx].key!==null) {
                     console.info('Node already has a key='+path.nodes[nodeIdx].key);
@@ -233,41 +227,43 @@ export default class DeveloperClass
             // [ key deletes selected node
             
         if (input.isKeyDownAndClear('[')) {
-            if (path.editorParentNodeIdx!==-1) {
+            selNodeIdx=this.getSelectNode();
+            if (selNodeIdx!==-1) {
                 
                     // fix any links
                     
                 for (n=0;n!=path.nodes.length;n++) {
-                    if (n===path.editorParentNodeIdx) continue;
+                    if (n===selNodeIdx) continue;
                     node=path.nodes[n];
                     
                     k=0;
                     while (k<node.links.length) {
-                        if (node.links[k]===path.editorParentNodeIdx) {
+                        if (node.links[k]===selNodeIdx) {
                             node.links.splice(k,1);
                             continue;
                         }
-                        if (node.links[k]>path.editorParentNodeIdx) node.links[k]=node.links[k]-1;
+                        if (node.links[k]>selNodeIdx) node.links[k]=node.links[k]-1;
                         k++;
                     }
                 }
                 
                     // and delete the node
                     
-                path.nodes.splice(path.editorParentNodeIdx,1);
+                path.nodes.splice(selNodeIdx,1);
                 
-                console.info('Deleted node '+path.editorParentNodeIdx);
+                console.info('Deleted node '+selNodeIdx);
                 
-                path.editorParentNodeIdx=-1;
+                this.selectItemType=this.SELECT_ITEM_NONE;
             }
         }
         
             // ] key moves selected node to ray end
 
         if (input.isKeyDownAndClear('y')) {
-            if (path.editorParentNodeIdx!==-1) {
-                path.nodes[path.editorParentNodeIdx].position.setFromPoint(rayEndPoint);
-                console.info('Moved node '+path.editorParentNodeIdx);
+            selNodeIdx=this.getSelectNode();
+            if (selNodeIdx!==-1) {
+                path.nodes[selNodeIdx].position.setFromPoint(rayEndPoint);
+                console.info('Moved node '+selNodeIdx);
             }
         }
     }
@@ -349,6 +345,12 @@ export default class DeveloperClass
         return('');
     }
     
+    getSelectNode()
+    {
+        if (this.selectItemType===this.SELECT_ITEM_NODE) return(this.selectItemIndex);
+        return(-1);
+    }
+    
         //
         // developer movement
         //
@@ -407,8 +409,8 @@ export default class DeveloperClass
             
         yAdd=0;
         
-        if (input.isKeyDown('q')) yAdd=this.MOVE_SPEED*moveFactor;
-        if (input.isKeyDown('e')) yAdd=-(this.MOVE_SPEED*moveFactor);
+        if (input.isKeyDown('q')) yAdd=-(this.MOVE_SPEED*moveFactor);
+        if (input.isKeyDown('e')) yAdd=this.MOVE_SPEED*moveFactor;
         
             // movement
 
@@ -441,8 +443,8 @@ export default class DeveloperClass
             
         yAdd=0;
         
-        if (input.isKeyDown('q')) yAdd=this.MOVE_SPEED*moveFactor;
-        if (input.isKeyDown('e')) yAdd=-(this.MOVE_SPEED*moveFactor);
+        if (input.isKeyDown('q')) yAdd=-(this.MOVE_SPEED*moveFactor);
+        if (input.isKeyDown('e')) yAdd=this.MOVE_SPEED*moveFactor;
         
             // movement
 
@@ -511,6 +513,12 @@ export default class DeveloperClass
 
             this.position.setFromAddPoint(this.getSelectPosition(this.selectItemType,this.selectItemIndex),this.selectVector);
             this.core.interface.updateText('wsSelect',('select:'+this.getSelectName(this.selectItemType,this.selectItemIndex)));
+        }
+        
+            // push selected node to path editor
+            
+        if (this.selectItemType===this.SELECT_ITEM_NODE) {
+            this.core.map.path.editorParentNodeIdx=this.selectItemIndex;
         }
     }
     

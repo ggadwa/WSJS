@@ -144,6 +144,19 @@ export default class MeshListClass
     }
     
         //
+        // run
+        //
+        
+    run()
+    {
+        let mesh;
+        
+        for (mesh of this.meshes) {
+            if (mesh.movement!==null) mesh.movement.run();
+        }
+    }
+    
+        //
         // setup all the mesh buffers
         //
 

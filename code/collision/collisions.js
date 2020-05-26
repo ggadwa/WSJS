@@ -204,6 +204,94 @@ export default class CollisionClass
         return(currentDist!==-1);
     }
     
+    rayCubeQuadIntersection(rayPnt,rayVector,x0,y0,z0,x1,y1,z1,x2,y2,z2,x3,y3,z3,intersectPnt)
+    {
+        this.tempCollisionTrig.resetFromValues(x0,y0,z0,x2,y2,z2,x3,y3,z3);
+        
+        if (this.tempCollisionTrig.rayOverlapBounds(rayPnt,rayVector)) {
+            if (this.tempCollisionTrig.rayTrace(rayPnt,rayVector,intersectPnt)) return(true);
+        }
+
+        this.tempCollisionTrig.resetFromValues(x0,y0,z0,x1,y1,z1,x2,y2,z2);
+        
+        if (this.tempCollisionTrig.rayOverlapBounds(rayPnt,rayVector)) {
+            if (this.tempCollisionTrig.rayTrace(rayPnt,rayVector,intersectPnt)) return(true);
+        }
+        
+        return(false);
+    }
+    
+    rayCubeIntersection(rayPnt,rayVector,centerPnt,xSize,ySize,zSize,intersectPnt)
+    {
+        let dist,currentDist,rayDist;
+        
+        currentDist=-1;
+        rayDist=rayVector.length();
+        
+            // create a series of quads and ray trace
+            // against their triangles
+            
+        xSize=Math.trunc(xSize*0.5);
+        ySize=Math.trunc(ySize*0.5);
+        zSize=Math.trunc(zSize*0.5);
+            
+            // x
+            
+        if (this.rayCubeQuadIntersection(rayPnt,rayVector,(centerPnt.x-xSize),(centerPnt.y-ySize),(centerPnt.z-zSize),(centerPnt.x-xSize),(centerPnt.y-ySize),(centerPnt.z+zSize),(centerPnt.x-xSize),(centerPnt.y+ySize),(centerPnt.z+zSize),(centerPnt.x-xSize),(centerPnt.y+ySize),(centerPnt.z-zSize),this.rayHitPnt)) {
+            dist=rayPnt.distance(this.rayHitPnt);
+            if ((dist<rayDist) && ((dist<currentDist) || (currentDist===-1))) {
+                intersectPnt.setFromPoint(this.rayHitPnt);
+                currentDist=dist;
+            }
+        }
+        
+        if (this.rayCubeQuadIntersection(rayPnt,rayVector,(centerPnt.x+xSize),(centerPnt.y-ySize),(centerPnt.z-zSize),(centerPnt.x+xSize),(centerPnt.y-ySize),(centerPnt.z+zSize),(centerPnt.x+xSize),(centerPnt.y+ySize),(centerPnt.z+zSize),(centerPnt.x+xSize),(centerPnt.y+ySize),(centerPnt.z-zSize),this.rayHitPnt)) {
+            dist=rayPnt.distance(this.rayHitPnt);
+            if ((dist<rayDist) && ((dist<currentDist) || (currentDist===-1))) {
+                intersectPnt.setFromPoint(this.rayHitPnt);
+                currentDist=dist;
+            }
+        }
+        
+            // y
+            
+        if (this.rayCubeQuadIntersection(rayPnt,rayVector,(centerPnt.x-xSize),(centerPnt.y-ySize),(centerPnt.z-zSize),(centerPnt.x-xSize),(centerPnt.y-ySize),(centerPnt.z+zSize),(centerPnt.x+xSize),(centerPnt.y-ySize),(centerPnt.z+zSize),(centerPnt.x+xSize),(centerPnt.y-ySize),(centerPnt.z-zSize),this.rayHitPnt)) {
+            dist=rayPnt.distance(this.rayHitPnt);
+            if ((dist<rayDist) && ((dist<currentDist) || (currentDist===-1))) {
+                intersectPnt.setFromPoint(this.rayHitPnt);
+                currentDist=dist;
+            }
+        }
+        
+        if (this.rayCubeQuadIntersection(rayPnt,rayVector,(centerPnt.x-xSize),(centerPnt.y+ySize),(centerPnt.z-zSize),(centerPnt.x-xSize),(centerPnt.y+ySize),(centerPnt.z+zSize),(centerPnt.x+xSize),(centerPnt.y+ySize),(centerPnt.z+zSize),(centerPnt.x+xSize),(centerPnt.y+ySize),(centerPnt.z-zSize),this.rayHitPnt)) {
+            dist=rayPnt.distance(this.rayHitPnt);
+            if ((dist<rayDist) && ((dist<currentDist) || (currentDist===-1))) {
+                intersectPnt.setFromPoint(this.rayHitPnt);
+                currentDist=dist;
+            }
+        }
+        
+            // z
+            
+        if (this.rayCubeQuadIntersection(rayPnt,rayVector,(centerPnt.x-xSize),(centerPnt.y-ySize),(centerPnt.z-zSize),(centerPnt.x+xSize),(centerPnt.y-ySize),(centerPnt.z-zSize),(centerPnt.x+xSize),(centerPnt.y+ySize),(centerPnt.z-zSize),(centerPnt.x-xSize),(centerPnt.y+ySize),(centerPnt.z-zSize),this.rayHitPnt)) {
+            dist=rayPnt.distance(this.rayHitPnt);
+            if ((dist<rayDist) && ((dist<currentDist) || (currentDist===-1))) {
+                intersectPnt.setFromPoint(this.rayHitPnt);
+                currentDist=dist;
+            }
+        }
+            
+        if (this.rayCubeQuadIntersection(rayPnt,rayVector,(centerPnt.x-xSize),(centerPnt.y-ySize),(centerPnt.z+zSize),(centerPnt.x+xSize),(centerPnt.y-ySize),(centerPnt.z+zSize),(centerPnt.x+xSize),(centerPnt.y+ySize),(centerPnt.z+zSize),(centerPnt.x-xSize),(centerPnt.y+ySize),(centerPnt.z+zSize),this.rayHitPnt)) {
+            dist=rayPnt.distance(this.rayHitPnt);
+            if ((dist<rayDist) && ((dist<currentDist) || (currentDist===-1))) {
+                intersectPnt.setFromPoint(this.rayHitPnt);
+                currentDist=dist;
+            }
+        }
+            
+        return(currentDist!==-1);
+    }
+    
         //
         // entity collisions
         //

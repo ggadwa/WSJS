@@ -404,7 +404,7 @@ export default class EntityKartPlayerClass extends EntityClass
         
             // determine any cube hits
             
-        cube=this.findCubeContainingEntity();
+        cube=this.core.map.cubeList.findCubeContainingEntity(this);
         if (cube!==null) {
             if (cube.name==='goal') {
                 if (this.hitMidpoint) {
@@ -597,8 +597,8 @@ export default class EntityKartPlayerClass extends EntityClass
             this.previousLap=this.lap;
         }
         
-        //let cube=this.findCubeContainingEntity();
-        //if (cube!==null) console.info('in cube='+cube.name);
+        let cube=this.core.map.cubeList.findCubeContainingEntity(this);
+        if (cube!==null) console.info('in cube='+cube.name);
     }
     
         //

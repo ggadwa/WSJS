@@ -86,7 +86,7 @@ export default class DialogDeveloperClass extends DialogBaseClass
     buildPathHintsThreadFinish(message)
     {
         let upload;
-        let json=message.json;
+        let json=message.data.json;
         
             // end the thread
             

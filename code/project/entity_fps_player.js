@@ -490,7 +490,7 @@ export default class EntityFPSPlayerClass extends EntityClass
         let liquid,liquidIdx,bump,gravityFactor,fallDist;
         let weapon,firePrimary,fireSecondary,fireTertiary;
         let turnAdd,lookAdd,startWeaponIdx;
-        let mouseWheelClick;
+        let mouseWheelClick,cube;
         let input=this.core.input;
         let setup=this.core.setup;
         
@@ -763,6 +763,11 @@ export default class EntityFPSPlayerClass extends EntityClass
             // current animation
             
         this.setCurrentAnimation();
+        
+            // any cube actions
+            
+        cube=this.core.map.cubeList.findCubeContainingEntity(this);
+        if (cube!==null) this.runActions(this,cube.actions);
     }
     
     drawSetup()

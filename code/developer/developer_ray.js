@@ -9,7 +9,7 @@ export default class DeveloperRayClass
         this.core=core;
         
         this.LOOK_DISTANCE=80000;
-        this.ICON_CLICK_SIZE=500;
+        this.ICON_CLICK_SIZE=1000;
         
         this.targetItemType=-1;
         this.targetItemIndex=0;
@@ -22,7 +22,6 @@ export default class DeveloperRayClass
         this.lookVector=new PointClass(0,0,0);
         this.lookEndPoint=new PointClass(0,0,0);
         
-        this.iconPosition=new PointClass(0,0,0);
         this.rayIntersectPnt=new PointClass(0,0,0);
         
         this.rayXBound=new BoundClass(0,0,0);
@@ -150,7 +149,7 @@ export default class DeveloperRayClass
             
             if (this.collision.rayCylinderIntersection(pnt,vector,entity.originalPosition,entity.radius,entity.height,this.rayIntersectPnt)) {
                 dist=pnt.distance(this.rayIntersectPnt);
-                if ((dist<currentDist) || (currentDist===-1)) {
+                if ((dist<currentDist) || (currentDist===-1) || (this.targetItemType===this.core.game.developer.SELECT_ITEM_MESH)) {
                     this.targetItemType=this.core.game.developer.SELECT_ITEM_ENTITY;
                     this.targetItemIndex=n;
                     hitPnt.setFromPoint(this.rayIntersectPnt);
@@ -166,12 +165,9 @@ export default class DeveloperRayClass
         for (n=0;n!==nLight;n++) {
             light=this.core.map.lightList.lights[n];
             
-            this.iconPosition.setFromPoint(light.position);
-            this.iconPosition.y-this.ICON_CLICK_SIZE;
-            
-            if (this.collision.rayCylinderIntersection(pnt,vector,this.iconPosition,this.ICON_CLICK_SIZE,(this.ICON_CLICK_SIZE*2),this.rayIntersectPnt)) {
+            if (this.collision.rayCubeIntersection(pnt,vector,light.position,this.ICON_CLICK_SIZE,this.ICON_CLICK_SIZE,this.ICON_CLICK_SIZE,this.rayIntersectPnt)) {
                 dist=pnt.distance(this.rayIntersectPnt);
-                if ((dist<currentDist) || (currentDist===-1)) {
+                if ((dist<currentDist) || (currentDist===-1) || (this.targetItemType===this.core.game.developer.SELECT_ITEM_MESH)) {
                     this.targetItemType=this.core.game.developer.SELECT_ITEM_LIGHT;
                     this.targetItemIndex=n;
                     hitPnt.setFromPoint(this.rayIntersectPnt);
@@ -188,12 +184,9 @@ export default class DeveloperRayClass
             effect=this.core.map.effectList.effects[n];
             if (!effect.mapSpawn) continue;
             
-            this.iconPosition.setFromPoint(effect.position);
-            this.iconPosition.y-this.ICON_CLICK_SIZE;
-            
-            if (this.collision.rayCylinderIntersection(pnt,vector,this.iconPosition,this.ICON_CLICK_SIZE,(this.ICON_CLICK_SIZE*2),this.rayIntersectPnt)) {
+            if (this.collision.rayCubeIntersection(pnt,vector,effect.position,this.ICON_CLICK_SIZE,this.ICON_CLICK_SIZE,this.ICON_CLICK_SIZE,this.rayIntersectPnt)) {
                 dist=pnt.distance(this.rayIntersectPnt);
-                if ((dist<currentDist) || (currentDist===-1)) {
+                if ((dist<currentDist) || (currentDist===-1) || (this.targetItemType===this.core.game.developer.SELECT_ITEM_MESH)) {
                     this.targetItemType=this.core.game.developer.SELECT_ITEM_EFFECT;
                     this.targetItemIndex=n;
                     hitPnt.setFromPoint(this.rayIntersectPnt);
@@ -209,12 +202,10 @@ export default class DeveloperRayClass
         for (n=0;n!==nNode;n++) {
             node=this.core.map.path.nodes[n];
             
-            this.iconPosition.setFromPoint(node.position);
-            this.iconPosition.y-this.ICON_CLICK_SIZE;
-            
-            if (this.collision.rayCylinderIntersection(pnt,vector,this.iconPosition,this.ICON_CLICK_SIZE,(this.ICON_CLICK_SIZE*2),this.rayIntersectPnt)) {
+            if (this.collision.rayCubeIntersection(pnt,vector,node.position,this.ICON_CLICK_SIZE,this.ICON_CLICK_SIZE,this.ICON_CLICK_SIZE,this.rayIntersectPnt)) {
                 dist=pnt.distance(this.rayIntersectPnt);
-                if ((dist<currentDist) || (currentDist===-1)) {
+                if ((dist<currentDist) || (currentDist===-1) || (this.targetItemType===this.core.game.developer.SELECT_ITEM_MESH)) {
+                    
                     this.targetItemType=this.core.game.developer.SELECT_ITEM_NODE;
                     this.targetItemIndex=n;
                     hitPnt.setFromPoint(this.rayIntersectPnt);
@@ -247,6 +238,8 @@ export default class DeveloperRayClass
             this.lookEndPoint.setFromAddPoint(this.lookPoint,this.lookVector);
             this.core.interface.updateText('wsTarget','target:');
         }
+        
+        this.lookEndPoint.trunc();      // this can be used to position things so make sure it's an integer
     }
 
     draw()

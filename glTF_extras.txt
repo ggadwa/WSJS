@@ -4,6 +4,7 @@ These are extra bits of data (usually JSON) stored at either the mesh (for chang
 (for changing all meshes attached to that material) in the engine.  In Blender these would be custom properties on
 the mesh (NOT the object) or the material.
 
+The chart below explains the specific names and gives one or more JSON examples.
 
 Name                        Description
 ----                        -----------
@@ -13,6 +14,33 @@ wsjsSky                     Mesh is a sky box definition.  Material determines t
                                 {
                                     "size":50000
                                 }
+
+wsjsMove                    This mesh has an attached movement, defined by the value
+                                {
+                                    "rotateOffset":{"x":2000,"y":0,"z":0},
+                                    "moves":
+                                        [
+                                            {"tick":1500,"rotate":{"x":0,"y":0,"z":0},"pauseType":"leave","pauseData":18000,"sound":{"name":"door","rate":1.0,"randomRateAdd":0,"distance":25000,"loopStart":0,"loopEnd":0,"loop":false}},
+                                            {"tick":1500,"rotate":{"x":0,"y":85,"z":0},"pauseType":"approach","pauseData":18000,"sound":{"name":"door","rate":1.0,"randomRateAdd":0,"distance":25000,"loopStart":0,"loopEnd":0,"loop":false}}
+                                        ]
+                                }
+                                {
+                                    "moves":
+                                        [
+                                            {"tick":1000,"move":{"x":0,"y":0,"z":0}},
+                                            {"tick":1000,"move":{"x":0,"y":10000,"z":0},"pauseType":"trigger","pauseData":"gate_01","sound":{"name":"gate","rate":1.0,"randomRateAdd":0,"distance":55000,"loopStart":0,"loopEnd":0,"loop":false}},
+                                            {"tick":1000,"move":{"x":0,"y":10000,"z":0},"pauseType":"stop"}
+                                        ]
+                                }
+                                {
+                                    "moves":
+                                        [
+                                            {"tick":5000,"move":{"x":0,"y":0,"z":0},"sound":{"name":"stone_platform","rate":1.0,"randomRateAdd":0,"distance":60000,"loopStart":0,"loopEnd":0,"loop":false}},
+                                            {"tick":2000,"move":{"x":0,"y":0,"z":0},"trigger":"platform_top"},
+                                            {"tick":5000,"move":{"x":0,"y":-12600,"z":0},"sound":{"name":"stone_platform","rate":0.8,"randomRateAdd":0,"distance":60000,"loopStart":0,"loopEnd":0,"loop":false}},
+                                            {"tick":2000,"move":{"x":0,"y":-12600,"z":0},"trigger":"platform_bottom"}
+                                        ]
+                                },
 
 wsjsCube                    Mesh is a cube definition.  Mesh bounds determine cube volume
                                 {
@@ -48,6 +76,7 @@ wsjsLight                   Mesh is a light definition.  Center is center point 
 wsjsEffect                  Mesh is an effect definition.  Center is center point of effect
                                 {
                                     "name":"fire",
+                                    "show":true,
                                     "data":{"intensity":23000}
                                 }
 

@@ -5,6 +5,7 @@ import QuaternionClass from '../utility/quaternion.js';
 import MeshClass from '../mesh/mesh.js';
 import ModelClass from '../model/model.js';
 import ModelEntityAlterClass from '../model/model_entity_alter.js';
+import EffectClass from '../project/effect.js';
 import CollisionClass from '../collision/collisions.js';
 import NetworkClass from '../main/network.js';
 
@@ -276,7 +277,14 @@ export default class EntityClass
     
     addEffect(spawnedByEntity,jsonName,position,data,show)
     {
-        return(this.core.map.effectList.add(spawnedByEntity,jsonName,position,data,false,show));
+        let effect;
+
+        effect=new EffectClass(this.core,spawnedByEntity,jsonName,position,data,false,show);
+        if (!effect.initialize()) return(false);
+        
+        this.core.map.effectList.add(effect);
+        
+        return(true);
     }
     
         //
@@ -713,19 +721,18 @@ export default class EntityClass
         // it can't be pushed
         //
         
-    meshPush(meshIdx,movePnt,rotateAng)
+    meshPush(mesh,movePnt,rotateAng)
     {
         let lft,rgt,top,bot;
-        let mesh;
-        
-        mesh=this.core.map.meshList.get(meshIdx);
         
             // lifting
             
         if (movePnt.y<0) {
-            if (this.standOnMeshIdx===meshIdx) {
-                if (this.position.y<=mesh.yBound.min) {
-                    this.position.y=Math.trunc(mesh.yBound.min)+1;
+            if (this.standOnMeshIdx!==-1) {
+                if (this.core.map.meshList.meshes[this.standOnMeshIdx]===mesh) {
+                    if (this.position.y<=mesh.yBound.min) {
+                        this.position.y=Math.trunc(mesh.yBound.min)+1;
+                    }
                 }
             }
         }

@@ -211,7 +211,7 @@ class MainClass
         
             // load any map effects
             
-        if (!this.core.map.effectList.loadMapEffects()) return;        // halt on bad effect start
+        if (!this.core.map.effectList.initializeMapEffects()) return;        // halt on bad effect start
 
             // load the entities
             
@@ -343,7 +343,7 @@ function mainLoop(timestamp)
                 core.physicsTick-=PHYSICS_MILLISECONDS;
                 core.lastPhysicTimestamp+=PHYSICS_MILLISECONDS;
 
-                map.movementList.run();
+                map.meshList.run();
                 core.game.run();
                 map.entityList.run();
             }

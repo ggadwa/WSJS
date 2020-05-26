@@ -39,16 +39,9 @@ export default class MapEffectListClass
         // effect list
         //
 
-    add(spawnedBy,jsonName,position,data,mapSpawn,show)
+    add(effect)
     {
-        let effect;
-        
-        effect=new EffectClass(this.core,spawnedBy,jsonName,position,data,mapSpawn,show);
-        if (!effect.initialize()) return(false);
-        
         this.effects.push(effect);
-        
-        return(true);
     }
     
     cleanUpMarkedAsDeleted()
@@ -65,51 +58,17 @@ export default class MapEffectListClass
     }
     
         //
-        // load map effects
+        // initialize map effects
         //
         
-    loadMapEffects()
+    initializeMapEffects()
     {
-        let effectList=this.core.map.json.effects;
-        let n,effectDef,effectPosition,effectShow,meshIdx;
+        let effect;
         
-        if (effectList===undefined) return(true);
-        
-            // load effects from map import settings
-             
-        for (n=0;n!==effectList.length;n++) {
-            effectDef=effectList[n];
-
-                // determine the position
-
-            if (effectDef.position!==undefined) {
-                effectPosition=new PointClass(effectDef.position.x,effectDef.position.y,effectDef.position.z);
-            }
-            else {
-                if (effectDef.attachMesh!==undefined) {
-                    
-                    meshIdx=this.core.map.meshList.find(effectDef.attachMesh);
-                    if (meshIdx===-1) {
-                        console.log('Unknown mesh to attach effect to: '+effectDef.attachMesh);
-                        return(false);
-                    }
-                    
-                    effectPosition=this.core.map.meshList.meshes[meshIdx].center.copy();
-                    if (effectDef.attachOffset!==undefined) effectPosition.addValues(effectDef.attachOffset.x,effectDef.attachOffset.y,effectDef.attachOffset.z);
-                }
-                else {
-                    effectPosition=new PointClass(0,0,0);
-                }
-            }
-
-                // create the effect
-
-            effectShow=true;
-            if (effectDef.show!==undefined) effectShow=effectDef.show;
-
-            if (!this.add(null,effectDef.json,effectPosition,effectDef.data,true,effectShow)) return(false);
+        for (effect of this.effects) {
+            if (!effect.initialize()) return(false);
         }
-        
+
         return(true);
     }
     

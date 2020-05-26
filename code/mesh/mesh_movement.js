@@ -1,14 +1,14 @@
 import PointClass from '../utility/point.js';
-import MoveClass from '../map/move.js';
 import MeshClass from '../mesh/mesh.js';
+import MeshMoveClass from '../mesh/mesh_move.js';
 
 //
 // movement class
 //
 
-export default class MovementClass
+export default class MeshMovementClass
 {
-    constructor(core,meshIdxList,reverseMeshIdxList,rotateOffset,centerOffset)
+    constructor(core,mesh,rotateOffset)
     {
         this.MOVEMENT_PAUSE_NONE=0;
         this.MOVEMENT_PAUSE_TRIGGER=1;
@@ -17,10 +17,8 @@ export default class MovementClass
         this.MOVEMENT_PAUSE_STOP=4;
     
         this.core=core;
-        this.meshIdxList=meshIdxList;
-        this.reverseMeshIdxList=reverseMeshIdxList;
+        this.mesh=mesh;
         this.rotateOffset=rotateOffset;
-        this.centerOffset=centerOffset;
         
         this.reverseRotateOffet=new PointClass(-this.rotateOffset.x,-this.rotateOffset.x,-this.rotateOffset.z);
         
@@ -57,8 +55,7 @@ export default class MovementClass
     
     run()
     {
-        let n,nMesh;
-        let mesh,paused,nextIdx,prevIdx,needPush;
+        let paused,nextIdx,prevIdx,needPush;
         let f,move;
         
             // skip if no moves or we
@@ -67,29 +64,11 @@ export default class MovementClass
         if (this.stopped) return;
         if (this.moves.length===0) return;
         
-            // the mesh count
-            
-        nMesh=this.meshIdxList.length;
-        
             // the first time we run, we grab the
-            // current center point for all meshes
+            // current center point for the mesh
             // because a big movement can change the distance
             
-        if (this.originalCenterPnt===null) {
-            
-            this.originalCenterPnt=new PointClass(0,0,0);
-            
-            for (n=0;n!==nMesh;n++) {
-                mesh=this.core.map.meshList.get(this.meshIdxList[n]);
-                this.originalCenterPnt.addPoint(mesh.center);
-            }
-            
-            this.originalCenterPnt.x=Math.trunc(this.originalCenterPnt.x/nMesh);
-            this.originalCenterPnt.y=Math.trunc(this.originalCenterPnt.y/nMesh);
-            this.originalCenterPnt.z=Math.trunc(this.originalCenterPnt.z/nMesh);
-            
-            this.originalCenterPnt.addPoint(this.centerOffset);        // a special offset so the approach center can be moved
-        }
+        if (this.originalCenterPnt===null) this.originalCenterPnt=this.mesh.center.copy();
         
             // are we moving to another movement?
             
@@ -132,7 +111,7 @@ export default class MovementClass
                     // set any trigger or sound
                     
                 if (move.triggerName!==null) this.core.setTrigger(move.triggerName);
-                if (move.sound!==null) this.core.soundList.playJson(this.core.map.meshList.get(this.meshIdxList[0]).center,move.sound);
+                if (move.sound!==null) this.core.soundList.playJson(this.mesh.center,move.sound);
             }
         }
         
@@ -173,49 +152,18 @@ export default class MovementClass
             // we set a moving flag here because bots need to
             // detect if they are on moving platforms and pause
         
-        for (n=0;n!==nMesh;n++) {
-            mesh=this.core.map.meshList.get(this.meshIdxList[n]);
-            
-            needPush=false;
-            
-            if (!this.movePnt.isZero()) {
-                needPush=true;
-                mesh.move(this.movePnt);
-            }
-            
-            if (!this.rotateAng.isZero()) {
-                needPush=true;
-                mesh.rotate(this.rotateAng,this.rotateOffset);
-            }
-            
-            if (needPush) this.core.map.entityList.meshPush(this.meshIdxList[n],this.movePnt,this.rotateAng);
+        needPush=false;
+
+        if (!this.movePnt.isZero()) {
+            needPush=true;
+            this.mesh.move(this.movePnt);
         }
-        
-            // do reverse moves
-            
-        if (this.reverseMeshIdxList!==null) {
-            nMesh=this.reverseMeshIdxList.length;
-            
-            this.movePnt.scale(-1);
-            this.rotateAng.scale(-1);
-        
-            for (n=0;n!==nMesh;n++) {
-                mesh=this.core.map.meshList.get(this.reverseMeshIdxList[n]);
-                
-                needPush=false;
-                
-                if (!this.movePnt.isZero()) {
-                    needPush=true;
-                    mesh.move(this.movePnt);
-                }
-                
-                if (!this.rotateAng.isZero()) {
-                    needPush=true;
-                    mesh.rotate(this.rotateAng,this.reverseRotateOffet);
-                }
-                
-                if (needPush) this.core.map.entityList.meshPush(this.reverseMeshIdxList[n],this.movePnt,this.rotateAng);
-            }
+
+        if (!this.rotateAng.isZero()) {
+            needPush=true;
+            this.mesh.rotate(this.rotateAng,this.rotateOffset);
         }
+
+        if (needPush) this.core.map.entityList.meshPush(this.mesh,this.movePnt,this.rotateAng);
     }
 }

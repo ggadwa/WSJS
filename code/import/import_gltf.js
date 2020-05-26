@@ -3,7 +3,12 @@ import ColorClass from '../utility/color.js';
 import QuaternionClass from '../utility/quaternion.js';
 import Matrix4Class from '../utility/matrix4.js';
 import MeshClass from '../mesh/mesh.js';
+import LightClass from '../light/light.js';
+import MeshMoveClass from '../mesh/mesh_move.js';
+import MeshMovementClass from '../mesh/mesh_movement.js';
+import MapCubeClass from '../map/map_cube.js';
 import MapLiquidClass from '../map/map_liquid.js';
+import EffectClass from '../project/effect.js';
 import ModelNodeClass from '../model/model_node.js';
 import ModelSkinClass from '../model/model_skin.js';
 import ModelJointClass from '../model/model_joint.js';
@@ -20,6 +25,10 @@ export default class ImportGLTFClass
     {
         this.core=core;
         this.json=json;
+        
+        this.MESH_INFORMATIONAL_KEEP=0;
+        this.MESH_INFORMATIONAL_REMOVE=1;
+        this.MESH_INFORMATIONAL_ERROR=2;
         
         this.jsonData=null;
         this.binData=null;
@@ -559,6 +568,13 @@ export default class ImportGLTFClass
         let prefixURL='models/'+this.json.name+'/';
         let materialNode=this.jsonData.materials[primitiveNode.material];
         
+            // no material at all
+            
+        if (materialNode===undefined) {
+            console.log('Mesh '+meshNode.name+' has no material.');
+            return(null);
+        }
+        
             // first find any normal texture
             
         if (materialNode.normalTexture!==undefined) {
@@ -674,7 +690,8 @@ export default class ImportGLTFClass
         
     decodeMapMeshInformational(map,materialNode,meshNode,mesh)
     {
-        let value,obj,liquid;
+        let n,value,obj;
+        let moveDef,movePoint,moveRotate,rotateOffset;
         
             // skyboxes
             
@@ -685,8 +702,43 @@ export default class ImportGLTFClass
             map.sky.on=true;
             map.sky.size=obj.size;
             map.sky.bitmap=mesh.bitmap;
+            return(this.MESH_INFORMATIONAL_REMOVE);
+        }
+        
+            // lights
             
-            return(true);
+        value=this.getCustomProperty(materialNode,meshNode,'wsjsLight');
+        if (value!==null) {
+            obj=JSON.parse(value);
+            
+            map.lightList.add(new LightClass(mesh.center,new ColorClass(obj.color.r,obj.color.g,obj.color.b),obj.intensity,obj.exponent,obj.ambient));
+            return(this.MESH_INFORMATIONAL_REMOVE);
+        }
+        
+            // movements
+            
+        value=this.getCustomProperty(materialNode,meshNode,'wsjsMove');
+        if (value!==null) {
+            obj=JSON.parse(value);
+            
+            rotateOffset=new PointClass(0,0,0);
+            if (obj.rotateOffset!==undefined) rotateOffset.setFromValues(obj.rotateOffset.x,obj.rotateOffset.y,obj.rotateOffset.z);
+
+            mesh.movement=new MeshMovementClass(this.core,mesh,rotateOffset);
+
+            for (n=0;n!==obj.moves.length;n++) {
+                moveDef=obj.moves[n];
+
+                movePoint=new PointClass(0,0,0);
+                if (moveDef.move!==undefined) movePoint.setFromValues(moveDef.move.x,moveDef.move.y,moveDef.move.z);
+
+                moveRotate=new PointClass(0,0,0);
+                if (moveDef.rotate!==undefined) moveRotate.setFromValues(moveDef.rotate.x,moveDef.rotate.y,moveDef.rotate.z);
+
+                mesh.movement.addMove(new MeshMoveClass(moveDef.tick,movePoint,moveRotate,mesh.movement.lookupPauseType(moveDef.pauseType),((moveDef.pauseData===undefined)?null:moveDef.pauseData),((moveDef.sound===undefined)?null:moveDef.sound),((moveDef.trigger===undefined)?null:moveDef.trigger)));
+            }
+            
+            return(this.MESH_INFORMATIONAL_KEEP);
         }
         
             // cubes
@@ -694,8 +746,9 @@ export default class ImportGLTFClass
         value=this.getCustomProperty(materialNode,meshNode,'wsjsCube');
         if (value!==null) {
             obj=JSON.parse(value);
-            
-            return(true);
+
+            map.cubeList.add(new MapCubeClass(obj.name,obj.actions,mesh.xBound,mesh.yBound,mesh.zBound,obj.data));
+            return(this.MESH_INFORMATIONAL_REMOVE);
         }
         
             // liquids
@@ -703,14 +756,22 @@ export default class ImportGLTFClass
         value=this.getCustomProperty(materialNode,meshNode,'wsjsLiquid');
         if (value!==null) {
             obj=JSON.parse(value);
+
+            map.liquidList.add(new MapLiquidClass(this.core,mesh.bitmap,obj.waveSize,obj.wavePeriod,obj.waveHeight,obj.waveUVStamp,new PointClass(obj.uvShift[0],obj.uvShift[1],0),obj.gravityFactor,new ColorClass(obj.tint[0],obj.tint[1],obj.tint[2]),obj.soundIn,obj.soundOut,mesh.xBound,mesh.yBound,mesh.zBound));
+            return(this.MESH_INFORMATIONAL_REMOVE);
+        }
+        
+            // effects
             
-            liquid=new MapLiquidClass(this.core,mesh.bitmap,obj.waveSize,obj.wavePeriod,obj.waveHeight,obj.waveUVStamp,new PointClass(obj.uvShift[0],obj.uvShift[1],0),obj.gravityFactor,new ColorClass(obj.tint[0],obj.tint[1],obj.tint[2]),obj.soundIn,obj.soundOut,mesh.xBound,mesh.yBound,mesh.zBound);
-            map.liquidList.add(liquid);
+        value=this.getCustomProperty(materialNode,meshNode,'wsjsEffect');
+        if (value!==null) {
+            obj=JSON.parse(value);
             
-            return(true);
+            map.effectList.add(new EffectClass(this.core,null,obj.name,mesh.center,obj.data,true,obj.show));
+            return(this.MESH_INFORMATIONAL_REMOVE);
         }
 
-        return(false);
+        return(this.MESH_INFORMATIONAL_KEEP);
     }
     
         //
@@ -723,7 +784,7 @@ export default class ImportGLTFClass
         let vertexArray,normalArray,tangentArray,uvArray,indexArray;
         let jointArray,weightArray,fakeArrayLen,noSkinAttachedNodeIdx,skinIdx;
         let nIdx,forceTangentRebuild;
-        let mesh,materialNode,bitmap,curBitmapName;
+        let mesh,materialNode,bitmap,curBitmapName,informResult;
         let v=new PointClass(0,0,0);
         let normal=new PointClass(0,0,0);
         let tangent=new PointClass(0,0,0);
@@ -897,7 +958,9 @@ export default class ImportGLTFClass
                 if (this.getCustomProperty(materialNode,meshNode,'wsjsNoCollision')!==null) mesh.noCollisions=true;
                 
                 if (map!==null) {
-                    if (this.decodeMapMeshInformational(map,materialNode,meshNode,mesh)) continue;     // mesh is information so it's not part of model
+                    informResult=this.decodeMapMeshInformational(map,materialNode,meshNode,mesh);
+                    if (informResult===this.MESH_INFORMATIONAL_ERROR) return(false);
+                    if (informResult===this.MESH_INFORMATIONAL_REMOVE) continue;
                 }
                 
                     // finally add it to model

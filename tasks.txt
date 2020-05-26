@@ -1,54 +1,83 @@
 
 
-- do cubes
-   - cubes can do actions
-   - add instantKill to actions
+latern_lamp01
+
+
+latern_lamp01.003
+{"name":"fire","show":true,"data":{"intensity":40000}}
+
+lamp02
+{"name":"fire","show":true,"data":{"intensity":40000}}
+
+latern_lamp02.002
+{"name":"fire","show":true,"data":{"intensity":40000}}
+
+latern_lamp003
+{"name":"fire","show":true,"data":{"intensity":40000}}
+
+latern_lamp004
+{"name":"fire","show":true,"data":{"intensity":40000}}
+
+latern_lamp005
+{"name":"fire","show":true,"data":{"intensity":40000}}
+
+latern_lamp006
+{"name":"fire","show":true,"data":{"intensity":40000}}
+
+LAMP14
+{"name":"fire","show":true,"data":{"intensity":14000}}
+
+LAMP16
+{"name":"fire","show":true,"data":{"intensity":12000}}
+
+LAMP08
+{"name":"fire","show":true,"data":{"intensity":12000}}
+
+LAMP10
+{"name":"fire","show":true,"data":{"intensity":14000}}
+
+
+
+
+- make all entity animations []
+- separate animations and sounds on entities into own object
 
 - car path threads
-- need a lock for look down, use 7 for now
+- get kart bots working again
+
+- eventually get rid of import_map/import_model?
 
 wsjsLight/wsjsEffect/wsjsEntity
 
 
-- dungeon death pit
-
-{"name":"kill_pit_1","actions":[{"action":"kill"}],"data":{}}
-{"name":"goal","actions":[],"data":{}}
 
 - use custom meshes for liquid volumes/cubes/effects/lights
 
 - swipe up for grenade
-- delete rest of old demo scripts
-- fix seams on skybox (need different filters)
+- fix seams on sky box?
 
 SHADOW MAPS
  - uploads need to delete old map/folder
 
-
 EDIT MODE
   - right click to start split
+  - way to put in node key name
   - stop all sounds
 
 PHYSICS
   - fix wacky bumping
-
-- bouncing up on bits of pillar in castle map is bad, should not be able to stand on those
-
-
+  - bouncing up on bits of pillar in castle map is bad, should not be able to stand on those
 
 BOTS
    - they seem to continue to fight with the dead
    - extra weapon fires (needs config for how often it uses extra weapons)
 
-- kart move out the weapons, clean up entity_kart_player from weapons, implement follow floor projectile
+KART
+  - kart move out the weapons, clean up entity_kart_player from weapons, implement follow floor projectile
 
-- death messages by game with json setup
-
-- bots/remotes (no need for game json for remotes)
-
-- eventually clean up entity and unecessary pass through APIs
-
-
+MISC
+  - death messages by game with json setup
+  - eventually clean up entity and unecessary pass through APIs
 
 NETWORKING
     - multiplayer needs a complete rebuild

@@ -130,32 +130,25 @@ export default class SoundListClass
 
     async loadAllSounds()
     {
-        let n,k;
-        let mapDef,entityDef,effectDef,keys,key;
-        let movementDef,moveDef;
+        let entityDef,effectDef,keys,key;
+        let mesh,move,liquid;
         let keyIter,rtn;
         let success,promises;
         let game=this.core.game;
         
-            // go throw the jsons and find
-            // all the sounds, we look at 
-            // maps, entities, and effects
+            // map based sounds
             
-        keys=Object.keys(game.jsonMapCache);
-        
-        for (key of keys)
-        {
-            mapDef=game.jsonMapCache[key];
-            if ((mapDef.movements===undefined) || (mapDef.movements===null)) continue;
-            
-            for (n=0;n!==mapDef.movements.length;n++) {
-                movementDef=mapDef.movements[n];
-                for (k=0;k!==movementDef.moves.length;k++) {
-                    moveDef=movementDef.moves[k];
-                    if ((moveDef.sound!==undefined) && (moveDef.sound!==null)) this.addSoundByNameAttribute(moveDef.sound);
+        for (mesh of this.core.map.meshList.meshes) {
+            if (mesh.movement!==null) {
+                for (move of mesh.movement.moves) {
+                    if (move.sound!==null) this.addSound(move.sound.name);
                 }
-                
             }
+        }
+        
+        for (liquid of this.core.map.liquidList.liquids) {
+            if (liquid.soundIn!==null) this.addSound(liquid.soundIn.name);
+            if (liquid.soundOut!==null) this.addSound(liquid.soundOut.name);
         }
             
         keys=Object.keys(game.jsonEntityCache);
@@ -195,10 +188,6 @@ export default class SoundListClass
             this.addSoundBySoundNameAttribute(effectDef);
         }
         
-        // supergumba -- temporary
-        
-        this.addSound('splash');
-            
             // load the sounds
             
         promises=[];
