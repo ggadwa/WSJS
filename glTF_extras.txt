@@ -80,3 +80,11 @@ wsjsEffect                  Mesh is an effect definition.  Center is center poin
                                     "data":{"intensity":23000}
                                 }
 
+wsjsEntity                  Mesh is an entity definition.  Center is center point of entity
+                                {
+                                    "model":"pickup_m16",
+                                    "name":"m16_01",
+                                    "angle":{"x":0,"y":0,"z":0},        ?? can we get this from cube?
+                                    "show":true,
+                                    "data":{"pickupOnce":true}
+                                }

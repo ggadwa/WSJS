@@ -58,6 +58,8 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.jumpHeight=0;
         this.nextDamageTick=0;
        
+        this.sleepAnimation=null;
+        this.wakeUpAnimation=null;
         this.idleAnimation=null;
         this.walkAnimation=null;
         this.melee1Animation=null;
@@ -136,6 +138,8 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.damageMovementFreezeTick=this.core.game.lookupValue(this.json.config.damageMovementFreezeTick,this.data,0);
         this.fallSoundWaitTick=this.core.game.lookupValue(this.json.config.fallSoundWaitTick,this.data,0);
         
+        this.sleepAnimation=this.core.game.lookupAnimationValue(this.json.config.sleepAnimation);
+        this.wakeUpAnimation=this.core.game.lookupAnimationValue(this.json.config.wakeUpAnimation);
         this.idleAnimation=this.core.game.lookupAnimationValue(this.json.config.idleAnimation);
         this.walkAnimation=this.core.game.lookupAnimationValue(this.json.config.walkAnimation);
         this.melee1Animation=this.core.game.lookupAnimationValue(this.json.config.melee1Animation);
@@ -171,7 +175,7 @@ export default class EntityFPSMonsterClass extends EntityClass
             
             // start idle animation
         
-        this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.idleAnimation[0],this.idleAnimation[1]);
+        this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.sleepAnimation[0],this.sleepAnimation[1]);
     }
     
     wakeUp()
@@ -190,7 +194,10 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.nextDamageTick=this.core.timestamp;
         
         this.core.soundList.playJson(this.position,this.wakeUpSound);
-        this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.walkAnimation[0],this.walkAnimation[1]);
+        this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.wakeUpAnimation[0],this.wakeUpAnimation[1]);
+        this.modelEntityAlter.queueAnimationChunkInFrames(null,30,this.walkAnimation[0],this.walkAnimation[1]);
+        
+        // this.modelEntityAlter.getAnimationTickCount(null,30,this.wakeUpAnimation[0],this.wakeUpAnimation[1])
     }
     
     sleep()
@@ -204,10 +211,17 @@ export default class EntityFPSMonsterClass extends EntityClass
     
     damage(fromEntity,damage,hitPoint)
     {
+        let wakingUp;
+        
         if (this.dead) return;
         
         this.health-=damage;
-        if (!this.awoke) this.wakeUp();
+        
+        wakingUp=false;
+        if (!this.awoke) {
+            wakingUp=true;
+            this.wakeUp();
+        }
         
             // any freezes
             
@@ -219,9 +233,11 @@ export default class EntityFPSMonsterClass extends EntityClass
             if (this.core.timestamp>this.nextDamageTick) {
                 this.nextDamageTick=this.core.timestamp+this.damageFlinchWaitTick;
 
-                this.core.soundList.playJson(this.position,this.hurtSound);
-                this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.hitAnimation[0],this.hitAnimation[1]);
-                this.modelEntityAlter.queueAnimationChunkInFrames(null,30,this.walkAnimation[0],this.walkAnimation[1]);
+                if (!wakingUp) {
+                    this.core.soundList.playJson(this.position,this.hurtSound);
+                    this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.hitAnimation[0],this.hitAnimation[1]);
+                    this.modelEntityAlter.queueAnimationChunkInFrames(null,30,this.walkAnimation[0],this.walkAnimation[1]);
+                }
             }
             return;
         }

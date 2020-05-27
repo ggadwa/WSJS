@@ -1,57 +1,30 @@
 
 
-latern_lamp01
-
-
-latern_lamp01.003
-{"name":"fire","show":true,"data":{"intensity":40000}}
-
-lamp02
-{"name":"fire","show":true,"data":{"intensity":40000}}
-
-latern_lamp02.002
-{"name":"fire","show":true,"data":{"intensity":40000}}
-
-latern_lamp003
-{"name":"fire","show":true,"data":{"intensity":40000}}
-
-latern_lamp004
-{"name":"fire","show":true,"data":{"intensity":40000}}
-
-latern_lamp005
-{"name":"fire","show":true,"data":{"intensity":40000}}
-
-latern_lamp006
-{"name":"fire","show":true,"data":{"intensity":40000}}
-
-LAMP14
-{"name":"fire","show":true,"data":{"intensity":14000}}
-
-LAMP16
-{"name":"fire","show":true,"data":{"intensity":12000}}
-
-LAMP08
-{"name":"fire","show":true,"data":{"intensity":12000}}
-
-LAMP10
-{"name":"fire","show":true,"data":{"intensity":14000}}
+- wsjsEntity
+- map settings
 
 
 
+- monsters
+   - need state / asleep / waking up / hurting / melee / firing / idle / stalking
+   - need to wait for animation to complete on each state, can't interrupt
+   - pause based on animation fps count
+   - remove the old hard set flinch/etc/pauses
+   - rename melee left/right
+   - can't fire or melee if not in stalk state
+   - only turn if stalking
+   - make a wake-up and death trigger and spawn trigger (close gate?)
+   - warp in spiders on wake up 
+   - separate animations and sounds on entities into own object
 
-- make all entity animations []
-- separate animations and sounds on entities into own object
-
-- car path threads
 - get kart bots working again
 
 - eventually get rid of import_map/import_model?
 
-wsjsLight/wsjsEffect/wsjsEntity
 
 
 
-- use custom meshes for liquid volumes/cubes/effects/lights
+
 
 - swipe up for grenade
 - fix seams on sky box?

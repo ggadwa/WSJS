@@ -515,6 +515,11 @@ export default class ModelEntityAlterClass
         return(this.queuedAnimationIdx!==-1);
     }
     
+    getAnimationTickCount(name,framesPerSecond,loopStartFrame,loopEndFrame)
+    {
+        return(Math.trunc((loopEndFrame-loopStartFrame)*(1000/framesPerSecond)));
+    }
+    
         //
         // hard set bone changes, these can only be used when
         // an animation is not running
