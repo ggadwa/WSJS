@@ -430,7 +430,8 @@ export default class MeshListClass
             if (!this.core.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) continue;
             
                 // draw the walls in green
-                // or yellow if simple
+                
+            gl.uniform3f(shader.colorUniform,0.0,1.0,0.0);
 
             idx=0;
             
@@ -449,13 +450,13 @@ export default class MeshListClass
             }
             
             if (idx!==0) {
-                gl.uniform3f(shader.colorUniform,0.0,1.0,0.0);
                 gl.bufferSubData(gl.ARRAY_BUFFER,0,vertexes,0,idx);
                 gl.drawArrays(gl.TRIANGLES,0,idx);
             }
             
                 // draw the floors in blue
-                // or puple is simple
+                
+            gl.uniform3f(shader.colorUniform,0.0,0.0,1.0);
 
             idx=0;
             
@@ -474,13 +475,13 @@ export default class MeshListClass
             }
                 
             if (idx!==0) {
-                gl.uniform3f(shader.colorUniform,0.0,0.0,1.0);
                 gl.bufferSubData(gl.ARRAY_BUFFER,0,vertexes,0,idx);
                 gl.drawArrays(gl.TRIANGLES,0,idx);
             }
             
                 // draw the ceilings in red
-                // or orange if simple
+            
+            gl.uniform3f(shader.colorUniform,1.0,0.4,0.0);
 
             idx=0;
             
@@ -499,7 +500,6 @@ export default class MeshListClass
             }
                 
             if (idx!==0) {
-                gl.uniform3f(shader.colorUniform,1.0,0.4,0.0);
                 gl.bufferSubData(gl.ARRAY_BUFFER,0,vertexes,0,idx);
                 gl.drawArrays(gl.TRIANGLES,0,idx);
             }

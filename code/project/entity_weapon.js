@@ -111,7 +111,7 @@ export default class EntityWeaponClass extends EntityClass
     {
         if (!super.initialize()) return(false);
         
-        this.idleAnimation=this.json.config.idleAnimation;
+        this.idleAnimation=this.json.animations.idleAnimation;
         
         this.interfaceCrosshair=this.core.game.lookupValue(this.json.config.interfaceCrosshair,this.data);
        

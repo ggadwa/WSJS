@@ -99,9 +99,9 @@ export default class EntityFPSPlayerClass extends EntityClass
         
         if (!super.initialize()) return(false);
         
-        this.idleAnimation=this.core.game.lookupAnimationValue(this.json.config.idleAnimation);
-        this.runAnimation=this.core.game.lookupAnimationValue(this.json.config.runAnimation);
-        this.dieAnimation=this.core.game.lookupAnimationValue(this.json.config.dieAnimation);
+        this.idleAnimation=this.core.game.lookupAnimationValue(this.json.animations.idleAnimation);
+        this.runAnimation=this.core.game.lookupAnimationValue(this.json.animations.runAnimation);
+        this.dieAnimation=this.core.game.lookupAnimationValue(this.json.animations.dieAnimation);
         
         this.healthInitialCount=this.core.game.lookupValue(this.json.config.healthInitialCount,this.data,0);
         this.healthMaxCount=this.core.game.lookupValue(this.json.config.healthMaxCount,this.data,0);
@@ -146,8 +146,8 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.hitIndicator=this.core.game.lookupValue(this.json.config.hitIndicator,this.data,null);
         this.hitIndicatorFlashTick=this.core.game.lookupValue(this.json.config.hitIndicatorFlashTick,this.data,0);
         
-        this.hurtSound=this.core.game.lookupSoundValue(this.json.config.hurtSound);
-        this.dieSound=this.core.game.lookupSoundValue(this.json.config.dieSound);
+        this.hurtSound=this.core.game.lookupSoundValue(this.json.sounds.hurtSound);
+        this.dieSound=this.core.game.lookupSoundValue(this.json.sounds.dieSound);
         
         this.nextDamageTick=0;
         this.lastInLiquidIdx=-1;

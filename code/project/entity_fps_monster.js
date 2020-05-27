@@ -13,23 +13,30 @@ export default class EntityFPSMonsterClass extends EntityClass
     {
         super(core,name,json,position,angle,data,mapSpawn);
         
+        this.STATE_HIDDEN=0;
+        this.STATE_ASLEEP=1;
+        this.STATE_WAKING_UP=2;
+        this.STATE_IDLE=3;
+        this.STATE_STALKING=4;
+        this.STATE_HURT=5;
+        this.STATE_MELEE=6;
+        this.STATE_PROJECTILE=7;
+        this.STATE_DYING=8;
+        this.STATE_DEAD=9;
+        
+        this.state=this.STATE_ASLEEP;
         this.fighter=true;
         
         this.health=0;
         this.startHealth=0;
-        this.awoke=false;
-        this.dead=false;
         this.wakeUpDistance=0;
-        this.fallAsleepDistance=0;
+        this.idleDistance=0;
         this.meleeDistance=0;
         this.meleeWaitTick=0;
-        this.meleeDamageTick=0;
         this.nextMeleeTick=0;
         this.meleeDamage=0;
-        this.meleeStartTick=-1;
         this.projectileDistance=0;
         this.projectileWaitTick=0;
-        this.projectileFireTick=0;
         this.nextProjectileTick=0;
         this.projectileStartTick=-1;
         this.projectileFirePosition=null;
@@ -49,10 +56,6 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.slideMoveTick=0;
         this.angleYProjectileRange=5;
         this.angleYMeleeRange=15;
-        this.damageFlinchWaitTick=500;
-        this.meleeMovementFreezeTick=0;
-        this.projectileMovementFreezeTick=0;
-        this.damageMovementFreezeTick=0;
         this.jumpWaitTick=0;
         this.nextJumpTick=0;
         this.jumpHeight=0;
@@ -62,19 +65,25 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.wakeUpAnimation=null;
         this.idleAnimation=null;
         this.walkAnimation=null;
-        this.melee1Animation=null;
-        this.melee2Animation=null;
+        this.meleeLeftAnimation=null;
+        this.meleeRightAnimation=null;
         this.projectileAnimation=null;
         this.hitAnimation=null;
         this.deathAnimation=null;
+        this.meleeLeftHitFrame=0;
+        this.meleeRightHitFrame=0;
+        this.projectileFireFrame=0;
+        this.deathFallSoundFrame=0;
+        
         this.wakeUpSound=null;
         this.hurtSound=null;
         this.meleeSound=null;
         this.deathSound=null;
         this.fallSound=null;
-        this.fallSoundWaitTick=0;
         
         this.fallSoundNextTick=0;
+        this.meleeHitNextTick=0;
+        this.projectileFireNextTick=0;
         
         this.lastInLiquidIdx=-1;
         
@@ -82,6 +91,12 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.slideNextTick=0;
         
         this.movementFreezeNextTick=0;
+        
+        this.wakeUpSetTriggerName=null;
+        this.deathSetTriggerName=null;
+        this.showTriggerName=null;
+        
+        this.animationFinishTick=0;
         
             // pre-allocations
 
@@ -102,16 +117,14 @@ export default class EntityFPSMonsterClass extends EntityClass
         
         this.startHealth=this.core.game.lookupValue(this.json.config.startHealth,this.data,0);
         this.wakeUpDistance=this.core.game.lookupValue(this.json.config.wakeUpDistance,this.data,0);
-        this.fallAsleepDistance=this.core.game.lookupValue(this.json.config.fallAsleepDistance,this.data,0);
+        this.idleDistance=this.core.game.lookupValue(this.json.config.idleDistance,this.data,0);
         
         this.meleeDistance=this.core.game.lookupValue(this.json.config.meleeDistance,this.data,0);
         this.meleeWaitTick=this.core.game.lookupValue(this.json.config.meleeWaitTick,this.data,0);
-        this.meleeDamageTick=this.core.game.lookupValue(this.json.config.meleeDamageTick,this.data,0);
         this.meleeDamage=this.core.game.lookupValue(this.json.config.meleeDamage,this.data,0);
         
         this.projectileDistance=this.core.game.lookupValue(this.json.config.projectileDistance,this.data,0);
         this.projectileWaitTick=this.core.game.lookupValue(this.json.config.projectileWaitTick,this.data,0);
-        this.projectileFireTick=this.core.game.lookupValue(this.json.config.projectileFireTick,this.data,0);
         this.projectileFirePosition=this.core.game.lookupPointValue(this.json.config.projectileFirePosition,0,0,0);
         this.projectileJson=this.core.game.lookupValue(this.json.config.projectileJson,this.data,null);
         this.projectileData=this.json.config.projectileData;
@@ -132,28 +145,31 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.jumpHeight=this.core.game.lookupValue(this.json.config.jumpHeight,this.data,0);
         this.angleYProjectileRange=this.core.game.lookupValue(this.json.config.angleYProjectileRange,this.data,0);
         this.angleYMeleeRange=this.core.game.lookupValue(this.json.config.angleYMeleeRange,this.data,0);
-        this.damageFlinchWaitTick=this.core.game.lookupValue(this.json.config.damageFlinchWaitTick,this.data,0);
-        this.meleeMovementFreezeTick=this.core.game.lookupValue(this.json.config.meleeMovementFreezeTick,this.data,0);
-        this.projectileMovementFreezeTick=this.core.game.lookupValue(this.json.config.projectileMovementFreezeTick,this.data,0);
-        this.damageMovementFreezeTick=this.core.game.lookupValue(this.json.config.damageMovementFreezeTick,this.data,0);
-        this.fallSoundWaitTick=this.core.game.lookupValue(this.json.config.fallSoundWaitTick,this.data,0);
         
-        this.sleepAnimation=this.core.game.lookupAnimationValue(this.json.config.sleepAnimation);
-        this.wakeUpAnimation=this.core.game.lookupAnimationValue(this.json.config.wakeUpAnimation);
-        this.idleAnimation=this.core.game.lookupAnimationValue(this.json.config.idleAnimation);
-        this.walkAnimation=this.core.game.lookupAnimationValue(this.json.config.walkAnimation);
-        this.melee1Animation=this.core.game.lookupAnimationValue(this.json.config.melee1Animation);
-        this.melee2Animation=this.core.game.lookupAnimationValue(this.json.config.melee2Animation);
-        this.projectileAnimation=this.core.game.lookupAnimationValue(this.json.config.projectileAnimation);
-        this.hitAnimation=this.core.game.lookupAnimationValue(this.json.config.hitAnimation);
-        this.deathAnimation=this.core.game.lookupAnimationValue(this.json.config.deathAnimation);
+        this.sleepAnimation=this.core.game.lookupAnimationValue(this.json.animations.sleepAnimation);
+        this.wakeUpAnimation=this.core.game.lookupAnimationValue(this.json.animations.wakeUpAnimation);
+        this.idleAnimation=this.core.game.lookupAnimationValue(this.json.animations.idleAnimation);
+        this.walkAnimation=this.core.game.lookupAnimationValue(this.json.animations.walkAnimation);
+        this.meleeLeftAnimation=this.core.game.lookupAnimationValue(this.json.animations.meleeLeftAnimation);
+        this.meleeRightAnimation=this.core.game.lookupAnimationValue(this.json.animations.meleeRightAnimation);
+        this.projectileAnimation=this.core.game.lookupAnimationValue(this.json.animations.projectileAnimation);
+        this.hitAnimation=this.core.game.lookupAnimationValue(this.json.animations.hitAnimation);
+        this.deathAnimation=this.core.game.lookupAnimationValue(this.json.animations.deathAnimation);
+        this.meleeLeftHitFrame=this.core.game.lookupValue(this.json.animations.meleeLeftHitFrame,this.data,0);
+        this.meleeRightHitFrame=this.core.game.lookupValue(this.json.animations.meleeRightHitFrame,this.data,0);
+        this.projectileFireFrame=this.core.game.lookupValue(this.json.animations.projectileFireFrame,this.data,0);
+        this.deathFallSoundFrame=this.core.game.lookupValue(this.json.animations.deathFallSoundFrame,this.data,0);
         
-        this.wakeUpSound=this.core.game.lookupSoundValue(this.json.config.wakeUpSound);
-        this.hurtSound=this.core.game.lookupSoundValue(this.json.config.hurtSound);
-        this.meleeSound=this.core.game.lookupSoundValue(this.json.config.meleeSound);
-        this.deathSound=this.core.game.lookupSoundValue(this.json.config.deathSound);
-        this.fallSound=this.core.game.lookupSoundValue(this.json.config.fallSound);
-
+        this.wakeUpSound=this.core.game.lookupSoundValue(this.json.sounds.wakeUpSound);
+        this.hurtSound=this.core.game.lookupSoundValue(this.json.sounds.hurtSound);
+        this.meleeSound=this.core.game.lookupSoundValue(this.json.sounds.meleeSound);
+        this.deathSound=this.core.game.lookupSoundValue(this.json.sounds.deathSound);
+        this.fallSound=this.core.game.lookupSoundValue(this.json.sounds.fallSound);
+        
+        this.wakeUpSetTriggerName=this.core.game.lookupValue(this.json.triggers.wakeUpSetTrigger,this.data,null);
+        this.deathSetTriggerName=this.core.game.lookupValue(this.json.triggers.deathSetTrigger,this.data,null);
+        this.showTriggerName=this.core.game.lookupValue(this.json.triggers.showTrigger,this.data,null);
+        
         return(true);
     }
     
@@ -163,9 +179,9 @@ export default class EntityFPSMonsterClass extends EntityClass
         
             // sleeping with all health
             
+        this.state=(this.showTriggerName===null)?this.STATE_ASLEEP:this.STATE_HIDDEN;
+        
         this.health=this.startHealth;
-        this.awoke=false;
-        this.dead=false;
         
             // misc
             
@@ -178,121 +194,10 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.sleepAnimation[0],this.sleepAnimation[1]);
     }
     
-    wakeUp()
-    {
-        this.awoke=true;
-        this.movement.setFromValues(0,0,0);
+        //
+        // projectile fire setup
+        //
         
-        this.nextProjectileTick=this.core.timestamp;
-        this.projectileStartTick=-1;
-        
-        this.nextMeleeTick=this.core.timestamp;
-        this.meleeStartTick=-1;
-        
-        this.nextJumpTick=this.core.timestamp+this.jumpWaitTick;
-        
-        this.nextDamageTick=this.core.timestamp;
-        
-        this.core.soundList.playJson(this.position,this.wakeUpSound);
-        this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.wakeUpAnimation[0],this.wakeUpAnimation[1]);
-        this.modelEntityAlter.queueAnimationChunkInFrames(null,30,this.walkAnimation[0],this.walkAnimation[1]);
-        
-        // this.modelEntityAlter.getAnimationTickCount(null,30,this.wakeUpAnimation[0],this.wakeUpAnimation[1])
-    }
-    
-    sleep()
-    {
-        this.awoke=false;
-        this.projectileStartTick=-1;
-        this.meleeStartTick=-1;
-        
-        this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.idleAnimation[0],this.idleAnimation[1]);
-    }
-    
-    damage(fromEntity,damage,hitPoint)
-    {
-        let wakingUp;
-        
-        if (this.dead) return;
-        
-        this.health-=damage;
-        
-        wakingUp=false;
-        if (!this.awoke) {
-            wakingUp=true;
-            this.wakeUp();
-        }
-        
-            // any freezes
-            
-        this.movementFreezeNextTick=this.core.timestamp+this.damageMovementFreezeTick;
-        
-            // just damage
-            
-        if (this.health>0) {
-            if (this.core.timestamp>this.nextDamageTick) {
-                this.nextDamageTick=this.core.timestamp+this.damageFlinchWaitTick;
-
-                if (!wakingUp) {
-                    this.core.soundList.playJson(this.position,this.hurtSound);
-                    this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.hitAnimation[0],this.hitAnimation[1]);
-                    this.modelEntityAlter.queueAnimationChunkInFrames(null,30,this.walkAnimation[0],this.walkAnimation[1]);
-                }
-            }
-            return;
-        }
-        
-            // monster is dead
-            
-        this.dead=true;
-        this.passThrough=true;
-        this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.deathAnimation[0],this.deathAnimation[1]);
-        this.modelEntityAlter.queueAnimationStop();
-        
-        this.core.soundList.playJson(this.position,this.deathSound);
-        
-        this.fallSoundNextTick=this.core.timestamp+this.fallSoundWaitTick;
-    }
-    
-    jump()
-    {
-        this.gravity=this.core.map.gravityMinValue;
-        this.movement.y=this.jumpHeight;
-        
-        this.core.soundList.playJson(this.position,this.wakeUpSound);
-    }
-    
-    meleeStart(distToPlayer)
-    {
-        if ((distToPlayer>this.meleeDistance) || (this.core.timestamp<this.nextMeleeTick)) return;
-        
-        this.nextMeleeTick=this.core.timestamp+this.meleeWaitTick;
-        
-            // melee animation
-            
-        if (Math.random()<0.5) {
-            this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.melee1Animation[0],this.melee1Animation[1]);
-        }
-        else {
-            this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.melee2Animation[0],this.melee2Animation[1]);
-        }
-        this.modelEntityAlter.queueAnimationChunkInFrames(null,30,this.walkAnimation[0],this.walkAnimation[1]);
-        
-            // pause to start actual melee
-            
-        this.meleeStartTick=this.core.timestamp+this.meleeDamageTick;
-        
-            // any movement freezes
-            
-        this.movementFreezeNextTick=this.core.timestamp+this.meleeMovementFreezeTick;
-    }
-    
-    meleeHit(player)
-    {
-        this.core.soundList.playJson(this.position,this.meleeSound);
-        player.damage(this,this.meleeDamage,this.position);
-    }
-    
     projectileSetupFire(player)
     {
         this.firePosition.setFromPoint(this.projectileFirePosition);
@@ -303,7 +208,78 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.fireAngle.x=this.position.getLookAngleTo(player.position);
     }
     
-    projectileStart(player,distToPlayer)
+        //
+        // state changes
+        //
+        
+    goWakeUp()
+    {
+        this.state=this.STATE_WAKING_UP;
+        
+        this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.wakeUpAnimation[0],this.wakeUpAnimation[1]);
+        this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(null,30,this.wakeUpAnimation[0],this.wakeUpAnimation[1]);
+        
+        this.core.soundList.playJson(this.position,this.wakeUpSound);
+        if (this.wakeUpSetTriggerName!==null) this.core.setTrigger(this.wakeUpSetTriggerName);
+    }
+    
+    goIdle()
+    {
+        this.state=this.STATE_IDLE;
+        
+        this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.idleAnimation[0],this.idleAnimation[1]);
+    }   
+    
+    goStalk(resetTimers)
+    {
+        this.state=this.STATE_STALKING;
+        
+        this.movement.setFromValues(0,0,0);
+        
+        if (resetTimers) {
+            this.nextProjectileTick=this.core.timestamp+this.projectileWaitTick;
+            this.nextMeleeTick=this.core.timestamp+this.meleeWaitTick;
+            this.nextJumpTick=this.core.timestamp+this.jumpWaitTick;
+        }
+        
+        this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.walkAnimation[0],this.walkAnimation[1]);
+    }
+    
+    goHurt()
+    {
+            // if already in hurt, just complete
+            
+        if (this.state===this.STATE_HURT) return;
+        
+            // go into hurt state
+            
+        this.state=this.STATE_HURT;
+        
+        this.core.soundList.playJson(this.position,this.hurtSound);
+        this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.hitAnimation[0],this.hitAnimation[1]);
+
+        this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(null,30,this.hitAnimation[0],this.hitAnimation[1]);
+    }
+    
+    goMelee(distToPlayer)
+    {
+        if ((distToPlayer>this.meleeDistance) || (this.core.timestamp<this.nextMeleeTick)) return;
+        
+        this.state=this.STATE_MELEE;
+        
+        if (Math.random()<0.5) {
+            this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.meleeLeftAnimation[0],this.meleeLeftAnimation[1]);
+            this.meleeHitNextTick=this.core.timestamp+Math.trunc(((this.meleeLeftHitFrame-this.meleeLeftAnimation[0])/30)*1000);
+            this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(null,30,this.meleeLeftAnimation[0],this.meleeLeftAnimation[1]);
+        }
+        else {
+            this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.meleeRightAnimation[0],this.meleeRightAnimation[1]);
+            this.meleeHitNextTick=this.core.timestamp+Math.trunc(((this.meleeRightHitFrame-this.meleeRightAnimation[0])/30)*1000);
+            this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(null,30,this.meleeRightAnimation[0],this.meleeRightAnimation[1]);
+        }
+    }
+    
+    goProjectile(player,distToPlayer)
     {
             // don't fire if past projectile distance, or less than melee distance
             
@@ -324,32 +300,88 @@ export default class EntityFPSMonsterClass extends EntityClass
         
             // we can fire
             
-        this.nextProjectileTick=this.core.timestamp+this.projectileWaitTick;
+        this.state=this.STATE_PROJECTILE;
 
-            // fire animaton
+            // projectile animaton
             
         this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.projectileAnimation[0],this.projectileAnimation[1]);
-        this.modelEntityAlter.queueAnimationChunkInFrames(null,30,this.walkAnimation[0],this.walkAnimation[1]);
-        
-            // pause for fire animation
-            
-        this.projectileStartTick=this.core.timestamp+this.projectileFireTick;
-        
-            // any movement freezes
-            
-        this.movementFreezeNextTick=this.core.timestamp+this.projectileMovementFreezeTick;
+        this.projectileFireNextTick=this.core.timestamp+Math.trunc(((this.projectileFireFrame-this.projectileAnimation[0])/30)*1000);
+        this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(null,30,this.projectileAnimation[0],this.projectileAnimation[1]);
     }
     
-    projectileFire(player)
+    goDying()
     {
-        let projEntity;
+        this.state=this.STATE_DYING;
         
-        this.projectileSetupFire(player);
-        
-        projEntity=this.addEntity(this,this.projectileJson,('projectile_'+this.name),this.firePosition,this.fireAngle,this.projectileData,true,false);
-        if (projEntity!==null) projEntity.ready();
+        this.passThrough=true;
+
+        this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.deathAnimation[0],this.deathAnimation[1]);
+        this.modelEntityAlter.queueAnimationStop();
+        this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(null,30,this.deathAnimation[0],this.deathAnimation[1]);
+
+        this.core.soundList.playJson(this.position,this.deathSound);
+
+        this.fallSoundNextTick=this.core.timestamp+Math.trunc(((this.deathFallSoundFrame-this.deathAnimation[0])/30)*1000);
     }
     
+    goDead()
+    {
+        this.state=this.STATE_DEAD;
+        
+        this.passThrough=true;
+        if (this.deathSetTriggerName!==null) this.core.setTrigger(this.deathSetTriggerName);
+    }
+    
+        //
+        // damage
+        //
+        
+    damage(fromEntity,damage,hitPoint)
+    {
+        if ((this.state===this.STATE_HIDDEN) || (this.state===this.STATE_DYING) || (this.state===this.STATE_DEAD)) return;
+        
+            // the damage and death
+            
+        this.health-=damage;
+        
+        if (this.health<=0) {
+            this.goDying();
+            
+            this.dead=true;
+            return;
+        }
+        
+            // check for certain states
+            // not going directly to hurt
+            
+        if (this.state===this.STATE_IDLE) {
+            this.goStalk(true);
+            return;
+        }
+        if (this.state===this.STATE_ASLEEP) {
+            this.goWakeUp();
+            return;
+        }
+        
+        if ((this.state===this.STATE_MELEE) || (this.state===this.STATE_PROJECTILE)) return;
+        
+            // regular damage
+            
+        this.goHurt();
+    }
+    
+        //
+        // jumping and sliding around
+        //
+        
+    jump()
+    {
+        this.gravity=this.core.map.gravityMinValue;
+        this.movement.y=this.jumpHeight;
+        
+        this.core.soundList.playJson(this.position,this.wakeUpSound);
+    }
+            
     findSlideDirection(player)
     {
         let distNeg,distPos;
@@ -370,95 +402,64 @@ export default class EntityFPSMonsterClass extends EntityClass
         return((distNeg>distPos)?-1:1);
     }
     
-    run()
+        //
+        // monster AI
+        //
+        
+    runHidden()
+    {
+        if (this.core.checkTrigger(this.showTriggerName)) this.goWakeUp();
+    }
+    
+    runAsleep(distToPlayer,gravityFactor)
+    {
+            // sleeping can only fall
+            
+        this.rotMovement.setFromValues(0,0,0);
+        this.moveInMapY(this.rotMovement,gravityFactor,false);
+
+            // time to wake up?
+            
+        if (distToPlayer<this.wakeUpDistance) {
+            this.goWakeUp();
+            return;
+        }
+    }
+        
+    runWakeUp(gravityFactor)
+    {
+            // waking up can only fall
+            
+        this.rotMovement.setFromValues(0,0,0);
+        this.moveInMapY(this.rotMovement,gravityFactor,false);
+        
+            // is animation over?
+            
+        if (this.animationFinishTick<=this.core.timestamp) this.goStalk(true);
+    }
+    
+    runStalk(player,distToPlayer,gravityFactor)
     {
         let angleDif;
-        let player,distToPlayer,liquid,liquidIdx,gravityFactor;
         
-            // liquids
+            // if to far away from player,
+            // go into idle
             
-        liquidIdx=this.core.map.liquidList.getLiquidForPoint(this.position);
-        
-        if (liquidIdx!==-1) {
-            liquid=this.core.map.liquidList.liquids[liquidIdx];
-            if (this.lastInLiquidIdx===-1) liquid.playSoundIn(this.position);
-            this.lastInLiquidIdx=liquidIdx;
-            gravityFactor=liquid.gravityFactor;
-        }
-        else {
-            if (this.lastInLiquidIdx!==-1) this.core.map.liquidList.liquids[this.lastInLiquidIdx].playSoundOut(this.position);
-            this.lastInLiquidIdx=-1;
-            gravityFactor=1.0;
-        }
-        
-            // if dead, only fall and play
-            // and fall sound
-            
-        if (this.dead) {
-            
-            if ((this.fallSound!==null) && (this.fallSoundNextTick!==0)) {
-                if (this.core.timestamp>this.fallSoundNextTick) {
-                    this.core.soundList.playJson(this.position,this.fallSound);
-                    this.fallSoundNextTick=0;
-                }
-            }
-            
-            this.rotMovement.setFromValues(0,0,0);
-            this.moveInMapY(this.rotMovement,gravityFactor,false);
+        if (distToPlayer>this.idleDistance) {
+            this.goIdle();
             return;
         }
         
-            // distance to player
-            
-        player=this.getPlayerEntity();
-        distToPlayer=this.position.distance(player.position);
-        
-            // if we are in a projectile animation,
-            // wait to fire
-            
-        if (this.projectileStartTick!==-1) {
-            if (this.core.timestamp>this.projectileStartTick) {
-                this.projectileStartTick=-1;
-                this.projectileFire(player);
-            }
-        }
-        
-            // if we are in a melee animation,
-            // wait for damage
-            
-        if (this.meleeStartTick!==-1) {
-            if (this.core.timestamp>this.meleeStartTick) {
-                this.meleeStartTick=-1;
-                if (distToPlayer<this.meleeDistance) this.meleeHit(player);
-            }
-        }
-        
-            // always turn towards player, even when idling
-            // remember how far we had to turn to see if we are
-            // facing within a certain distance so we can attack
+            // turn towards player, remember how far we had to turn
+            // to see if we are facing within a certain distance so
+            // we can attack
          
         angleDif=this.turnYTowardsEntity(player,this.maxTurnSpeed);
         
-            // time to wake up?
-            
-        if (!this.awoke) {
-            if (distToPlayer<this.wakeUpDistance) {
-                this.wakeUp();
-            }
-            return;
-        }
-        
-            // if we get to far away, go back to sleep
-            
-        if (distToPlayer>this.fallAsleepDistance) {
-            this.sleep();
-            return;
-        }
-        
             // projectiles and melee starts
         
-        if ((this.projectileJson!=null) && (Math.abs(angleDif)<=this.angleYProjectileRange)) this.projectileStart(player,distToPlayer);
-        if (Math.abs(angleDif)<=this.angleYMeleeRange) this.meleeStart(distToPlayer);
+        if ((this.projectileJson!=null) && (Math.abs(angleDif)<=this.angleYProjectileRange)) this.goProjectile(player,distToPlayer);
+        if (Math.abs(angleDif)<=this.angleYMeleeRange) this.goMelee(distToPlayer);
         
             // time to jump?
             
@@ -515,10 +516,166 @@ export default class EntityFPSMonsterClass extends EntityClass
                 }
             }
         }
+        
     }
+    
+    runHurt(gravityFactor)
+    {
+            // hurt can only fall
+            
+        this.rotMovement.setFromValues(0,0,0);
+        this.moveInMapY(this.rotMovement,gravityFactor,false);
+        
+            // is animation over?
+            
+        if (this.animationFinishTick<=this.core.timestamp) this.goStalk(false);
+    }
+    
+    runMelee(player,gravityFactor)
+    {
+            // can fall and turn towards player while in melee
+            
+        this.rotMovement.setFromValues(0,0,0);
+        this.moveInMapY(this.rotMovement,gravityFactor,false);
+        
+        this.turnYTowardsEntity(player,this.maxTurnSpeed);
+        
+            // the hit itself
+            
+        if ((this.meleeHitNextTick<=this.core.timestamp) && (this.meleeHitNextTick!==0)) {
+            this.core.soundList.playJson(this.position,this.meleeSound);
+            player.damage(this,this.meleeDamage,this.position);
+            
+            this.meleeHitNextTick=0;
+        }
+            // is animation over?
+            
+        if (this.animationFinishTick<=this.core.timestamp) this.goStalk(true);
+    }
+    
+    runProjectile(player,gravityFactor)
+    {
+        let projEntity;
+        
+            // can fall and turns towards player while in projectile
+            
+        this.rotMovement.setFromValues(0,0,0);
+        this.moveInMapY(this.rotMovement,gravityFactor,false);
+        
+        this.turnYTowardsEntity(player,this.maxTurnSpeed);
+        
+            // the projectile itself
+            
+        if ((this.projectileFireNextTick<=this.core.timestamp) && (this.projectileFireNextTick!==0)) {
+            this.projectileSetupFire(player);
+
+            projEntity=this.addEntity(this,this.projectileJson,('projectile_'+this.name),this.firePosition,this.fireAngle,this.projectileData,true,false);
+            if (projEntity!==null) projEntity.ready();
+            
+            this.projectileFireNextTick=0;
+        }
+            // is animation over?
+            
+        if (this.animationFinishTick<=this.core.timestamp) this.goStalk(true);
+    }
+    
+    runDying(gravityFactor)
+    {
+            // dying can only fall
+            
+        this.rotMovement.setFromValues(0,0,0);
+        this.moveInMapY(this.rotMovement,gravityFactor,false);
+        
+            // the fall sound
+               
+        if (this.fallSound!==null) {
+            if ((this.fallSoundNextTick<=this.core.timestamp) && (this.fallSoundNextTick!==0)) {
+                this.core.soundList.playJson(this.position,this.fallSound);
+                this.fallSoundNextTick=0;
+            }
+        }
+        
+            // is animation over?
+            
+        if (this.animationFinishTick<=this.core.timestamp) this.goDead();
+    }
+    
+    runDead(gravityFactor)
+    {
+            // dead can only fall
+            
+        this.rotMovement.setFromValues(0,0,0);
+        this.moveInMapY(this.rotMovement,gravityFactor,false);
+    }
+    
+    run()
+    {
+        let player,distToPlayer,liquid,liquidIdx,gravityFactor;
+        
+            // liquids
+            
+        liquidIdx=this.core.map.liquidList.getLiquidForPoint(this.position);
+        
+        if (liquidIdx!==-1) {
+            liquid=this.core.map.liquidList.liquids[liquidIdx];
+            if (this.lastInLiquidIdx===-1) liquid.playSoundIn(this.position);
+            this.lastInLiquidIdx=liquidIdx;
+            gravityFactor=liquid.gravityFactor;
+        }
+        else {
+            if (this.lastInLiquidIdx!==-1) this.core.map.liquidList.liquids[this.lastInLiquidIdx].playSoundOut(this.position);
+            this.lastInLiquidIdx=-1;
+            gravityFactor=1.0;
+        }
+        
+            // distance to player
+            
+        player=this.getPlayerEntity();
+        distToPlayer=this.position.distance(player.position);
+        
+            // run the state
+            
+        switch (this.state) {
+            case this.STATE_HIDDEN:
+                this.runHidden();
+                return;
+            case this.STATE_ASLEEP:
+                this.runAsleep(distToPlayer,gravityFactor);
+                return;
+            case this.STATE_WAKING_UP:
+                this.runWakeUp(gravityFactor);
+                return;
+            case this.STATE_IDLE:
+                return;
+            case this.STATE_STALKING:
+                this.runStalk(player,distToPlayer,gravityFactor);
+                return;
+            case this.STATE_HURT:
+                this.runHurt(gravityFactor);
+                return;
+            case this.STATE_MELEE:
+                this.runMelee(player,gravityFactor);
+                return;
+            case this.STATE_PROJECTILE:
+                this.runProjectile(player,gravityFactor);
+                return;
+            case this.STATE_DYING:
+                this.runDying(gravityFactor);
+                return;
+            case this.STATE_DEAD:
+                this.runDead(gravityFactor);
+                return;
+        }
+    }
+    
+        //
+        // drawing
+        //
     
     drawSetup()
     {
+        if (this.state===this.STATE_HIDDEN) return(false);
+        
         this.modelEntityAlter.position.setFromPoint(this.position);
         this.modelEntityAlter.angle.setFromPoint(this.angle);
         this.modelEntityAlter.scale.setFromPoint(this.scale);

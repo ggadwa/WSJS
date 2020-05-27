@@ -28,10 +28,10 @@ export default class EntityContainerClass extends EntityClass
     {
         if (!super.initialize()) return(false);
         
-        this.openAnimation=this.core.game.lookupAnimationValue(this.json.config.openAnimation);
-        this.openingAnimation=this.core.game.lookupAnimationValue(this.json.config.openingAnimation);
-        this.closedAnimation=this.core.game.lookupAnimationValue(this.json.config.closedAnimation);
-        this.closingAnimation=this.core.game.lookupAnimationValue(this.json.config.closingAnimation);
+        this.openAnimation=this.core.game.lookupAnimationValue(this.json.animations.openAnimation);
+        this.openingAnimation=this.core.game.lookupAnimationValue(this.json.animations.openingAnimation);
+        this.closedAnimation=this.core.game.lookupAnimationValue(this.json.animations.closedAnimation);
+        this.closingAnimation=this.core.game.lookupAnimationValue(this.json.animations.closingAnimation);
         
         this.opened=this.core.game.lookupValue(this.json.config.startOpened,this.data,false);
         this.openOnce=this.core.game.lookupValue(this.json.config.openOnce,this.data,false);
@@ -39,8 +39,8 @@ export default class EntityContainerClass extends EntityClass
         this.openDistance=this.core.game.lookupValue(this.json.config.openDistance,this.data,0);
         this.openPause=this.core.game.lookupValue(this.json.config.openPause,this.data,false);
         
-        this.openSound=this.core.game.lookupSoundValue(this.json.config.openSound);
-        this.closeSound=this.core.game.lookupSoundValue(this.json.config.closeSound);
+        this.openSound=this.core.game.lookupSoundValue(this.json.sounds.openSound);
+        this.closeSound=this.core.game.lookupSoundValue(this.json.sounds.closeSound);
         
         return(true);
     }

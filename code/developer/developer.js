@@ -31,6 +31,8 @@ export default class DeveloperClass
         
         this.on=false;
         this.lookDownLock=false;
+        this.collisionDrawOn=false;
+        
         this.position=new PointClass(0,0,0);
         this.angle=new PointClass(0,0,0);
         this.fpsAngle=new PointClass(0,0,0);
@@ -726,17 +728,13 @@ export default class DeveloperClass
         this.select();
         this.pathEditor();
         
+            // collision draw
+            
+        if (input.isKeyDownAndClear('PageDown')) this.collisionDrawOn=!this.collisionDrawOn;
+        
             // run the targetting
             
         this.developerRay.run(this.position,this.angle);
 
-/*
-                console.info('u add key to nearest node');
-                console.info('i select nearest node');
-                console.info('o start path splitting');
-                console.info('p adds new node to path');
-                console.info('[ deleted selected node');
-                console.info('] moves selected node to player');
-*/
     }
 }

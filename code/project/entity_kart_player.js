@@ -108,10 +108,10 @@ export default class EntityKartPlayerClass extends EntityClass
         this.mineRechargeTick=2000;
         this.weight=500;
         
-        this.engineSound=this.core.game.lookupSoundValue(this.json.config.engineSound);
-        this.skidSound=this.core.game.lookupSoundValue(this.json.config.skidSound);
-        this.crashKartSound=this.core.game.lookupSoundValue(this.json.config.crashKartSound);
-        this.crashWallSound=this.core.game.lookupSoundValue(this.json.config.crashWallSound);
+        this.engineSound=this.core.game.lookupSoundValue(this.json.sounds.engineSound);
+        this.skidSound=this.core.game.lookupSoundValue(this.json.sounds.skidSound);
+        this.crashKartSound=this.core.game.lookupSoundValue(this.json.sounds.crashKartSound);
+        this.crashWallSound=this.core.game.lookupSoundValue(this.json.sounds.crashWallSound);
         
         
         for (n=0;n!==this.json.weapons.length;n++) {

@@ -466,6 +466,7 @@ export default class CoreClass
         let light;
         let player=this.map.entityList.getPlayer();
         let developerOn=this.game.developer.on;
+        let developerCollisionDraw=(developerOn&&this.game.developer.collisionDrawOn);
          
             // everything overdraws except
             // clear the depth buffer
@@ -567,9 +568,9 @@ export default class CoreClass
             
         this.map.sky.draw();
 
-        this.map.meshList.drawMap();
+        if (!developerCollisionDraw) this.map.meshList.drawMap();
         if ((this.map.hasShadowmap) && (!developerOn)) this.map.meshList.drawMapShadow();
-        // this.map.meshList.drawCollisionSurfaces();
+        if (developerCollisionDraw) this.map.meshList.drawCollisionSurfaces();
 
             // draw any non held entities
             

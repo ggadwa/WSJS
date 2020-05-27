@@ -121,10 +121,10 @@ export default class GameClass
     {
         let data;
         
-        data=null;
-        
             // get the main game json
             // this is the only hard coded json file
+        
+        data=null;
         
         await this.fetchJson('game')
             .then
@@ -143,6 +143,8 @@ export default class GameClass
         
             // effects
             
+        data=null;
+        
         await this.fetchJson('effect')
             .then
                 (
@@ -155,11 +157,13 @@ export default class GameClass
                 );
         
         if (data===null) return(false);
-           
+        
         this.jsonEffectCache=data;
         
             // entities
             
+        data=null;
+        
         await this.fetchJson('entity')
             .then
                 (
@@ -172,11 +176,13 @@ export default class GameClass
                 );
         
         if (data===null) return(false);
-           
+        
         this.jsonEntityCache=data;
         
             // maps
             
+        data=null;
+        
         await this.fetchJson('map')
             .then
                 (

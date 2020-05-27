@@ -161,23 +161,24 @@ export default class SoundListClass
             this.addSoundBySoundNameAttribute(entityDef.config.secondary);
             this.addSoundBySoundNameAttribute(entityDef.config.tertiary);
             
-            this.addSoundByNameAttribute(entityDef.config.hurtSound);
-            this.addSoundByNameAttribute(entityDef.config.dieSound);
-            this.addSoundByNameAttribute(entityDef.config.pickupSound);
-            this.addSoundByNameAttribute(entityDef.config.bounceSound);
-            this.addSoundByNameAttribute(entityDef.config.reflectSound);
-            this.addSoundByNameAttribute(entityDef.config.spawnSound);
-            this.addSoundByNameAttribute(entityDef.config.openSound);
-            this.addSoundByNameAttribute(entityDef.config.closeSound);
-            this.addSoundByNameAttribute(entityDef.config.wakeUpSound);
-            this.addSoundByNameAttribute(entityDef.config.meleeSound);
-            this.addSoundByNameAttribute(entityDef.config.deathSound);
-            this.addSoundByNameAttribute(entityDef.config.fallSound);
-            
-            this.addSoundByNameAttribute(entityDef.config.engineSound);
-            this.addSoundByNameAttribute(entityDef.config.skidSound);
-            this.addSoundByNameAttribute(entityDef.config.crashKartSound);
-            this.addSoundByNameAttribute(entityDef.config.crashWallSound);
+            if (entityDef.sounds!==undefined) {
+                this.addSoundByNameAttribute(entityDef.sounds.hurtSound);
+                this.addSoundByNameAttribute(entityDef.sounds.dieSound);
+                this.addSoundByNameAttribute(entityDef.sounds.pickupSound);
+                this.addSoundByNameAttribute(entityDef.sounds.bounceSound);
+                this.addSoundByNameAttribute(entityDef.sounds.reflectSound);
+                this.addSoundByNameAttribute(entityDef.sounds.spawnSound);
+                this.addSoundByNameAttribute(entityDef.sounds.openSound);
+                this.addSoundByNameAttribute(entityDef.sounds.closeSound);
+                this.addSoundByNameAttribute(entityDef.sounds.wakeUpSound);
+                this.addSoundByNameAttribute(entityDef.sounds.meleeSound);
+                this.addSoundByNameAttribute(entityDef.sounds.deathSound);
+                this.addSoundByNameAttribute(entityDef.sounds.fallSound);
+                this.addSoundByNameAttribute(entityDef.config.engineSound);
+                this.addSoundByNameAttribute(entityDef.config.skidSound);
+                this.addSoundByNameAttribute(entityDef.config.crashKartSound);
+                this.addSoundByNameAttribute(entityDef.config.crashWallSound);
+            }
         }
         
         keys=Object.keys(game.jsonEffectCache);

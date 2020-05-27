@@ -29,8 +29,8 @@ export default class EntityPickupClass extends EntityClass
         this.spinTick=this.core.game.lookupValue(this.json.config.spinTick,this.data,0);
         this.floatMove=this.core.game.lookupValue(this.json.config.floatMove,this.data,0);
         
-        this.idleAnimation=this.core.game.lookupAnimationValue(this.json.config.idleAnimation);
-        this.pickupSound=this.core.game.lookupSoundValue(this.json.config.pickupSound);
+        this.idleAnimation=this.core.game.lookupAnimationValue(this.json.animations.idleAnimation);
+        this.pickupSound=this.core.game.lookupSoundValue(this.json.sounds.pickupSound);
         
         return(true);
     }

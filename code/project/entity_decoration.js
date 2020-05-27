@@ -14,7 +14,7 @@ export default class EntityDecorationClass extends EntityClass
     {
         if (!super.initialize()) return(false);
         
-        this.idleAnimation=this.json.config.idleAnimation;
+        this.idleAnimation=this.json.animations.idleAnimation;
         
         return(true);
     }

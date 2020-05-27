@@ -110,12 +110,12 @@ export default class EntityFPSBotClass extends EntityClass
         
             // regular config
             
-        this.idleAnimation=this.core.game.lookupAnimationValue(this.json.config.idleAnimation);
-        this.runAnimation=this.core.game.lookupAnimationValue(this.json.config.runAnimation);
-        this.dieAnimation=this.core.game.lookupAnimationValue(this.json.config.dieAnimation);
+        this.idleAnimation=this.core.game.lookupAnimationValue(this.json.animations.idleAnimation);
+        this.runAnimation=this.core.game.lookupAnimationValue(this.json.animations.runAnimation);
+        this.dieAnimation=this.core.game.lookupAnimationValue(this.json.animations.dieAnimation);
         
-        this.hurtSound=this.core.game.lookupSoundValue(this.json.config.hurtSound);
-        this.dieSound=this.core.game.lookupSoundValue(this.json.config.dieSound);
+        this.hurtSound=this.core.game.lookupSoundValue(this.json.sounds.hurtSound);
+        this.dieSound=this.core.game.lookupSoundValue(this.json.sounds.dieSound);
 
             // skill based config
             

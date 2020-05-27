@@ -1,21 +1,15 @@
 
 
+
+
+
 - wsjsEntity
+- wsjsEffect get rid of show
 - map settings
 
 
 
-- monsters
-   - need state / asleep / waking up / hurting / melee / firing / idle / stalking
-   - need to wait for animation to complete on each state, can't interrupt
-   - pause based on animation fps count
-   - remove the old hard set flinch/etc/pauses
-   - rename melee left/right
-   - can't fire or melee if not in stalk state
-   - only turn if stalking
-   - make a wake-up and death trigger and spawn trigger (close gate?)
-   - warp in spiders on wake up 
-   - separate animations and sounds on entities into own object
+- pants on dragon queen
 
 - get kart bots working again
 
@@ -38,6 +32,7 @@ EDIT MODE
   - stop all sounds
 
 PHYSICS
+  - get rid of two small floor skip
   - fix wacky bumping
   - bouncing up on bits of pillar in castle map is bad, should not be able to stand on those
 

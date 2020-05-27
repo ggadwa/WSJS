@@ -61,9 +61,9 @@ export default class EntityProjectileClass extends EntityClass
         this.rollDeceleration=this.core.game.lookupValue(this.json.config.rollDeceleration,this.data,0);
         this.bounceFactor=this.core.game.lookupValue(this.json.config.bounceFactor,this.data,0);
         
-        this.bounceSound=this.core.game.lookupSoundValue(this.json.config.bounceSound);
-        this.reflectSound=this.core.game.lookupSoundValue(this.json.config.reflectSound);
-        this.spawnSound=this.core.game.lookupSoundValue(this.json.config.spawnSound);
+        this.bounceSound=this.core.game.lookupSoundValue(this.json.sounds.bounceSound);
+        this.reflectSound=this.core.game.lookupSoundValue(this.json.sounds.reflectSound);
+        this.spawnSound=this.core.game.lookupSoundValue(this.json.sounds.spawnSound);
 
         this.hitEffect=this.core.game.lookupValue(this.json.config.hitEffect,this.data,null);
         
