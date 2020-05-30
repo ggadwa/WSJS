@@ -4,6 +4,8 @@ import EntityFPSBotClass from '../project/entity_fps_bot.js';
 import EntityFPSMonsterClass from '../project/entity_fps_monster.js';
 import EntityKartPlayerClass from '../project/entity_kart_player.js';
 import EntityKartBotClass from '../project/entity_kart_bot.js';
+import Entity2DPlayerClass from '../project/entity_2d_player.js';
+import Entity2DMonsterClass from '../project/entity_2d_monster.js';
 import EntityWeaponClass from '../project/entity_weapon.js';
 import EntityProjectileClass from '../project/entity_projectile.js';
 import EntityContainerClass from '../project/entity_container.js';
@@ -58,68 +60,84 @@ export default class MapEntityListClass
     }
     
         //
-        // list items
+        // entity classes
         //
         
-    add(spawnedByEntity,jsonName,name,position,angle,data,mapSpawn,show,hold)
+    getEntityClass(jsonName)
     {
-        let json,entity,entityClass;
+        let json;
         
-            // load the json
+            // get json
             
         json=this.core.game.getCachedJsonEntity(jsonName);
         if (json===null) return(null);
-
-            // get the correct entity
-            
-        entityClass=null;
         
+            // lookup type
+            
         switch (json.type) {
             case 'fps_player':
-                entityClass=EntityFPSPlayerClass;
-                break;
+                return(EntityFPSPlayerClass);
             case 'fps_bot':
-                entityClass=EntityFPSBotClass;
-                break;
+                return(EntityFPSBotClass);
             case 'fps_monster':
-                entityClass=EntityFPSMonsterClass;
-                break;
+                return(EntityFPSMonsterClass);
             case 'kart_player':
-                entityClass=EntityKartPlayerClass;
-                break;
+                return(EntityKartPlayerClass);
             case 'kart_bot':
-                entityClass=EntityKartBotClass;
-                break;
+                return(EntityKartBotClass);
+            case '2d_player':
+                return(Entity2DPlayerClass);
+            case '2d_monster':
+                return(Entity2DMonsterClass);
             case 'weapon':
-                entityClass=EntityWeaponClass;
-                break;
+                return(EntityWeaponClass);
             case 'projectile':
-                entityClass=EntityProjectileClass;
-                break;
+                return(EntityProjectileClass);
             case 'container':
-                entityClass=EntityContainerClass;
-                break;
+                return(EntityContainerClass);
             case 'pickup':
-                entityClass=EntityPickupClass;
-                break;
+                return(EntityPickupClass);
             case 'decoration':
-                entityClass=EntityDecorationClass;
-                break;
+                return(EntityDecorationClass);
         }
         
-        if (entityClass===null) {
-            console.log('Unknown entity type: '+json.type);
-            return(null);
-        }
+        console.log('Unknown entity type: '+json.type);
+        return(null);
+    }
+    
+        //
+        // list items
+        //
+    
+    addFromMap(jsonName,name,position,angle,data,show)
+    {
+        let entity,entityClass;
+        
+            // get the correct entity class
+            
+        entityClass=this.getEntityClass(jsonName);        
+        if (entityClass===null) return(null);
         
             // create the entity
             
-        entity=new entityClass(this.core,name,json,position,angle,data,mapSpawn);
+        entity=new entityClass(this.core,name,jsonName,position,angle,data,true,null,null,show);        
+        this.entities.push(entity);
         
-        entity.spawnedBy=spawnedByEntity;
-        if (hold) entity.heldBy=spawnedByEntity;
-        entity.show=show;
+        return(entity);
+    }
         
+    addDynamic(jsonName,name,position,angle,data,spawnedBy,heldBy,show)
+    {
+        let entity,entityClass;
+        
+            // get the correct entity class
+            
+        entityClass=this.getEntityClass(jsonName);        
+        if (entityClass===null) return(null);
+        
+            // create the entity
+            
+        entity=new entityClass(this.core,name,jsonName,position,angle,data,false,spawnedBy,heldBy,show);        
         this.entities.push(entity);
         
             // finally initialize it
@@ -172,60 +190,46 @@ export default class MapEntityListClass
         // load map entities
         //
         
-    loadMapEntities()
+    initializeMapEntities()
     {
-        let entityList=this.core.map.json.entities;
-        let n,nameIdx,entityDef;
-        let entity,entityName,entityPosition,entityAngle,entityData;
+        let n,nameIdx;
+        let entity,entityCount;
+            
+            // add any bots if it's a local multiplayer game
+            
+        if ((this.core.isMultiplayer) && (this.core.setup.localGame)) {
+            for (n=0;n!==this.core.setup.botCount;n++) {
+                nameIdx=n%this.core.game.json.bot.names.length;
+                
+                if (this.addFromMap(this.core.game.json.bot.json,this.core.game.json.bot.names[nameIdx],new PointClass(0,0,0),new PointClass(0,0,0),null,true)===null) return(false);
+            }
+        }
 
-            // at least a player entity is required
+            // initialize everything
             
-        if (entityList===undefined) {
-            console.log('no entities in map setup, at least one entity, the player (entity 0), is required');
-            return(false);
-        }
+        this.entityPlayerIdx=-1;
         
-            // load entities from map import settings
-            
-        for (n=0;n!==entityList.length;n++) {
-            entityDef=entityList[n];
-            
-            entityName=(entityDef.name===undefined)?'':entityDef.name;
-            entityPosition=new PointClass(entityDef.position.x,entityDef.position.y,entityDef.position.z);
-            entityAngle=new PointClass(entityDef.angle.x,entityDef.angle.y,entityDef.angle.z);
-            entityData=(entityDef.data===undefined)?null:entityDef.data;
-            
-                // mark if the player
-                
-            if (entityDef.player) this.entityPlayerIdx=this.entities.length;
-            
-                // add the entity
-                
-            entity=this.add(null,entityDef.json,entityName,entityPosition,entityAngle,entityData,true,true,false);
-            if (entity===null) return(false);
-            
-                // random positions
-                
-            if (entityDef.randomStart) entity.moveToRandomNode(false);
-        }
+        entityCount=this.entities.length;       // dynamic entities can be added in the initialize
         
+        for (n=0;n!==entityCount;n++) {
+            entity=this.entities[n];
+            
+                // check for player types
+                
+            if (this.entityPlayerIdx===-1) {
+                if ((entity.constructor.name==='EntityFPSPlayerClass') || (entity.constructor.name==='EntityKartPlayerClass') || (entity.constructor.name==='Entity2DPlayerClass')) this.entityPlayerIdx=n;
+            }
+            
+                // initialize
+                
+            if (!entity.initialize()) return(false);
+        }
+
             // player is required
             
         if (this.entityPlayerIdx===-1) {
             console.log('no player entity in this map');
             return(false);
-        }
-            
-            // load any bots if it's a local multiplayer game
-            // these are dynamic entities, which means they
-            // don't show up in edit mode
-            
-        if (!((this.core.isMultiplayer) && (this.core.setup.localGame))) return(true);
-
-        for (n=0;n!==this.core.setup.botCount;n++) {
-            nameIdx=n%this.core.game.json.bot.names.length;
-            entity=this.add(null,this.core.game.json.bot.json,this.core.game.json.bot.names[nameIdx],new PointClass(0,0,0),new PointClass(0,0,0),null,false,true,false);
-            if (entity===null) return(false);
         }
 
         return(true);

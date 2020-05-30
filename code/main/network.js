@@ -1,4 +1,4 @@
-import EntityRemoteClass from '../project/entity_remote.js';
+//import EntityRemoteClass from '../project/entity_remote.js';
 
 //
 // network class
@@ -207,14 +207,16 @@ export default class NetworkClass
     handleEntityEnter(remoteId,dataView)
     {
         let userName,entity;
-        let remoteClass=EntityRemoteClass; // this.core.game.getRemoteClass();  -- TODO deal with this after json
         
         userName=this.getStringFromDataView(dataView,4,this.USER_NAME_LENGTH);
         
         console.info('ENTER>'+remoteId+'>'+userName);
         
-        entity=new remoteClass(this.core,remoteId,userName);
-        this.core.map.entityList.add(entity);
+        entity=new EntityRemoteClass(this.core,userName,null,new PointClass(0,0,0),new PointClass(0,0,0),null,false,null,null,false);
+        entity.remoteId=remoteId;
+        entity.initialize();        // errors here!
+        
+        this.core.map.entityList.add(entity);       // need addRemote?
         
         this.core.game.remoteEntering(userName);
     }

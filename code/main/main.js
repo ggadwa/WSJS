@@ -209,13 +209,13 @@ class MainClass
         
         this.core.map.ready();
         
-            // load any map effects
+            // initialize any map effects
             
         if (!this.core.map.effectList.initializeMapEffects()) return;        // halt on bad effect start
 
-            // load the entities
+            // initialize any map entities
             
-        if (!this.core.map.entityList.loadMapEntities()) return;    // halt on bad entity start
+        if (!this.core.map.entityList.initializeMapEntities()) return;    // halt on bad entity start
         
         this.core.loadingScreenUpdate();
         this.core.loadingScreenAddString('Final Setup');

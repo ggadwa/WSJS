@@ -174,10 +174,10 @@ export default class SoundListClass
                 this.addSoundByNameAttribute(entityDef.sounds.meleeSound);
                 this.addSoundByNameAttribute(entityDef.sounds.deathSound);
                 this.addSoundByNameAttribute(entityDef.sounds.fallSound);
-                this.addSoundByNameAttribute(entityDef.config.engineSound);
-                this.addSoundByNameAttribute(entityDef.config.skidSound);
-                this.addSoundByNameAttribute(entityDef.config.crashKartSound);
-                this.addSoundByNameAttribute(entityDef.config.crashWallSound);
+                this.addSoundByNameAttribute(entityDef.sounds.engineSound);
+                this.addSoundByNameAttribute(entityDef.sounds.skidSound);
+                this.addSoundByNameAttribute(entityDef.sounds.crashKartSound);
+                this.addSoundByNameAttribute(entityDef.sounds.crashWallSound);
             }
         }
         

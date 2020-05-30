@@ -3,9 +3,9 @@ import EntityClass from '../project/entity.js';
 
 export default class EntityContainerClass extends EntityClass
 {
-    constructor(core,name,json,position,angle,data,mapSpawn)
+    constructor(core,name,jsonName,position,angle,data,mapSpawn,spawnedBy,heldBy,show)
     {
-        super(core,name,json,position,angle,data,mapSpawn);
+        super(core,name,jsonName,position,angle,data,mapSpawn,spawnedBy,heldBy,show);
         
         this.openAnimation=null;
         this.openingAnimation=null;

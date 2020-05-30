@@ -1,20 +1,66 @@
 
 
 
+- deal with model loading by entity list instead of defs
 
 
+- autogenerate no entity
+- autogenerate pass in settings
 - wsjsEntity
-- wsjsEffect get rid of show
+
 - map settings
 
 
+{"entity":"player","randomStart":false,"show":true,"data":{}}
+{"entity":"captain_chest","randomStart":false,"show":true,"data":{"trigger":"gate_01"}}
 
-- pants on dragon queen
 
-- get kart bots working again
+
+{"entity":"captain_chest","randomStart":false,"show":true,"data":{"trigger":"gate_03"}}
+{"entity":"captain_chest","randomStart":false,"show":true,"data":{"trigger":"gate_02"}}
+{"entity":"captain_chest","randomStart":false,"show":true,"data":{"trigger":"gate_05"}}
+{"entity":"captain_chest","randomStart":false,"show":true,"data":{"trigger":"gate_06"}}
+{"entity":"captain_chest","randomStart":false,"show":true,"data":{"trigger":"gate_07"}}
+{"entity":"captain_chest","randomStart":false,"show":true,"data":{"trigger":"gate_08"}}
+{"entity":"captain_chest","randomStart":false,"show":true,"data":{"trigger":"gate_09"}}
+{"entity":"captain_chest","randomStart":false,"show":true,"data":{"trigger":null}}
+{"entity":"captain_chest","randomStart":false,"show":true,"data":{"trigger":null}}
+{"entity":"captain_chest","randomStart":false,"show":true,"data":{"trigger":null}}
+{"entity":"ratkin","randomStart":false,"show":true,"data":{}}
+{"entity":"ratkin","randomStart":false,"show":true,"data":{}}
+{"entity":"ratkin","randomStart":false,"show":true,"data":{}}
+{"entity":"ratkin","randomStart":false,"show":true,"data":{}}
+{"entity":"spider","randomStart":false,"show":true,"data":{"showTrigger":null}}
+{"entity":"spider","randomStart":false,"show":true,"data":{"showTrigger":null}}
+{"entity":"spider","randomStart":false,"show":true,"data":{"showTrigger":null}}
+{"entity":"spider","randomStart":false,"show":true,"data":{"showTrigger":null}}
+{"entity":"spider","randomStart":false,"show":true,"data":{"showTrigger":null}}
+{"entity":"vampire","randomStart":false,"show":true,"data":{}}
+{"entity":"skeleton","randomStart":false,"show":true,"data":{}}
+{"entity":"skeleton","randomStart":false,"show":true,"data":{}}
+{"entity":"spider","randomStart":false,"show":true,"data":{"showTrigger":null}}
+{"entity":"spider","randomStart":false,"show":true,"data":{"showTrigger":null}}
+{"entity":"ratkin","randomStart":false,"show":true,"data":{}}
+{"entity":"skeleton","randomStart":false,"show":true,"data":{}}
+{"entity":"skeleton","randomStart":false,"show":true,"data":{}}
+{"entity":"skeleton","randomStart":false,"show":true,"data":{}}
+{"entity":"skeleton","randomStart":false,"show":true,"data":{}}
+{"entity":"vampire","randomStart":false,"show":true,"data":{}}
+{"entity":"spider","randomStart":false,"show":true,"data":{"showTrigger":null}}
+{"entity":"spider","randomStart":false,"show":true,"data":{"showTrigger":null}}
+{"entity":"spider","randomStart":false,"show":false,"data":{"showTrigger":"queen_wake"}}
+{"entity":"spider","randomStart":false,"show":false,"data":{"showTrigger":"queen_wake"}}
+{"entity":"spider","randomStart":false,"show":false,"data":{"showTrigger":"queen_wake"}}
+{"entity":"spider","randomStart":false,"show":false,"data":{"showTrigger":"queen_wake"}}
+{"entity":"dragon_queen","randomStart":false,"show":true,"data":{}}
+{"entity":"pickup_m16","randomStart":false,"show":true,"data":{"pickupOnce":true}}
+{"entity":"pickup_armor","randomStart":false,"show":true,"data":{"pickupOnce":true}}
+
+
+
 
 - eventually get rid of import_map/import_model?
-
+- eventually make model/etc loading specific instead of everything
 
 
 
@@ -41,7 +87,8 @@ BOTS
    - extra weapon fires (needs config for how often it uses extra weapons)
 
 KART
-  - kart move out the weapons, clean up entity_kart_player from weapons, implement follow floor projectile
+ - get position/score running again
+ - fix the bots
 
 MISC
   - death messages by game with json setup

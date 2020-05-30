@@ -1,20 +1,16 @@
 import PointClass from '../utility/point.js';
 import EntityClass from '../project/entity.js';
 
-export default class EntityDecorationClass extends EntityClass
+export default class Entity2DMonsterClass extends EntityClass
 {
     constructor(core,name,jsonName,position,angle,data,mapSpawn,spawnedBy,heldBy,show)
     {
         super(core,name,jsonName,position,angle,data,mapSpawn,spawnedBy,heldBy,show);
-        
-        this.idleAnimation=null;
     }
     
     initialize()
     {
         if (!super.initialize()) return(false);
-        
-        this.idleAnimation=this.json.animations.idleAnimation;
         
         return(true);
     }
@@ -22,10 +18,14 @@ export default class EntityDecorationClass extends EntityClass
     ready()
     {
         super.ready();
-        
-        if (this.idleAnimation!==null) this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.idleAnimation[0],this.idleAnimation[1]);
     }
-   
+        
+    run()
+    {
+        super.run();
+        
+    }
+    
     drawSetup()
     {
         if (this.model===null) return(false);

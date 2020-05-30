@@ -6,9 +6,9 @@ import EntityClass from '../project/entity.js';
 
 export default class EntityKartPlayerClass extends EntityClass
 {
-    constructor(core,name,json,position,angle,data,mapSpawn)
+    constructor(core,name,jsonName,position,angle,data,mapSpawn,spawnedBy,heldBy,show)
     {
-        super(core,name,json,position,angle,data,mapSpawn);
+        super(core,name,jsonName,position,angle,data,mapSpawn,spawnedBy,heldBy,show);
         
         this.engineSound=null;
         this.skidSound=null;
@@ -82,10 +82,6 @@ export default class EntityKartPlayerClass extends EntityClass
         this.ADD_ENGINE_SOUND_RATE=0.8;
         this.ADD_ENGINE_SOUND_AIR_RATE_INCREASE=0.2;
 
-            // settings
-            
-        this.filter='player';          // filters are used when searching for entities
-        
             // kart settings
             
         this.maxTurnSpeed=1.5;
@@ -117,7 +113,7 @@ export default class EntityKartPlayerClass extends EntityClass
         for (n=0;n!==this.json.weapons.length;n++) {
             weaponBlock=this.json.weapons[n];
 
-             weaponEntity=this.addEntity(this,weaponBlock.json,weaponBlock.name,new PointClass(0,0,0),new PointClass(0,0,0),null,true,true);
+             weaponEntity=this.addEntity(weaponBlock.json,weaponBlock.name,new PointClass(0,0,0),new PointClass(0,0,0),null,this,this,true);
              this.weapons.push(weaponEntity);
         }
         
@@ -596,9 +592,6 @@ export default class EntityKartPlayerClass extends EntityClass
             this.previousPlace=this.place;
             this.previousLap=this.lap;
         }
-        
-        let cube=this.core.map.cubeList.findCubeContainingEntity(this);
-        if (cube!==null) console.info('in cube='+cube.name);
     }
     
         //

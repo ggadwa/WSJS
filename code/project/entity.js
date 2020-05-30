@@ -11,7 +11,7 @@ import NetworkClass from '../main/network.js';
 
 export default class EntityClass
 {
-    constructor(core,name,json,position,angle,data,mapSpawn)
+    constructor(core,name,jsonName,position,angle,data,mapSpawn,spawnedBy,heldBy,show)
     {
         this.TEXT_ALIGN_LEFT=0;     // when we have statics (safari) then use the class static to create these (still don't want people to include other classes)
         this.TEXT_ALIGN_CENTER=1;
@@ -29,7 +29,8 @@ export default class EntityClass
         this.MODEL_ROTATION_ORDER_LIST=['XYZ','XZY'];
         
         this.core=core;
-        this.json=json;
+        this.jsonName=jsonName;
+        this.json=null;
         
         this.name=name;
         this.radius=1;
@@ -40,17 +41,18 @@ export default class EntityClass
         this.angle=angle.copy();
         this.data=data;
         this.mapSpawn=mapSpawn;
+        this.spawnedBy=spawnedBy;
+        this.heldBy=heldBy;
+        this.show=show;
         
         this.originalPosition=this.position.copy();
         this.originalAngle=this.angle.copy();
         this.originalScale=this.scale.copy();
         
-        this.show=true;
-        this.heldBy=null;
         this.fighter=false;
         this.canPickup=false;
         this.pickup=false;
-        this.spawnedBy=null;
+        
         this.markDelete=false;
         
         this.model=null;
@@ -103,6 +105,11 @@ export default class EntityClass
     initialize()
     {
         let n;
+        
+            // get the json
+            
+        this.json=this.core.game.getCachedJsonEntity(this.jsonName);
+        if (this.json===null) return(false);
         
             // setup
             
@@ -226,9 +233,9 @@ export default class EntityClass
         return(this.core.map.entityList.getPlayer());
     }
     
-    addEntity(spawnedByEntity,jsonName,name,position,angle,data,show,hold)
+    addEntity(jsonName,name,position,angle,data,spawnedBy,heldBy,show)
     {
-        return(this.core.map.entityList.add(spawnedByEntity,jsonName,name,position,angle,data,false,show,hold));
+        return(this.core.map.entityList.addDynamic(jsonName,name,position,angle,data,spawnedBy,heldBy,show));
     }
     
     removeEntity(entity)

@@ -74,9 +74,9 @@ class EntityWeaponFireClass
 
 export default class EntityWeaponClass extends EntityClass
 {
-    constructor(core,name,json,position,angle,data,mapSpawn)
+    constructor(core,name,json,position,angle,data,mapSpawn,spawnedBy,heldBy,show)
     {
-        super(core,name,json,position,angle,data,mapSpawn);
+        super(core,name,json,position,angle,data,mapSpawn,spawnedBy,heldBy,show);
         
         this.FIRE_TYPE_HIT_SCAN=0;
         this.FIRE_TYPE_PROJECTILE=1;
@@ -245,7 +245,7 @@ export default class EntityWeaponClass extends EntityClass
             // spawn from whatever is holding this weapon
             // so it counts as the spawnBy for any damage calculations, etc
 
-        projEntity=this.addEntity(parentEntity,fire.projectileJson,('projectile_'+this.name),this.firePoint,fireAngle,null,true,false);
+        projEntity=this.addEntity(fire.projectileJson,('projectile_'+this.name),this.firePoint,fireAngle,null,parentEntity,null,true);
         if (projEntity!==null) projEntity.ready();
     }
     

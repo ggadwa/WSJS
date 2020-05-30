@@ -448,6 +448,37 @@ export default class ImportGLTFClass
         return(mat);
     }
     
+    getRotationForMeshNodeParent(meshIdx)
+    {
+        let node,nodeIdx;
+        let rotationProp,rotation,ang;
+        
+            // this is used for wsjsEntity meshes
+            // so we can grab the rotation from the
+            // first node
+            
+        ang=new PointClass(0,0,0);
+        
+            // if no node, then no rotation
+            
+        nodeIdx=this.findNodeIndexInDataForMeshIndex(meshIdx);
+        if (nodeIdx===-1) return(ang);
+        
+            // we only look at TRS matrix at this point
+            // this will probably need to be improved in
+            // the future
+
+        node=this.jsonData.nodes[nodeIdx];
+
+        rotationProp=node.rotation;
+        if (rotationProp!==undefined) {
+            rotation=new QuaternionClass(rotationProp[0],rotationProp[1],rotationProp[2],rotationProp[3]);
+            rotation.getEulerAngle(ang);
+        }
+        
+        return(ang);
+    }
+    
         //
         // decode skeleton
         //
@@ -556,7 +587,7 @@ export default class ImportGLTFClass
     
     findMaterialForMesh(meshNode,primitiveNode)
     {
-        let n,bitmap,uri;
+        let bitmap,uri;
         let baseColorTexture,metallicRoughnessTexture,emissiveTexture;
         let colorURL=null;
         let colorBase=null;
@@ -688,10 +719,11 @@ export default class ImportGLTFClass
         // just contain logic that is used elsewhere in the engine
         //
         
-    decodeMapMeshInformational(map,materialNode,meshNode,mesh)
+    decodeMapMeshInformational(map,materialNode,meshNode,mesh,meshIdx)
     {
         let n,value,obj;
         let moveDef,movePoint,moveRotate,rotateOffset;
+        let pos,ang;
         
             // skyboxes
             
@@ -767,7 +799,19 @@ export default class ImportGLTFClass
         if (value!==null) {
             obj=JSON.parse(value);
             
-            map.effectList.add(new EffectClass(this.core,null,obj.name,mesh.center,obj.data,true,obj.show));
+            map.effectList.add(new EffectClass(this.core,null,obj.effect,mesh.center,obj.data,true,true));
+            return(this.MESH_INFORMATIONAL_REMOVE);
+        }
+        
+            // entities
+            
+        value=this.getCustomProperty(materialNode,meshNode,'wsjsEntity');
+        if (value!==null) {
+            obj=JSON.parse(value);
+            
+            pos=new PointClass(mesh.center.x,mesh.yBound.min,mesh.center.z);
+            ang=this.getRotationForMeshNodeParent(meshIdx);
+            if (map.entityList.addFromMap(obj.entity,meshNode.name,pos,ang,obj.data,obj.show)===null) return(this.MESH_INFORMATIONAL_ERROR);
             return(this.MESH_INFORMATIONAL_REMOVE);
         }
 
@@ -958,7 +1002,7 @@ export default class ImportGLTFClass
                 if (this.getCustomProperty(materialNode,meshNode,'wsjsNoCollision')!==null) mesh.noCollisions=true;
                 
                 if (map!==null) {
-                    informResult=this.decodeMapMeshInformational(map,materialNode,meshNode,mesh);
+                    informResult=this.decodeMapMeshInformational(map,materialNode,meshNode,mesh,n);
                     if (informResult===this.MESH_INFORMATIONAL_ERROR) return(false);
                     if (informResult===this.MESH_INFORMATIONAL_REMOVE) continue;
                 }

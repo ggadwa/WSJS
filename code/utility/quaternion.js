@@ -102,6 +102,30 @@ export default class QuaternionClass
         this.z=(mat.data[1]-mat.data[4])/w4;
     }
     
+    getEulerAngle(ang)
+    {
+        let sinRcosP,cosRcosP;
+        let sinP;
+        let sinYcosP,cosYcosP;
+        
+        sinRcosP=2*((this.w*this.x)+(this.y*this.z));
+        cosRcosP=1-(2*((this.x*this.x)+(this.y*this.y)));
+        ang.x=Math.atan2(sinRcosP,cosRcosP)*(180.0/Math.PI);
+        
+        sinP=2*((this.w*this.y)-(this.z*this.x));
+        if (Math.abs(sinP)>=1.0) {
+            ang.y=(Math.PI*0.5)*Math.sign(sinP);
+        }
+        else {
+            ang.y=Math.asin(sinP);
+        }
+        ang.y*=(180.0/Math.PI);
+        
+        sinYcosP=2*((this.w*this.z)+(this.x*this.y));
+        cosYcosP=1-(2*((this.y*this.y)+(this.z*this.z)));
+        ang.z=Math.atan2(sinYcosP,cosYcosP)*(180.0/Math.PI);
+    }
+    
     copy()
     {
         return(new QuaternionClass(this.x,this.y,this.z,this.w));

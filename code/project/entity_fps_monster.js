@@ -9,9 +9,9 @@ import EntityClass from '../project/entity.js';
 
 export default class EntityFPSMonsterClass extends EntityClass
 {
-    constructor(core,name,json,position,angle,data,mapSpawn)
+    constructor(core,name,jsonName,position,angle,data,mapSpawn,spawnedBy,heldBy,show)
     {
-        super(core,name,json,position,angle,data,mapSpawn);
+        super(core,name,jsonName,position,angle,data,mapSpawn,spawnedBy,heldBy,show);
         
         this.STATE_HIDDEN=0;
         this.STATE_ASLEEP=1;
@@ -569,7 +569,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         if ((this.projectileFireNextTick<=this.core.timestamp) && (this.projectileFireNextTick!==0)) {
             this.projectileSetupFire(player);
 
-            projEntity=this.addEntity(this,this.projectileJson,('projectile_'+this.name),this.firePosition,this.fireAngle,this.projectileData,true,false);
+            projEntity=this.addEntity(this.projectileJson,('projectile_'+this.name),this.firePosition,this.fireAngle,this.projectileData,this,null,true);
             if (projEntity!==null) projEntity.ready();
             
             this.projectileFireNextTick=0;
