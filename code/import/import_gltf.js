@@ -21,10 +21,12 @@ import BitmapColorClass from '../bitmap/bitmap_color.js';
 
 export default class ImportGLTFClass
 {
-    constructor(core,json)
+    constructor(core,name)
     {
         this.core=core;
-        this.json=json;
+        this.name=name;
+        
+        this.mapImportScale=1;
         
         this.MESH_INFORMATIONAL_KEEP=0;
         this.MESH_INFORMATIONAL_REMOVE=1;
@@ -43,7 +45,7 @@ export default class ImportGLTFClass
     async loadGLTFJson()
     {
         let resp;
-        let url='../models/'+this.json.name+'/'+this.json.name+'.gltf';
+        let url='../models/'+this.name+'/'+this.name+'.gltf';
         
         try {
             resp=await fetch(url);
@@ -58,7 +60,7 @@ export default class ImportGLTFClass
     async loadGLTFBin()
     {
         let resp;
-        let url='../models/'+this.json.name+'/'+this.jsonData.buffers[0].uri;     // right now assume a single buffer, this isn't necessarly true though TODO on this
+        let url='../models/'+this.name+'/'+this.jsonData.buffers[0].uri;     // right now assume a single buffer, this isn't necessarly true though TODO on this
         
         try {
             resp=await fetch(url);
@@ -476,6 +478,11 @@ export default class ImportGLTFClass
             rotation.getEulerAngle(ang);
         }
         
+            // we can get some wacky results,
+            // like negative angles, so fix them
+            
+        ang.angleFix();
+        
         return(ang);
     }
     
@@ -561,7 +568,7 @@ export default class ImportGLTFClass
                 joints=skin.joints;
 
                 if (joints.length>this.core.MAX_SKELETON_JOINT) {
-                    console.log('too many joints in skeleton ('+joints.length+' out of '+this.core.MAX_SKELETON_JOINT+' in model '+this.json.name);
+                    console.log('too many joints in skeleton ('+joints.length+' out of '+this.core.MAX_SKELETON_JOINT+' in model '+this.name);
                     return(false);
                 }
 
@@ -596,7 +603,7 @@ export default class ImportGLTFClass
         let emissiveURL=null;
         let emissiveFactor=null;
         let scale=null;
-        let prefixURL='models/'+this.json.name+'/';
+        let prefixURL='models/'+this.name+'/';
         let materialNode=this.jsonData.materials[primitiveNode.material];
         
             // no material at all
@@ -685,7 +692,7 @@ export default class ImportGLTFClass
                 }
             }
             else {
-                console.log('Could not find texture for mesh '+meshNode.name+' in material '+materialNode.name+' in '+this.json.name);
+                console.log('Could not find texture for mesh '+meshNode.name+' in material '+materialNode.name+' in '+this.name);
                 return(null);
             }
         }
@@ -701,8 +708,10 @@ export default class ImportGLTFClass
         
     getCustomProperty(materialNode,meshNode,propName)
     {
-        if (materialNode.extras!==undefined) {
-            if (materialNode.extras[propName]!==undefined) return(materialNode.extras[propName]);
+        if (materialNode!==null) {
+            if (materialNode.extras!==undefined) {
+                if (materialNode.extras[propName]!==undefined) return(materialNode.extras[propName]);
+            }
         }
         if (meshNode.extras!==undefined) {
             if (meshNode.extras[propName]!==undefined) return(meshNode.extras[propName]);
@@ -719,17 +728,39 @@ export default class ImportGLTFClass
         // just contain logic that is used elsewhere in the engine
         //
         
+    decideMapMeshInformationalParseJSON(meshNode,value)
+    {
+        try {
+            return(JSON.parse(value));
+        }
+        catch (e) {
+            console.log('Error in map JSON for mesh '+meshNode.name+':'+value+':'+e);
+            return(null);
+        }
+    }
+    
     decodeMapMeshInformational(map,materialNode,meshNode,mesh,meshIdx)
     {
         let n,value,obj;
         let moveDef,movePoint,moveRotate,rotateOffset;
         let pos,ang;
         
+            // map settings
+            
+        value=this.getCustomProperty(materialNode,meshNode,'wsjsMap');
+        if (value!==null) {
+            obj=this.decideMapMeshInformationalParseJSON(meshNode,value);
+            if (obj===null) return(this.MESH_INFORMATIONAL_ERROR);
+            
+            return(this.MESH_INFORMATIONAL_REMOVE);
+        }
+        
             // skyboxes
             
         value=this.getCustomProperty(materialNode,meshNode,'wsjsSky');
         if (value!==null) {
-            obj=JSON.parse(value);
+            obj=this.decideMapMeshInformationalParseJSON(meshNode,value);
+            if (obj===null) return(this.MESH_INFORMATIONAL_ERROR);
             
             map.sky.on=true;
             map.sky.size=obj.size;
@@ -741,9 +772,10 @@ export default class ImportGLTFClass
             
         value=this.getCustomProperty(materialNode,meshNode,'wsjsLight');
         if (value!==null) {
-            obj=JSON.parse(value);
+            obj=this.decideMapMeshInformationalParseJSON(meshNode,value);
+            if (obj===null) return(this.MESH_INFORMATIONAL_ERROR);
             
-            map.lightList.add(new LightClass(mesh.center,new ColorClass(obj.color.r,obj.color.g,obj.color.b),obj.intensity,obj.exponent,obj.ambient));
+            map.lightList.add(new LightClass(mesh.center,new ColorClass(obj.color.r,obj.color.g,obj.color.b),obj.intensity,((obj.exponent===undefined)?0.0:obj.exponent),((obj.ambient===undefined)?false:obj.ambient)));
             return(this.MESH_INFORMATIONAL_REMOVE);
         }
         
@@ -751,7 +783,8 @@ export default class ImportGLTFClass
             
         value=this.getCustomProperty(materialNode,meshNode,'wsjsMove');
         if (value!==null) {
-            obj=JSON.parse(value);
+            obj=this.decideMapMeshInformationalParseJSON(meshNode,value);
+            if (obj===null) return(this.MESH_INFORMATIONAL_ERROR);
             
             rotateOffset=new PointClass(0,0,0);
             if (obj.rotateOffset!==undefined) rotateOffset.setFromValues(obj.rotateOffset.x,obj.rotateOffset.y,obj.rotateOffset.z);
@@ -777,9 +810,10 @@ export default class ImportGLTFClass
             
         value=this.getCustomProperty(materialNode,meshNode,'wsjsCube');
         if (value!==null) {
-            obj=JSON.parse(value);
+            obj=this.decideMapMeshInformationalParseJSON(meshNode,value);
+            if (obj===null) return(this.MESH_INFORMATIONAL_ERROR);
 
-            map.cubeList.add(new MapCubeClass(obj.name,obj.actions,mesh.xBound,mesh.yBound,mesh.zBound,obj.data));
+            map.cubeList.add(new MapCubeClass(obj.name,((obj.actions===undefined)?null:obj.actions),mesh.xBound,mesh.yBound,mesh.zBound,((obj.data===undefined)?null:obj.data)));
             return(this.MESH_INFORMATIONAL_REMOVE);
         }
         
@@ -787,9 +821,10 @@ export default class ImportGLTFClass
             
         value=this.getCustomProperty(materialNode,meshNode,'wsjsLiquid');
         if (value!==null) {
-            obj=JSON.parse(value);
+            obj=this.decideMapMeshInformationalParseJSON(meshNode,value);
+            if (obj===null) return(this.MESH_INFORMATIONAL_ERROR);
 
-            map.liquidList.add(new MapLiquidClass(this.core,mesh.bitmap,obj.waveSize,obj.wavePeriod,obj.waveHeight,obj.waveUVStamp,new PointClass(obj.uvShift[0],obj.uvShift[1],0),obj.gravityFactor,new ColorClass(obj.tint[0],obj.tint[1],obj.tint[2]),obj.soundIn,obj.soundOut,mesh.xBound,mesh.yBound,mesh.zBound));
+            map.liquidList.add(new MapLiquidClass(this.core,mesh.bitmap,obj.waveSize,obj.wavePeriod,obj.waveHeight,((obj.waveUVStamp===undefined)?[0,0]:obj.waveUVStamp),((obj.uvShift===undefined)?new PointClass(0,0,0):new PointClass(obj.uvShift[0],obj.uvShift[1],0)),((obj.gravityFactor===undefined)?0.1:obj.gravityFactor),((obj.tint===undefined)?new ColorClass(1,1,1):new ColorClass(obj.tint[0],obj.tint[1],obj.tint[2])),((obj.soundIn===undefined)?null:obj.soundIn),((obj.soundOut===undefined)?null:obj.soundOut),mesh.xBound,mesh.yBound,mesh.zBound));
             return(this.MESH_INFORMATIONAL_REMOVE);
         }
         
@@ -797,9 +832,15 @@ export default class ImportGLTFClass
             
         value=this.getCustomProperty(materialNode,meshNode,'wsjsEffect');
         if (value!==null) {
-            obj=JSON.parse(value);
+            obj=this.decideMapMeshInformationalParseJSON(meshNode,value);
+            if (obj===null) return(this.MESH_INFORMATIONAL_ERROR);
             
-            map.effectList.add(new EffectClass(this.core,null,obj.effect,mesh.center,obj.data,true,true));
+            if (obj.effect===undefined) {
+                console.log('Bad effect JSON for mesh: '+meshNode.name);
+                return(this.MESH_INFORMATIONAL_ERROR);
+            }
+            
+            map.effectList.add(new EffectClass(this.core,null,obj.effect,mesh.center,((obj.data===undefined)?null:obj.data),true,true));
             return(this.MESH_INFORMATIONAL_REMOVE);
         }
         
@@ -807,11 +848,17 @@ export default class ImportGLTFClass
             
         value=this.getCustomProperty(materialNode,meshNode,'wsjsEntity');
         if (value!==null) {
-            obj=JSON.parse(value);
+            obj=this.decideMapMeshInformationalParseJSON(meshNode,value);
+            if (obj===null) return(this.MESH_INFORMATIONAL_ERROR);
+            
+            if (obj.entity===undefined) {
+                console.log('Bad entity JSON for mesh: '+meshNode.name);
+                return(this.MESH_INFORMATIONAL_ERROR);
+            }
             
             pos=new PointClass(mesh.center.x,mesh.yBound.min,mesh.center.z);
             ang=this.getRotationForMeshNodeParent(meshIdx);
-            if (map.entityList.addFromMap(obj.entity,meshNode.name,pos,ang,obj.data,obj.show)===null) return(this.MESH_INFORMATIONAL_ERROR);
+            if (map.entityList.addFromMap(obj.entity,meshNode.name,pos,ang,((obj.data===undefined)?null:obj.data),((obj.show===undefined)?true:obj.show))===null) return(this.MESH_INFORMATIONAL_ERROR);
             return(this.MESH_INFORMATIONAL_REMOVE);
         }
 
@@ -827,19 +874,13 @@ export default class ImportGLTFClass
         let n,k,t,meshesNode,meshNode,primitiveNode;
         let vertexArray,normalArray,tangentArray,uvArray,indexArray;
         let jointArray,weightArray,fakeArrayLen,noSkinAttachedNodeIdx,skinIdx;
-        let nIdx,forceTangentRebuild;
+        let nIdx;
         let mesh,materialNode,bitmap,curBitmapName,informResult;
         let v=new PointClass(0,0,0);
         let normal=new PointClass(0,0,0);
         let tangent=new PointClass(0,0,0);
         let cumulativeNodeMatrix;
         let meshes=[];
-        
-            // special flag to force tangents to
-            // get rebuild if tangents in file are wrong
-            
-        forceTangentRebuild=false;
-        if (this.json.forceTangentRebuild!==undefined) forceTangentRebuild=this.json.forceTangentRebuild;
         
             // run through the meshes
             
@@ -883,7 +924,7 @@ export default class ImportGLTFClass
                 normalArray=this.decodeBuffer(primitiveNode.attributes.NORMAL,3);
                 
                 tangentArray=null;  // tangents aren't always there, we recreate them if missing
-                if ((primitiveNode.attributes.TANGENT!==undefined) && (!forceTangentRebuild)) tangentArray=this.decodeBuffer(primitiveNode.attributes.TANGENT,3);
+                if (primitiveNode.attributes.TANGENT!==undefined) tangentArray=this.decodeBuffer(primitiveNode.attributes.TANGENT,3);
                 
                     // get the UV, sometimes solid colors have
                     // no UV so just make a 0 uv array
@@ -993,7 +1034,7 @@ export default class ImportGLTFClass
                     // maps don't have rigging, so we need to
                     // fix the import scale here
                     
-                if (map!==null) mesh.scale(map.getImportScale());
+                if (map!==null) mesh.scale(this.mapImportScale);
                     
                     // handle any custom properties and
                     // informational meshes
@@ -1031,6 +1072,58 @@ export default class ImportGLTFClass
         }
         
         return(true);
+    }
+    
+        //
+        // decode map informational
+        // this is a special mesh in the map that we use to store
+        // some game specific information
+        //
+        
+    decodeMapInformational(map)
+    {
+        let n,meshNode,meshesNode;
+        let value,obj;
+
+        meshesNode=this.jsonData.meshes;
+        
+        for (n=0;n!==meshesNode.length;n++) {
+            meshNode=meshesNode[n];
+            
+            value=this.getCustomProperty(null,meshNode,'wsjsMap');
+            if (value===null) continue;
+            
+                // decode it
+                
+            obj=this.decideMapMeshInformationalParseJSON(meshNode,value);
+            if (obj===null) return(false);
+            
+            if ((obj.scale===undefined) || (obj.bumpHeight===undefined) || (obj.gravity===undefined)) {
+                console.log('Map glTF wsjsMap mesh JSON requires scale, bumpHeight, and gravity');
+                return(false);
+            }
+            
+            this.mapImportScale=obj.scale;
+            
+            map.bumpHeight=obj.bumpHeight;
+            map.cameraSetup=obj.camera;
+            map.gravityMinValue=obj.gravity.min;
+            map.gravityMaxValue=obj.gravity.max;
+            map.gravityAcceleration=obj.gravity.acceleration;
+
+            if (obj.maxFloorCeilingDetectionFactor!==undefined) {
+                map.meshList.maxFloorCeilingDetectionFactor=1.0-obj.maxFloorCeilingDetectionFactor;     // 0 = walls facing straight up only, to 1 which is pretty much anything
+            }
+
+            if (obj.lightMin!==undefined) this.core.map.lightList.lightMin.setFromValues(obj.lightMin.r,obj.lightMin.g,obj.lightMin.b);
+            if (obj.lightMax!==undefined) this.core.map.lightList.lightMax.setFromValues(obj.lightMax.r,obj.lightMax.g,obj.lightMax.b);
+            
+            return(true);
+        }
+        
+        console.log('Map glTF is missing a wsjsMap mesh with map information');
+        
+        return(false);
     }
     
         //
@@ -1147,6 +1240,10 @@ export default class ImportGLTFClass
             
         if (skeleton!==null) {
             if (!this.decodeSkeleton(skeleton)) return(false);
+        }
+        
+        if (map!==null) {
+            if (!this.decodeMapInformational(map)) return(false);
         }
         
         if (!this.decodeMesh(map,meshList,skeleton)) return(false);

@@ -10,6 +10,36 @@ Name                        Description
 ----                        -----------
 wsjsNoCollision             Mesh has no collision (value ignored)
 
+wsjsMap                     Misc map settings
+                                {
+                                    "scale":700,
+                                    "bumpHeight":1400,
+                                    "camera":
+                                        {
+                                            "mode":"firstPerson",
+                                            "viewNearZ":500,
+                                            "viewFarZ":500000
+                                        },
+                                    "gravity":
+                                        {
+                                            "min":0,
+                                            "max":1700,
+                                            "acceleration":0.1
+                                        }
+                                    "maxFloorCeilingDetectionFactor":0.6,       [default: 0.7]
+                                    "lightMin":                                 [default: {"r":0.0,"g":0.0,"b":0.0}]
+                                        {
+                                            "r":0.2,
+                                            "g":0.2,
+                                            "b":0.2
+                                        },
+                                    "lightMax":                                 [default: {"r":1.5,"g":1.5,"b":1.5}]
+                                        {
+                                            "r":1.0,
+                                            "g":1.0,
+                                            "b":1.0
+                                        }
+
 wsjsSky                     Mesh is a sky box definition.  Material determines the texture
                                 {
                                     "size":50000
@@ -45,11 +75,14 @@ wsjsMove                    This mesh has an attached movement, defined by the v
 wsjsCube                    Mesh is a cube definition.  Mesh bounds determine cube volume
                                 {
                                     "name":"health_spot_1",
-                                    "actions":
+                                    "actions":                                  [default: null]
                                         [
-                                            {"action":"addHealth","count":10}
+                                            {
+                                                "action":"addHealth",
+                                                "count":10
+                                            }
                                         ],
-                                    "data":{}
+                                    "data":{}                                   [default: null]
                                 }
 
 wsjsLiquid                  Mesh is a liquid definition.  Mesh bounds determine liquid volume & material determines texture
@@ -58,33 +91,50 @@ wsjsLiquid                  Mesh is a liquid definition.  Mesh bounds determine 
                                     "wavePeriod":4000,
                                     "waveHeight":400,
                                     "waveUVStamp":0.1,
-                                    "uvShift":[0,0.0005],
-                                    "tint":[0.2,0.2,1.0],
-                                    "gravityFactor":0.1,
-                                    "soundIn":{"name":"splash","rate":1.0,"randomRateAdd":0,"distance":40000,"loopStart":0,"loopEnd":0,"loop":false},
-                                    "soundOut":{"name":"splash","rate":0.8,"randomRateAdd":0,"distance":40000,"loopStart":0,"loopEnd":0,"loop":false}
+                                    "uvShift":[0,0.0005],                       [default [0,0]]
+                                    "tint":[0.2,0.2,1.0],                       [default [1,1,1]]
+                                    "gravityFactor":0.1,                        [default 0.1]
+                                    "soundIn":                                  [default null]
+                                        {
+                                            "name":"splash",
+                                            "rate":1.0,                         [default 1.0]
+                                            "randomRateAdd":0,                  [default 0]
+                                            "distance":40000,
+                                            "loopStart":0,                      [default 0]
+                                            "loopEnd":0,                        [default 0]
+                                            "loop":false                        [default false]
+                                        },
+                                    "soundOut":                                 [default null]
+                                        {
+                                            "name":"splash",
+                                            "rate":0.8,                         [default 1.0]
+                                            "randomRateAdd":0,                  [default 0.0]
+                                            "distance":40000,
+                                            "loopStart":0,                      [default 0]
+                                            "loopEnd":0,                        [default 0]
+                                            "loop":false                        [default false]
+                                        }
                                 }
 
 wsjsLight                   Mesh is a light definition.  Center is center point of light
                                 {
                                     "color":{"r":0.2,"g":0.2,"b":0.2},
                                     "intensity":500000,
-                                    "exponent":0.0,
-                                    "ambient":true
+                                    "exponent":0.0,                             [default: 0.0]
+                                    "ambient":true                              [default: false]
                                 }
 
 wsjsEffect                  Mesh is an effect definition.  Center is center point of effect
                                 {
                                     "effect":"fire",
-                                    "data":{"intensity":23000}
+                                    "data":{"intensity":23000}                  [default: null]
                                 }
 
 wsjsEntity                  Mesh is an entity definition.  Entity is x/z center of mesh and Y at the bottom of the mesh.  The angle is from the object
-                            angle and the name is from the mesh name.  (Note: If you use a cube, turn on viewport display/axis and the face marked with Y
-                            will be the back of the entity.)
+                            angle and the name is from the mesh name.  (Note: In blender, if you use a cube, turn on viewport display/axis and the face marked with Y
+                            will be the back of the entity)
                                 {
                                     "entity":"pickup_m16",
-                                    "randomStart":false,
-                                    "show":true,
-                                    "data":{"pickupOnce":true}
+                                    "show":true,                                [default: true]
+                                    "data":{"pickupOnce":true}                  [default: null]
                                 }

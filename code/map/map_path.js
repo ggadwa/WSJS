@@ -47,7 +47,7 @@ export default class MapPathClass
     async loadPathJson()
     {
         let resp;
-        let url='../paths/'+this.core.map.json.name+'.json';
+        let url='../paths/'+this.core.map.name+'.json';
         
         try {
             resp=await fetch(url);

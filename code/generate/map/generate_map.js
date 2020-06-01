@@ -265,7 +265,7 @@ export default class GenerateMapClass
         // build a map
         //
         
-    build(json)
+    build(autoGenerate)
     {
         let n,k,seed;
         let genPiece,genMesh,genBitmap;
@@ -277,7 +277,7 @@ export default class GenerateMapClass
         
             // see the random number generator
             
-        seed=(json.autoGenerate.randomSeed===undefined)?Date.now():json.autoGenerate.randomSeed;
+        seed=(autoGenerate.randomSeed===undefined)?Date.now():autoGenerate.randomSeed;
         console.info('Random Seed: '+seed);
         
         this.core.setRandomSeed(seed);
@@ -290,8 +290,8 @@ export default class GenerateMapClass
         
             // some global settings
             
-        roomCount=json.autoGenerate.roomCount;
-        segmentSize=json.autoGenerate.segmentSize;
+        roomCount=autoGenerate.roomCount;
+        segmentSize=autoGenerate.segmentSize;
         
             // first room in center of map
             

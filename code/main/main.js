@@ -54,15 +54,13 @@ class MainClass
 
     async initGame()
     {
-        let startMap,mapJson;
+        let startMap;
         
           // initialize the map
           
         startMap=this.core.game.lookupValue(this.core.game.json.startMap,this.data);
-        mapJson=this.core.game.getCachedJsonMap(startMap);
-        if (mapJson===null) return;
         
-        this.core.map=new MapClass(this.core,mapJson);
+        this.core.map=new MapClass(this.core,startMap,this.core.game.autoGenerate);
         if (!this.core.map.initialize()) return;
 
             // next step
@@ -143,7 +141,7 @@ class MainClass
             // auto generated maps don't have shadowmaps
             // so we skip
             
-        if (this.core.map.json.autoGenerate===undefined) {
+        if (this.core.map.autoGenerate===null) {
             this.core.loadingScreenAddString('Loading Shadowmap');
             this.core.loadingScreenDraw();
             

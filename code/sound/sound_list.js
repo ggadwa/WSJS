@@ -304,13 +304,22 @@ export default class SoundListClass
     {
         let rate;
         
-        if (obj===undefined) return(-1);
-        if ((obj.name===undefined) || (obj.name==='')) return(-1);
+        if ((obj===undefined) || (obj===null)) return(-1);
+        if ((obj.name===undefined) || (obj.name==='')) {
+            console.log('Sound is missing or has a blank name');
+            return(-1);
+        }
+        if (obj.distance===undefined) {
+            console.info(`Sound ${obj.name} is missing a distance value`);
+            return(-1);
+        }
         
-        rate=obj.rate;
-        if (obj.randomRateAdd!==0) rate+=(Math.random()*obj.randomRateAdd);
+        rate=(obj.rate===undefined)?1.0:obj.rate;
+        if (obj.randomRateAdd!==undefined) {
+            if (obj.randomRateAdd!==0) rate+=(Math.random()*obj.randomRateAdd);
+        }
         
-        return(this.play(position,obj.name,rate,obj.distance,obj.loopStart,obj.loopEnd,obj.loop));
+        return(this.play(position,obj.name,rate,obj.distance,((obj.loopStart===undefined)?0:obj.loopStart),((obj.loopEnd===undefined)?0:obj.loopEnd),((obj.loop===undefined)?false:obj.loop)));
     }
     
     stop(playIdx)

@@ -15,7 +15,7 @@ export default class ShadowmapLoadClass
     async loadShadowmapBin()
     {
         let resp;
-        let url='../shadowmaps/'+this.core.map.json.name+'/shadowmap.bin';
+        let url='../shadowmaps/'+this.core.map.name+'/shadowmap.bin';
         
         try {
             resp=await fetch(url);
@@ -109,7 +109,7 @@ export default class ShadowmapLoadClass
                 
                 bitmap=bitmaps.get(bitmapIdx);
                 if (bitmap===undefined) {
-                    bitmap=new BitmapShadowmapClass(this.core,('shadowmaps/'+this.core.map.json.name+'/shadowmap_'+bitmapIdx+'.png'));
+                    bitmap=new BitmapShadowmapClass(this.core,('shadowmaps/'+this.core.map.name+'/shadowmap_'+bitmapIdx+'.png'));
                     this.core.bitmapList.add(bitmap);
                     bitmaps.set(bitmapIdx,bitmap);      // internal list so we can keep track of bitmaps we loaded
                 }

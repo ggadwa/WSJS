@@ -769,6 +769,20 @@ export default class PointClass
         }
     }
     
+    singleAxisAngleFix(f)
+    {
+        if (f===-0) return(0);
+        f=Math.floor(f)%360;
+        if (f<0) f=360+f;
+        return(f);
+    }
+    angleFix()
+    {
+        this.x=this.singleAxisAngleFix(this.x);
+        this.y=this.singleAxisAngleFix(this.y);
+        this.z=this.singleAxisAngleFix(this.z);
+    }
+    
     copy()
     {
         return(new PointClass(this.x,this.y,this.z));

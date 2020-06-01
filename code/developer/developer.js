@@ -128,18 +128,18 @@ export default class DeveloperClass
             // hit o on each node, then o for new node
             
         if (input.isKeyDownAndClear('o')) {
-            nodeIdx=this.findNearestPathNode(1000000);
-            if (nodeIdx===-1) return;
+            selNodeIdx=this.getSelectNode();
+            if (selNodeIdx===-1) return;
             
             if (path.editorSplitStartNodeIdx===-1) {
-                path.editorSplitStartNodeIdx=nodeIdx;
-                console.info('starting split at '+nodeIdx+' > now select second node');
+                path.editorSplitStartNodeIdx=selNodeIdx;
+                console.info('starting split at '+selNodeIdx+' > now select second node');
                 return;
             }
             
             if (path.editorSplitEndNodeIdx===-1) {
-                path.editorSplitEndNodeIdx=nodeIdx;
-                console.info('second node selected '+nodeIdx+' > now add split node');
+                path.editorSplitEndNodeIdx=selNodeIdx;
+                console.info('second node selected '+selNodeIdx+' > now add split node');
                 return;
             }
             
@@ -147,13 +147,13 @@ export default class DeveloperClass
             path.nodes.push(new MapPathNodeClass(nodeIdx,rayEndPoint.copy(),[path.editorSplitStartNodeIdx,path.editorSplitEndNodeIdx],null,null,null));
             
             links=path.nodes[path.editorSplitStartNodeIdx].links;
-            links[links.indexOf(path.editorSplitEndNodeIdx)]=nodeIdx;
+            links[links.indexOf(path.editorSplitEndNodeIdx)]=selNodeIdx;
             
             links=path.nodes[path.editorSplitEndNodeIdx].links;
-            links[links.indexOf(path.editorSplitStartNodeIdx)]=nodeIdx;
+            links[links.indexOf(path.editorSplitStartNodeIdx)]=selNodeIdx;
             
             this.selectItemType=this.SELECT_ITEM_NODE;
-            this.selectItemIndex=nodeIdx;
+            this.selectItemIndex=selNodeIdx;
             
             path.editorSplitStartNodeIdx=-1;
             path.editorSplitEndNodeIdx=-1;
@@ -168,16 +168,14 @@ export default class DeveloperClass
                 // is there a close node?
                 // if so connect to that
                 
-            nodeIdx=this.findNearestPathNode(this.NEAR_PATH_NODE_DISTANCE);
-            if (nodeIdx!==-1) {
-                selNodeIdx=this.getSelectNode();
-                if (selNodeIdx!==-1) {
-                    path.nodes[nodeIdx].links.push(selNodeIdx);
-                    path.nodes[selNodeIdx].links.push(nodeIdx);
+            if ((this.selectItemType===this.SELECT_ITEM_NODE) && (this.developerRay.targetItemType===this.SELECT_ITEM_NODE)) {
+                if (this.developerRay.targetItemIndex!==this.selectItemIndex) {
+                    path.nodes[this.selectItemIndex].links.push(this.developerRay.targetItemIndex);
+                    path.nodes[this.developerRay.targetItemIndex].links.push(this.selectItemIndex);
                     
-                    this.selectedItemIndex=nodeIdx;
+                    this.selectItemIndex=this.developerRay.targetItemIndex;
                     
-                    console.info('Connected node '+nodeIdx);
+                    console.info('Connected node '+this.developerRay.targetItemIndex);
                 }
                 
                 return;
@@ -206,67 +204,67 @@ export default class DeveloperClass
             return;
         }
         
-            // u key adds a key to nearest node
+            // u key adds a key to selected node
             
         if (input.isKeyDownAndClear('u')) {
-            nodeIdx=this.findNearestPathNode(this.NEAR_PATH_NODE_DISTANCE);
-            if (nodeIdx!==-1) {
-                this.selectItemType=this.SELECT_ITEM_NODE;
-                this.selectItemIndex=nodeIdx;
-                
-                if (path.nodes[nodeIdx].key!==null) {
-                    console.info('Node already has a key='+path.nodes[nodeIdx].key);
-                    return;
-                }
-                
-                path.nodes[nodeIdx].key='KEY_'+nodeIdx;
-                
-                console.info('Added temp key '+nodeIdx);
+            selNodeIdx=this.getSelectNode();
+            if (selNodeIdx===-1) return;
+            
+            if (path.nodes[selNodeIdx].key!==null) {
+                console.info('Node already has a key='+path.nodes[selNodeIdx].key);
                 return;
             }
-        }
-        
-            // [ key deletes selected node
-            
-        if (input.isKeyDownAndClear('[')) {
-            selNodeIdx=this.getSelectNode();
-            if (selNodeIdx!==-1) {
-                
-                    // fix any links
-                    
-                for (n=0;n!=path.nodes.length;n++) {
-                    if (n===selNodeIdx) continue;
-                    node=path.nodes[n];
-                    
-                    k=0;
-                    while (k<node.links.length) {
-                        if (node.links[k]===selNodeIdx) {
-                            node.links.splice(k,1);
-                            continue;
-                        }
-                        if (node.links[k]>selNodeIdx) node.links[k]=node.links[k]-1;
-                        k++;
-                    }
-                }
-                
-                    // and delete the node
-                    
-                path.nodes.splice(selNodeIdx,1);
-                
-                console.info('Deleted node '+selNodeIdx);
-                
-                this.selectItemType=this.SELECT_ITEM_NONE;
-            }
-        }
-        
-            // ] key moves selected node to ray end
 
-        if (input.isKeyDownAndClear('y')) {
+            path.nodes[selNodeIdx].key='KEY_'+selNodeIdx;
+
+            console.info('Added temp key '+selNodeIdx);
+            return;
+        }
+        
+            // \ key deletes selected node
+            
+        if (input.isKeyDownAndClear('\\')) {
             selNodeIdx=this.getSelectNode();
-            if (selNodeIdx!==-1) {
-                path.nodes[selNodeIdx].position.setFromPoint(rayEndPoint);
-                console.info('Moved node '+selNodeIdx);
+            if (selNodeIdx===-1) return;
+                
+                // fix any links
+
+            for (n=0;n!=path.nodes.length;n++) {
+                if (n===selNodeIdx) continue;
+                node=path.nodes[n];
+
+                k=0;
+                while (k<node.links.length) {
+                    if (node.links[k]===selNodeIdx) {
+                        node.links.splice(k,1);
+                        continue;
+                    }
+                    if (node.links[k]>selNodeIdx) node.links[k]=node.links[k]-1;
+                    k++;
+                }
             }
+
+                // and delete the node
+
+            path.nodes.splice(selNodeIdx,1);
+
+            console.info('Deleted node '+selNodeIdx);
+
+            this.selectItemType=this.SELECT_ITEM_NONE;
+            
+            return;
+        }
+        
+            // i key moves selected node to ray end
+
+        if (input.isKeyDownAndClear('i')) {
+            selNodeIdx=this.getSelectNode();
+            if (selNodeIdx===-1) return;
+            
+            path.nodes[selNodeIdx].position.setFromPoint(rayEndPoint);
+            console.info('Moved node '+selNodeIdx);
+           
+           return;
         }
     }
     

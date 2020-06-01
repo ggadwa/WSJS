@@ -408,7 +408,10 @@ export default class EntityFPSMonsterClass extends EntityClass
         
     runHidden()
     {
-        if (this.core.checkTrigger(this.showTriggerName)) this.goWakeUp();
+        if (this.core.checkTrigger(this.showTriggerName)) {
+            this.show=true;
+            this.goWakeUp();
+        }
     }
     
     runAsleep(distToPlayer,gravityFactor)

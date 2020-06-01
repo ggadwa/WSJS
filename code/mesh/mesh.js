@@ -241,7 +241,6 @@ export default class MeshClass
     {
         let n,ny;
         let tIdx,vIdx;
-        let xSize,zSize;
         let x0,y0,z0,x1,y1,z1,x2,y2,z2;
         
             // some meshes can be tagged as no
@@ -290,19 +289,9 @@ export default class MeshClass
                 
             ny=ny/3;
             
-                // get the x/z area for some floor
-                // or ceiling eliminations, if too small
-                // it can't be stood on and is decorative
-                // sometimes we get walls that are just slivers,
-                // also eliminate them
-                
-            xSize=Math.max(Math.abs(x0-x1),Math.abs(x0-x2),Math.abs(x1-x2));
-            zSize=Math.max(Math.abs(z0-z1),Math.abs(z0-z2),Math.abs(z1-z2));
-            
                 // detect if triangle is a floor
                 
             if (ny>=maxFloorCeilingDetectionFactor) {
-                if (Math.min(xSize,zSize)<this.FLOOR_MIN_XZ_ELIMINATION_SIZE) continue;
                 this.collisionFloorTrigs.push(new CollisionTrigClass(new PointClass(x0,y0,z0),new PointClass(x1,y1,z1),new PointClass(x2,y2,z2),new PointClass(this.normalArray[vIdx],this.normalArray[vIdx+1],this.normalArray[vIdx+2])));
             }
             
@@ -310,7 +299,6 @@ export default class MeshClass
                 
             else {
                 if (ny<=-maxFloorCeilingDetectionFactor) {
-                    if (Math.min(xSize,zSize)<this.FLOOR_MIN_XZ_ELIMINATION_SIZE) continue;
                     this.collisionCeilingTrigs.push(new CollisionTrigClass(new PointClass(x0,y0,z0),new PointClass(x1,y1,z1),new PointClass(x2,y2,z2),new PointClass(this.normalArray[vIdx],this.normalArray[vIdx+1],this.normalArray[vIdx+2])));
                 }
 

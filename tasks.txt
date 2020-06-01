@@ -1,61 +1,14 @@
 
 
+- dragon queen sound effects
 
-- deal with model loading by entity list instead of defs
-
-
-- autogenerate no entity
-- autogenerate pass in settings
-- wsjsEntity
-
-- map settings
+MONSTERS
+  - wakeUpOnOtherWakeUpDistance
+  - allow hurt noise again without animation running again
 
 
-{"entity":"player","randomStart":false,"show":true,"data":{}}
-{"entity":"captain_chest","randomStart":false,"show":true,"data":{"trigger":"gate_01"}}
-
-
-
-{"entity":"captain_chest","randomStart":false,"show":true,"data":{"trigger":"gate_03"}}
-{"entity":"captain_chest","randomStart":false,"show":true,"data":{"trigger":"gate_02"}}
-{"entity":"captain_chest","randomStart":false,"show":true,"data":{"trigger":"gate_05"}}
-{"entity":"captain_chest","randomStart":false,"show":true,"data":{"trigger":"gate_06"}}
-{"entity":"captain_chest","randomStart":false,"show":true,"data":{"trigger":"gate_07"}}
-{"entity":"captain_chest","randomStart":false,"show":true,"data":{"trigger":"gate_08"}}
-{"entity":"captain_chest","randomStart":false,"show":true,"data":{"trigger":"gate_09"}}
-{"entity":"captain_chest","randomStart":false,"show":true,"data":{"trigger":null}}
-{"entity":"captain_chest","randomStart":false,"show":true,"data":{"trigger":null}}
-{"entity":"captain_chest","randomStart":false,"show":true,"data":{"trigger":null}}
-{"entity":"ratkin","randomStart":false,"show":true,"data":{}}
-{"entity":"ratkin","randomStart":false,"show":true,"data":{}}
-{"entity":"ratkin","randomStart":false,"show":true,"data":{}}
-{"entity":"ratkin","randomStart":false,"show":true,"data":{}}
-{"entity":"spider","randomStart":false,"show":true,"data":{"showTrigger":null}}
-{"entity":"spider","randomStart":false,"show":true,"data":{"showTrigger":null}}
-{"entity":"spider","randomStart":false,"show":true,"data":{"showTrigger":null}}
-{"entity":"spider","randomStart":false,"show":true,"data":{"showTrigger":null}}
-{"entity":"spider","randomStart":false,"show":true,"data":{"showTrigger":null}}
-{"entity":"vampire","randomStart":false,"show":true,"data":{}}
-{"entity":"skeleton","randomStart":false,"show":true,"data":{}}
-{"entity":"skeleton","randomStart":false,"show":true,"data":{}}
-{"entity":"spider","randomStart":false,"show":true,"data":{"showTrigger":null}}
-{"entity":"spider","randomStart":false,"show":true,"data":{"showTrigger":null}}
-{"entity":"ratkin","randomStart":false,"show":true,"data":{}}
-{"entity":"skeleton","randomStart":false,"show":true,"data":{}}
-{"entity":"skeleton","randomStart":false,"show":true,"data":{}}
-{"entity":"skeleton","randomStart":false,"show":true,"data":{}}
-{"entity":"skeleton","randomStart":false,"show":true,"data":{}}
-{"entity":"vampire","randomStart":false,"show":true,"data":{}}
-{"entity":"spider","randomStart":false,"show":true,"data":{"showTrigger":null}}
-{"entity":"spider","randomStart":false,"show":true,"data":{"showTrigger":null}}
-{"entity":"spider","randomStart":false,"show":false,"data":{"showTrigger":"queen_wake"}}
-{"entity":"spider","randomStart":false,"show":false,"data":{"showTrigger":"queen_wake"}}
-{"entity":"spider","randomStart":false,"show":false,"data":{"showTrigger":"queen_wake"}}
-{"entity":"spider","randomStart":false,"show":false,"data":{"showTrigger":"queen_wake"}}
-{"entity":"dragon_queen","randomStart":false,"show":true,"data":{}}
-{"entity":"pickup_m16","randomStart":false,"show":true,"data":{"pickupOnce":true}}
-{"entity":"pickup_armor","randomStart":false,"show":true,"data":{"pickupOnce":true}}
-
+- kart = skidding needs to actually reduce speed
+- kart = weapon
 
 
 
@@ -70,15 +23,14 @@
 - fix seams on sky box?
 
 SHADOW MAPS
- - uploads need to delete old map/folder
+ - uploads need to delete old map/folder (!!! TEST !!!!)
 
-EDIT MODE
-  - right click to start split
+DEVELOPER
+  - work on developer path split
   - way to put in node key name
-  - stop all sounds
+  - stop all sounds / movements / liquids
 
 PHYSICS
-  - get rid of two small floor skip
   - fix wacky bumping
   - bouncing up on bits of pillar in castle map is bad, should not be able to stand on those
 

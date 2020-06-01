@@ -17,7 +17,6 @@ export default class GameClass
         
         this.jsonEffectCache=[];
         this.jsonEntityCache=[];
-        this.jsonMapCache=[];
         
         this.scores=null;
         this.scoreShow=false;
@@ -69,18 +68,6 @@ export default class GameClass
         }
         
         console.log('Unknown entity: '+name);
-        return(null);
-    }
-    
-    getCachedJsonMap(name)
-    {
-        let n;
-        
-        for (n=0;n!==this.jsonMapCache.length;n++) {
-            if (this.jsonMapCache[n].name===name) return(this.jsonMapCache[n]);
-        }
-        
-        console.log('Unknown map: '+name);
         return(null);
     }
     
@@ -178,25 +165,6 @@ export default class GameClass
         if (data===null) return(false);
         
         this.jsonEntityCache=data;
-        
-            // maps
-            
-        data=null;
-        
-        await this.fetchJson('map')
-            .then
-                (
-                    value=>{
-                        data=value;
-                    },
-                    value=>{
-                        console.log(value);
-                    }
-                );
-        
-        if (data===null) return(false);
-           
-        this.jsonMapCache=data;
             
         return(true);
     }

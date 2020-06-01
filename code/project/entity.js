@@ -302,6 +302,8 @@ export default class EntityClass
     {
         let action;
         
+        if (actions===null) return;
+        
         for (action of actions) {
             
             switch (action.action) {

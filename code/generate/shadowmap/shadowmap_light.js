@@ -8,10 +8,9 @@ import PointClass from '../../utility/point.js';
 
 export default class ShadowmapLightClass
 {
-    constructor(meshes,shadowMapSkinBitmaps,mapLight)
+    constructor(meshes,mapLight)
     {
         this.meshes=meshes;
-        this.shadowMapSkinBitmaps=shadowMapSkinBitmaps;
         
         this.position=mapLight.position;
         this.intensity=mapLight.intensity;

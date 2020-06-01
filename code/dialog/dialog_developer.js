@@ -156,7 +156,7 @@ export default class DialogDeveloperClass extends DialogBaseClass
         data.lights=[];
         
         for (n=0;n!==map.lightList.lights.length;n++) {
-            light=new ShadowmapLightClass(data.meshes,map.json.shadowMapSkinBitmaps,map.lightList.lights[n]);
+            light=new ShadowmapLightClass(data.meshes,map.lightList.lights[n]);
             light.calculateCollisionList();
             
             lightIdx=data.lights.length;
@@ -175,7 +175,7 @@ export default class DialogDeveloperClass extends DialogBaseClass
             effect=map.effectList.effects[n];
             if (effect.light===null) continue;
             
-            light=new ShadowmapLightClass(data.meshes,map.json.shadowMapSkinBitmaps,effect.light);
+            light=new ShadowmapLightClass(data.meshes,effect.light);
             light.calculateCollisionList();
             
             lightIdx=data.lights.length;
@@ -382,6 +382,10 @@ export default class DialogDeveloperClass extends DialogBaseClass
             
         upload=new UploadClass(this.core);
         
+            // the bin
+            
+        upload.upload('SBN',0,bin);
+        
             // turn shadowmaps into canvases
             // and then upload as png
         
@@ -418,10 +422,6 @@ export default class DialogDeveloperClass extends DialogBaseClass
             data=data.substring(data.indexOf(',')+1);
             upload.upload('SMP',n,data);   // already in base64
         }
-        
-            // the bin
-            
-        upload.upload('SBN',0,bin);
         
         console.info('time='+(Date.now()-this.shadowmapTimestamp));
         

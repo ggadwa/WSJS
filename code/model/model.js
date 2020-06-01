@@ -3,7 +3,7 @@ import Matrix4Class from '../utility/matrix4.js';
 import CoreClass from '../main/core.js';
 import MeshListClass from '../mesh/mesh_list.js';
 import ModelSkeletonClass from '../model/model_skeleton.js';
-import ImportModelClass from '../import/import_model.js';
+import ImportGLTFClass from '../import/import_gltf.js';
 
 //
 // model object
@@ -50,7 +50,7 @@ export default class ModelClass
         
     async load()
     {
-        let importModel;
+        let importGLTF;
         
             // no import settings, nothing to load
             
@@ -58,8 +58,8 @@ export default class ModelClass
         
             // the model
             
-        importModel=new ImportModelClass(this.core,this);
-        if (!(await importModel.load(this.json))) return(false);
+        importGLTF=new ImportGLTFClass(this.core,this.json.name);
+        if (!(await importGLTF.import(null,this.meshList,this.skeleton,false))) return(false);
 
         this.setupBuffers();
         
