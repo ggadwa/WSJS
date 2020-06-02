@@ -19,7 +19,7 @@ export default class ShadowmapMeshClass
         this.hasEmissiveTexture=(mesh.bitmap.emissiveTexture!==null);
         this.hasMaskTexture=(mesh.bitmap.maskTexture!==null);
         
-        this.moveable=mesh.moveable;
+        this.moveable=(mesh.movement!==null);
         this.center=mesh.center.copy();
         this.xBound=mesh.xBound.copy();
         this.yBound=mesh.yBound.copy();

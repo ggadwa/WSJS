@@ -138,21 +138,10 @@ class MainClass
         
         this.core.loadingScreenUpdate();
 
-            // auto generated maps don't have shadowmaps
-            // so we skip
-            
-        if (this.core.map.autoGenerate===null) {
-            this.core.loadingScreenAddString('Loading Shadowmap');
-            this.core.loadingScreenDraw();
-            
-            setTimeout(this.initLoadShadowmap.bind(this),1);
-        }
-        else {
-            this.core.loadingScreenAddString('Loading Models');
-            this.core.loadingScreenDraw();
-            
-            setTimeout(this.initLoadModels.bind(this),1);
-        }
+        this.core.loadingScreenAddString('Loading Shadowmap');
+        this.core.loadingScreenDraw();
+
+        setTimeout(this.initLoadShadowmap.bind(this),1);
     }
     
     async initLoadShadowmap()

@@ -58,7 +58,6 @@ export default class MeshClass
             // moving
             
         this.movement=null;
-        this.moveable=false;            // a flag so we can detect which meshes have movements attached
 
             // gl buffers
 

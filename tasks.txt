@@ -12,7 +12,6 @@ MONSTERS
 
 
 
-- eventually get rid of import_map/import_model?
 - eventually make model/etc loading specific instead of everything
 
 
@@ -21,9 +20,6 @@ MONSTERS
 
 - swipe up for grenade
 - fix seams on sky box?
-
-SHADOW MAPS
- - uploads need to delete old map/folder (!!! TEST !!!!)
 
 DEVELOPER
   - work on developer path split
