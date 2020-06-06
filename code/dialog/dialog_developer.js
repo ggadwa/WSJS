@@ -189,9 +189,7 @@ export default class DialogDeveloperClass extends DialogBaseClass
             
             data.lights.splice(lightIdx,0,light);
         }
-        
-        //data.lights.length=5;   // testing
-        
+                
             // use these global variables to contain
             // all the thread results
             

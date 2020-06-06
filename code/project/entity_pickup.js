@@ -16,6 +16,10 @@ export default class EntityPickupClass extends EntityClass
         this.pickupOnce=false;
         this.spinTick=0;
         this.floatMove=0;
+        this.randomPosition=false;
+        this.randomPositionAdd=null;
+        this.randomPositionOffset=null;
+        
         this.idleAnimation=null;
         this.pickupSound=null;
     }
@@ -29,6 +33,10 @@ export default class EntityPickupClass extends EntityClass
         this.spinTick=this.core.game.lookupValue(this.json.config.spinTick,this.data,0);
         this.floatMove=this.core.game.lookupValue(this.json.config.floatMove,this.data,0);
         
+        this.randomPosition=this.core.game.lookupValue(this.json.config.randomPosition,this.data,false);
+        this.randomPositionAdd=new PointClass(this.json.config.randomPositionAdd.x,this.json.config.randomPositionAdd.y,this.json.config.randomPositionAdd.z);
+        this.randomPositionOffset=new PointClass(this.json.config.randomPositionOffset.x,this.json.config.randomPositionOffset.y,this.json.config.randomPositionOffset.z);
+        
         this.idleAnimation=this.core.game.lookupAnimationValue(this.json.animations.idleAnimation);
         this.pickupSound=this.core.game.lookupSoundValue(this.json.sounds.pickupSound);
         
@@ -41,8 +49,22 @@ export default class EntityPickupClass extends EntityClass
         
         if (this.idleAnimation!==null) this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.idleAnimation[0],this.idleAnimation[1]);
         
+        if (this.randomPosition) this.setRandomPosition();
+        
         this.hideStartTick=0;
         this.originalY=this.position.y;
+    }
+    
+    setRandomPosition()
+    {
+        let node;
+        let nodes=this.core.map.path.nodes;
+        
+        node=nodes[Math.trunc(nodes.length*Math.random())];
+        
+        this.position.setFromPoint(node.position);
+        this.position.addPoint(this.randomPositionAdd);
+        this.position.addValues(Math.trunc(Math.random()*this.randomPositionOffset.x),Math.trunc(Math.random()*this.randomPositionOffset.y),Math.trunc(Math.random()*this.randomPositionOffset.z));
     }
         
     run()
@@ -58,6 +80,8 @@ export default class EntityPickupClass extends EntityClass
             
             this.touchEntity=null;          // clear any touches
             this.show=true;
+            
+            if (this.randomPosition) this.setRandomPosition();
         }
         
             // animation

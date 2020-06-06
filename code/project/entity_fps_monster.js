@@ -30,6 +30,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.health=0;
         this.startHealth=0;
         this.wakeUpDistance=0;
+        this.wakeUpOnOtherWakeUpDistance=0;
         this.idleDistance=0;
         this.meleeDistance=0;
         this.meleeWaitTick=0;
@@ -53,6 +54,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.sideAcceleration=0;
         this.sideDeceleration=0;
         this.sideMaxSpeed=0;
+        this.damageSpeedFactor=0;
         this.slideMoveTick=0;
         this.angleYProjectileRange=5;
         this.angleYMeleeRange=15;
@@ -97,6 +99,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.showTriggerName=null;
         
         this.animationFinishTick=0;
+        this.noiseFinishTick=0;
         
             // pre-allocations
 
@@ -117,6 +120,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         
         this.startHealth=this.core.game.lookupValue(this.json.config.startHealth,this.data,0);
         this.wakeUpDistance=this.core.game.lookupValue(this.json.config.wakeUpDistance,this.data,0);
+        this.wakeUpOnOtherWakeUpDistance=this.core.game.lookupValue(this.json.config.wakeUpOnOtherWakeUpDistance,this.data,0);
         this.idleDistance=this.core.game.lookupValue(this.json.config.idleDistance,this.data,0);
         
         this.meleeDistance=this.core.game.lookupValue(this.json.config.meleeDistance,this.data,0);
@@ -140,6 +144,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.sideAcceleration=this.core.game.lookupValue(this.json.config.sideAcceleration,this.data,0);
         this.sideDeceleration=this.core.game.lookupValue(this.json.config.sideDeceleration,this.data,0);
         this.sideMaxSpeed=this.core.game.lookupValue(this.json.config.sideMaxSpeed,this.data,0);
+        this.damageSpeedFactor=this.core.game.lookupValue(this.json.config.damageSpeedFactor,this.data,0);
         this.slideMoveTick=this.core.game.lookupValue(this.json.config.slideMoveTick,this.data,0);
         this.jumpWaitTick=this.core.game.lookupValue(this.json.config.jumpWaitTick,this.data,0);
         this.jumpHeight=this.core.game.lookupValue(this.json.config.jumpHeight,this.data,0);
@@ -188,6 +193,8 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.lastInLiquidIdx=-1;
         this.slideNextTick=0;
         this.movementFreezeNextTick=0;
+        this.animationFinishTick=0;
+        this.noiseFinishTick=0;
             
             // start idle animation
         
@@ -212,8 +219,12 @@ export default class EntityFPSMonsterClass extends EntityClass
         // state changes
         //
         
-    goWakeUp()
+    goWakeUp(noRecurse)
     {
+        let entity;
+        
+            // wake this monster up
+            
         this.state=this.STATE_WAKING_UP;
         
         this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.wakeUpAnimation[0],this.wakeUpAnimation[1]);
@@ -221,6 +232,21 @@ export default class EntityFPSMonsterClass extends EntityClass
         
         this.core.soundList.playJson(this.position,this.wakeUpSound);
         if (this.wakeUpSetTriggerName!==null) this.core.setTrigger(this.wakeUpSetTriggerName);
+        
+        if (noRecurse) return;
+        
+            // check any other monster of the same
+            // type being alerted
+        
+        for (entity of this.core.map.entityList.entities) {
+            if (entity===this) continue;
+            if ((!entity.show) || (entity.health<=0)) continue;
+            if (entity.json.name!==this.json.name) continue;
+            
+            if (this.position.distance(entity.position)<entity.wakeUpOnOtherWakeUpDistance) {
+                entity.goWakeUp(true);
+            }
+        }
     }
     
     goIdle()
@@ -247,7 +273,15 @@ export default class EntityFPSMonsterClass extends EntityClass
     
     goHurt()
     {
-            // if already in hurt, just complete
+            // we always make a noise if possible
+        
+        if (this.noiseFinishTick<=this.core.timestamp) {
+            this.noiseFinishTick=this.core.timestamp+this.core.soundList.getMillisecondDurationJson(this.hurtSound);
+            this.core.soundList.playJson(this.position,this.hurtSound);
+        }
+        
+            // if still in hurt, that means the animation
+            // is complete so skip
             
         if (this.state===this.STATE_HURT) return;
         
@@ -255,9 +289,7 @@ export default class EntityFPSMonsterClass extends EntityClass
             
         this.state=this.STATE_HURT;
         
-        this.core.soundList.playJson(this.position,this.hurtSound);
         this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.hitAnimation[0],this.hitAnimation[1]);
-
         this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(null,30,this.hitAnimation[0],this.hitAnimation[1]);
     }
     
@@ -359,7 +391,7 @@ export default class EntityFPSMonsterClass extends EntityClass
             return;
         }
         if (this.state===this.STATE_ASLEEP) {
-            this.goWakeUp();
+            this.goWakeUp(false);
             return;
         }
         
@@ -410,7 +442,7 @@ export default class EntityFPSMonsterClass extends EntityClass
     {
         if (this.core.checkTrigger(this.showTriggerName)) {
             this.show=true;
-            this.goWakeUp();
+            this.goWakeUp(false);
         }
     }
     
@@ -424,7 +456,7 @@ export default class EntityFPSMonsterClass extends EntityClass
             // time to wake up?
             
         if (distToPlayer<this.wakeUpDistance) {
-            this.goWakeUp();
+            this.goWakeUp(false);
             return;
         }
     }
@@ -444,6 +476,7 @@ export default class EntityFPSMonsterClass extends EntityClass
     runStalk(player,distToPlayer,gravityFactor)
     {
         let angleDif;
+        let speedFactor,maxForwardSpeed,maxReverseSpeed,maxSideSpeed;
         
             // if to far away from player,
             // go into idle
@@ -453,11 +486,15 @@ export default class EntityFPSMonsterClass extends EntityClass
             return;
         }
         
+            // damage speed changes
+            
+        speedFactor=((this.startHealth-this.health)*this.damageSpeedFactor)/this.startHealth;
+        
             // turn towards player, remember how far we had to turn
             // to see if we are facing within a certain distance so
             // we can attack
          
-        angleDif=this.turnYTowardsEntity(player,this.maxTurnSpeed);
+        angleDif=this.turnYTowardsEntity(player,(this.maxTurnSpeed+Math.trunc(this.maxTurnSpeed*speedFactor)));
         
             // projectiles and melee starts
         
@@ -477,10 +514,14 @@ export default class EntityFPSMonsterClass extends EntityClass
 
         if (this.core.timestamp>this.movementFreezeNextTick) {
             
+            maxForwardSpeed=this.forwardMaxSpeed+(this.forwardMaxSpeed*speedFactor);
+            maxReverseSpeed=this.reverseMaxSpeed+(this.reverseMaxSpeed*speedFactor);
+            maxSideSpeed=this.sideMaxSpeed+(this.sideMaxSpeed*speedFactor);
+            
                 // not in a back slide
                 
             if (this.slideNextTick===0) {
-                this.movement.moveZWithAcceleration(true,false,this.forwardAcceleration,this.forwardDeceleration,this.forwardMaxSpeed,this.forwardAcceleration,this.forwardDeceleration,this.forwardMaxSpeed);        
+                this.movement.moveZWithAcceleration(true,false,this.forwardAcceleration,this.forwardDeceleration,maxForwardSpeed,this.forwardAcceleration,this.forwardDeceleration,maxForwardSpeed);        
 
                 this.rotMovement.setFromPoint(this.movement);
                 this.rotMovement.rotateY(null,this.angle.y);
@@ -505,8 +546,8 @@ export default class EntityFPSMonsterClass extends EntityClass
                 // in slide
                 
             else {
-                this.sideMovement.moveZWithAcceleration(false,true,this.forwardAcceleration,this.forwardDeceleration,this.forwardMaxSpeed,this.reverseAcceleration,this.reverseDeceleration,this.reverseMaxSpeed); 
-                this.sideMovement.moveXWithAcceleration((this.slideDirection<0),(this.slideDirection>0),this.sideAcceleration,this.sideDeceleration,this.sideMaxSpeed,this.sideAcceleration,this.sideDeceleration,this.sideMaxSpeed);
+                this.sideMovement.moveZWithAcceleration(false,true,this.forwardAcceleration,this.forwardDeceleration,maxForwardSpeed,this.reverseAcceleration,this.reverseDeceleration,maxReverseSpeed); 
+                this.sideMovement.moveXWithAcceleration((this.slideDirection<0),(this.slideDirection>0),this.sideAcceleration,this.sideDeceleration,maxSideSpeed,this.sideAcceleration,this.sideDeceleration,maxSideSpeed);
                 this.rotMovement.setFromPoint(this.sideMovement);
                 this.rotMovement.rotateY(null,this.angle.y);
                 

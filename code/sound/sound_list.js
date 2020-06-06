@@ -263,6 +263,29 @@ export default class SoundListClass
             if (!this.soundPlays[n].free) this.soundPlays[n].update(this.currentListenerEntity);
         }
     }
+        
+        //
+        // gets milliseconds length of sample
+        //
+        
+    getMillisecondDuration(name)
+    {
+        let sound;
+        
+        sound=this.sounds.get(name);
+        if (sound===undefined) return(0);
+        
+        return(sound.buffer.duration*1000);
+    }
+    
+    getMillisecondDurationJson(obj)
+    {
+        if ((obj===undefined) || (obj===null)) return(0);
+        if ((obj.name===undefined) || (obj.name==='')) return(0);
+        
+        return(this.getMillisecondDuration(obj.name));
+    }
+    
         //
         // start playing a sound attached to an entity or mesh
         // (or if no attachment, a global sound)

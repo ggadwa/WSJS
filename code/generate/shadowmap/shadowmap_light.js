@@ -1,4 +1,5 @@
 import PointClass from '../../utility/point.js';
+import BoundClass from '../../utility/bound.js';
 
 //
 // this object contains one of the lights in the scene,
@@ -35,7 +36,16 @@ export default class ShadowmapLightClass
     calculateCollisionList()
     {
         let n,mesh;
-        let pnt=new PointClass(0,0,0);
+        let xBound,yBound,zBound;
+            
+            // this check is loose, we treat the light
+            // like a cube and then collide them, if we did
+            // something like check corners/centers we'd
+            // miss many meshes
+            
+        xBound=new BoundClass((this.position.x-this.intensity),(this.position.x+this.intensity));
+        yBound=new BoundClass((this.position.y-this.intensity),(this.position.y+this.intensity));
+        zBound=new BoundClass((this.position.z-this.intensity),(this.position.z+this.intensity));
         
         for (n=0;n!==this.meshes.length;n++) {
             mesh=this.meshes[n];
@@ -45,56 +55,16 @@ export default class ShadowmapLightClass
                 
             if ((mesh.moveable) || (mesh.noCollisions)) continue;
             
-                // check if center in light globe
-                
-            if (mesh.center.distance(this.position)<this.intensity) {
-                this.collideMeshes.push(n);
-                continue;
-            }
+                // the bounds check
             
-                // now the 8 cube corners
-            
-            pnt.setFromValues(mesh.xBound.min,mesh.yBound.min,mesh.zBound.min);
-            if (pnt.distance(this.position)<this.intensity) {
-                this.collideMeshes.push(n);
-                continue;
-            }
-            pnt.setFromValues(mesh.xBound.min,mesh.yBound.min,mesh.zBound.max);
-            if (pnt.distance(this.position)<this.intensity) {
-                this.collideMeshes.push(n);
-                continue;
-            }
-            pnt.setFromValues(mesh.xBound.max,mesh.yBound.min,mesh.zBound.min);
-            if (pnt.distance(this.position)<this.intensity) {
-                this.collideMeshes.push(n);
-                continue;
-            }
-            pnt.setFromValues(mesh.xBound.max,mesh.yBound.min,mesh.zBound.max);
-            if (pnt.distance(this.position)<this.intensity) {
-                this.collideMeshes.push(n);
-                continue;
-            }
-            
-            pnt.setFromValues(mesh.xBound.min,mesh.yBound.max,mesh.zBound.min);
-            if (pnt.distance(this.position)<this.intensity) {
-                this.collideMeshes.push(n);
-                continue;
-            }
-            pnt.setFromValues(mesh.xBound.min,mesh.yBound.max,mesh.zBound.max);
-            if (pnt.distance(this.position)<this.intensity) {
-                this.collideMeshes.push(n);
-                continue;
-            }
-            pnt.setFromValues(mesh.xBound.max,mesh.yBound.max,mesh.zBound.min);
-            if (pnt.distance(this.position)<this.intensity) {
-                this.collideMeshes.push(n);
-                continue;
-            }
-            pnt.setFromValues(mesh.xBound.max,mesh.yBound.max,mesh.zBound.max);
-            if (pnt.distance(this.position)<this.intensity) {
-                this.collideMeshes.push(n);
-                continue;
-            }
+            if (xBound.min>=mesh.xBound.max) continue;
+            if (xBound.max<=mesh.xBound.min) continue;
+            if (yBound.min>=mesh.yBound.max) continue;
+            if (yBound.max<=mesh.yBound.min) continue;
+            if (zBound.min>=mesh.zBound.max) continue;
+            if (zBound.max<=mesh.zBound.min) continue;
+
+            this.collideMeshes.push(n);
         }
     }
 }

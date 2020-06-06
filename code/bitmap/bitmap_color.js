@@ -41,5 +41,10 @@ export default class BitmapColorClass extends BitmapClass
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D,this.colorTexture);
+        
+        gl.uniform1i(shader.hasMaskUniform,0);
+        gl.uniform1i(shader.hasEmissiveUniform,0);
+        gl.uniform1i(shader.hasMetallicRoughnessUniform,0);
+        gl.uniform1i(shader.hasNormalUniform,0);
     }
 }

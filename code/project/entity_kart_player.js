@@ -65,7 +65,6 @@ export default class EntityKartPlayerClass extends EntityClass
         this.rotMovement=new PointClass(0,0,0);
         this.driftMovement=new PointClass(0,0,0);
         this.smokePosition=new PointClass(0,0,0);
-        this.firePosition=new PointClass(0,0,0);
         
         this.rigidAngle=new PointClass(0,0,0);
         this.rigidGotoAngle=new PointClass(0,0,0);
@@ -296,10 +295,7 @@ export default class EntityKartPlayerClass extends EntityClass
         
         if (fire) {
             if (this.currentWeaponIdx!==-1) {
-                this.firePosition.setFromPoint(this.position);
-                this.firePosition.y+=Math.trunc(this.height*0.25);
-
-                this.weapons[this.currentWeaponIdx].firePrimary(this.firePosition,this.drawAngle);
+                this.weapons[this.currentWeaponIdx].firePrimary(this.position,this.drawAngle);
              }
         }
         

@@ -138,7 +138,7 @@ export default class EntityProjectileClass extends EntityClass
             }
         }
         
-            // rolling slows down grenade
+            // rolling slows down projectile
             
         if ((this.rolling) && (!this.stopped)) {
             this.motion.x*=this.rollDeceleration;
@@ -151,7 +151,7 @@ export default class EntityProjectileClass extends EntityClass
             }
         }
         
-            // move grenade
+            // move projectile
             
         this.savePoint.setFromPoint(this.position);
         

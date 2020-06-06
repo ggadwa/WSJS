@@ -1,14 +1,11 @@
 
 
-- dragon queen sound effects
-
-MONSTERS
-  - wakeUpOnOtherWakeUpDistance
-  - allow hurt noise again without animation running again
 
 
 - kart = skidding needs to actually reduce speed
-- kart = weapon
+- kart = get other tanks moving
+- kart = shell icon instead of gear
+- kart = reactivate bots
 
 
 
@@ -27,16 +24,14 @@ DEVELOPER
   - stop all sounds / movements / liquids
 
 PHYSICS
-  - fix wacky bumping
-  - bouncing up on bits of pillar in castle map is bad, should not be able to stand on those
+  - fix wacky bumping (if you bump but can't move fully, than completely stop motion -- check stairs)
 
 BOTS
    - they seem to continue to fight with the dead
    - extra weapon fires (needs config for how often it uses extra weapons)
+   - run away if no ammo?
 
 KART
- - get position/score running again
- - fix the bots
 
 MISC
   - death messages by game with json setup

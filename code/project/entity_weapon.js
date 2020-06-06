@@ -19,7 +19,6 @@ class EntityWeaponFireClass
                 
         this.type=weapon.FIRE_TYPE_LIST.indexOf(this.core.game.lookupValue(fireObj.type,weapon.data,null));
         this.waitTick=this.core.game.lookupValue(fireObj.waitTick,weapon.data,0);
-        this.startRadius=this.core.game.lookupValue(fireObj.startRadius,weapon.data,0);
         
         this.damage=this.core.game.lookupValue(fireObj.damage,weapon.data,0);
         this.distance=this.core.game.lookupValue(fireObj.distance,weapon.data,0);
@@ -97,12 +96,15 @@ export default class EntityWeaponClass extends EntityClass
         
         this.lastFireTimestamp=0;
         
-            // pre-allocates
-            
         this.handOffset=new PointClass(0,0,0);
         this.handAngle=new PointClass(0,0,0);
+        this.fireOffsetAdd=new PointClass(0,0,0);
+        this.fireAngleAdd=new PointClass(0,0,0);
+        
+            // pre-allocates
         
         this.firePoint=new PointClass(0,0,0);
+        this.fireAng=new PointClass(0,0,0);
         this.fireVector=new PointClass(0,0,0);
         this.fireHitPoint=new PointClass(0,0,0);
     }
@@ -125,6 +127,9 @@ export default class EntityWeaponClass extends EntityClass
         }
         
             // fire setup
+        
+        this.fireOffsetAdd=new PointClass(this.json.config.fireOffsetAdd.x,this.json.config.fireOffsetAdd.y,this.json.config.fireOffsetAdd.z);
+        this.fireAngleAdd=new PointClass(this.json.config.fireAngleAdd.x,this.json.config.fireAngleAdd.y,this.json.config.fireAngleAdd.z);
             
         if (this.json.config.primary!==null) this.primary=new EntityWeaponFireClass(this.core,this,this.json.config.primary);
         if (this.json.config.secondary!==null) this.secondary=new EntityWeaponFireClass(this.core,this,this.json.config.secondary);
@@ -184,11 +189,12 @@ export default class EntityWeaponClass extends EntityClass
             // the hit scan
           
         this.firePoint.setFromPoint(firePosition);
+        this.fireAng.setFromAddPoint(fireAngle,this.fireAngleAdd);
         
         this.fireVector.setFromValues(0,0,fire.distance);
-        this.fireVector.rotateX(null,fireAngle.x);
+        this.fireVector.rotateX(null,this.fireAng.x);
         
-        y=fireAngle.y;
+        y=this.fireAng.y;
         if (this.fireYSlop!==0) {
             y+=(this.fireYSlop-(Math.random()*(this.fireYSlop*2)));
             if (y<0) y=360+y;
@@ -228,11 +234,12 @@ export default class EntityWeaponClass extends EntityClass
         
             // fire position
             
-        this.firePoint.setFromValues(0,0,fire.startRadius);
-
-        this.firePoint.rotateX(null,fireAngle.x);
+        this.firePoint.setFromPoint(this.fireOffsetAdd);
+        this.fireAng.setFromAddPoint(fireAngle,this.fireAngleAdd);
         
-        y=fireAngle.y;
+        this.firePoint.rotateX(null,this.fireAng.x);
+        
+        y=this.fireAng.y;
         if (this.fireYSlop!==0) {
             y+=(this.fireYSlop-(Math.random()*(this.fireYSlop*2)));
             if (y<0) y=360+y;
@@ -245,7 +252,7 @@ export default class EntityWeaponClass extends EntityClass
             // spawn from whatever is holding this weapon
             // so it counts as the spawnBy for any damage calculations, etc
 
-        projEntity=this.addEntity(fire.projectileJson,('projectile_'+this.name),this.firePoint,fireAngle,null,parentEntity,null,true);
+        projEntity=this.addEntity(fire.projectileJson,('projectile_'+this.name),this.firePoint,this.fireAng,null,parentEntity,null,true);
         if (projEntity!==null) projEntity.ready();
     }
     
