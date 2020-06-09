@@ -8,7 +8,8 @@ import MapEntityListClass from '../map/map_entity_list.js';
 import MapEffectListClass from '../map/map_effect_list.js';
 import MapCubeListClass from '../map/map_cube_list.js';
 import MapPathClass from '../map/map_path.js';
-import SkyClass from '../map/sky.js';
+import MapSkyClass from '../map/map_sky.js';
+import MapBackgroundClass from '../map/map_background.js';
 
 //
 // map class
@@ -23,7 +24,7 @@ export default class MapClass
             
         this.bumpHeight=0;
         
-        this.cameraSetup=null;
+        this.viewSetup=null;
         
         this.gravityMinValue=0;
         this.gravityMaxValue=0;
@@ -36,7 +37,8 @@ export default class MapClass
         this.effectList=new MapEffectListClass(core);
         this.cubeList=new MapCubeListClass(core);
         this.path=new MapPathClass(core);
-        this.sky=new SkyClass(core);
+        this.sky=new MapSkyClass(core);
+        this.background=new MapBackgroundClass(core);
         
         this.hasShadowmap=false;
         
@@ -55,7 +57,8 @@ export default class MapClass
         if (!this.entityList.initialize()) return(false);
         if (!this.effectList.initialize()) return(false);
         if (!this.cubeList.initialize()) return(false);
-        return(this.sky.initialize());
+        if (!this.sky.initialize()) return(false);
+        return(this.background.initialize());
     }
 
     release()
@@ -67,6 +70,7 @@ export default class MapClass
         this.effectList.release();
         this.cubeList.release();
         this.sky.release();
+        this.background.release();
     }
     
         //
@@ -123,16 +127,8 @@ export default class MapClass
             
         camera=this.core.camera;
 
-        switch (camera.CAMERA_MODE_LIST.indexOf(this.cameraSetup.mode)) {
-            case camera.CAMERA_MODE_FIRST_PERSON:
-                camera.gotoFirstPerson();
-                break;
-            case camera.CAMERA_MODE_THIRD_PERSON_BEHIND:
-                camera.gotoThirdPersonBehind(this.cameraSetup.thirdPersonDistance,this.cameraSetup.thirdPersonLookDegree);
-                break;
-        }
-
-        camera.setViewDistance(this.cameraSetup.viewNearZ,this.cameraSetup.viewFarZ);
+        camera.gotoFirstPerson();   // default until player script runs
+        camera.setViewDistance(this.viewSetup.nearZ,this.viewSetup.farZ);
     }
     
 }

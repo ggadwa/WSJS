@@ -2,7 +2,7 @@
 // sky class
 //
 
-export default class SkyClass
+export default class MapSkyClass
 {
     constructor(core)
     {
@@ -16,7 +16,6 @@ export default class SkyClass
         this.uvs=null;
         this.normals=null;
         this.tangents=null;
-        this.indexes=null;
         
         this.vertexBuffer=null;
         this.uvBuffer=null;
@@ -33,6 +32,7 @@ export default class SkyClass
 
     initialize()
     {
+        let indexes;
         let gl=this.core.gl;
         
             // room enough for the 8 points of the cube
@@ -41,7 +41,6 @@ export default class SkyClass
         this.uvs=new Float32Array(16);
         this.normals=new Float32Array(24);
         this.tangents=new Float32Array(24);
-        this.indexes=new Uint16Array(6*4);      //enough for 4 sides, the longest draw pattern we do
         
             // prebuild these so we can use subdata later
             
@@ -64,16 +63,18 @@ export default class SkyClass
             
             // index buffer is always the same
             
-        this.indexes[0]=0;
-        this.indexes[1]=1;
-        this.indexes[2]=3;
-        this.indexes[3]=1;
-        this.indexes[4]=2;
-        this.indexes[5]=3;
+        indexes=new Uint16Array(6);
+        
+        indexes[0]=0;
+        indexes[1]=1;
+        indexes[2]=3;
+        indexes[3]=1;
+        indexes[4]=2;
+        indexes[5]=3;
             
         this.indexBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.indexes,gl.STATIC_DRAW);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,indexes,gl.STATIC_DRAW);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
         
         return(true);
@@ -85,6 +86,8 @@ export default class SkyClass
 
         gl.deleteBuffer(this.vertexBuffer);
         gl.deleteBuffer(this.uvBuffer);
+        gl.deleteBuffer(this.normalBuffer);
+        gl.deleteBuffer(this.tangentBuffer);
         gl.deleteBuffer(this.indexBuffer);
     }
     
@@ -92,8 +95,9 @@ export default class SkyClass
         // draw
         //
 
-    drawPlane(gl,cameraPos,vx0,vy0,vz0,vx1,vy1,vz1,vx2,vy2,vz2,vx3,vy3,vz3,u,v,u2,v2,nx,ny,nz,tx,ty,tz)
+    drawPlane(cameraPos,vx0,vy0,vz0,vx1,vy1,vz1,vx2,vy2,vz2,vx3,vy3,vz3,u,v,u2,v2,nx,ny,nz,tx,ty,tz)
     {
+        let gl=this.core.gl;
         let shader=this.core.shaderList.mapMeshShader;
         
         this.vertexes[0]=cameraPos.x+vx0;
@@ -212,12 +216,12 @@ export default class SkyClass
             // the planes
             // -x, +x, -y, +y, -z, +z
 
-        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,-skyRadius,0.5,0.664,0.75,0.335,1,0,0,0,0,1);
-        this.drawPlane(gl,cameraPos,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,-skyRadius,0.25,0.664,0,0.335,-1,0,0,0,0,-1);
-        this.drawPlane(gl,cameraPos,skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,0.252,0.999,0.498,0.664,0,1,0,1,0,0);
-        this.drawPlane(gl,cameraPos,skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,0.252,0,0.498,0.333,0,-1,0,-1,0,0);
-        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,0.498,0.664,0.252,0.335,0,0,1,1,0,0);
-        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,0.752,0.664,0.999,0.335,0,0,-1,-1,0,0);
+        this.drawPlane(cameraPos,-skyRadius,-skyRadius,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,-skyRadius,0.5,0.664,0.75,0.335,1,0,0,0,0,1);
+        this.drawPlane(cameraPos,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,-skyRadius,0.25,0.664,0,0.335,-1,0,0,0,0,-1);
+        this.drawPlane(cameraPos,skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,0.252,0.999,0.498,0.664,0,1,0,1,0,0);
+        this.drawPlane(cameraPos,skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,0.252,0,0.498,0.333,0,-1,0,-1,0,0);
+        this.drawPlane(cameraPos,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,0.498,0.664,0.252,0.335,0,0,1,1,0,0);
+        this.drawPlane(cameraPos,-skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,0.752,0.664,0.999,0.335,0,0,-1,-1,0,0);
         
             // remove the buffers
 

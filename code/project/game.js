@@ -361,7 +361,7 @@ export default class GameClass
             // score functions
 
         if (this.core.isMultiplayer) {
-            if (this.core.input.isKeyDownAndClear('/')) this.showScoreDisplay(!this.scoreShow);
+            if (this.core.input.isKeyDownAndClear('`')) this.showScoreDisplay(!this.scoreShow);
         }
         
             // developer functions

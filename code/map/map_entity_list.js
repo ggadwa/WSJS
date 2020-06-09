@@ -4,8 +4,8 @@ import EntityFPSBotClass from '../project/entity_fps_bot.js';
 import EntityFPSMonsterClass from '../project/entity_fps_monster.js';
 import EntityKartPlayerClass from '../project/entity_kart_player.js';
 import EntityKartBotClass from '../project/entity_kart_bot.js';
-import Entity2DPlayerClass from '../project/entity_2d_player.js';
-import Entity2DMonsterClass from '../project/entity_2d_monster.js';
+import EntityPlatformPlayerClass from '../project/entity_platform_player.js';
+import EntityPlatformMonsterClass from '../project/entity_platform_monster.js';
 import EntityWeaponClass from '../project/entity_weapon.js';
 import EntityProjectileClass from '../project/entity_projectile.js';
 import EntityContainerClass from '../project/entity_container.js';
@@ -85,10 +85,10 @@ export default class MapEntityListClass
                 return(EntityKartPlayerClass);
             case 'kart_bot':
                 return(EntityKartBotClass);
-            case '2d_player':
-                return(Entity2DPlayerClass);
-            case '2d_monster':
-                return(Entity2DMonsterClass);
+            case 'platform_player':
+                return(EntityPlatformPlayerClass);
+            case 'platform_monster':
+                return(EntityPlatformMonsterClass);
             case 'weapon':
                 return(EntityWeaponClass);
             case 'projectile':
@@ -217,7 +217,7 @@ export default class MapEntityListClass
                 // check for player types
                 
             if (this.entityPlayerIdx===-1) {
-                if ((entity.constructor.name==='EntityFPSPlayerClass') || (entity.constructor.name==='EntityKartPlayerClass') || (entity.constructor.name==='Entity2DPlayerClass')) this.entityPlayerIdx=n;
+                if ((entity.constructor.name==='EntityFPSPlayerClass') || (entity.constructor.name==='EntityKartPlayerClass') || (entity.constructor.name==='EntityPlatformPlayerClass')) this.entityPlayerIdx=n;
             }
             
                 // initialize

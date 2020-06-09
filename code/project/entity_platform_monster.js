@@ -1,7 +1,7 @@
 import PointClass from '../utility/point.js';
 import EntityClass from '../project/entity.js';
 
-export default class Entity2DMonsterClass extends EntityClass
+export default class EntityPlatformMonsterClass extends EntityClass
 {
     constructor(core,name,jsonName,position,angle,data,mapSpawn,spawnedBy,heldBy,show)
     {

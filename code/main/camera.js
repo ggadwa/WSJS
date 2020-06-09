@@ -6,9 +6,8 @@ export default class CameraClass
     constructor(core)
     {
         this.CAMERA_MODE_FIRST_PERSON=0;
-        this.CAMERA_MODE_THIRD_PERSON_BEHIND=1;
-        
-        this.CAMERA_MODE_LIST=['firstPerson','thirdPersonBehind'];
+        this.CAMERA_MODE_THIRD_PERSON=1;
+        this.CAMERA_MODE_TOP_DOWN=2;
         
         this.core=core;
     
@@ -19,7 +18,9 @@ export default class CameraClass
         this.glFarZ=500000;
 
         this.thirdPersonDistance=0;
-        this.thirdPersonLookDegree=0;
+        this.thirdPersonLookAngle=null;
+        
+        this.topDownDistance=0;
     
         this.position=new PointClass(0.0,0.0,0.0);
         this.angle=new PointClass(0.0,0.0,0.0);
@@ -27,65 +28,53 @@ export default class CameraClass
         this.thirdPersonAngle=new PointClass(0,0,0);
         
         this.collision=new CollisionClass(core);
-        this.rayAngle=new PointClass(0,0,0);
         this.rayVector=new PointClass(0,0,0);
         this.rayHitPosition=new PointClass(0,0,0);
         
         Object.seal(this);
     }
     
-    /**
-     * Set the min/max view distance (really the webGL near and far Z.)
-     * 
-     * @param {number} nearZ The distance of the near clip plane
-     * @param {number} farZ The distance of the far clip plane
-     */ 
+        //
+        // camera setup
+        //
+    
     setViewDistance(nearZ,farZ)
     {
         this.glNearZ=nearZ;
         this.glFarZ=farZ;
     }
     
-    /**
-     * Sets the camera to first person view.
-     */
     gotoFirstPerson()
     {
         this.mode=this.CAMERA_MODE_FIRST_PERSON;
     }
     
-    /**
-     * Returns TRUE if camera is in first person view.
-     * 
-     * @returns {boolean} TRUE if camera in first person view
-     */
     isFirstPerson()
     {
         return(this.mode===this.CAMERA_MODE_FIRST_PERSON);
     }
     
-    /**
-     * Sets the camera to third person behind view, which is behind
-     * the player back a distance and looked down/up on by an angle.
-     * 
-     * @param {number} thirdPersonDistance How far back the camera is
-     * @param {number} thirdPersonLookDegree What angle above (negative) or below (postive) the camera is
-     */
-    gotoThirdPersonBehind(thirdPersonDistance,thirdPersonLookDegree)
+    gotoThirdPerson(thirdPersonDistance,thirdPersonLookAngle)
     {
-        this.mode=this.CAMERA_MODE_THIRD_PERSON_BEHIND;
+        this.mode=this.CAMERA_MODE_THIRD_PERSON;
         this.thirdPersonDistance=thirdPersonDistance;
-        this.thirdPersonLookDegree=thirdPersonLookDegree;
+        this.thirdPersonLookAngle=thirdPersonLookAngle;
     }
     
-    /**
-     * Returns TRUE if camera is in third person behind view.
-     * 
-     * @returns {boolean} TRUE if camera in third person behind view
-     */
-    isThirdPersonBehind()
+    isThirdPerson()
     {
-        return(this.mode===this.CAMERA_MODE_THIRD_PERSON_BEHIND);
+        return(this.mode===this.CAMERA_MODE_THIRD_PERSON);
+    }
+    
+    gotoTopDown(topDownDistance)
+    {
+        this.mode=this.CAMERA_MODE_TOP_DOWN;
+        this.topDownDistance=topDownDistance;
+    }
+    
+    isTopDown()
+    {
+        return(this.mode===this.CAMERA_MODE_TOP_DOWN);
     }
     
         //
@@ -96,9 +85,9 @@ export default class CameraClass
     {
         let dist,yAng;
         
-            // third person cameras behind camera
+            // third person camera
             
-        if (this.mode===this.CAMERA_MODE_THIRD_PERSON_BEHIND) {
+        if (this.mode===this.CAMERA_MODE_THIRD_PERSON) {
             
                 // start at the eye point
                 
@@ -107,34 +96,76 @@ export default class CameraClass
 
                 // get the ray to trace
                 
+            yAng=entity.angle.y+this.thirdPersonLookAngle.y;
+            if (yAng>360) yAng-=360;
+            if (yAng<0) yAng=360+yAng;
+                
             this.rayVector.setFromValues(0,0,this.thirdPersonDistance);
-            
-            yAng=entity.angle.y+180.0;
-            if (yAng>=360) yAng=yAng-360;
-            this.rayAngle.setFromValues(this.thirdPersonLookDegree,yAng,0);
-            this.rayVector.rotate(this.rayAngle);
+            this.rayVector.rotateX(null,this.thirdPersonLookAngle.x);
+            this.rayVector.rotateZ(null,this.thirdPersonLookAngle.z);
+            this.rayVector.rotateY(null,yAng);
 
                 // if we hit something, than the distance to
                 // put the camera is 10% of the distance back
                 // from the hit point
                 
-            if (this.collision.rayCollision(entity,this.position,this.rayVector,this.rayHitPosition)) {
+            if (this.collision.rayCollisionCamera(entity,this.position,this.rayVector,false,this.rayHitPosition)) {
                 dist=this.position.distance(this.rayHitPosition)-Math.trunc(this.thirdPersonDistance*0.1);
             }
             else {
                 dist=this.thirdPersonDistance;
             }
 
-                // get the camera point and the
-                // look back angle
+                // get the final camera point
 
             this.rayVector.setFromValues(0,0,dist);
-            this.rayVector.rotate(this.rayAngle);
+            this.rayVector.rotateX(null,this.thirdPersonLookAngle.x);
+            this.rayVector.rotateZ(null,this.thirdPersonLookAngle.z);
+            this.rayVector.rotateY(null,yAng);
             this.position.addPoint(this.rayVector);
 
                 // and finally look back at entity
                 
-            this.angle.setFromValues(0,this.position.angleYTo(entity.position),0);
+            yAng+=180;
+            if (yAng>360) yAng-=360;
+            
+            this.angle.setFromValues(-this.thirdPersonLookAngle.x,yAng,0);
+            
+            return;
+        }
+        
+            // top down
+            
+        if (this.mode===this.CAMERA_MODE_TOP_DOWN) {
+            
+                // start at the eye point
+                
+            this.position.setFromPoint(entity.position);
+            this.position.y+=entity.eyeOffset;
+
+                // get the ray to trace
+                
+            this.rayVector.setFromValues(0,this.topDownDistance,0);
+ 
+                // if we hit something, than the distance to
+                // put the camera is 10% of the distance back
+                // from the hit point
+                
+            if (this.collision.rayCollisionCamera(entity,this.position,this.rayVector,true,this.rayHitPosition)) {
+                dist=this.position.distance(this.rayHitPosition)-Math.trunc(this.thirdPersonDistance*0.1);
+            }
+            else {
+                dist=this.thirdPersonDistance;
+            }
+
+                // get the final camera point
+
+            this.rayVector.setFromValues(0,dist,0);
+            this.position.addPoint(this.rayVector);
+
+                // and finally look down at entity
+                
+            this.angle.setFromValues(89,0,0);
             
             return;
         }

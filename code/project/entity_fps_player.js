@@ -55,8 +55,11 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.fallDamagePercentage=0;
         this.respawnWaitTick=0;
         
+        this.isThirdPersonCamera=false;
         this.thirdPersonCameraDistance=0;
-        this.thirdPersonCameraLookAngle=0;
+        this.thirdPersonCameraLookAngle=null;
+        this.isTopDownCameraOnDeath=false;
+        this.topDownCameraDistance=0;
         
         this.hitIndicator=false;
         this.hitIndicatorFlashTick=0;
@@ -83,7 +86,6 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.currentRunAnimation=null;
         
         this.respawnTick=0;
-        this.respawnCameraFirstPerson=true;
         this.telefragTriggerEntity=null;
         
             // pre-allocates
@@ -140,8 +142,11 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.fallDamagePercentage=this.core.game.lookupValue(this.json.config.fallDamagePercentage,this.data,0);
         this.respawnWaitTick=this.core.game.lookupValue(this.json.config.respawnWaitTick,this.data,0);
         
+        this.isThirdPersonCamera=this.core.game.lookupValue(this.json.config.isThirdPersonCamera,this.data,0);
         this.thirdPersonCameraDistance=this.core.game.lookupValue(this.json.config.thirdPersonCameraDistance,this.data,0);
-        this.thirdPersonCameraLookAngle=this.core.game.lookupValue(this.json.config.thirdPersonCameraLookAngle,this.data,0);
+        this.thirdPersonCameraLookAngle=new PointClass(this.json.config.thirdPersonCameraLookAngle.x,this.json.config.thirdPersonCameraLookAngle.y,this.json.config.thirdPersonCameraLookAngle.z);
+        this.isTopDownCameraOnDeath=this.core.game.lookupValue(this.json.config.isTopDownCameraOnDeath,this.data,0);
+        this.topDownCameraDistance=this.core.game.lookupValue(this.json.config.topDownCameraDistance,this.data,0);
         
         this.hitIndicator=this.core.game.lookupValue(this.json.config.hitIndicator,this.data,null);
         this.hitIndicatorFlashTick=this.core.game.lookupValue(this.json.config.hitIndicatorFlashTick,this.data,0);
@@ -154,10 +159,6 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.lastUnderLiquid=false;
         
         this.lastWheelClick=0;
-        
-            // initial camera
-            
-        this.respawnCameraFirstPerson=this.core.game.lookupValue(this.json.config.cameraFirstPerson,this.data,true);
 
             // setup the weapons
         
@@ -262,6 +263,15 @@ export default class EntityFPSPlayerClass extends EntityClass
         
         super.ready();
         
+            // set the camera
+            
+        if (!this.isThirdPerson) {
+            this.core.camera.gotoFirstPerson();
+        }
+        else {
+            this.core.camera.gotoThirdPerson(this.thirdPersonCameraDistance,this.thirdPersonCameraAngle);
+        }
+        
             // health
             
         this.health=this.healthInitialCount;
@@ -308,10 +318,6 @@ export default class EntityFPSPlayerClass extends EntityClass
             // turn off any score display
             
         this.core.game.showScoreDisplay(false);
-        
-            // restore the camera
-            
-        if (this.respawnCameraFirstPerson) this.core.camera.gotoFirstPerson();
     }
     
         //
@@ -387,10 +393,9 @@ export default class EntityFPSPlayerClass extends EntityClass
     die(fromEntity,isTelefrag)
     {
         this.respawnTick=this.core.timestamp+this.respawnWaitTick;
-        this.respawnCameraFirstPerson=this.core.camera.isFirstPerson();
         this.passThrough=true;
         
-        this.core.camera.gotoThirdPersonBehind(this.thirdPersonCameraDistance,this.thirdPersonCameraLookAngle);
+        if (this.isTopDownCameraOnDeath) this.core.camera.gotoTopDown(this.topDownCameraDistance);
 
         this.core.soundList.playJson(this.position,this.dieSound);
         this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.dieAnimation[0],this.dieAnimation[1]);
@@ -746,19 +751,6 @@ export default class EntityFPSPlayerClass extends EntityClass
 
         this.movement.y=this.moveInMapY(this.rotMovement,gravityFactor,false);
         this.moveInMapXZ(this.rotMovement,bump,true);
-
-            // camera swap button
-            
-        if (this.json.config.multiCamera) {
-            if (this.core.input.isKeyDownAndClear('`')) {
-                if (this.core.camera.isFirstPerson()) {
-                    this.core.camera.gotoThirdPersonBehind(this.thirdPersonCameraDistance,this.thirdPersonCameraLookAngle);
-                }
-                else {
-                    this.core.camera.gotoFirstPerson();
-                }
-            }
-        }
         
             // current animation
             
@@ -779,7 +771,7 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.modelEntityAlter.scale.setFromPoint(this.scale);
         this.modelEntityAlter.inCameraSpace=false;
 
-        return(this.core.camera.isThirdPersonBehind());
+        return(!this.core.camera.isFirstPerson());
     }
 }
 

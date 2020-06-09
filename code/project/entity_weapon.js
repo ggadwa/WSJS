@@ -1,4 +1,5 @@
 import PointClass from '../utility/point.js';
+import BoundClass from '../utility/bound.js';
 import EntityClass from '../project/entity.js';
 
 class EntityWeaponFireClass
@@ -28,7 +29,7 @@ class EntityWeaponFireClass
         
         this.animation=this.core.game.lookupAnimationValue(fireObj.animation);
         this.sound=this.core.game.lookupSoundValue(fireObj.sound);
-       
+        
         this.lastFireTimestamp=0;
         this.lastRegenerateTimestamp=0;
     }
@@ -100,6 +101,7 @@ export default class EntityWeaponClass extends EntityClass
         this.handAngle=new PointClass(0,0,0);
         this.fireOffsetAdd=new PointClass(0,0,0);
         this.fireAngleAdd=new PointClass(0,0,0);
+        this.botFireRange=new BoundClass(0,0);
         
             // pre-allocates
         
@@ -134,6 +136,10 @@ export default class EntityWeaponClass extends EntityClass
         if (this.json.config.primary!==null) this.primary=new EntityWeaponFireClass(this.core,this,this.json.config.primary);
         if (this.json.config.secondary!==null) this.secondary=new EntityWeaponFireClass(this.core,this,this.json.config.secondary);
         if (this.json.config.tertiary!==null) this.tertiary=new EntityWeaponFireClass(this.core,this,this.json.config.tertiary);
+        
+            // misc bot setup
+            
+        this.botFireRange.setFromValues(this.json.config.botFireRange[0],this.json.config.botFireRange[1]);
         
             // some items added to entity so fire methods
             // can have access to parent animations
@@ -176,6 +182,20 @@ export default class EntityWeaponClass extends EntityClass
                 if (this.tertiary!==null) this.tertiary.addAmmo(count);
                 break;
         }
+    }
+    
+    hasAnyAmmo()
+    {
+        if (this.primary!==null) {
+            if (this.primary.ammo!==0) return(true);
+        }
+        if (this.secondary!==null) {
+            if (this.secondary.ammo!==0) return(true);
+        }
+        if (this.tertiary!==null) {
+            if (this.tertiary.ammo!==0) return(true);
+        }
+        return(false);
     }
     
         //
@@ -323,6 +343,32 @@ export default class EntityWeaponClass extends EntityClass
     fireTertiary(firePosition,fireAngle)
     {
         if (this.tertiary!==null) this.fireForType(this.heldBy,this.tertiary,this.parentTertiaryFireRunAnimation,firePosition,fireAngle);
+    }
+    
+    fireAny(firePosition,fireAngle)
+    {
+        if (this.primary!==null) {
+            if (this.primary.ammo!==0) {
+                this.firePrimary(firePosition,fireAngle);
+                return(true);
+            }
+        }
+        
+        if (this.secondary!==null) {
+            if (this.secondary.ammo!==0) {
+                this.fireSecondary(firePosition,fireAngle);
+                return(true);
+            }
+        }
+        
+        if (this.tertiary!==null) {
+            if (this.tertiary.ammo!==0) {
+                this.fireTertiary(firePosition,fireAngle);
+                return(true);
+            }
+        }
+        
+        return(false);
     }
     
         //

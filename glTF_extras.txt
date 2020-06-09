@@ -14,11 +14,10 @@ wsjsMap                     Misc map settings
                                 {
                                     "scale":700,
                                     "bumpHeight":1400,
-                                    "camera":
+                                    "view":
                                         {
-                                            "mode":"firstPerson",
-                                            "viewNearZ":500,
-                                            "viewFarZ":500000
+                                            "nearZ":500,
+                                            "farZ":500000
                                         },
                                     "gravity":
                                         {
@@ -43,6 +42,11 @@ wsjsMap                     Misc map settings
 wsjsSky                     Mesh is a sky box definition.  Material determines the texture
                                 {
                                     "size":50000
+                                }
+
+wsjsBackground              Mesh is a background definition (3 scrolling planes for platformers.)  Material determines the texture
+                                {
+                                    "shift":[0.1,0.15,0.2]
                                 }
 
 wsjsMove                    This mesh has an attached movement, defined by the value

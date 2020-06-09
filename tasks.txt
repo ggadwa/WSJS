@@ -1,7 +1,9 @@
 
+- swipe up for grenade
+- bot extra weapon fire (in weapon config)
+- bot run away with projectile/no ammo (need to be able to pick node behind)
 
-
-
+- kart = settings into json
 - kart = skidding needs to actually reduce speed
 - kart = get other tanks moving
 - kart = shell icon instead of gear
@@ -15,20 +17,19 @@
 
 
 
-- swipe up for grenade
+
 - fix seams on sky box?
 
 DEVELOPER
   - work on developer path split
   - way to put in node key name
-  - stop all sounds / movements / liquids
+  - stop all movements / liquids
 
 PHYSICS
   - fix wacky bumping (if you bump but can't move fully, than completely stop motion -- check stairs)
 
 BOTS
    - they seem to continue to fight with the dead
-   - extra weapon fires (needs config for how often it uses extra weapons)
    - run away if no ammo?
 
 KART
@@ -46,6 +47,7 @@ NETWORKING
     - need open system for passing message (like firing weapons, etc)
 
 GENERATOR
+    - make the whole thing part of developer
     - nodes don't seem right in certain rooms (like boxes)
     - the random color scheme
     - lights
@@ -61,6 +63,3 @@ GENERATOR
        - better uv for pillars
        - control panel decorations
        - connectors for pipes
-
-DEMO
-    - made a 2D demo

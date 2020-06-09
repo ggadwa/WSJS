@@ -15,6 +15,10 @@ export default class EntityKartPlayerClass extends EntityClass
         this.crashKartSound=null;
         this.crashWallSound=null;
         
+        this.thirdPersonCameraDistance=0;
+        this.thirdPersonCameraLookAngle=null;
+
+        
         this.currentWeaponIdx=-1;
         this.weapons=[];
     }
@@ -108,6 +112,8 @@ export default class EntityKartPlayerClass extends EntityClass
         this.crashKartSound=this.core.game.lookupSoundValue(this.json.sounds.crashKartSound);
         this.crashWallSound=this.core.game.lookupSoundValue(this.json.sounds.crashWallSound);
         
+        this.thirdPersonCameraDistance=this.core.game.lookupValue(this.json.config.thirdPersonCameraDistance,this.data,0);
+        this.thirdPersonCameraLookAngle=new PointClass(this.json.config.thirdPersonCameraLookAngle.x,this.json.config.thirdPersonCameraLookAngle.y,this.json.config.thirdPersonCameraLookAngle.z);
         
         for (n=0;n!==this.json.weapons.length;n++) {
             weaponBlock=this.json.weapons[n];
@@ -140,6 +146,8 @@ export default class EntityKartPlayerClass extends EntityClass
         let n,weaponBlock;
 
         super.ready();
+        
+        this.core.camera.gotoThirdPerson(this.thirdPersonCameraDistance,this.thirdPersonCameraLookAngle);
         
         this.inDrift=false;
         this.bounceCount=0;

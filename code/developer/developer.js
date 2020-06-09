@@ -29,9 +29,13 @@ export default class DeveloperClass
         this.SELECT_ITEM_NODE=3;
         this.SELECT_ITEM_MESH=4;
         
+        this.DRAW_MODE_NORMAL=0;
+        this.DRAW_MODE_SHADOW=1;
+        this.DRAW_MODE_COLLISION=2;
+        
         this.on=false;
         this.lookDownLock=false;
-        this.collisionDrawOn=false;
+        this.drawMode=this.DRAW_MODE_NORMAL;
         
         this.position=new PointClass(0,0,0);
         this.angle=new PointClass(0,0,0);
@@ -621,6 +625,10 @@ export default class DeveloperClass
         this.core.map.lightList.lightMin.setFromValues(1,1,1);
         this.core.map.lightList.lightMax.setFromValues(1,1,1);
         
+            // suspect sound
+            
+        this.core.soundList.suspend();
+        
         console.info('developer mode: on');
     }
     
@@ -638,6 +646,10 @@ export default class DeveloperClass
             
         this.core.map.lightList.lightMin.setFromColor(this.lightMinBackup);
         this.core.map.lightList.lightMax.setFromColor(this.lightMaxBackup);
+        
+            // resume sound
+            
+        this.core.soundList.resume();
         
         console.info('developer mode: off');
     }
@@ -726,9 +738,16 @@ export default class DeveloperClass
         this.select();
         this.pathEditor();
         
-            // collision draw
+            // draw modes
             
-        if (input.isKeyDownAndClear('PageDown')) this.collisionDrawOn=!this.collisionDrawOn;
+        if (input.isKeyDownAndClear('PageDown')) {
+            if (this.drawMode===this.DRAW_MODE_NORMAL) {
+                this.drawMode=(this.core.map.hasShadowmap)?this.DRAW_MODE_SHADOW:this.DRAW_MODE_COLLISION;
+            }
+            else {
+                this.drawMode=(this.drawMode===this.DRAW_MODE_SHADOW)?this.DRAW_MODE_COLLISION:this.DRAW_MODE_NORMAL;
+            }
+        }
         
             // run the targetting
             

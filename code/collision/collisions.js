@@ -837,15 +837,126 @@ export default class CollisionClass
             if (checkEntity===entity) continue;
             if (checkEntity===entity.heldBy) continue;         // skip source entity and anything holding source entity
             if ((!checkEntity.show) || (checkEntity.passThrough) || (checkEntity.heldBy!==null)) continue;
-            
+
                 // run the collision
-                
+
             if (this.rayCylinderIntersection(pnt,vector,checkEntity.position,checkEntity.radius,checkEntity.height,this.rayIntersectPnt)) {
                 dist=pnt.distance(this.rayIntersectPnt);
                 if ((dist<currentDist) || (currentDist===-1)) {
                     entity.hitEntity=checkEntity;
                     hitPnt.setFromPoint(this.rayIntersectPnt);
                     currentDist=dist;
+                }
+            }
+        }
+        
+            // any hits
+            
+        return(currentDist!==-1);
+    }
+    
+        //
+        // ray collisions for cameras
+        //
+        
+    rayCollisionCamera(entity,pnt,vector,skipEntities,hitPnt)
+    {
+        let n,k,nEntity;
+        let mesh,checkEntity;
+        let collisionTrig,nCollisionTrig;              
+        let dist,currentDist;
+        
+            // the rough collide boxes
+            
+        this.objXBound.setFromValues(pnt.x,(pnt.x+vector.x));
+        this.objYBound.setFromValues(pnt.y,(pnt.y+vector.y));
+        this.objZBound.setFromValues(pnt.z,(pnt.z+vector.z));
+        
+            // no collisions yet
+
+        currentDist=-1;
+
+            // run through the meshes and
+            // check against all trigs
+
+        for (n of this.core.map.meshList.collisionMeshIndexList) {
+            mesh=this.core.map.meshList.meshes[n];
+
+                // skip any mesh we don't collide with
+
+            if (!mesh.boxBoundCollision(this.objXBound,this.objYBound,this.objZBound)) continue;
+
+                // check the wall trigs
+
+            nCollisionTrig=mesh.collisionWallTrigs.length;
+
+            for (k=0;k!==nCollisionTrig;k++) {
+                collisionTrig=mesh.collisionWallTrigs[k];
+                if (!collisionTrig.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) continue;
+
+                if (collisionTrig.rayTrace(pnt,vector,this.rayIntersectPnt)) {
+                    dist=pnt.distance(this.rayIntersectPnt);
+                    if ((dist<currentDist) || (currentDist===-1)) {
+                        hitPnt.setFromPoint(this.rayIntersectPnt);
+                        currentDist=dist;
+                    }
+                }
+            }
+            
+                // check the floor trigs
+
+            nCollisionTrig=mesh.collisionFloorTrigs.length;
+
+            for (k=0;k!==nCollisionTrig;k++) {
+                collisionTrig=mesh.collisionFloorTrigs[k];
+                if (!collisionTrig.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) continue;
+
+                if (collisionTrig.rayTrace(pnt,vector,this.rayIntersectPnt)) {
+                    dist=pnt.distance(this.rayIntersectPnt);
+                    if ((dist<currentDist) || (currentDist===-1)) {
+                        hitPnt.setFromPoint(this.rayIntersectPnt);
+                        currentDist=dist;
+                    }
+                }
+            }
+            
+                // check the ceiling trigs
+
+            nCollisionTrig=mesh.collisionCeilingTrigs.length;
+
+            for (k=0;k!==nCollisionTrig;k++) {
+                collisionTrig=mesh.collisionCeilingTrigs[k];
+                if (!collisionTrig.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) continue;
+
+                if (collisionTrig.rayTrace(pnt,vector,this.rayIntersectPnt)) {
+                    dist=pnt.distance(this.rayIntersectPnt);
+                    if ((dist<currentDist) || (currentDist===-1)) {
+                        hitPnt.setFromPoint(this.rayIntersectPnt);
+                        currentDist=dist;
+                    }
+                }
+            }
+        }
+        
+            // check entities
+            
+        if (!skipEntities) {
+            let nEntity=this.core.map.entityList.count();
+            
+            for (n=0;n!==nEntity;n++) {
+                checkEntity=this.core.map.entityList.entities[n];
+                if (checkEntity===entity) continue;
+                if (checkEntity===entity.heldBy) continue;         // skip source entity and anything holding source entity
+                if ((!checkEntity.show) || (checkEntity.passThrough) || (checkEntity.heldBy!==null)) continue;
+
+                    // run the collision
+
+                if (this.rayCylinderIntersection(pnt,vector,checkEntity.position,checkEntity.radius,checkEntity.height,this.rayIntersectPnt)) {
+                    dist=pnt.distance(this.rayIntersectPnt);
+                    if ((dist<currentDist) || (currentDist===-1)) {
+                        hitPnt.setFromPoint(this.rayIntersectPnt);
+                        currentDist=dist;
+                    }
                 }
             }
         }

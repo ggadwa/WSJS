@@ -458,46 +458,30 @@ export default class EntityFPSBotClass extends EntityClass
 
     fireWeapon()
     {
-        let x,weapon;
+        let dist,weapon;
         
             // are we turned enough towards player?
             
         if (Math.abs(this.lastTargetAngleDif)>this.targetFireYRange) return;
             
-           // are we outside of grenade distance?
-           // if so, then we can throw a grenade
-           // we also have a pause so bots don't unload
-           // at one helpless player
+           // see if any extra weapons can be fired
            
-           // run through extraWeapons here
-           /*
-        if (this.grenade.ammoCount>0) {
-            if (this.getTimestamp()>this.grenadePauseTick) {
-                if (this.position.distance(this.targetEntity.position)>this.MIN_GRENADE_DISTANCE) {
-                    this.fireAngle.setFromPoint(this.drawAngle);
-                    this.fireAngle.x=this.position.getLookAngleTo(this.targetEntity.position);
-                    this.grenade.fire(this.position,this.fireAngle,this.eyeOffset);
-                    this.grenadePauseTick=this.getTimestamp()+this.GRENADE_PAUSE_TICK;
-
-                    if (this.currentWeapon===this.WEAPON_BERETTA) {
-                        this.modelEntityAlter.startAnimationChunkInFrames(null,30,51,91);
-                        this.modelEntityAlter.queueAnimationChunkInFrames(null,30,406,442);
-                    }
-                    else {
-                        this.modelEntityAlter.startAnimationChunkInFrames(null,30,820,860);
-                        this.modelEntityAlter.queueAnimationChunkInFrames(null,30,960,996);
-                    }
-                    return;
+        dist=this.position.distance(this.targetEntity.position);
+        
+        for (weapon of this.extraWeapons) {
+            if (weapon.hasAnyAmmo()) {
+                if ((dist>weapon.botFireRange.min) && (dist<weapon.botFireRange.max)) {
+                    if (weapon.fireAny(this.firePosition,this.drawAngle)) return;
                 }
             }
         }
-        */
+           
             // otherwise shot the held weapon
             
         this.firePosition.setFromPoint(this.position);
         this.firePosition.y+=this.eyeOffset;
             
-        weapon=this.carouselWeapons[this.currentCarouselWeaponIdx].firePrimary(this.firePosition,this.drawAngle);
+        weapon=this.carouselWeapons[this.currentCarouselWeaponIdx].fireAny(this.firePosition,this.drawAngle);
     }
     
         //

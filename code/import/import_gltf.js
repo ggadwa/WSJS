@@ -768,6 +768,19 @@ export default class ImportGLTFClass
             return(this.MESH_INFORMATIONAL_REMOVE);
         }
         
+            // backgrounds
+            
+        value=this.getCustomProperty(materialNode,meshNode,'wsjsBackground');
+        if (value!==null) {
+            obj=this.decideMapMeshInformationalParseJSON(meshNode,value);
+            if (obj===null) return(this.MESH_INFORMATIONAL_ERROR);
+            
+            map.background.on=true;
+            map.background.shift=obj.shift;
+            map.background.bitmap=mesh.bitmap;
+            return(this.MESH_INFORMATIONAL_REMOVE);
+        }
+        
             // lights
             
         value=this.getCustomProperty(materialNode,meshNode,'wsjsLight');
@@ -1106,7 +1119,7 @@ export default class ImportGLTFClass
             this.mapImportScale=obj.scale;
             
             map.bumpHeight=obj.bumpHeight;
-            map.cameraSetup=obj.camera;
+            map.viewSetup=obj.view;
             map.gravityMinValue=obj.gravity.min;
             map.gravityMaxValue=obj.gravity.max;
             map.gravityAcceleration=obj.gravity.acceleration;
