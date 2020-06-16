@@ -103,6 +103,16 @@ export default class EntityWeaponClass extends EntityClass
         this.fireAngleAdd=new PointClass(0,0,0);
         this.botFireRange=new BoundClass(0,0);
         
+        this.parentIdleAnimation=null;
+        this.parentRunAnimation=null; 
+        this.parentFireIdleAnimation=null;
+        this.parentPrimaryFireRunAnimation=null;
+        this.parentPrimaryFireFreezeMovement=false;
+        this.parentSecondaryFireRunAnimation=null;
+        this.parentSecondaryFireFreezeMovement=false;
+        this.parentTertiaryFireRunAnimation=null;
+        this.parentTertiaryFireFreezeMovement=false;
+        
             // pre-allocates
         
         this.firePoint=new PointClass(0,0,0);
@@ -148,8 +158,11 @@ export default class EntityWeaponClass extends EntityClass
         this.parentRunAnimation=null; 
         this.parentFireIdleAnimation=null;
         this.parentPrimaryFireRunAnimation=null;
+        this.parentPrimaryFireFreezeMovement=false;
         this.parentSecondaryFireRunAnimation=null;
+        this.parentSecondaryFireFreezeMovement=false;
         this.parentTertiaryFireRunAnimation=null;
+        this.parentTertiaryFireFreezeMovement=false;
         
         return(true);    
     }
@@ -280,7 +293,7 @@ export default class EntityWeaponClass extends EntityClass
         // fire for type
         //
         
-    fireForType(parentEntity,fire,fireAnimation,firePosition,fireAngle)
+    fireForType(parentEntity,fire,fireAnimation,fireAnimationFreezeMovement,firePosition,fireAngle)
     {
         if (fire.ammo===0) return;
         
@@ -306,7 +319,12 @@ export default class EntityWeaponClass extends EntityClass
         if (parentEntity.model!==null) {
             if (!parentEntity.modelEntityAlter.isAnimationQueued()) {   // don't do this if we have a queue, which means another fire is still going on
                 if ((parentEntity.movement.x!==0) || (parentEntity.movement.z!==0)) {
-                    if (fireAnimation!==null) parentEntity.modelEntityAlter.interuptAnimationChunkInFrames(null,30,fireAnimation[0],fireAnimation[1]);
+                    if (fireAnimation!==null) {
+                        parentEntity.modelEntityAlter.interuptAnimationChunkInFrames(null,30,fireAnimation[0],fireAnimation[1]);
+                        if ((fireAnimationFreezeMovement) && (parentEntity.movementFreezeTick!==undefined)) {
+                            parentEntity.movementFreezeTick=this.core.timestamp+parentEntity.modelEntityAlter.getAnimationTickCount(null,30,fireAnimation[0],fireAnimation[1]);
+                        }
+                    }
                 }
                 else {
                     if (this.parentFireIdleAnimation!==null) parentEntity.modelEntityAlter.interuptAnimationChunkInFrames(null,30,this.parentFireIdleAnimation[0],this.parentFireIdleAnimation[1]);
@@ -332,17 +350,17 @@ export default class EntityWeaponClass extends EntityClass
         
     firePrimary(firePosition,fireAngle)
     {
-        if (this.primary!==null) this.fireForType(this.heldBy,this.primary,this.parentPrimaryFireRunAnimation,firePosition,fireAngle);
+        if (this.primary!==null) this.fireForType(this.heldBy,this.primary,this.parentPrimaryFireRunAnimation,this.parentPrimaryFireFreezeMovement,firePosition,fireAngle);
     }
     
     fireSecondary(firePosition,fireAngle)
     {
-        if (this.secondary!==null) this.fireForType(this.heldBy,this.secondary,this.parentSecondaryFireRunAnimation,firePosition,fireAngle);
+        if (this.secondary!==null) this.fireForType(this.heldBy,this.secondary,this.parentSecondaryFireRunAnimation,this.parentSecondaryFireFreezeMovement,firePosition,fireAngle);
     }
     
     fireTertiary(firePosition,fireAngle)
     {
-        if (this.tertiary!==null) this.fireForType(this.heldBy,this.tertiary,this.parentTertiaryFireRunAnimation,firePosition,fireAngle);
+        if (this.tertiary!==null) this.fireForType(this.heldBy,this.tertiary,this.parentTertiaryFireRunAnimation,this.parentTertiaryFireFreezeMovement,firePosition,fireAngle);
     }
     
     fireAny(firePosition,fireAngle)

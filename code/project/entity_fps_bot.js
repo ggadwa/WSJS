@@ -47,6 +47,7 @@ export default class EntityFPSBotClass extends EntityClass
         this.fallDamageMinDistance=0;
         this.fallDamagePercentage=0;
         this.respawnWaitTick=0;
+        this.movementFreezeTick=0;
         
         this.hurtSound=null;
         this.dieSound=null;
@@ -196,8 +197,11 @@ export default class EntityFPSBotClass extends EntityClass
             weaponEntity.parentRunAnimation=this.core.game.lookupAnimationValue(weaponBlock.parentRunAnimation);
             weaponEntity.parentFireIdleAnimation=this.core.game.lookupAnimationValue(weaponBlock.parentFireIdleAnimation);
             weaponEntity.parentPrimaryFireRunAnimation=this.core.game.lookupAnimationValue(weaponBlock.parentPrimaryFireRunAnimation);
+            weaponEntity.parentPrimaryFireFreezeMovement=this.core.game.lookupValue(weaponBlock.parentPrimaryFireFreezeMovement,this.data,false);
             weaponEntity.parentSecondaryFireRunAnimation=this.core.game.lookupAnimationValue(weaponBlock.parentSecondaryFireRunAnimation);
+            weaponEntity.parentSecondaryFireFreezeMovement=this.core.game.lookupValue(weaponBlock.parentSecondaryFireFreezeMovement,this.data,false);
             weaponEntity.parentTertiaryFireRunAnimation=this.core.game.lookupAnimationValue(weaponBlock.parentTertiaryFireRunAnimation);
+            weaponEntity.parentTertiaryFireFreezeMovement=this.core.game.lookupValue(weaponBlock.parentTertiaryFireFreezeMovement,this.data,false);
         }
         
         return(true);
@@ -219,6 +223,8 @@ export default class EntityFPSBotClass extends EntityClass
         
         this.respawnTick=0;
         this.telefragTriggerEntity=null;
+        
+        this.movementFreezeTick=0;
         
             // start with best weapon
             
@@ -288,7 +294,7 @@ export default class EntityFPSBotClass extends EntityClass
             return;
         }
         
-        if (fromEntity!==null) this.targetEntity=fromEntity;
+        if ((fromEntity!==null) && (fromEntity!==this)) this.targetEntity=fromEntity;
     }
     
     telefrag(fromEntity)
@@ -444,12 +450,12 @@ export default class EntityFPSBotClass extends EntityClass
         this.lookPoint.y+=Math.trunc(this.height*0.5);      // use middle instead of eye position in case other stuff is smaller
         
         this.lookVector.setFromValues(0,0,this.targetForgetDistance);
-        this.lookVector.rotateY(null,(this.currentTargetYScan-Math.trunc(this.targetScanYRange*0.5)));
+        this.lookVector.rotateY(null,(this.angle.y+(this.currentTargetYScan-Math.trunc(this.targetScanYRange*0.5))));
         
         this.currentTargetYScan++;
         if (this.currentTargetYScan>=this.targetScanYRange) this.currentTargetYScan=0;
         
-        if (this.rayCollision(this.lookPoint,this.lookVector,this.lookHitPoint)) {
+        if (this.collision.rayCollision(this,this.lookPoint,this.lookVector,this.lookHitPoint)) {
             if (this.hitEntity!==null) {
                 if (this.hitEntity.fighter) this.targetEntity=this.hitEntity;
             }
@@ -464,6 +470,11 @@ export default class EntityFPSBotClass extends EntityClass
             
         if (Math.abs(this.lastTargetAngleDif)>this.targetFireYRange) return;
             
+            // fire position
+            
+        this.firePosition.setFromPoint(this.position);
+        this.firePosition.y+=this.eyeOffset;
+            
            // see if any extra weapons can be fired
            
         dist=this.position.distance(this.targetEntity.position);
@@ -477,9 +488,6 @@ export default class EntityFPSBotClass extends EntityClass
         }
            
             // otherwise shot the held weapon
-            
-        this.firePosition.setFromPoint(this.position);
-        this.firePosition.y+=this.eyeOffset;
             
         weapon=this.carouselWeapons[this.currentCarouselWeaponIdx].fireAny(this.firePosition,this.drawAngle);
     }
@@ -636,6 +644,19 @@ export default class EntityFPSBotClass extends EntityClass
         
         if ((this.touchEntity!==null) && (moveForward)) {
             slideLeft=true;
+        }
+        
+            // turn off all movement if in a freeze
+            // mostly happens from certain weapon fires
+            
+        if (this.movementFreezeTick!==0) {
+            if (this.movementFreezeTick>this.core.timestamp) {
+                moveForward=false;
+                slideLeft=false;
+            }
+            else {
+                this.movementFreezeTick=0;
+            }
         }
         
             // turn towards the node

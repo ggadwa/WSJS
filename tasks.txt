@@ -1,15 +1,16 @@
 
 - swipe up for grenade
-- bot extra weapon fire (in weapon config)
-- bot run away with projectile/no ammo (need to be able to pick node behind)
 
+
+- kart = start slower
+- kart = pickup
 - kart = settings into json
 - kart = skidding needs to actually reduce speed
 - kart = get other tanks moving
 - kart = shell icon instead of gear
 - kart = reactivate bots
 
-
+- platform = maybe less farz (has weird bending at edges because of 3d transform)
 
 - eventually make model/etc loading specific instead of everything
 
@@ -63,3 +64,33 @@ GENERATOR
        - better uv for pillars
        - control panel decorations
        - connectors for pipes
+
+
+MISC
+
+- player animations
+
+Berreta_COMBAT_mode 0-50
+Berreta_Grenade_throw 51-91
+Berreta_Looking_around 92-177
+Berreta_RightFoot_kick 178-208
+Berreta_Die_on_back 209-247
+Berreta_Die_on_belt 252-359
+Berreta_fire_staying 364-401
+Berreta_Casual_walk 406-442
+Berreta_Cautious_walk 447-487
+Berreta_Combat_run 492-518
+Berreta_Fire_run 523-549
+Berreta_Fire_walk 554-594
+Berreta_Fire_walking_back 599-634
+Berreta_run 639-665
+Berreta_Walking_back 670-705
+M16_Combat_Mode 710-760
+M16_Fire_Belt 765-770
+M16_Fire_standing 775-815
+M16_Grenade_throw 820-860
+M16_Fire_Runing 865-887
+M16_Fire_walking 892-928
+M16_Run 933-955
+M16_Walking 960-996
+M16_Walking_back 1001-1036

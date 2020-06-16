@@ -12,6 +12,7 @@ export default class EntityPlatformPlayerClass extends EntityClass
 
             // pre-allocates
             
+        this.rotMovement=new PointClass(0,0,0);
         this.drawAngle=new PointClass(0,90,0);
     }
     
@@ -48,6 +49,9 @@ export default class EntityPlatformPlayerClass extends EntityClass
                 this.position.x-=70;
             }
         }
+        
+        this.rotMovement.setFromValues(0,0,0);
+        this.moveInMapY(this.rotMovement,1.0,false);
         
     }
     

@@ -411,7 +411,7 @@ class ShadowmapGeneratorClass
 
     renderMesh(meshIdx)
     {
-        let n,renderResult,runIdx;
+        let n,renderResult,runIdx,drawTrigIdx;
         let rv0,rv1,rv2,dist0,dist1,dist2;
         let vertexShadowArray,uvShadowArray;
         let mesh,shadowmap;
@@ -451,6 +451,8 @@ class ShadowmapGeneratorClass
             // run through the triangles
             // if no lights hit a triangle, it's
             // autoset to chunk 0, the all black trig
+            
+        drawTrigIdx=0;
 
         for (n=0;n!==mesh.trigCount;n++) {
 
@@ -516,7 +518,7 @@ class ShadowmapGeneratorClass
 
                 // add the shadow map pass triangle
                 
-            mesh.shadowmapRuns[runIdx].endTrigIdx=n+1;
+            mesh.shadowmapRuns[runIdx].endTrigIdx=drawTrigIdx+1;
 
             vertexShadowArray.push(rv0.x,rv0.y,rv0.z);
             uvShadowArray.push((this.t0.x/this.SHADOWMAP_TEXTURE_SIZE),(this.t0.y/this.SHADOWMAP_TEXTURE_SIZE));
@@ -526,6 +528,8 @@ class ShadowmapGeneratorClass
 
             vertexShadowArray.push(rv2.x,rv2.y,rv2.z);
             uvShadowArray.push((this.t2.x/this.SHADOWMAP_TEXTURE_SIZE),(this.t2.y/this.SHADOWMAP_TEXTURE_SIZE));
+            
+            drawTrigIdx++;
 
                 // are we at the end of this shadowmap
                 // and need to start a new one (and therefore
@@ -538,7 +542,7 @@ class ShadowmapGeneratorClass
                 this.shadowmapList.push(shadowmap);
                 
                 runIdx=mesh.shadowmapRuns.length;
-                mesh.shadowmapRuns.push(new ShadowmapMeshRunClass(this.shadowmapIdx,(n+1),(n+1)));
+                mesh.shadowmapRuns.push(new ShadowmapMeshRunClass(this.shadowmapIdx,drawTrigIdx,drawTrigIdx));
             }
         }
         

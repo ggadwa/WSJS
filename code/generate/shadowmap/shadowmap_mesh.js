@@ -14,7 +14,7 @@ export default class ShadowmapMeshClass
         let v0,v1,v2,v3,vIdx,tIdx;
         
         this.name=mesh.name;
-        this.bitmapName=mesh.bitmap.name;
+        this.colorURL=mesh.bitmap.colorURL;
         
         this.hasEmissiveTexture=(mesh.bitmap.emissiveTexture!==null);
         this.hasMaskTexture=(mesh.bitmap.maskTexture!==null);

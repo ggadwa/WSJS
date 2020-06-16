@@ -190,8 +190,11 @@ export default class EntityFPSPlayerClass extends EntityClass
             weaponEntity.parentRunAnimation=weaponBlock.parentRunAnimation;
             weaponEntity.parentFireIdleAnimation=weaponBlock.parentFireIdleAnimation;
             weaponEntity.parentPrimaryFireRunAnimation=weaponBlock.parentPrimaryFireRunAnimation;
+            weaponEntity.parentPrimaryFireFreezeMovement=false;
             weaponEntity.parentSecondaryFireRunAnimation=weaponBlock.parentSecondaryFireRunAnimation;
+            weaponEntity.parentSecondaryFireFreezeMovement=false;
             weaponEntity.parentTertiaryFireRunAnimation=weaponBlock.parentTertiaryFireRunAnimation;
+            weaponEntity.parentTertiaryFireFreezeMovement=false;
         }
         
         return(true);
