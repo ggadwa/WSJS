@@ -49,10 +49,6 @@ export default class EntityClass
         this.originalAngle=this.angle.copy();
         this.originalScale=this.scale.copy();
         
-        this.fighter=false;
-        this.canPickup=false;
-        this.pickup=false;
-        
         this.markDelete=false;
         
         this.model=null;
@@ -321,6 +317,9 @@ export default class EntityClass
                     break;
                 case 'addArmor':
                     entity.addArmor(this.core.game.lookupValue(action.count,this.data,0));
+                    break;
+                case 'addSpeed':
+                    entity.addSpeed(this.core.game.lookupValue(action.count,this.data,0));
                     break;
                 case 'kill':
                     entity.die(null,false);

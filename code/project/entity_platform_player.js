@@ -35,18 +35,21 @@ export default class EntityPlatformPlayerClass extends EntityClass
         
     run()
     {
+        let speed;
         let input=this.core.input;
         
         super.run();
         
+        speed=(input.isKeyDown('Shift'))?120:70;
+        
         if (input.isKeyDown('d')) {
             this.drawAngle.y=90;
-            this.position.x+=70;
+            this.position.x+=speed;
         }
         else {
             if (input.isKeyDown('a')) {
                 this.drawAngle.y=270;
-                this.position.x-=70;
+                this.position.x-=speed;
             }
         }
         

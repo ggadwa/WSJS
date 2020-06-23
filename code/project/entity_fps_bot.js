@@ -1,14 +1,13 @@
 import PointClass from '../utility/point.js';
 import EntityClass from '../project/entity.js';
+import EntityFPSPlayerClass from '../project/entity_fps_player.js';
+import EntityFPSMonsterClass from '../project/entity_fps_monster.js';
 
 export default class EntityFPSBotClass extends EntityClass
 {
     constructor(core,name,jsonName,position,angle,data,mapSpawn,spawnedBy,heldBy,show)
     {
         super(core,name,jsonName,position,angle,data,mapSpawn,spawnedBy,heldBy,show);
-        
-        this.fighter=true;
-        this.canPickup=true;
         
         this.health=0;
         this.healthInitialCount=0;
@@ -457,7 +456,9 @@ export default class EntityFPSBotClass extends EntityClass
         
         if (this.collision.rayCollision(this,this.lookPoint,this.lookVector,this.lookHitPoint)) {
             if (this.hitEntity!==null) {
-                if (this.hitEntity.fighter) this.targetEntity=this.hitEntity;
+                if ((this.hitEntity instanceof EntityFPSPlayerClass) ||
+                   (this.hitEntity instanceof EntityFPSBotClass) ||
+                   (this.hitEntity instanceof EntityFPSMonsterClass)) this.targetEntity=this.hitEntity;
             }
         }
     }

@@ -25,7 +25,6 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.STATE_DEAD=9;
         
         this.state=this.STATE_ASLEEP;
-        this.fighter=true;
         
         this.health=0;
         this.startHealth=0;

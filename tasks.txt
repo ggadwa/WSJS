@@ -1,23 +1,17 @@
 
 - swipe up for grenade
+- all the project/entity_? need object seals
 
-
-- kart = start slower
-- kart = pickup
+- kart = why are shell interface count always at 3?
+- kart = pickups seem to start on each other
 - kart = settings into json
 - kart = skidding needs to actually reduce speed
-- kart = get other tanks moving
-- kart = shell icon instead of gear
-- kart = reactivate bots
+- kart = update the kart bots and get them working
 
-- platform = maybe less farz (has weird bending at edges because of 3d transform)
+- platform = blocking rock is too thin
+- platform = slow down layer movement
 
 - eventually make model/etc loading specific instead of everything
-
-
-
-
-
 
 - fix seams on sky box?
 
@@ -33,11 +27,9 @@ BOTS
    - they seem to continue to fight with the dead
    - run away if no ammo?
 
-KART
-
 MISC
   - death messages by game with json setup
-  - eventually clean up entity and unecessary pass through APIs
+  - eventually clean up entity and unnecessary pass through APIs
 
 NETWORKING
     - multiplayer needs a complete rebuild

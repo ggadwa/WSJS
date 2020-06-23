@@ -137,7 +137,7 @@ export default class InterfaceCountClass
         
             gl.drawElements(gl.TRIANGLES,(this.count*6),gl.UNSIGNED_SHORT,0);
         }
-        if (this.count<this.maxCount) {
+        if ((this.count<this.maxCount) && (this.offAlpha>0)) {
             if (this.onColor===null) {
                 gl.uniform4f(shader.colorUniform,1,1,1,this.offAlpha);
             }

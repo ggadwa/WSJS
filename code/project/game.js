@@ -1,5 +1,7 @@
 import PointClass from '../utility/point.js';
 import ColorClass from '../utility/color.js';
+import EntityFPSPlayerClass from '../project/entity_fps_player.js';
+import EntityFPSBotClass from '../project/entity_fps_bot.js';
 import DeveloperClass from '../developer/developer.js';
 
 export default class GameClass
@@ -196,7 +198,8 @@ export default class GameClass
             this.scores=new Map();
 
             for (entity of this.core.map.entityList.entities) {
-                if (entity.fighter) this.scores.set(entity.name,0);
+                if ((entity instanceof EntityFPSPlayerClass) ||
+                    (entity instanceof EntityFPSBotClass)) this.scores.set(entity.name,0);
             }
             
                 // max number of scores to display
@@ -242,7 +245,7 @@ export default class GameClass
             
         points=0;
             
-        if ((fromEntity!==null) && (fromEntity.fighter)) {
+        if ((fromEntity!==null) && ((fromEntity instanceof EntityFPSPlayerClass) || (fromEntity instanceof EntityFPSBotClass))) {
             if (isTelefrag) {
                 scoreEntity=fromEntity;
                 points=1;

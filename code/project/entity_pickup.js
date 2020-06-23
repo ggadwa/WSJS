@@ -1,5 +1,10 @@
 import PointClass from '../utility/point.js';
 import EntityClass from '../project/entity.js';
+import EntityFPSPlayerClass from '../project/entity_fps_player.js';
+import EntityFPSBotClass from '../project/entity_fps_bot.js';
+import EntityKartPlayerClass from '../project/entity_kart_player.js';
+import EntityKartBotClass from '../project/entity_kart_bot.js';
+import EntityPlatformPlayerClass from '../project/entity_platform_player.js';
 
 export default class EntityPickupClass extends EntityClass
 {
@@ -7,7 +12,6 @@ export default class EntityPickupClass extends EntityClass
     {
         super(core,name,jsonName,position,angle,data,mapSpawn,spawnedBy,heldBy,show);
         
-        this.pickup=true;
         this.passThrough=true;           // can pass through
         
         this.originalY=0;
@@ -95,9 +99,14 @@ export default class EntityPickupClass extends EntityClass
             
         if (this.touchEntity===null) return;
         
-            // can this entity pickup?
+            // is this an entity that can
+            // pick things up?
             
-        if (!this.touchEntity.canPickup) return;
+        if (!((this.touchEntity instanceof EntityFPSPlayerClass) ||
+              (this.touchEntity instanceof EntityFPSBotClass) ||
+              (this.touchEntity instanceof EntityKartPlayerClass) ||
+              (this.touchEntity instanceof EntityKartBotClass) ||
+              (this.touchEntity instanceof EntityPlatformPlayerClass))) return;
         
             // pickup and run actions
             

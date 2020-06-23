@@ -3,6 +3,8 @@ import QuaternionClass from '../utility/quaternion.js';
 import BoundClass from '../utility/bound.js';
 import ColorClass from '../utility/color.js';
 import EntityClass from '../project/entity.js';
+import EntityPickupClass from '../project/entity_pickup.js';
+import EntityKartBotClass from '../project/entity_kart_bot.js';
 
 export default class EntityKartPlayerClass extends EntityClass
 {
@@ -10,13 +12,47 @@ export default class EntityKartPlayerClass extends EntityClass
     {
         super(core,name,jsonName,position,angle,data,mapSpawn,spawnedBy,heldBy,show);
         
+        this.maxTurnSpeed=1.5;
+        this.driftMaxTurnSpeed=2.5;
+        this.forwardAcceleration=8;
+        this.forwardDeceleration=25;
+        this.forwardMaxSpeed=2000;
+        this.reverseAcceleration=5;
+        this.reverseDeceleration=35;
+        this.reverseMaxSpeed=1500;
+        this.speedItemIncrease=50;
+        this.forwardBrakeDeceleration=50;
+        this.reverseBrakeDeceleration=50;
+        this.jumpHeight=1000;
+        this.bounceWaitCount=20;
+        this.spinOutSpeed=6;
+        this.driftDecelerationFactor=0.99;
+        this.fireWaitTick=1000;
+        
+        this.thirdPersonCameraDistance=0;
+        this.thirdPersonCameraLookAngle=null;
+        this.maxSpeedItemCount=0;
+        this.interfaceSpeedItem=null;
+        
         this.engineSound=null;
         this.skidSound=null;
         this.crashKartSound=null;
         this.crashWallSound=null;
         
-        this.thirdPersonCameraDistance=0;
-        this.thirdPersonCameraLookAngle=null;
+        
+            // lap calculations
+            // the existence of these means this entity
+            // is calculated into the laps
+            
+        this.lap=0;
+        this.previousLap=-1;
+        this.place=0;
+        this.previousPlace=-1;
+        this.placeNodeIdx=0;
+        this.placeNodeDistance=0;
+        this.placeLap=0;
+        this.hitMidpoint=false;
+
 
         
         this.currentWeaponIdx=-1;
@@ -33,13 +69,10 @@ export default class EntityKartPlayerClass extends EntityClass
         this.MAX_RIGID_ANGLE=25;
         this.RIGID_TRANSFORM_SPEED_PER_TICK=0.025;
         this.MAX_LOOK_ANGLE=80.0;
-        this.MAX_STARS=10;
         this.MAX_PROJECTILE_COUNT=3;
         this.MOUSE_MAX_LOOK_SPEED=8;
         this.MAX_LOOK_ANGLE=80.0;
         this.SMOKE_COOL_DOWN_COUNT=2;
-        
-        this.fighter=true;
         
         this.inDrift=false;
         this.smokeCoolDownCount=0;
@@ -49,19 +82,8 @@ export default class EntityKartPlayerClass extends EntityClass
     
         this.hitMidpoint=false;
     
-        this.starCount=0;
-
-        this.lastProjectileFireTick=0;
-    
         this.lastDrawTick=0;
     
-        this.lap=0;
-        this.previousLap=-1;
-        this.place=0;
-        this.previousPlace=-1;
-        this.placeNodeIdx=0;
-        this.placeNodeDistance=0;
-        this.placeLap=0;
         
             // pre-allocate
             
@@ -91,11 +113,11 @@ export default class EntityKartPlayerClass extends EntityClass
         this.driftMaxTurnSpeed=2.5;
         this.forwardAcceleration=8;
         this.forwardDeceleration=25;
-        this.forwardMaxSpeed=2000;
+        this.forwardMaxSpeed=1500;
         this.reverseAcceleration=5;
         this.reverseDeceleration=35;
-        this.reverseMaxSpeed=1500;
-        this.starSpeedIncrease=50;
+        this.reverseMaxSpeed=1000;
+        this.itemSpeedIncrease=50;
         this.forwardBrakeDeceleration=50;
         this.reverseBrakeDeceleration=50;
         this.jumpHeight=1000;
@@ -103,17 +125,18 @@ export default class EntityKartPlayerClass extends EntityClass
         this.spinOutSpeed=6;
         this.driftDecelerationFactor=0.99;
         this.fireWaitTick=1000;
-        this.maxMines=5;
-        this.mineRechargeTick=2000;
-        this.weight=500;
+        
+        this.thirdPersonCameraDistance=this.core.game.lookupValue(this.json.config.thirdPersonCameraDistance,this.data,0);
+        this.thirdPersonCameraLookAngle=new PointClass(this.json.config.thirdPersonCameraLookAngle.x,this.json.config.thirdPersonCameraLookAngle.y,this.json.config.thirdPersonCameraLookAngle.z);
+        
+        this.maxSpeedItemCount=this.core.game.lookupValue(this.json.config.maxSpeedItemCount,this.data,0);
+        this.interfaceSpeedItem=this.core.game.lookupValue(this.json.config.interfaceSpeedItem,this.data,null);
         
         this.engineSound=this.core.game.lookupSoundValue(this.json.sounds.engineSound);
         this.skidSound=this.core.game.lookupSoundValue(this.json.sounds.skidSound);
         this.crashKartSound=this.core.game.lookupSoundValue(this.json.sounds.crashKartSound);
         this.crashWallSound=this.core.game.lookupSoundValue(this.json.sounds.crashWallSound);
         
-        this.thirdPersonCameraDistance=this.core.game.lookupValue(this.json.config.thirdPersonCameraDistance,this.data,0);
-        this.thirdPersonCameraLookAngle=new PointClass(this.json.config.thirdPersonCameraLookAngle.x,this.json.config.thirdPersonCameraLookAngle.y,this.json.config.thirdPersonCameraLookAngle.z);
         
         for (n=0;n!==this.json.weapons.length;n++) {
             weaponBlock=this.json.weapons[n];
@@ -154,12 +177,6 @@ export default class EntityKartPlayerClass extends EntityClass
         this.spinOutCount=0;
         this.lastDriftSoundPlayIdx=-1;
         
-        this.starCount=0;
-        
-        this.mineCount=this.maxMines;
-        this.lastProjectileFireTick=0;
-        this.lastMineTick=0;
-        
         this.lap=-1;
         this.hitMidpoint=true;      // first lap starts the laps
         
@@ -168,7 +185,10 @@ export default class EntityKartPlayerClass extends EntityClass
         
         this.currentWeaponIdx=0;
         
-        this.resetStars();
+            // reset the speed items
+            
+        this.speedItemCount=0;
+        if (this.interfaceSpeedItem!==null) this.core.interface.setCount(this.interfaceSpeedItem,this.speedItemCount);
         
         this.engineSoundRateAirIncrease=0;
         this.engineSoundPlayIdx=this.core.soundList.playJson(this.position,this.engineSound);
@@ -190,31 +210,36 @@ export default class EntityKartPlayerClass extends EntityClass
     }
     
         //
-        // star UI
+        // pickup items
         //
         
-    resetStars()
+    addSpeed(count)
     {
-        this.starCount=0;
-        this.core.interface.setCount('stars',this.starCount);
-    }
-    
-    addStar()
-    {
-        if ((this.starCount+1)===this.MAX_STARS) return;
+        this.speedItemCount+=count;
+        if (this.speedItemCount>this.maxSpeedItemCount) this.speedItemCount=this.maxSpeedItemCount;
         
-        this.starCount++;
-        this.core.interface.setCount('stars',this.starCount);
+        if (this.interfaceSpeedItem!==null) this.core.interface.setCount(this.interfaceSpeedItem,this.speedItemCount);
     }
     
-    removeStar()
+    removeSpeed(count)
     {
-        if (this.starCount===0) return;
+        this.speedItemCount-=count;
+        if (this.speedItemCount<0) this.speedItemCount=0;
         
-        this.starCount--;
-        this.core.interface.setCount('stars',this.starCount);
+        if (this.interfaceSpeedItem!==null) this.core.interface.setCount(this.interfaceSpeedItem,this.speedItemCount);
     }
     
+    addAmmo(weaponName,fireMethod,count)
+    {
+        let weapon;
+        
+        for (weapon of this.weapons) {
+            if (weapon.name===weaponName) {
+                weapon.addAmmo(fireMethod,count);
+                return;
+            }
+        }
+    }
     
         //
         // drifts, bounces, spins
@@ -247,9 +272,9 @@ export default class EntityKartPlayerClass extends EntityClass
         if (this.spinOutCount===0) this.spinOutCount=360;
         this.core.soundList.playJson(this.position,soundJson);
         
-            // all bounces cost a star
+            // all bounces cost a speed item
             
-        this.removeStar();
+        this.removeSpeed(1);
         
             // bounces cancel drifts
             
@@ -290,13 +315,11 @@ export default class EntityKartPlayerClass extends EntityClass
             if (this.spinOutCount<=0) this.spinOutCount=0;
         }
         
-            // push if we hit another kart
-            // we loose a star for this and bounce back
+            // bounce if we hit another kart
             
         if (this.touchEntity!==null) {
-            if (this.touchEntity.name.startsWith('kart_')) {
-                this.bounceStart(this.crashKartSound);
-            }
+            if (this.touchEntity instanceof EntityKartBotClass) this.bounceStart(this.crashKartSound);
+
         }   
         
             // firing
@@ -358,7 +381,7 @@ export default class EntityKartPlayerClass extends EntityClass
             }
             else {
                 if (this.isStandingOnFloor()) {
-                    speed=this.forwardMaxSpeed+(this.starSpeedIncrease*this.starCount);
+                    speed=this.forwardMaxSpeed+(this.speedItemIncrease*this.speedItemCount);
                     this.movement.moveZWithAcceleration(moveForward,moveReverse,this.forwardAcceleration,this.forwardDeceleration,speed,this.reverseAcceleration,this.reverseDeceleration,this.reverseMaxSpeed);
                 }
             }
@@ -377,7 +400,6 @@ export default class EntityKartPlayerClass extends EntityClass
         this.moveInMapXZ(this.rotMovement,true,true);
         
             // bounce and spin out if hit wall
-            // we loose a star for this
         
         if (this.bounceCount!==0) {
             this.bounceCount--;
@@ -430,8 +452,6 @@ export default class EntityKartPlayerClass extends EntityClass
         let nodeIdx,nodeIdx2,nextNodeIdx,spliceIdx,entity;
         let entityList=this.getEntityList();
         let placeList=[];
-        
-        return;
 
             // this is a bit complicated, we assume there
             // is a path where the goalNodeIdx is right on the goal
@@ -448,7 +468,7 @@ export default class EntityKartPlayerClass extends EntityClass
             // around the track (taking into account the lap)
             
         for (entity of entityList.entities) {
-            if (!entity.name.startsWith('kart_')) continue;
+            if (entity.lap===undefined) continue;           // use this variable to tell if it's something that calculates place
             
                 // get nearest node and then the next node
                 // in the kart travel path

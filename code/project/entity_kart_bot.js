@@ -100,7 +100,7 @@ export default class EntityKartBotClass extends EntityClass
         
         if (this.rayCollision(this.lookPoint,this.lookVector,this.lookHitPoint)) {
             if (this.hitEntity!==null) {
-                if (this.hitEntity.fighter) this.targetEntity=this.hitEntity;
+                //if (this.hitEntity.fighter) this.targetEntity=this.hitEntity;
             }
         }
 
