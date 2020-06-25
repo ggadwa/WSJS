@@ -19,16 +19,19 @@ export default class DialogSettingsClass extends DialogBaseClass
     
     addMovementControls(viewDiv)
     {
-        this.addInput(viewDiv,'mouseXSensitivity','Mouse X Sensitivity:','range',null,Math.trunc(this.core.setup.mouseXSensitivity*100),null);
-        this.addInput(viewDiv,'mouseXAcceleration','Mouse X Acceleration:','range',null,Math.trunc(this.core.setup.mouseXAcceleration*100),null);
-        this.addInput(viewDiv,'mouseXInvert','Invert Mouse X:','checkbox',null,this.core.setup.mouseXInvert,null);
-        this.addInput(viewDiv,'mouseYSensitivity','Mouse Y Sensitivity:','range',null,Math.trunc(this.core.setup.mouseYSensitivity*100),null);
-        this.addInput(viewDiv,'mouseYAcceleration','Mouse X Acceleration:','range',null,Math.trunc(this.core.setup.mouseYAcceleration*100),null);
-        this.addInput(viewDiv,'mouseYInvert','Invert Mouse Y:','checkbox',null,this.core.setup.mouseYInvert,null);
-        
-        this.addInput(viewDiv,'touchStickXSensitivity','Touch Stick X Sensitivity:','range',null,Math.trunc(this.core.setup.touchStickXSensitivity*100),null);
-        this.addInput(viewDiv,'touchStickYSensitivity','Touch Stick Y Sensitivity:','range',null,Math.trunc(this.core.setup.touchStickYSensitivity*100),null);
-        
+        if (!this.core.input.hasTouch) {
+            this.addInput(viewDiv,'mouseXSensitivity','Mouse X Sensitivity:','range',null,Math.trunc(this.core.setup.mouseXSensitivity*100),null);
+            this.addInput(viewDiv,'mouseXAcceleration','Mouse X Acceleration:','range',null,Math.trunc(this.core.setup.mouseXAcceleration*100),null);
+            this.addInput(viewDiv,'mouseXInvert','Invert Mouse X:','checkbox',null,this.core.setup.mouseXInvert,null);
+            this.addInput(viewDiv,'mouseYSensitivity','Mouse Y Sensitivity:','range',null,Math.trunc(this.core.setup.mouseYSensitivity*100),null);
+            this.addInput(viewDiv,'mouseYAcceleration','Mouse X Acceleration:','range',null,Math.trunc(this.core.setup.mouseYAcceleration*100),null);
+            this.addInput(viewDiv,'mouseYInvert','Invert Mouse Y:','checkbox',null,this.core.setup.mouseYInvert,null);
+        }
+        else {
+            this.addInput(viewDiv,'touchStickXSensitivity','Touch Stick X Sensitivity:','range',null,Math.trunc(this.core.setup.touchStickXSensitivity*100),null);
+            this.addInput(viewDiv,'touchStickYSensitivity','Touch Stick Y Sensitivity:','range',null,Math.trunc(this.core.setup.touchStickYSensitivity*100),null);
+        }
+
         this.addInput(viewDiv,'snapLook','Snap Look:','checkbox',null,this.core.setup.snapLook,null);
     }
     
@@ -64,15 +67,18 @@ export default class DialogSettingsClass extends DialogBaseClass
     {
             // change the setup and save
             
-        this.core.setup.mouseXSensitivity=document.getElementById('mouseXSensitivity').value/100.0;
-        this.core.setup.mouseXAcceleration=document.getElementById('mouseXAcceleration').value/100.0;
-        this.core.setup.mouseXInvert=document.getElementById('mouseXInvert').checked;
-        this.core.setup.mouseYSensitivity=document.getElementById('mouseYSensitivity').value/100.0;
-        this.core.setup.mouseYAcceleration=document.getElementById('mouseYAcceleration').value/100.0;
-        this.core.setup.mouseYInvert=document.getElementById('mouseYInvert').checked;
-        
-        this.core.setup.touchStickXSensitivity=document.getElementById('touchStickXSensitivity').value/100.0;
-        this.core.setup.touchStickYSensitivity=document.getElementById('touchStickYSensitivity').value/100.0;
+        if (!this.core.input.hasTouch) {
+            this.core.setup.mouseXSensitivity=document.getElementById('mouseXSensitivity').value/100.0;
+            this.core.setup.mouseXAcceleration=document.getElementById('mouseXAcceleration').value/100.0;
+            this.core.setup.mouseXInvert=document.getElementById('mouseXInvert').checked;
+            this.core.setup.mouseYSensitivity=document.getElementById('mouseYSensitivity').value/100.0;
+            this.core.setup.mouseYAcceleration=document.getElementById('mouseYAcceleration').value/100.0;
+            this.core.setup.mouseYInvert=document.getElementById('mouseYInvert').checked;
+        }
+        else {
+            this.core.setup.touchStickXSensitivity=document.getElementById('touchStickXSensitivity').value/100.0;
+            this.core.setup.touchStickYSensitivity=document.getElementById('touchStickYSensitivity').value/100.0;
+        }
         
         this.core.setup.snapLook=document.getElementById('snapLook').checked;
 

@@ -70,8 +70,6 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.lastInLiquidIdx=-1;
         this.lastUnderLiquid=false;
         
-        this.lastWheelClick=0;
-        
         this.carouselWeapons=[];        // weapons in the carousel
         this.extraWeapons=[];           // any other weapon
         
@@ -154,8 +152,6 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.nextDamageTick=0;
         this.lastInLiquidIdx=-1;
         this.lastUnderLiquid=false;
-        
-        this.lastWheelClick=0;
 
             // setup the weapons
         
@@ -495,7 +491,7 @@ export default class EntityFPSPlayerClass extends EntityClass
         let liquid,liquidIdx,bump,gravityFactor,fallDist;
         let weapon,firePrimary,fireSecondary,fireTertiary;
         let turnAdd,lookAdd,startWeaponIdx;
-        let mouseWheelClick,cube;
+        let weapChangeDir,cube;
         let input=this.core.input;
         let setup=this.core.setup;
         
@@ -585,9 +581,9 @@ export default class EntityFPSPlayerClass extends EntityClass
         
             // weapon switching
             
-        mouseWheelClick=this.core.input.mouseWheelRead();
+        weapChangeDir=input.mouseWheelRead()+input.getTouchSwipeLeftX();
         
-        if ((mouseWheelClick<0) && (this.lastWheelClick===0)) {
+        if (weapChangeDir<0) {
             this.startWeaponIdx=this.currentCarouselWeaponIdx;
             
             while (true) {
@@ -603,12 +599,12 @@ export default class EntityFPSPlayerClass extends EntityClass
             }
         }
 
-        if ((mouseWheelClick>0) && (this.lastWheelClick===0)) {
+        if (weapChangeDir>0) {
             this.startWeaponIdx=this.currentCarouselWeaponIdx;
             
             while (true) {
                 this.currentCarouselWeaponIdx++;
-                if (this.currentCarouselWeaponIdx>=(this.carouselWeapons.length-1)) this.currentCarouselWeaponIdx=0;
+                if (this.currentCarouselWeaponIdx>(this.carouselWeapons.length-1)) this.currentCarouselWeaponIdx=0;
                 
                 if (this.currentCarouselWeaponIdx===startWeaponIdx) break;
                 
@@ -628,13 +624,11 @@ export default class EntityFPSPlayerClass extends EntityClass
             }
         }
         
-        this.lastWheelClick=mouseWheelClick;
-        
             // weapon firing
             
         firePrimary=input.mouseButtonFlags[0]||input.isTouchStickRightClick();
         fireSecondary=input.mouseButtonFlags[1];
-        fireTertiary=input.mouseButtonFlags[2];
+        fireTertiary=input.mouseButtonFlags[2]||(input.getTouchSwipeRightY()<0);
         
         this.firePosition.setFromPoint(this.position);
         this.firePosition.y+=this.eyeOffset;
@@ -658,10 +652,13 @@ export default class EntityFPSPlayerClass extends EntityClass
         
             // forward and shift controls
             
-        moveForward=(input.isKeyDown('w')) || (input.isKeyDown('ArrowUp')) || (input.getTouchStickLeftY()<0);
-        moveBackward=(input.isKeyDown('s')) || (input.isKeyDown('ArrowDown')) || (input.getTouchStickLeftY()>0);
-        moveLeft=input.isKeyDown('a') || (input.getTouchStickLeftX()<0);
-        moveRight=input.isKeyDown('d') || (input.getTouchStickLeftX()>0);
+        x=input.getTouchStickLeftX(setup.touchStickLeftXDeadZone,setup.touchStickLeftXAcceleration);
+        y=input.getTouchStickLeftY(setup.touchStickLeftYDeadZone,setup.touchStickLeftYAcceleration);
+            
+        moveForward=(input.isKeyDown('w')) || (input.isKeyDown('ArrowUp')) || (y<0);
+        moveBackward=(input.isKeyDown('s')) || (input.isKeyDown('ArrowDown')) || (y>0);
+        moveLeft=input.isKeyDown('a') || (x<0);
+        moveRight=input.isKeyDown('d') || (x>0);
         
             // turning
             
@@ -675,7 +672,9 @@ export default class EntityFPSPlayerClass extends EntityClass
             if (Math.abs(turnAdd)>this.maxTurnSpeed) turnAdd=this.maxTurnSpeed*Math.sign(turnAdd);
         }
         
-        turnAdd-=(input.getTouchStickRightX()*(setup.touchStickXSensitivity*20));
+        x=input.getTouchStickRightX(setup.touchStickRightXDeadZone,setup.touchStickRightXAcceleration);
+        this.core.interface.updateText('health_count',x);
+        turnAdd-=x;
         
         if (turnAdd!==0) {
             this.angle.y+=turnAdd;
@@ -696,7 +695,8 @@ export default class EntityFPSPlayerClass extends EntityClass
                 if (Math.abs(lookAdd)>this.maxLookSpeed) lookAdd=this.maxLookSpeed*Math.sign(lookAdd);
             }
 
-            lookAdd+=(input.getTouchStickRightY()*(setup.touchStickYSensitivity*20));
+            y=input.getTouchStickRightY(setup.touchStickRightYDeadZone,setup.touchStickRightYAcceleration);
+            lookAdd+=y;
 
             if ((setup.snapLook) && (moveForward || moveBackward || moveLeft || moveRight)) {
                 if (lookAdd===0) {

@@ -1,5 +1,5 @@
 
-- swipe up for grenade
+
 - all the project/entity_? need object seals
 
 - kart = why are shell interface count always at 3?

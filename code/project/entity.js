@@ -17,12 +17,6 @@ export default class EntityClass
         this.TEXT_ALIGN_CENTER=1;
         this.TEXT_ALIGN_RIGHT=2;
         
-        this.TOUCH_QUADRANT_ANY=-1;
-        this.TOUCH_QUADRANT_TOPLEFT=0;
-        this.TOUCH_QUADRANT_TOPRIGHT=1;
-        this.TOUCH_QUADRANT_BOTTOMLEFT=2;
-        this.TOUCH_QUADRANT_BOTTOMRIGHT=3
-        
         this.MODEL_ROTATION_ORDER_XYZ=0;
         this.MODEL_ROTATION_ORDER_XZY=1;
         

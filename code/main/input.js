@@ -1,3 +1,5 @@
+import PointClass from '../utility/point.js';
+
 //
 // input class
 //
@@ -6,13 +8,8 @@ export default class InputClass
 {
     constructor(core)
     {
-        this.TOUCH_QUADRANT_ANY=-1;
-        this.TOUCH_QUADRANT_TOPLEFT=0;
-        this.TOUCH_QUADRANT_TOPRIGHT=1;
-        this.TOUCH_QUADRANT_BOTTOMLEFT=2;
-        this.TOUCH_QUADRANT_BOTTOMRIGHT=3;
-        
         this.INPUT_WHEEL_REFRESH_TICK=500;
+        this.TOUCH_SWIPE_DEAD_ZONE=20;
 
         this.core=core;
 
@@ -61,6 +58,14 @@ export default class InputClass
         
         this.touchStickLeftClick=false;
         this.touchStickRightClick=false;
+        
+        this.touchLeftSwipeId=null;
+        this.touchLeftSwipePosition=new PointClass(0,0,0);
+        this.touchLeftSwipeMovement=new PointClass(0,0,0);
+        
+        this.touchRightSwipeId=null;
+        this.touchRightSwipePosition=new PointClass(0,0,0);
+        this.touchRightSwipeMovement=new PointClass(0,0,0);
             
         Object.seal(this);
     }
@@ -327,14 +332,20 @@ export default class InputClass
         return(click);
     }
     
-    getTouchStickLeftX()
+    getTouchStickLeftX(deadZone,acceleration)
     {
-        return(this.core.interface.touchStickLeft.getX());
+        let x=this.core.interface.touchStickLeft.getX();
+        
+        if (Math.abs(x)<deadZone) return(0);
+        return(x*acceleration);
     }
     
-    getTouchStickLeftY()
+    getTouchStickLeftY(deadZone,acceleration)
     {
-        return(this.core.interface.touchStickLeft.getY());
+        let y=this.core.interface.touchStickLeft.getY();
+        
+        if (Math.abs(y)<deadZone) return(0);
+        return(y*acceleration);
     }
     
     isTouchStickRightClick()
@@ -345,14 +356,64 @@ export default class InputClass
         return(click);
     }
     
-    getTouchStickRightX()
+    getTouchStickRightX(deadZone,acceleration)
     {
-        return(this.core.interface.touchStickRight.getX());
+        let x=this.core.interface.touchStickRight.getX();
+        
+        if (Math.abs(x)<deadZone) return(0);
+        return(x*acceleration);
     }
     
-    getTouchStickRightY()
+    getTouchStickRightY(deadZone,acceleration)
     {
-        return(this.core.interface.touchStickRight.getY());
+        let y=this.core.interface.touchStickRight.getY();
+        
+        if (Math.abs(y)<deadZone) return(0);
+        return(y*acceleration);
+    }
+    
+    getTouchSwipeLeftX()
+    {
+        let x;
+        
+        if (this.touchLeftSwipeMovement.x===0) return(0);
+        
+        x=this.touchLeftSwipeMovement.x;
+        this.touchLeftSwipeMovement.x=0;
+        return(x);
+    }
+    
+    getTouchSwipeLeftY()
+    {
+        let y;
+        
+        if (this.touchLeftSwipeMovement.y===0) return(0);
+        
+        y=this.touchLeftSwipeMovement.y;
+        this.touchLeftSwipeMovement.y=0;
+        return(y);
+    }
+    
+    getTouchSwipeRightX()
+    {
+        let x;
+        
+        if (this.touchRightSwipeMovement.x===0) return(0);
+        
+        x=this.touchRightSwipeMovement.x;
+        this.touchRightSwipeMovement.x=0;
+        return(x);
+    }
+    
+    getTouchSwipeRightY()
+    {
+        let y;
+        
+        if (this.touchRightSwipeMovement.y===0) return(0);
+        
+        y=this.touchRightSwipeMovement.y;
+        this.touchRightSwipeMovement.y=0;
+        return(y);
     }
     
     touchClear()
@@ -362,11 +423,17 @@ export default class InputClass
         
         this.touchStickLeftClick=false;
         this.touchStickRightClick=false;
+        
+        this.touchLeftSwipeId=null;
+        this.touchLeftSwipeMovement.setFromValues(0,0,0);
+        
+        this.touchRightSwipeId=null;
+        this.touchRightSwipeMovement.setFromValues(0,0,0);
     }
     
     touchStart(event)
     {
-        let touch,x,y,quadrant;
+        let touch,x,y;
         let iface=this.core.interface;
         
         event.preventDefault();
@@ -375,21 +442,29 @@ export default class InputClass
             x=(touch.clientX-this.canvasLeft);
             y=(touch.clientY-this.canvasTop);
 
-            if (y<this.canvasMidY) {
-                quadrant=(x<this.canvasMidX)?this.TOUCH_QUADRANT_TOPLEFT:this.TOUCH_QUADRANT_TOPRIGHT;
-            }
-            else {
-                quadrant=(x<this.canvasMidX)?this.TOUCH_QUADRANT_BOTTOMLEFT:this.TOUCH_QUADRANT_BOTTOMRIGHT;
-            }
-
                 // check sticks
 
             if (y>this.canvasMidY) {
                 if (x<this.canvasMidX) {
-                    if (!iface.touchStickLeft.show) iface.touchStickLeft.touchDown(touch.identifier,x,y);
+                    if (!iface.touchStickLeft.show) iface.touchStickLeft.touchUp();
+                    iface.touchStickLeft.touchDown(touch.identifier,x,y);
                 }
                 else {
-                    if (!iface.touchStickRight.show) iface.touchStickRight.touchDown(touch.identifier,x,y);
+                    if (iface.touchStickRight.show) iface.touchStickRight.touchUp();
+                    iface.touchStickRight.touchDown(touch.identifier,x,y);
+                }
+            }
+            
+                // check swipes
+                
+            else {
+                if (x<this.canvasMidX) {
+                    this.touchLeftSwipeId=touch.identifier;
+                    this.touchLeftSwipePosition.setFromValues(x,y,0);
+                }
+                else {
+                    this.touchRightSwipeId=touch.identifier;
+                    this.touchRightSwipePosition.setFromValues(x,y,0);
                 }
             }
             
@@ -408,7 +483,7 @@ export default class InputClass
     
     touchEnd(event)
     {
-        let touch;
+        let touch,x,y,ax,ay;
         let iface=this.core.interface;
         
         event.preventDefault();
@@ -424,6 +499,47 @@ export default class InputClass
             
             if (iface.touchStickRight.id===touch.identifier) {
                 this.touchStickRightClick=iface.touchStickRight.touchUp();
+                break;
+            }
+            
+                // release either swipe
+                
+            x=(touch.clientX-this.canvasLeft);
+            y=(touch.clientY-this.canvasTop);
+                
+            if (this.touchLeftSwipeId===touch.identifier) {
+                this.touchLeftSwipeId=null;
+                x-=this.touchLeftSwipePosition.x;
+                y-=this.touchLeftSwipePosition.y;
+                ax=Math.abs(x);
+                ay=Math.abs(y);
+                if ((ax>this.TOUCH_SWIPE_DEAD_ZONE) && (ax>ay)) {
+                    this.touchLeftSwipeMovement.setFromValues(x,0,0);
+                }
+                else {
+                    if (ay>this.TOUCH_SWIPE_DEAD_ZONE) {
+                        this.touchLeftSwipeMovement.setFromValues(0,y,0);
+                    }
+                }
+                
+                break;
+            }
+            
+            if (this.touchRightSwipeId===touch.identifier) {
+                this.touchRightSwipeId=null;
+                x-=this.touchRightSwipePosition.x;
+                y-=this.touchRightSwipePosition.y;
+                ax=Math.abs(x);
+                ay=Math.abs(y);
+                if ((ax>this.TOUCH_SWIPE_DEAD_ZONE) && (ax>ay)) {
+                    this.touchRightSwipeMovement.setFromValues(x,0,0);
+                }
+                else {
+                    if (ay>this.TOUCH_SWIPE_DEAD_ZONE) {
+                        this.touchRightSwipeMovement.setFromValues(0,y,0);
+                    }
+                }
+                
                 break;
             }
             

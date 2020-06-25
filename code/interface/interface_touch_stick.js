@@ -3,7 +3,6 @@ export default class InterfaceTouchStickClass
     constructor(core,ringBitmapName,thumbBitmapName,ringSize)
     {
         this.TOUCH_CLICK_TICK=300;
-        this.TOUCH_DEAD_ZONE=20;
         
         this.core=core;
         this.ringBitmapName=ringBitmapName;
@@ -135,29 +134,13 @@ export default class InterfaceTouchStickClass
     getX()
     {
         if (!this.show) return(0);
-        
-        if (this.thumbX<this.x) {
-            if ((this.x-this.thumbX)<this.TOUCH_DEAD_ZONE) return(0);
-            return(((this.thumbX+this.TOUCH_DEAD_ZONE)-this.x)/(this.ringRadius-this.TOUCH_DEAD_ZONE));
-        }
-        else {
-            if ((this.thumbX-this.x)<this.TOUCH_DEAD_ZONE) return(0);
-            return(((this.thumbX-this.TOUCH_DEAD_ZONE)-this.x)/(this.ringRadius-this.TOUCH_DEAD_ZONE));
-        }
+        return((this.thumbX-this.x)/(this.ringRadius-this.thumbRadius));
     }
     
     getY()
     {
         if (!this.show) return(0);
-        
-        if (this.thumbY<this.y) {
-            if ((this.y-this.thumbY)<this.TOUCH_DEAD_ZONE) return(0);
-            return(((this.thumbY+this.TOUCH_DEAD_ZONE)-this.y)/(this.ringRadius-this.TOUCH_DEAD_ZONE));
-        }
-        else {
-            if ((this.thumbY-this.y)<this.TOUCH_DEAD_ZONE) return(0);
-            return(((this.thumbY-this.TOUCH_DEAD_ZONE)-this.y)/(this.ringRadius-this.TOUCH_DEAD_ZONE));
-        }
+        return((this.thumbY-this.y)/(this.ringRadius-this.thumbRadius));
     }
     
     draw()
