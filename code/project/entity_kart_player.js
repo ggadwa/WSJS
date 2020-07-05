@@ -34,6 +34,10 @@ export default class EntityKartPlayerClass extends EntityClass
         this.maxSpeedItemCount=0;
         this.interfaceSpeedItem=null;
         
+        this.smokeThickness=0;
+        this.smokeAngles=[];
+        this.smokeEffect=null;
+        
         this.engineSound=null;
         this.skidSound=null;
         this.crashKartSound=null;
@@ -72,7 +76,6 @@ export default class EntityKartPlayerClass extends EntityClass
         this.MAX_PROJECTILE_COUNT=3;
         this.MOUSE_MAX_LOOK_SPEED=8;
         this.MAX_LOOK_ANGLE=80.0;
-        this.SMOKE_COOL_DOWN_COUNT=2;
         
         this.inDrift=false;
         this.smokeCoolDownCount=0;
@@ -131,6 +134,10 @@ export default class EntityKartPlayerClass extends EntityClass
         
         this.maxSpeedItemCount=this.core.game.lookupValue(this.json.config.maxSpeedItemCount,this.data,0);
         this.interfaceSpeedItem=this.core.game.lookupValue(this.json.config.interfaceSpeedItem,this.data,null);
+        
+        this.smokeThickness=this.core.game.lookupValue(this.json.config.smokeThickness,this.data,5);
+        this.smokeAngles=this.json.config.smokeAngles;
+        this.smokeEffect=this.core.game.lookupValue(this.json.config.smokeEffect,this.data,null);
         
         this.engineSound=this.core.game.lookupSoundValue(this.json.sounds.engineSound);
         this.skidSound=this.core.game.lookupSoundValue(this.json.sounds.skidSound);
@@ -206,7 +213,7 @@ export default class EntityKartPlayerClass extends EntityClass
         this.smokePosition.rotateY(null,((this.angle.y+offsetAngleY)%360));
         this.smokePosition.addPoint(this.position);
 
-        this.addEffect(this,'tire_smoke',this.smokePosition,null,true);
+        this.addEffect(this,this.smokeEffect,this.smokePosition,null,true);
     }
     
         //
@@ -295,6 +302,7 @@ export default class EntityKartPlayerClass extends EntityClass
     {
         let maxTurnSpeed,speed;
         let cube,weapon;
+        let smokeAngle;
         let timestamp=this.getTimestamp();
         
             // start spinning if you touch a monster
@@ -413,14 +421,17 @@ export default class EntityKartPlayerClass extends EntityClass
             // smoke if drifting, spinning out, or turning
             // without moving
             
-        if ((this.inDrift) || (this.spinOutCount!==0) || ((turnAdd!==0) && (this.movement.z===0))) {
-            if (this.smokeCoolDownCount===0) {
-                this.smokeCoolDownCount=this.SMOKE_COOL_DOWN_COUNT;
-                this.createSmoke(135);
-                this.createSmoke(225);
-            }
-            else {
-                this.smokeCoolDownCount--;
+        if (this.smokeEffect!==null) {
+            if ((this.inDrift) || (this.spinOutCount!==0) || ((turnAdd!==0) && (this.movement.z===0))) {
+                if (this.smokeCoolDownCount===0) {
+                    this.smokeCoolDownCount=this.smokeThickness;
+                    for (smokeAngle of this.smokeAngles) {
+                        this.createSmoke(smokeAngle);
+                    }
+                }
+                else {
+                    this.smokeCoolDownCount--;
+                }
             }
         }
         

@@ -17,8 +17,8 @@ export default class GameClass
         
         this.json=null;
         
-        this.jsonEffectCache=[];
-        this.jsonEntityCache=[];
+        this.jsonEffectMap=new Map();
+        this.jsonEntityMap=new Map();
         
         this.scores=null;
         this.scoreShow=false;
@@ -51,11 +51,10 @@ export default class GameClass
         
     getCachedJsonEffect(name)
     {
-        let n;
-        
-        for (n=0;n!==this.jsonEffectCache.length;n++) {
-            if (this.jsonEffectCache[n].name===name) return(this.jsonEffectCache[n]);
-        }
+        let jsonEffect;
+                
+        jsonEffect=this.jsonEffectMap.get(name);
+        if (jsonEffect!==undefined) return(jsonEffect);
         
         console.log('Unknown effect: '+name);
         return(null);
@@ -63,11 +62,10 @@ export default class GameClass
     
     getCachedJsonEntity(name)
     {
-        let n;
-        
-        for (n=0;n!==this.jsonEntityCache.length;n++) {
-            if (this.jsonEntityCache[n].name===name) return(this.jsonEntityCache[n]);
-        }
+        let jsonEntity;
+                
+        jsonEntity=this.jsonEntityMap.get(name);
+        if (jsonEntity!==undefined) return(jsonEntity);
         
         console.log('Unknown entity: '+name);
         return(null);
@@ -101,6 +99,171 @@ export default class GameClass
         if ((value==undefined) || (value===null)) return(new PointClass(valueDefaultX,valueDefaultY,valueDefaultZ));
         return(new PointClass(value[0],value[1],value[2]));
     }
+    
+    
+    // TODO -- all temp for now
+    
+    async fetchJsonEffect(name)
+    {
+        let resp;
+        let url='../effects/'+name+'.json';
+        
+        try {
+            resp=await fetch(url);
+            if (!resp.ok) return(Promise.reject('Unable to load effect: '+url+'; '+resp.statusText));
+            this.jsonEffectMap.set(name,await resp.json());
+            return(true);
+        }
+        catch (e) {
+            return(Promise.reject('Unable to load effect: '+url+'; '+e.message));
+        }
+    }
+    
+    async tempLoadEffects()
+    {
+        let effectSet,effect,jsonEntity;
+        let name,promises,success;
+        
+        // config.primary.hitEffect
+        // config.secondary.hitEffect
+        // config.tertiary.hitEffect
+        // config.hitEffect
+        // config.trailEffect
+        // config.smokeEffect
+        
+        effectSet=new Set();        
+        /*
+
+        
+        for (effect of this.core.map.effects) {
+            effectSet.add(effect.jsonName);
+        }
+        
+        for (jsonEntity of this.jsonEntityMap.values()) {
+            if (jsonEntity.config===undefined) continue;
+            
+            if (jsonEntity.config.primary!==undefined) {
+                if ((jsonEntity.config.primary.hitEffect!==undefined) && (jsonEntity.config.primary.hitEffect!==null)) effectSet.add(jsonEntity.config.primary.hitEffect);
+            }
+            if (jsonEntity.config.secondary!==undefined) {
+                if ((jsonEntity.config.secondary.hitEffect!==undefined) && (jsonEntity.config.secondary.hitEffect!==null)) effectSet.add(jsonEntity.config.secondary.hitEffect);
+            }
+            if (jsonEntity.config.tertiary!==undefined) {
+                if ((jsonEntity.config.tertiary.hitEffect!==undefined) && (jsonEntity.config.tertiary.hitEffect!==null)) effectSet.add(jsonEntity.config.tertiary.hitEffect);
+            }
+            
+            if ((jsonEntity.config.hitEffect!==undefined) && (jsonEntity.config.hitEffect!==null)) effectSet.add(jsonEntity.config.hitEffect);
+            if ((jsonEntity.config.trailEffect!==undefined) && (jsonEntity.config.trailEffect!==null)) effectSet.add(jsonEntity.config.trailEffect);
+            if ((jsonEntity.config.smokeEffect!==undefined) && (jsonEntity.config.smokeEffect!==null)) effectSet.add(jsonEntity.config.smokeEffect);
+        }
+        
+*/        
+
+        effectSet.add('exhaust');
+        effectSet.add('explosion');
+        effectSet.add('fire');
+        effectSet.add('fountain');
+        effectSet.add('hit');
+        effectSet.add('sparkle');
+        effectSet.add('spotlight');
+        effectSet.add('tire_smoke');
+       
+        promises=[];
+        
+        for (name of effectSet) {
+           // console.info(name);
+            promises.push(this.fetchJsonEffect(name));
+        }
+
+            // and await them all
+            
+        success=true;
+        
+        await Promise.all(promises)
+            .then
+                (
+                    (values)=>{
+                        success=!values.includes(false);
+                    },
+                );
+
+        return(success);
+    }
+
+
+
+
+    async fetchJsonEntity(name)
+    {
+        let resp;
+        let url='../entities/'+name+'.json';
+        
+        try {
+            resp=await fetch(url);
+            if (!resp.ok) return(Promise.reject('Unable to load entity: '+url+'; '+resp.statusText));
+            this.jsonEntityMap.set(name,await resp.json());
+            return(true);
+        }
+        catch (e) {
+            return(Promise.reject('Unable to load entity: '+url+'; '+e.message));
+        }
+    }
+    
+    async tempLoadEntities()
+    {
+        let entitySet;
+        let name,promises,success;
+        
+        entitySet=new Set();        
+
+        entitySet.add('bot');
+        entitySet.add('captain_chest');
+        entitySet.add('dragon_queen');
+        entitySet.add('kart_bot');
+        entitySet.add('kart_player');
+        entitySet.add('pickup_armor');
+        entitySet.add('pickup_grenade');
+        entitySet.add('pickup_health');
+        entitySet.add('pickup_m16');
+        entitySet.add('pickup_m16_ammo');
+        entitySet.add('pickup_pistol_ammo');
+        entitySet.add('pickup_shell');
+        entitySet.add('pickup_star');
+        entitySet.add('platform_player');
+        entitySet.add('player');
+        entitySet.add('projectile_grenade');
+        entitySet.add('projectile_sparkle');
+        entitySet.add('projectile_tank_shell');
+        entitySet.add('ratkin');
+        entitySet.add('skeleton');
+        entitySet.add('spider');
+        entitySet.add('vampire');
+        entitySet.add('weapon_grenade');
+        entitySet.add('weapon_m16');
+        entitySet.add('weapon_pistol');
+        entitySet.add('weapon_tank_shell');
+       
+        promises=[];
+        
+        for (name of entitySet) {
+            //console.info(name);
+            promises.push(this.fetchJsonEntity(name));
+        }
+
+            // and await them all
+            
+        success=true;
+        
+        await Promise.all(promises)
+            .then
+                (
+                    (values)=>{
+                        success=!values.includes(false);
+                    },
+                );
+
+        return(success);
+    }
 
         //
         // game initialize/release
@@ -130,8 +293,12 @@ export default class GameClass
            
         this.json=data;
         
+        if (!this.tempLoadEntities()) return(false);
+        if (!this.tempLoadEffects()) return(false);
+        
             // effects
-            
+        
+        /*    
         data=null;
         
         await this.fetchJson('effect')
@@ -148,6 +315,10 @@ export default class GameClass
         if (data===null) return(false);
         
         this.jsonEffectCache=data;
+             
+
+        
+        
         
             // entities
             
@@ -167,7 +338,8 @@ export default class GameClass
         if (data===null) return(false);
         
         this.jsonEntityCache=data;
-            
+            */
+           
         return(true);
     }
     

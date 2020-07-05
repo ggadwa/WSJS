@@ -94,18 +94,10 @@ export default class BitmapListClass
         // loading
         //
         
-    async loadAllBitmaps()
+    addGameBitmaps()
     {
-        let entityDef,effectDef,keys,key;
-        let keyIter,rtn,bitmap;
-        let success,promises;
         let game=this.core.game;
         
-            // we will already have bitmaps that
-            // were added by importing glTF models,
-            // so we only add the rest here
-            // we look at the game, entity, and effect json
-            
         this.addInterface(game.json.config.interfaceHitBitmap);
         this.addInterface(game.json.config.touchStickRingBitmap);
         this.addInterface(game.json.config.touchStickThumbBitmap);
@@ -114,27 +106,59 @@ export default class BitmapListClass
             this.addInterfaceFromJson(game.json.interface.elements);
             this.addInterfaceFromJson(game.json.interface.counts);
         }
+    }
+    
+    addEntityBitmaps()
+    {
+        let entity,jsonEntity;
+        let weapon,jsonWeapon;
+        let game=this.core.game;
         
-        keys=Object.keys(game.jsonEntityCache);
-        
-        for (key of keys)
-        {
-            entityDef=game.jsonEntityCache[key];
-            if (entityDef.interface!==undefined) {
-                this.addInterfaceFromJson(entityDef.interface.elements);
-                this.addInterfaceFromJson(entityDef.interface.counts);
+        for (entity of this.core.map.entityList.entities) {
+            jsonEntity=game.getCachedJsonEntity(entity.jsonName);
+            if (jsonEntity.interface!==undefined) {
+                this.addInterfaceFromJson(jsonEntity.interface.elements);
+                this.addInterfaceFromJson(jsonEntity.interface.counts);
+            }
+            if (jsonEntity.weapons!==undefined) {
+                for (weapon of jsonEntity.weapons) {
+                    jsonWeapon=game.getCachedJsonEntity(weapon.json);
+                    if (jsonWeapon.interface!==undefined) {
+                        this.addInterfaceFromJson(jsonWeapon.interface.elements);
+                        this.addInterfaceFromJson(jsonWeapon.interface.counts);
+                    }
+                }
             }
         }
+    }
+    
+    addEffectBitmaps()
+    {
+        let jsonEffect;
+        let game=this.core.game;
         
-        keys=Object.keys(game.jsonEffectCache);
-        
-        for (key of keys)
+        for (jsonEffect of game.jsonEffectMap.values())
         {
-            effectDef=game.jsonEffectCache[key];
-            this.addEffectFromJson(effectDef.billboards);
-            this.addEffectFromJson(effectDef.particles);
-            this.addEffectFromJson(effectDef.triangles);
+            this.addEffectFromJson(jsonEffect.billboards);
+            this.addEffectFromJson(jsonEffect.particles);
+            this.addEffectFromJson(jsonEffect.triangles);
         }
+    }
+        
+    async loadAllBitmaps()
+    {
+        let keyIter,rtn,bitmap;
+        let success,promises;
+        
+            // we will already have bitmaps that
+            // were added by importing glTF models,
+            // so we only add the rest here
+            // we look at the game, loaded entities, and
+            // all effects
+            
+        this.addGameBitmaps();
+        this.addEntityBitmaps();
+        this.addEffectBitmaps();
      
             // gather all the promises
             

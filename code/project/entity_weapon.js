@@ -28,7 +28,7 @@ class EntityWeaponFireClass
         this.projectileJson=this.core.game.lookupValue(fireObj.projectileJson,weapon.data,null);
         
         this.animation=this.core.game.lookupAnimationValue(fireObj.animation);
-        this.sound=this.core.game.lookupSoundValue(fireObj.sound);
+        this.fireSound=this.core.game.lookupSoundValue(fireObj.sounds.fire);
         
         this.lastFireTimestamp=0;
         this.lastRegenerateTimestamp=0;
@@ -305,7 +305,7 @@ export default class EntityWeaponClass extends EntityClass
         fire.ammo--;
         fire.resetRegenerateAmmo();
         
-        fire.core.soundList.playJson(firePosition,fire.sound);
+        fire.core.soundList.playJson(firePosition,fire.fireSound);
            
            // weapon animation
            

@@ -1,5 +1,22 @@
 
 
+
+
+0. needs to be all moved to map level, map needs to load to a set and then later load them in
+
+1. effects seperate json
+2. find effects to load from map & entity json
+3. entity separate json
+4. find entities by map
+
+
+
+
+
+
+
+
+- have entities/effects as separate json
 - all the project/entity_? need object seals
 
 - kart = why are shell interface count always at 3?

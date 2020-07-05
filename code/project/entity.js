@@ -111,7 +111,7 @@ export default class EntityClass
 
             this.model=this.core.modelList.get(this.json.setup.model);
             if (this.model===undefined) {
-                console.log('model '+this.json.setup.model+' does not exist, needs to be defined in map setup');
+                console.log('model '+this.json.setup.model+' does not exist, needs to be defined in a entity in the map');
                 return(false);
             }
 

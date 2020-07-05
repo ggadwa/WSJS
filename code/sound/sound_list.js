@@ -100,106 +100,136 @@ export default class SoundListClass
     
         //
         // loading
-        //
-        
-    addSound(name)
-    {
-        let sound;
-        
-        if ((name===undefined) || (name===null)) return;        // name can come from json
-        
-        if (this.sounds.has(name)) return;
-        
-        sound=new SoundClass(this.core,this.ctx,name);
-        sound.initialize();
-            
-        this.sounds.set(name,sound);
-    }
+        //    
     
-    addSoundByNameAttribute(elem)
+    addMapSoundsToSoundSet(soundSet)
     {
-        if ((elem===undefined) || (elem===null)) return;
-        if ((elem.name!==undefined) && (elem.name!==null)) this.addSound(elem.name);
-    }
-    
-    addSoundBySoundNameAttribute(elem)
-    {
-        if ((elem===undefined) || (elem===null)) return;  
-        this.addSoundByNameAttribute(elem.sound);
-    }
-
-    async loadAllSounds()
-    {
-        let entityDef,effectDef,keys,key;
         let mesh,move,liquid;
-        let keyIter,rtn;
-        let success,promises;
-        let game=this.core.game;
+        let map=this.core.map;
         
-            // map based sounds
+            // movement sounds
             
-        for (mesh of this.core.map.meshList.meshes) {
+        for (mesh of map.meshList.meshes) {
             if (mesh.movement!==null) {
                 for (move of mesh.movement.moves) {
-                    if (move.sound!==null) this.addSound(move.sound.name);
+                    if (move.sound!==null) soundSet.add(move.sound.name);
                 }
             }
         }
         
-        for (liquid of this.core.map.liquidList.liquids) {
-            if (liquid.soundIn!==null) this.addSound(liquid.soundIn.name);
-            if (liquid.soundOut!==null) this.addSound(liquid.soundOut.name);
-        }
-            
-        keys=Object.keys(game.jsonEntityCache);
+            // liquid sounds
         
-        for (key of keys)
-        {
-            entityDef=game.jsonEntityCache[key];
+        for (liquid of map.liquidList.liquids) {
+            if (liquid.soundIn!==null) soundSet.add(liquid.soundIn.name);
+            if (liquid.soundOut!==null) soundSet.add(liquid.soundOut.name);
+        }
+    }
+    
+    addObjectSoundsArrayToSoundSet(soundSet,obj)
+    {
+        let key,sound;
 
-            this.addSoundBySoundNameAttribute(entityDef.config.primary);
-            this.addSoundBySoundNameAttribute(entityDef.config.secondary);
-            this.addSoundBySoundNameAttribute(entityDef.config.tertiary);
-            
-            if (entityDef.sounds!==undefined) {
-                this.addSoundByNameAttribute(entityDef.sounds.hurtSound);
-                this.addSoundByNameAttribute(entityDef.sounds.dieSound);
-                this.addSoundByNameAttribute(entityDef.sounds.pickupSound);
-                this.addSoundByNameAttribute(entityDef.sounds.bounceSound);
-                this.addSoundByNameAttribute(entityDef.sounds.reflectSound);
-                this.addSoundByNameAttribute(entityDef.sounds.spawnSound);
-                this.addSoundByNameAttribute(entityDef.sounds.openSound);
-                this.addSoundByNameAttribute(entityDef.sounds.closeSound);
-                this.addSoundByNameAttribute(entityDef.sounds.wakeUpSound);
-                this.addSoundByNameAttribute(entityDef.sounds.meleeSound);
-                this.addSoundByNameAttribute(entityDef.sounds.deathSound);
-                this.addSoundByNameAttribute(entityDef.sounds.fallSound);
-                this.addSoundByNameAttribute(entityDef.sounds.engineSound);
-                this.addSoundByNameAttribute(entityDef.sounds.skidSound);
-                this.addSoundByNameAttribute(entityDef.sounds.crashKartSound);
-                this.addSoundByNameAttribute(entityDef.sounds.crashWallSound);
-            }
-        }
+        if ((obj===undefined) || (obj===null)) return;
+        if ((obj.sounds===undefined) || (obj.sounds===null)) return;
         
-        keys=Object.keys(game.jsonEffectCache);
-        
-        for (key of keys)
+        for (key in obj.sounds)
         {
-            effectDef=game.jsonEffectCache[key];
-            this.addSoundBySoundNameAttribute(effectDef);
+            sound=obj.sounds[key];
+            if (sound!==null) soundSet.add(sound.name);
         }
+    }
+    
+    addEntityProjectileSoundsToSoundSet(soundSet,jsonProjectileItem)
+    {
+        let jsonProjectile;
+        
+        if ((jsonProjectileItem===undefined) || (jsonProjectileItem===null)) return;
+        if ((jsonProjectileItem.projectileJson===undefined) || (jsonProjectileItem.projectileJson===null)) return;
+        
+        jsonProjectile=this.core.game.getCachedJsonEntity(jsonProjectileItem.projectileJson);
+        this.addObjectSoundsArrayToSoundSet(soundSet,jsonProjectile);
+    }
+    
+    addEntityWeaponSoundsToSoundSet(soundSet,jsonWeaponItem)
+    {
+        let jsonWeapon;
+        
+        jsonWeapon=this.core.game.getCachedJsonEntity(jsonWeaponItem.json);
+        
+        this.addObjectSoundsArrayToSoundSet(soundSet,jsonWeapon.config.primary);
+        this.addEntityProjectileSoundsToSoundSet(soundSet,jsonWeapon.config.primary);
+        
+        this.addObjectSoundsArrayToSoundSet(soundSet,jsonWeapon.config.secondary);
+        this.addEntityProjectileSoundsToSoundSet(soundSet,jsonWeapon.config.secondary);
+        
+        this.addObjectSoundsArrayToSoundSet(soundSet,jsonWeapon.config.tertiary);
+        this.addEntityProjectileSoundsToSoundSet(soundSet,jsonWeapon.config.tertiary);
+    }
+    
+    addEntitySoundsToSoundSet(soundSet)
+    {
+        let entity,jsonEntity,jsonWeaponItem;
+        let game=this.core.game;
+        
+        for (entity of this.core.map.entityList.entities) {
+            jsonEntity=this.core.game.getCachedJsonEntity(entity.jsonName);
+
+                // entity sounds
+                
+            this.addObjectSoundsArrayToSoundSet(soundSet,jsonEntity);
+            
+                // fps/kart/platform weapon sounds
+                
+            if (jsonEntity.weapons!==undefined) {
+                for (jsonWeaponItem of jsonEntity.weapons) {
+                    this.addEntityWeaponSoundsToSoundSet(soundSet,jsonWeaponItem);
+                }
+            }
+            
+                // monster projectiles
+                
+            if (jsonEntity.config!==undefined) this.addEntityProjectileSoundsToSoundSet(soundSet,jsonEntity.config);
+        }        
+    }
+    
+    addEffectSoundsToSoundSet(soundSet)
+    {
+        let jsonEffect;
+        let game=this.core.game;
+        
+            // we have to add all effects, we don't
+            // know what will be launched
+            
+        for (jsonEffect of game.jsonEffectMap.values())
+        {
+            this.addObjectSoundsArrayToSoundSet(soundSet,jsonEffect);
+        }
+    }
+
+    async loadAllSounds()
+    {
+        let soundSet,name,sound;
+        let success,promises;
+        
+            // load all the necessary sounds
+            // into a set
+            
+        soundSet=new Set();
+        
+        this.addMapSoundsToSoundSet(soundSet);
+        this.addEntitySoundsToSoundSet(soundSet);
+        this.addEffectSoundsToSoundSet(soundSet);
         
             // load the sounds
             
         promises=[];
         
-        keyIter=this.sounds.keys();
-        
-        while (true) {
-            rtn=keyIter.next();
-            if (rtn.done) break;
+        for (name of soundSet) {
+            sound=new SoundClass(this.core,this.ctx,name);
+            sound.initialize();
+            promises.push(sound.load());
             
-            promises.push(this.sounds.get(rtn.value).load());
+            this.sounds.set(name,sound);
         }
 
             // and await them all

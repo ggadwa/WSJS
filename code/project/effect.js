@@ -408,9 +408,9 @@ export default class EffectClass
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
         }
         
-            // finally any sound, shaking or damage
+            // finally any start sound, shaking or damage
             
-        this.core.soundList.playJson(this.position,this.json.sound);
+        if (this.json.sounds!==undefined) this.core.soundList.playJson(this.position,this.json.sounds.start);
         
         if (this.json.shake!==undefined) {
             dist=this.position.distance(this.core.map.entityList.getPlayer().position);
