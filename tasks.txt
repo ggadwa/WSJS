@@ -2,23 +2,16 @@
 
 
 
-0. needs to be all moved to map level, map needs to load to a set and then later load them in
 
-1. effects seperate json
-2. find effects to load from map & entity json
-3. entity separate json
-4. find entities by map
+6. loading on single line with animation?
+
+8. need MIT license
 
 
 
-
-
-
-
-
-- have entities/effects as separate json
 - all the project/entity_? need object seals
 
+- kart = explosions push
 - kart = why are shell interface count always at 3?
 - kart = pickups seem to start on each other
 - kart = settings into json
@@ -28,7 +21,6 @@
 - platform = blocking rock is too thin
 - platform = slow down layer movement
 
-- eventually make model/etc loading specific instead of everything
 
 - fix seams on sky box?
 

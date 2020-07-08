@@ -1,5 +1,6 @@
 import ColorClass from '../utility/color.js';
 
+
 export default class BitmapClass
 {
     constructor(core)

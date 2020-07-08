@@ -100,12 +100,21 @@ export default class SoundListClass
     
         //
         // loading
-        //    
-    
-    addMapSoundsToSoundSet(soundSet)
+        //
+   
+    async loadAllSounds()
     {
+        let soundSet,name,sound;
         let mesh,move,liquid;
+        let entity,jsonEntity,jsonEffect;
+        let success,promises;
+        let game=this.core.game;
         let map=this.core.map;
+        
+            // load all the necessary sounds
+            // into a set
+            
+        soundSet=new Set();
         
             // movement sounds
             
@@ -123,102 +132,21 @@ export default class SoundListClass
             if (liquid.soundIn!==null) soundSet.add(liquid.soundIn.name);
             if (liquid.soundOut!==null) soundSet.add(liquid.soundOut.name);
         }
-    }
-    
-    addObjectSoundsArrayToSoundSet(soundSet,obj)
-    {
-        let key,sound;
 
-        if ((obj===undefined) || (obj===null)) return;
-        if ((obj.sounds===undefined) || (obj.sounds===null)) return;
-        
-        for (key in obj.sounds)
-        {
-            sound=obj.sounds[key];
-            if (sound!==null) soundSet.add(sound.name);
-        }
-    }
-    
-    addEntityProjectileSoundsToSoundSet(soundSet,jsonProjectileItem)
-    {
-        let jsonProjectile;
-        
-        if ((jsonProjectileItem===undefined) || (jsonProjectileItem===null)) return;
-        if ((jsonProjectileItem.projectileJson===undefined) || (jsonProjectileItem.projectileJson===null)) return;
-        
-        jsonProjectile=this.core.game.getCachedJsonEntity(jsonProjectileItem.projectileJson);
-        this.addObjectSoundsArrayToSoundSet(soundSet,jsonProjectile);
-    }
-    
-    addEntityWeaponSoundsToSoundSet(soundSet,jsonWeaponItem)
-    {
-        let jsonWeapon;
-        
-        jsonWeapon=this.core.game.getCachedJsonEntity(jsonWeaponItem.json);
-        
-        this.addObjectSoundsArrayToSoundSet(soundSet,jsonWeapon.config.primary);
-        this.addEntityProjectileSoundsToSoundSet(soundSet,jsonWeapon.config.primary);
-        
-        this.addObjectSoundsArrayToSoundSet(soundSet,jsonWeapon.config.secondary);
-        this.addEntityProjectileSoundsToSoundSet(soundSet,jsonWeapon.config.secondary);
-        
-        this.addObjectSoundsArrayToSoundSet(soundSet,jsonWeapon.config.tertiary);
-        this.addEntityProjectileSoundsToSoundSet(soundSet,jsonWeapon.config.tertiary);
-    }
-    
-    addEntitySoundsToSoundSet(soundSet)
-    {
-        let entity,jsonEntity,jsonWeaponItem;
-        let game=this.core.game;
-        
+            // entity sounds
+            
         for (entity of this.core.map.entityList.entities) {
-            jsonEntity=this.core.game.getCachedJsonEntity(entity.jsonName);
-
-                // entity sounds
-                
-            this.addObjectSoundsArrayToSoundSet(soundSet,jsonEntity);
-            
-                // fps/kart/platform weapon sounds
-                
-            if (jsonEntity.weapons!==undefined) {
-                for (jsonWeaponItem of jsonEntity.weapons) {
-                    this.addEntityWeaponSoundsToSoundSet(soundSet,jsonWeaponItem);
-                }
-            }
-            
-                // monster projectiles
-                
-            if (jsonEntity.config!==undefined) this.addEntityProjectileSoundsToSoundSet(soundSet,jsonEntity.config);
-        }        
-    }
-    
-    addEffectSoundsToSoundSet(soundSet)
-    {
-        let jsonEffect;
-        let game=this.core.game;
-        
-            // we have to add all effects, we don't
-            // know what will be launched
-            
-        for (jsonEffect of game.jsonEffectMap.values())
-        {
-            this.addObjectSoundsArrayToSoundSet(soundSet,jsonEffect);
+            jsonEntity=game.jsonEntityCache.get(entity.jsonName);
+            if (jsonEntity!==null) game.addJsonObjectToLoadSet(soundSet,entity.data,"sounds",false,['name'],jsonEntity);
         }
-    }
-
-    async loadAllSounds()
-    {
-        let soundSet,name,sound;
-        let success,promises;
         
-            // load all the necessary sounds
-            // into a set
+            // effect sounds
             
-        soundSet=new Set();
-        
-        this.addMapSoundsToSoundSet(soundSet);
-        this.addEntitySoundsToSoundSet(soundSet);
-        this.addEffectSoundsToSoundSet(soundSet);
+        for (jsonEffect of game.jsonEffectCache.values())
+        {
+            game.addJsonObjectToLoadSet(soundSet,null,"sounds",false,['name'],jsonEffect);
+        }
+
         
             // load the sounds
             

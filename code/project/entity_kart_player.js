@@ -148,7 +148,7 @@ export default class EntityKartPlayerClass extends EntityClass
         for (n=0;n!==this.json.weapons.length;n++) {
             weaponBlock=this.json.weapons[n];
 
-             weaponEntity=this.addEntity(weaponBlock.json,weaponBlock.name,new PointClass(0,0,0),new PointClass(0,0,0),null,this,this,true);
+             weaponEntity=this.addEntity(weaponBlock.weaponJson,weaponBlock.name,new PointClass(0,0,0),new PointClass(0,0,0),weaponBlock.weaponData,this,this,true);
              this.weapons.push(weaponEntity);
         }
         

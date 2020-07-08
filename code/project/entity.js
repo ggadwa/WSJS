@@ -98,7 +98,7 @@ export default class EntityClass
         
             // get the json
             
-        this.json=this.core.game.getCachedJsonEntity(this.jsonName);
+        this.json=this.core.game.jsonEntityCache.get(this.jsonName);
         if (this.json===null) return(false);
         
             // setup

@@ -1,10 +1,3 @@
-/**
- * The object that contains all the information on how
- * the user setup this game (for instance, things like mouse
- * speed, etc.)
- * 
- * @hideconstructor
- */
 export default class SetupClass
 {
     constructor()

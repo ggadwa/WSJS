@@ -179,9 +179,9 @@ export default class EffectClass
         
         this.startTimestamp=this.core.timestamp;
         
-            // translate the json with this data
+            // get the named json
             
-        this.json=this.core.game.getCachedJsonEffect(this.jsonName);
+        this.json=this.core.game.jsonEffectCache.get(this.jsonName);
         if (this.json===null) return(false);
         
             // lights

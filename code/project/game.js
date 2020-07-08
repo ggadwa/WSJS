@@ -16,63 +16,22 @@ export default class GameClass
         this.developer=new DeveloperClass(core);
         
         this.json=null;
-        
-        this.jsonEffectMap=new Map();
-        this.jsonEntityMap=new Map();
+        this.jsonEntityCache=new Map();
+        this.jsonEffectCache=new Map();
         
         this.scores=null;
         this.scoreShow=false;
         this.scoreLastItemCount=0;
         this.scoreColor=new ColorClass(0,1,0.2);
     }
-    
-        //
-        // load json from network
-        //
-        
-    async fetchJson(name)
-    {
-        let resp;
-        let url='../json/'+name+'.json';
-        
-        try {
-            resp=await fetch(url);
-            if (!resp.ok) return(Promise.reject('Unable to load '+url+'; '+resp.statusText));
-            return(await resp.json());
-        }
-        catch (e) {
-            return(Promise.reject('Unable to load '+url+'; '+e.message));
-        }
-    }
  
         //
-        // json caches and utilities
+        // json lookup/load utilities
         //
         
-    getCachedJsonEffect(name)
-    {
-        let jsonEffect;
-                
-        jsonEffect=this.jsonEffectMap.get(name);
-        if (jsonEffect!==undefined) return(jsonEffect);
-        
-        console.log('Unknown effect: '+name);
-        return(null);
-    }
-    
-    getCachedJsonEntity(name)
-    {
-        let jsonEntity;
-                
-        jsonEntity=this.jsonEntityMap.get(name);
-        if (jsonEntity!==undefined) return(jsonEntity);
-        
-        console.log('Unknown entity: '+name);
-        return(null);
-    }
-    
     lookupValue(value,data,valueDefault)
     {
+        if ((data===undefined) || (data===null)) return(value);
         if (value===undefined) return(valueDefault);
         if (value===null) return(value);
         if (typeof(value)!=='string') return(value);
@@ -100,192 +59,95 @@ export default class GameClass
         return(new PointClass(value[0],value[1],value[2]));
     }
     
-    
-    // TODO -- all temp for now
-    
-    async fetchJsonEffect(name)
+    addJsonObjectToLoadSet(loadSet,data,requiredParentObjectKey,inParentObject,keyNames,obj)
     {
-        let resp;
-        let url='../effects/'+name+'.json';
+        let key,item,jsonEntity;
+        let recurseInParentObject;
+        let map=this.core.map;
         
-        try {
-            resp=await fetch(url);
-            if (!resp.ok) return(Promise.reject('Unable to load effect: '+url+'; '+resp.statusText));
-            this.jsonEffectMap.set(name,await resp.json());
-            return(true);
-        }
-        catch (e) {
-            return(Promise.reject('Unable to load effect: '+url+'; '+e.message));
-        }
-    }
-    
-    async tempLoadEffects()
-    {
-        let effectSet,effect,jsonEntity;
-        let name,promises,success;
-        
-        // config.primary.hitEffect
-        // config.secondary.hitEffect
-        // config.tertiary.hitEffect
-        // config.hitEffect
-        // config.trailEffect
-        // config.smokeEffect
-        
-        effectSet=new Set();        
-        /*
-
-        
-        for (effect of this.core.map.effects) {
-            effectSet.add(effect.jsonName);
-        }
-        
-        for (jsonEntity of this.jsonEntityMap.values()) {
-            if (jsonEntity.config===undefined) continue;
+        for (key in obj) {
             
-            if (jsonEntity.config.primary!==undefined) {
-                if ((jsonEntity.config.primary.hitEffect!==undefined) && (jsonEntity.config.primary.hitEffect!==null)) effectSet.add(jsonEntity.config.primary.hitEffect);
-            }
-            if (jsonEntity.config.secondary!==undefined) {
-                if ((jsonEntity.config.secondary.hitEffect!==undefined) && (jsonEntity.config.secondary.hitEffect!==null)) effectSet.add(jsonEntity.config.secondary.hitEffect);
-            }
-            if (jsonEntity.config.tertiary!==undefined) {
-                if ((jsonEntity.config.tertiary.hitEffect!==undefined) && (jsonEntity.config.tertiary.hitEffect!==null)) effectSet.add(jsonEntity.config.tertiary.hitEffect);
+                // recursal keys
+                
+            if (typeof(obj[key])==='object') {
+                
+                    // some properties are required to be within
+                    // a named parent object, check that here
+                
+                recurseInParentObject=inParentObject;
+                if (requiredParentObjectKey!==null) recurseInParentObject|=(key===requiredParentObjectKey);
+                
+                this.addJsonObjectToLoadSet(loadSet,data,requiredParentObjectKey,recurseInParentObject,keyNames,obj[key]);
+                continue;
             }
             
-            if ((jsonEntity.config.hitEffect!==undefined) && (jsonEntity.config.hitEffect!==null)) effectSet.add(jsonEntity.config.hitEffect);
-            if ((jsonEntity.config.trailEffect!==undefined) && (jsonEntity.config.trailEffect!==null)) effectSet.add(jsonEntity.config.trailEffect);
-            if ((jsonEntity.config.smokeEffect!==undefined) && (jsonEntity.config.smokeEffect!==null)) effectSet.add(jsonEntity.config.smokeEffect);
-        }
-        
-*/        
-
-        effectSet.add('exhaust');
-        effectSet.add('explosion');
-        effectSet.add('fire');
-        effectSet.add('fountain');
-        effectSet.add('hit');
-        effectSet.add('sparkle');
-        effectSet.add('spotlight');
-        effectSet.add('tire_smoke');
-       
-        promises=[];
-        
-        for (name of effectSet) {
-           // console.info(name);
-            promises.push(this.fetchJsonEffect(name));
-        }
-
-            // and await them all
+            if (typeof(obj[key])==='array') {
+                for (item of obj[key]) {
+                    if (typeof(item)==='object') this.addJsonObjectToLoadSet(loadSet,data,requiredParentObjectKey,false,keyNames,item);
+                }
+                continue;
+            }
+                
+                // recurse into other entities
+                
+            if (key==='weaponJson') {
+                jsonEntity=this.jsonEntityCache.get(obj[key]);
+                if (jsonEntity!==null) this.addJsonObjectToLoadSet(loadSet,obj['weaponData'],requiredParentObjectKey,false,keyNames,jsonEntity);
+                continue;
+            }
             
-        success=true;
-        
-        await Promise.all(promises)
-            .then
-                (
-                    (values)=>{
-                        success=!values.includes(false);
-                    },
-                );
-
-        return(success);
-    }
-
-
-
-
-    async fetchJsonEntity(name)
-    {
-        let resp;
-        let url='../entities/'+name+'.json';
-        
-        try {
-            resp=await fetch(url);
-            if (!resp.ok) return(Promise.reject('Unable to load entity: '+url+'; '+resp.statusText));
-            this.jsonEntityMap.set(name,await resp.json());
-            return(true);
-        }
-        catch (e) {
-            return(Promise.reject('Unable to load entity: '+url+'; '+e.message));
-        }
-    }
-    
-    async tempLoadEntities()
-    {
-        let entitySet;
-        let name,promises,success;
-        
-        entitySet=new Set();        
-
-        entitySet.add('bot');
-        entitySet.add('captain_chest');
-        entitySet.add('dragon_queen');
-        entitySet.add('kart_bot');
-        entitySet.add('kart_player');
-        entitySet.add('pickup_armor');
-        entitySet.add('pickup_grenade');
-        entitySet.add('pickup_health');
-        entitySet.add('pickup_m16');
-        entitySet.add('pickup_m16_ammo');
-        entitySet.add('pickup_pistol_ammo');
-        entitySet.add('pickup_shell');
-        entitySet.add('pickup_star');
-        entitySet.add('platform_player');
-        entitySet.add('player');
-        entitySet.add('projectile_grenade');
-        entitySet.add('projectile_sparkle');
-        entitySet.add('projectile_tank_shell');
-        entitySet.add('ratkin');
-        entitySet.add('skeleton');
-        entitySet.add('spider');
-        entitySet.add('vampire');
-        entitySet.add('weapon_grenade');
-        entitySet.add('weapon_m16');
-        entitySet.add('weapon_pistol');
-        entitySet.add('weapon_tank_shell');
-       
-        promises=[];
-        
-        for (name of entitySet) {
-            //console.info(name);
-            promises.push(this.fetchJsonEntity(name));
-        }
-
-            // and await them all
+            if (key==='projectileJson') {
+                jsonEntity=this.jsonEntityCache.get(obj[key]);
+                if (jsonEntity!==null) this.addJsonObjectToLoadSet(loadSet,obj['projectileData'],requiredParentObjectKey,false,keyNames,jsonEntity);
+                continue;
+            }
             
-        success=true;
-        
-        await Promise.all(promises)
-            .then
-                (
-                    (values)=>{
-                        success=!values.includes(false);
-                    },
-                );
-
-        return(success);
+                // effect keys
+                
+            if (!keyNames.includes(key)) continue;
+            if ((requiredParentObjectKey!==null) && (!inParentObject)) continue;
+            
+            loadSet.add(this.lookupValue(obj[key],data,null));
+        }
     }
 
         //
         // game initialize/release
         //
         
+    async fetchJson(name)
+    {
+        let resp;
+        let url='../'+name+'.json';
+        
+        try {
+            resp=await fetch(url);
+            if (!resp.ok) return(Promise.reject('Unable to load '+url+'; '+resp.statusText));
+            return(await resp.json());
+        }
+        catch (e) {
+            return(Promise.reject('Unable to load '+url+'; '+e.message));
+        }
+    }
+        
     async initialize()
     {
-        let data;
+        let n,data;
+        let promises,name,success;
         
             // get the main game json
             // this is the only hard coded json file
         
         data=null;
         
-        await this.fetchJson('game')
+        await this.fetchJson('game/game')
             .then
                 (
                     value=>{
                         data=value;
                     },
-                    value=>{
-                        console.log(value);
+                    reason=>{
+                        console.log(reason);
                     }
                 );
         
@@ -293,54 +155,57 @@ export default class GameClass
            
         this.json=data;
         
-        if (!this.tempLoadEntities()) return(false);
-        if (!this.tempLoadEffects()) return(false);
-        
-            // effects
-        
-        /*    
-        data=null;
-        
-        await this.fetchJson('effect')
-            .then
-                (
-                    value=>{
-                        data=value;
-                    },
-                    value=>{
-                        console.log(value);
-                    }
-                );
-        
-        if (data===null) return(false);
-        
-        this.jsonEffectCache=data;
-             
-
-        
-        
-        
-            // entities
+            // cache all the entity json
             
-        data=null;
+        promises=[];
         
-        await this.fetchJson('entity')
+        for (name of this.json.entities) {
+            promises.push(this.fetchJson('entities/'+name));
+        }
+            
+        success=true;
+        
+        await Promise.all(promises)
             .then
                 (
-                    value=>{
-                        data=value;
+                    values=>{
+                        for (n=0;n<values.length;n++) {
+                            this.jsonEntityCache.set(this.json.entities[n],values[n]);
+                        }
                     },
-                    value=>{
-                        console.log(value);
+                    reason=>{
+                        console.log(reason);
+                        success=false;
                     }
                 );
         
-        if (data===null) return(false);
+        if (!success) return(false);
         
-        this.jsonEntityCache=data;
-            */
-           
-        return(true);
+            // cache all the effect json
+            
+        promises=[];
+        
+        for (name of this.json.effects) {
+            promises.push(this.fetchJson('effects/'+name));
+        }
+            
+        success=true;
+        
+        await Promise.all(promises)
+            .then
+                (
+                    values=>{
+                        for (n=0;n<values.length;n++) {
+                            this.jsonEffectCache.set(this.json.effects[n],values[n]);
+                        }
+                    },
+                    reason=>{
+                        console.log(reason);
+                        success=false;
+                    }
+                );
+
+        return(success);
     }
     
     release()

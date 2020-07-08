@@ -51,40 +51,6 @@ export default class BitmapListClass
         }
     }
     
-    addEffectFromJson(arr)
-    {
-        let obj;
-        
-        if ((arr===undefined) || (arr===null)) return;
-        
-        for (obj of arr)
-        {
-            this.addEffect(obj.bitmap);
-        }
-    }
-    
-    addInterface(colorURL)
-    {
-        let bitmap;
-            
-        if (!this.bitmaps.has(colorURL)) {
-            bitmap=new BitmapInterfaceClass(this.core,colorURL);
-            this.bitmaps.set(colorURL,bitmap);
-        }
-    }
-    
-    addInterfaceFromJson(arr)
-    {
-        let obj;
-        
-        if ((arr===undefined) || (arr===null)) return;
-        
-        for (obj of arr)
-        {
-            this.addInterface(obj.bitmap);
-        }
-    }
-    
     get(colorURL)
     {
         return(this.bitmaps.get(colorURL));
@@ -93,72 +59,52 @@ export default class BitmapListClass
         //
         // loading
         //
-        
-    addGameBitmaps()
-    {
-        let game=this.core.game;
-        
-        this.addInterface(game.json.config.interfaceHitBitmap);
-        this.addInterface(game.json.config.touchStickRingBitmap);
-        this.addInterface(game.json.config.touchStickThumbBitmap);
-        this.addInterface(game.json.config.touchMenuBitmap);
-        if (game.interface!==undefined) {
-            this.addInterfaceFromJson(game.json.interface.elements);
-            this.addInterfaceFromJson(game.json.interface.counts);
-        }
-    }
-    
-    addEntityBitmaps()
-    {
-        let entity,jsonEntity;
-        let weapon,jsonWeapon;
-        let game=this.core.game;
-        
-        for (entity of this.core.map.entityList.entities) {
-            jsonEntity=game.getCachedJsonEntity(entity.jsonName);
-            if (jsonEntity.interface!==undefined) {
-                this.addInterfaceFromJson(jsonEntity.interface.elements);
-                this.addInterfaceFromJson(jsonEntity.interface.counts);
-            }
-            if (jsonEntity.weapons!==undefined) {
-                for (weapon of jsonEntity.weapons) {
-                    jsonWeapon=game.getCachedJsonEntity(weapon.json);
-                    if (jsonWeapon.interface!==undefined) {
-                        this.addInterfaceFromJson(jsonWeapon.interface.elements);
-                        this.addInterfaceFromJson(jsonWeapon.interface.counts);
-                    }
-                }
-            }
-        }
-    }
-    
-    addEffectBitmaps()
-    {
-        let jsonEffect;
-        let game=this.core.game;
-        
-        for (jsonEffect of game.jsonEffectMap.values())
-        {
-            this.addEffectFromJson(jsonEffect.billboards);
-            this.addEffectFromJson(jsonEffect.particles);
-            this.addEffectFromJson(jsonEffect.triangles);
-        }
-    }
-        
+
     async loadAllBitmaps()
     {
-        let keyIter,rtn,bitmap;
+        let keyIter,rtn,colorURL,bitmap;
+        let entity,jsonEntity,jsonEffect;
         let success,promises;
+        let bitmapSet;
+        let game=this.core.game;
         
             // we will already have bitmaps that
             // were added by importing glTF models,
             // so we only add the rest here
-            // we look at the game, loaded entities, and
-            // all effects
+
+            // game and entity interface bitmaps
             
-        this.addGameBitmaps();
-        this.addEntityBitmaps();
-        this.addEffectBitmaps();
+        bitmapSet=new Set();
+        
+        game.addJsonObjectToLoadSet(bitmapSet,null,null,false,['bitmap','interfaceHitBitmap','touchStickRingBitmap','touchStickThumbBitmap','touchMenuBitmap'],game.json);
+        
+        for (entity of this.core.map.entityList.entities) {
+            jsonEntity=game.jsonEntityCache.get(entity.jsonName);
+            if (jsonEntity!==null) game.addJsonObjectToLoadSet(bitmapSet,entity.data,null,false,['bitmap'],jsonEntity);
+        }
+        
+        for (colorURL of bitmapSet) {
+            if (!this.bitmaps.has(colorURL)) {
+                bitmap=new BitmapInterfaceClass(this.core,colorURL);
+                this.bitmaps.set(colorURL,bitmap);
+            }
+        }
+        
+            // effect bitmaps
+            
+        bitmapSet=new Set();
+        
+        for (jsonEffect of game.jsonEffectCache.values())
+        {
+            game.addJsonObjectToLoadSet(bitmapSet,null,null,false,['bitmap'],jsonEffect);
+        }
+        
+        for (colorURL of bitmapSet) {
+            if (!this.bitmaps.has(colorURL)) {
+                bitmap=new BitmapEffectClass(this.core,colorURL);
+                this.bitmaps.set(colorURL,bitmap);
+            }
+        }
      
             // gather all the promises
             

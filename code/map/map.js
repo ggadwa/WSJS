@@ -1,6 +1,5 @@
 import BoundClass from '../utility/bound.js';
 import ImportGLTFClass from '../import/import_gltf.js';
-import GenerateMapClass from '../generate/map/generate_map.js';
 import MeshListClass from '../mesh/mesh_list.js';
 import MapLiquidListClass from '../map/map_liquid_list.js';
 import MapLightListClass from '../map/map_light_list.js';
@@ -98,7 +97,7 @@ export default class MapClass
     }
     
         //
-        // load the map
+        // load the map and required json caches
         //
         
     async loadMap()

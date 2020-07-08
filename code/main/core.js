@@ -268,6 +268,8 @@ export default class CoreClass
         this.settingsDialog=new DialogSettingsClass(this);
         this.connectDialog=new DialogConnectClass(this);
         this.developerDialog=new DialogDeveloperClass(this);
+        
+        return(true);
     }
 
     release()

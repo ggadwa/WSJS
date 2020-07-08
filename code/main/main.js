@@ -42,7 +42,7 @@ class MainClass
 
     async initCore()
     {
-        this.core.initialize();
+        if (!(await this.core.initialize())) return;
         if (!(await this.core.loadShaders())) return;
 
         this.core.loadingScreenUpdate();
@@ -129,10 +129,10 @@ class MainClass
         this.core.loadingScreenAddString('Building Collision Geometry');
         this.core.loadingScreenDraw();
         
-        setTimeout(this.initCollisionGeomtry.bind(this),1);
+        setTimeout(this.initCollisionGeometry.bind(this),1);
     }
     
-    initCollisionGeomtry()
+    initCollisionGeometry()
     {
         this.core.map.meshList.buildCollisionGeometry();
         
@@ -151,7 +151,7 @@ class MainClass
         if (!(await shadowmapLoad.load())) return;
         
         this.core.loadingScreenUpdate();
-        this.core.loadingScreenAddString('Loading Models');
+        this.core.loadingScreenAddString('Load Models');
         this.core.loadingScreenDraw();
        
         setTimeout(this.initLoadModels.bind(this),1);    
@@ -184,7 +184,7 @@ class MainClass
         if (!(await this.core.bitmapList.loadAllBitmaps())) return;
         
         this.core.loadingScreenUpdate();
-        this.core.loadingScreenAddString('Creating Entities');
+        this.core.loadingScreenAddString('Initializing Entities and Effects');
         this.core.loadingScreenDraw();
         
         setTimeout(this.initLoadEntities.bind(this),1);

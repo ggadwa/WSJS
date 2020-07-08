@@ -69,7 +69,7 @@ export default class MapEntityListClass
         
             // get json
             
-        json=this.core.game.getCachedJsonEntity(jsonName);
+        json=this.core.game.jsonEntityCache.get(jsonName);
         if (json===null) return(null);
         
             // lookup type
