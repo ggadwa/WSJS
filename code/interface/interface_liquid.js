@@ -1,5 +1,5 @@
 import ColorClass from '../utility/color.js';
-import RectClass from '../../../code/utility/rect.js';
+import RectClass from '../utility/rect.js';
 import InterfaceHitClass from '../interface/interface_hit.js';
 import InterfaceElementClass from '../interface/interface_element.js';
 import InterfaceCountClass from '../interface/interface_count.js';
