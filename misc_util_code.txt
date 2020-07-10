@@ -1,0 +1,69 @@
+##############################
+######### quick triangle OBJ importer
+
+    let str=`[obj here]`;
+
+    let n,k,tokens,faceTokens;
+    let lines=str.split('\n');
+    let vertex=[];
+    let uv=[];
+    let fv,fvt;
+    let vOut='';
+    let vtOut='';
+    
+    for (n=0;n!==lines.length;n++) {
+        tokens=lines[n].split(' ');
+        if (tokens[0]==='v') vertex.push([parseFloat(tokens[1]),-parseFloat(tokens[2]),parseFloat(tokens[3])]); // - for y flip, remove if not needed
+        if (tokens[0]==='vt') uv.push([parseFloat(tokens[1]),parseFloat(tokens[2])]);
+        if (tokens[0]==='f') {
+            fv=[];
+            fvt=[];
+            for (k=1;k!==4;k++) {
+                faceTokens=tokens[k].split('/');
+                fv.push(parseInt(faceTokens[0])-1);
+                fvt.push(parseInt(faceTokens[1])-1);
+            }
+            if (vOut.length!==0) {
+                vOut+=',\n';
+                vtOut+=',\n';
+            }
+            vOut+=(vertex[fv[0]][0]+','+vertex[fv[0]][1]+','+vertex[fv[0]][2]+',');
+            vOut+=(vertex[fv[1]][0]+','+vertex[fv[1]][1]+','+vertex[fv[1]][2]+',');
+            vOut+=(vertex[fv[2]][0]+','+vertex[fv[2]][1]+','+vertex[fv[2]][2]);
+            vtOut+=(uv[fvt[0]][0]+','+uv[fvt[0]][1]+',');
+            vtOut+=(uv[fvt[1]][0]+','+uv[fvt[1]][1]+',');
+            vtOut+=(uv[fvt[2]][0]+','+uv[fvt[2]][1]);
+        }
+    }
+    
+    console.info('this.vertexes=new Float32Array([\n'+vOut+'\n]);\n');
+    console.info('this.uvs=new Float32Array([\n'+vtOut+'\n]);\n');
+
+
+##############################
+######### updated (held weapon) player animations
+
+Berreta_COMBAT_mode 0-50
+Berreta_Grenade_throw 51-91
+Berreta_Looking_around 92-177
+Berreta_RightFoot_kick 178-208
+Berreta_Die_on_back 209-247
+Berreta_Die_on_belt 252-359
+Berreta_fire_staying 364-401
+Berreta_Casual_walk 406-442
+Berreta_Cautious_walk 447-487
+Berreta_Combat_run 492-518
+Berreta_Fire_run 523-549
+Berreta_Fire_walk 554-594
+Berreta_Fire_walking_back 599-634
+Berreta_run 639-665
+Berreta_Walking_back 670-705
+M16_Combat_Mode 710-760
+M16_Fire_Belt 765-770
+M16_Fire_standing 775-815
+M16_Grenade_throw 820-860
+M16_Fire_Runing 865-887
+M16_Fire_walking 892-928
+M16_Run 933-955
+M16_Walking 960-996
+M16_Walking_back 1001-1036
