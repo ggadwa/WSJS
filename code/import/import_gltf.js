@@ -763,7 +763,10 @@ export default class ImportGLTFClass
             if (obj===null) return(this.MESH_INFORMATIONAL_ERROR);
             
             map.sky.on=true;
-            map.sky.size=obj.size;
+            map.sky.offset.setFromValues(obj.offset.x,obj.offset.y,obj.offset.z);
+            map.sky.scale.setFromValues(obj.scale.x,obj.scale.y,obj.scale.z);
+            map.sky.rotate.setFromValues(obj.rotate.x,obj.rotate.y,obj.rotate.z);
+            map.sky.color.setFromValues(obj.color.r,obj.color.g,obj.color.b);
             map.sky.bitmap=mesh.bitmap;
             return(this.MESH_INFORMATIONAL_REMOVE);
         }

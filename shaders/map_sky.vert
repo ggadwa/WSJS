@@ -5,15 +5,14 @@ in highp vec2 vertexUV;
 
 uniform highp mat4 perspectiveMatrix;
 uniform highp mat4 viewMatrix;
-
-uniform highp vec3 cameraPosition;
-uniform highp float globeSize;
+uniform highp mat4 transformMatrix;
 
 out highp vec2 fragUV;
 
 void main(void)
 {
-    gl_Position=perspectiveMatrix*viewMatrix*vec4(((vertexPosition*globeSize)+cameraPosition),1.0);
+    gl_Position=perspectiveMatrix*viewMatrix*transformMatrix*vec4(vertexPosition,1.0);
+
     fragUV=vertexUV;
 }
 

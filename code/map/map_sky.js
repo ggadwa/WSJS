@@ -1,3 +1,7 @@
+import PointClass from '../utility/point.js';
+import ColorClass from '../utility/color.js';
+import Matrix4Class from '../utility/matrix4.js';
+
 //
 // sky class
 //
@@ -9,11 +13,20 @@ export default class MapSkyClass
         this.core=core;
         
         this.on=false;
-        this.size=0;
+
+        this.offset=new PointClass(0,0,0);
+        this.scale=new PointClass(1,1,1);
+        this.rotate=new PointClass(0,0,0);
+        this.color=new ColorClass(0,0,0);
         this.bitmap=null;
 
         this.vertexBuffer=null;
         this.uvBuffer=null;
+        
+        this.position=new PointClass(0,0,0);
+        
+        this.tempMatrix=new Matrix4Class();
+        this.transformMatrix=new Matrix4Class();
         
             // this is vertexes and UVs for a globe
             
@@ -293,6 +306,16 @@ export default class MapSkyClass
         let shader=this.core.shaderList.mapSkyShader;
         
         if (!this.on) return;
+        
+            // set the globe transforms
+            
+        this.position.setFromAddPoint(this.core.camera.position,this.offset);
+            
+        this.transformMatrix.setTranslationFromPoint(this.position);
+        this.tempMatrix.setScaleFromPoint(this.scale);
+        this.transformMatrix.multiply(this.tempMatrix);
+        this.tempMatrix.setRotationFromYAngle(this.rotate.y);
+        this.transformMatrix.multiply(this.tempMatrix);
         
             // setup shader
 

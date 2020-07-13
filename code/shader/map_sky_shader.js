@@ -19,9 +19,9 @@ export default class MapSkyShaderClass extends ShaderClass
 
         this.perspectiveMatrixUniform=null;
         this.viewMatrixUniform=null;
-        
-        this.cameraPositionUniform=null;
-        this.globeSizeUniform=null;
+        this.transformMatrixUniform=null;
+                
+        this.colorUniform=null;
                 
         Object.seal(this);
     }
@@ -43,9 +43,9 @@ export default class MapSkyShaderClass extends ShaderClass
 
         this.perspectiveMatrixUniform=gl.getUniformLocation(this.program,'perspectiveMatrix');
         this.viewMatrixUniform=gl.getUniformLocation(this.program,'viewMatrix');
+        this.transformMatrixUniform=gl.getUniformLocation(this.program,'transformMatrix');
         
-        this.cameraPositionUniform=gl.getUniformLocation(this.program,'cameraPosition');
-        this.globeSizeUniform=gl.getUniformLocation(this.program,'globeSize');
+        this.colorUniform=gl.getUniformLocation(this.program,'color');
         
             // these uniforms are always the same
             // need the unused textures as we are using a common routine that binds to them
@@ -74,13 +74,12 @@ export default class MapSkyShaderClass extends ShaderClass
 
         gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,core.perspectiveMatrix.data);
         gl.uniformMatrix4fv(this.viewMatrixUniform,false,core.viewMatrix.data);
-        
-            // the camera position which centers the sky
-            // and the globe size which grows it
-            
-        gl.uniform3f(this.cameraPositionUniform,core.camera.position.x,core.camera.position.y,core.camera.position.z);
-        gl.uniform1f(this.globeSizeUniform,(core.map.sky.size*0.5));
+        gl.uniformMatrix4fv(this.transformMatrixUniform,false,core.map.sky.transformMatrix.data);     // repositions/resizes/etc the sky globe
 
+            // the color
+            
+        gl.uniform3f(this.colorUniform,core.map.sky.color.r,core.map.sky.color.g,core.map.sky.color.b);
+        
             // enable the vertex attributes
 
         gl.enableVertexAttribArray(this.vertexPositionAttribute);
