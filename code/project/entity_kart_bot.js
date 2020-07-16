@@ -1,13 +1,24 @@
 import PointClass from '../utility/point.js';
-import EntityClass from '../project/entity.js';
+import EntityKartBaseClass from '../project/entity_kart_base.js';
+import Entity from '../project/entity.js';
 
-export default class EntityKartBotClass extends EntityClass
+//
+// kart bot module
+//
+
+export default class EntityKartBotClass extends EntityKartBaseClass
 {
+    /*
     constructor(core,name,jsonName,position,angle,data,mapSpawn,spawnedBy,heldBy,show)
     {
         super(core,name,jsonName,position,angle,data,mapSpawn,spawnedBy,heldBy,show);
         
         this.targetScanYRange=0;
+        
+            // variables
+            
+        this.trackZOffset=0;
+        this.nextNodeIdx=-1;
         
         this.currentTargetYScan=0;
         
@@ -15,6 +26,8 @@ export default class EntityKartBotClass extends EntityClass
             
         this.gotoRotPoint=new PointClass(0,0,0);
         this.gotoPosition=new PointClass(0,0,0);
+        
+        Object.seal(this);
     }
     
     initialize()
@@ -32,26 +45,22 @@ export default class EntityKartBotClass extends EntityClass
         
     ready()
     {
-        let goalNodeIdx,goalPosition;
+        let goalPosition;
         
         super.ready();
-        
-            // get the goal node
-        
-        goalNodeIdx=this.findKeyNodeIndex('goal');
-        goalPosition=this.getNodePosition(goalNodeIdx);
         
             // we assume all maps have the starting direction
             // heading -x, so we get the Z distance and that
             // makes our track when turned 90 degrees from
             // the node path
             
+        goalPosition=this.getNodePosition(this.goalNodeIdx);
         this.trackZOffset=this.position.z-goalPosition.z;
         
             // always start by going to node directly after goal
             
-        this.nextNodeIdx=goalNodeIdx+1;
-        this.calcGotoPosition(goalNodeIdx,this.nextNodeIdx);
+        this.nextNodeIdx=this.goalNodeIdx+1;
+        this.calcGotoPosition(this.goalNodeIdx,this.nextNodeIdx);
         
             // start scanning in middle
             
@@ -83,7 +92,7 @@ export default class EntityKartBotClass extends EntityClass
         //
         // find monster to fire at
         //
-        
+
     checkFireAtMonster()
     {
                     // ray trace for entities
@@ -120,6 +129,8 @@ export default class EntityKartBotClass extends EntityClass
         
         return(this.rayCollision(this.lookPoint,this.lookVector,this.lookHitPoint));
     }
+         
+
     
         //
         // run bot kart
@@ -158,7 +169,7 @@ export default class EntityKartBotClass extends EntityClass
             
         this.moveKart(turnAdd,true,false,drifting,false,this.checkFireAtMonster(),false,false);
     }
-    
+
     drawSetup()
     {
         if (this.model===null) return(false);
@@ -170,5 +181,7 @@ export default class EntityKartBotClass extends EntityClass
 
         return(true);
     }
+         * 
+     */
 }
 
