@@ -1,10 +1,5 @@
 import PointClass from '../utility/point.js';
 import EntityClass from '../project/entity.js';
-import EntityFPSPlayerClass from '../project/entity_fps_player.js';
-import EntityFPSBotClass from '../project/entity_fps_bot.js';
-import EntityKartPlayerClass from '../project/entity_kart_player.js';
-import EntityKartBotClass from '../project/entity_kart_bot.js';
-import EntityPlatformPlayerClass from '../project/entity_platform_player.js';
 
 export default class EntityPickupClass extends EntityClass
 {
@@ -99,14 +94,10 @@ export default class EntityPickupClass extends EntityClass
             
         if (this.touchEntity===null) return;
         
-            // is this an entity that can
-            // pick things up?
+            // only trigger for entities that can do
+            // all the required actions
             
-        if (!((this.touchEntity instanceof EntityFPSPlayerClass) ||
-              (this.touchEntity instanceof EntityFPSBotClass) ||
-              (this.touchEntity instanceof EntityKartPlayerClass) ||
-              (this.touchEntity instanceof EntityKartBotClass) ||
-              (this.touchEntity instanceof EntityPlatformPlayerClass))) return;
+        if (!this.hasActions(this.touchEntity,this.json.config.actions)) return;
         
             // pickup and run actions
             

@@ -394,7 +394,7 @@ export default class EntityFPSMonsterClass extends EntityClass
             return;
         }
         
-        if ((this.state===this.STATE_MELEE) || (this.state===this.STATE_PROJECTILE)) return;
+        if ((this.state===this.STATE_WAKING_UP) || (this.state===this.STATE_MELEE) || (this.state===this.STATE_PROJECTILE)) return;
         
             // regular damage
             

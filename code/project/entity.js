@@ -288,6 +288,39 @@ export default class EntityClass
         // actions
         //
         
+    hasActions(entity,actions)
+    {
+        let action;
+        
+        if (actions===null) return(true);
+        
+        for (action of actions) {
+            
+            switch (action.action) {
+                case 'addWeapon':
+                    if (entity.addWeapon===undefined) return(false);
+                    break;
+                case 'addAmmo':
+                    if (entity.addAmmo===undefined) return(false);
+                    break;
+                case 'addHealth':
+                    if (entity.addHealth===undefined) return(false);
+                    break;
+                case 'addArmor':
+                    if (entity.addArmor===undefined) return(false);
+                    break;
+                case 'addSpeed':
+                    if (entity.addSpeed===undefined) return(false);
+                    break;
+                case 'kill':
+                    if (entity.die===undefined) return(false);
+                    break;
+            }
+        }
+        
+        return(true);
+    }
+    
     runActions(entity,actions)
     {
         let action;

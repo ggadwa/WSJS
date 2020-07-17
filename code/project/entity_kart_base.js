@@ -34,9 +34,8 @@ export default class EntityKartBaseClass extends EntityClass
         this.spinOutSpeed=6;
         this.driftDecelerationFactor=0.99;
         
-        this.thirdPersonCameraDistance=0;
-        this.thirdPersonCameraLookAngle=null;
         this.maxSpeedItemCount=0;
+        this.speedItemIncrease=0;
         
         this.rigidBodyMaxDrop=0;
         this.rigidBodyMaxAngle=0;
@@ -132,10 +131,8 @@ export default class EntityKartBaseClass extends EntityClass
         this.spinOutSpeed=6;
         this.driftDecelerationFactor=0.99;
         
-        this.thirdPersonCameraDistance=this.core.game.lookupValue(this.json.config.thirdPersonCameraDistance,this.data,0);
-        this.thirdPersonCameraLookAngle=new PointClass(this.json.config.thirdPersonCameraLookAngle.x,this.json.config.thirdPersonCameraLookAngle.y,this.json.config.thirdPersonCameraLookAngle.z);
-        
         this.maxSpeedItemCount=this.core.game.lookupValue(this.json.config.maxSpeedItemCount,this.data,0);
+        this.speedItemIncrease=this.core.game.lookupValue(this.json.config.speedItemIncrease,this.data,0);
         
         this.rigidBodyMaxDrop=this.core.game.lookupValue(this.json.config.rigidBodyMaxDrop,this.data,0);
         this.rigidBodyMaxAngle=this.core.game.lookupValue(this.json.config.rigidBodyMaxAngle,this.data,0);
@@ -178,9 +175,7 @@ export default class EntityKartBaseClass extends EntityClass
         let n,weaponBlock;
 
         super.ready();
-        
-        this.core.camera.gotoThirdPerson(this.thirdPersonCameraDistance,this.thirdPersonCameraLookAngle);
-        
+         
         this.inDrift=false;
         this.smokeCoolDownCount=0;
         this.bounceCount=0;

@@ -1,4 +1,9 @@
 
+- can do damage animation/sound during wake
+- need idlePath: ["abc","def","hij"] (vampires)
+- need stalkByPath: true (dragon queen)
+
+
 - all the project/entity_? need object seals
 
 - kart = explosions push
@@ -20,7 +25,6 @@ PHYSICS
   - fix wacky bumping (if you bump but can't move fully, than completely stop motion -- check stairs)
 
 BOTS
-   - they seem to continue to fight with the dead
    - run away if no ammo?
 
 MISC
