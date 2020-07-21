@@ -556,8 +556,8 @@ export default class DeveloperClass
         
             // always max the player heath
             
-        player.health=player.healthMaxCount;
-        player.armor=player.armorMaxCount;
+        if (player.health!==undefined) player.health=player.healthMaxCount;
+        if (player.armor!==undefined) player.armor=player.armorMaxCount;
     }
     
         //

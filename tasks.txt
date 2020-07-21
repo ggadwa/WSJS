@@ -1,7 +1,17 @@
 
-- can do damage animation/sound during wake
+- path generator needs to detect unreachable paths
 - need idlePath: ["abc","def","hij"] (vampires)
 - need stalkByPath: true (dragon queen)
+
+
+
+
+--> need uv movement for tank treads
+--> what's with place working funky
+
+
+
+
 
 
 - all the project/entity_? need object seals
@@ -10,8 +20,6 @@
 - kart = why are shell interface count always at 3?
 - kart = pickups seem to start on each other
 - kart = settings into json
-- kart = skidding needs to actually reduce speed
-- kart = update the kart bots and get them working
 
 - platform = blocking rock is too thin
 - platform = slow down layer movement

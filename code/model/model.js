@@ -96,6 +96,11 @@ export default class ModelClass
         
         this.meshList.drawModel(modelEntityAlter);
         
+            // debugging for skeletons
+            
+        //modelEntityAlter.setupModelMatrix(false);
+        //modelEntityAlter.drawSkeleton();
+        
             // developer bounds drawing
             // note this can't draw held stuff
             

@@ -8,12 +8,13 @@ import EntityKartBaseClass from '../project/entity_kart_base.js';
 
 export default class EntityKartBotClass extends EntityKartBaseClass
 {
-    /*
     constructor(core,name,jsonName,position,angle,data,mapSpawn,spawnedBy,heldBy,show)
     {
         super(core,name,jsonName,position,angle,data,mapSpawn,spawnedBy,heldBy,show);
         
         this.targetScanYRange=0;
+        this.pathNodeSlop=0;
+        this.driftMinAngle=0;
         
             // variables
             
@@ -34,7 +35,11 @@ export default class EntityKartBotClass extends EntityKartBaseClass
     {
         if (!super.initialize()) return(false);
         
-        this.targetScanYRange=this.core.game.lookupValue(this.json.targetScanYRange,this.data,0);
+            // bot specific json
+            
+        this.targetScanYRange=this.core.game.lookupValue(this.json.config.targetScanYRange,this.data,0);
+        this.pathNodeSlop=this.core.game.lookupValue(this.json.config.pathNodeSlop,this.data,0);
+        this.driftMinAngle=this.core.game.lookupValue(this.json.config.driftMinAngle,this.data,0);
         
         return(true);
     }
@@ -55,7 +60,7 @@ export default class EntityKartBotClass extends EntityKartBaseClass
             // the node path
             
         goalPosition=this.getNodePosition(this.goalNodeIdx);
-        this.trackZOffset=this.position.z-goalPosition.z;
+        this.trackZOffset=goalPosition.z-this.position.z;
         
             // always start by going to node directly after goal
             
@@ -92,7 +97,12 @@ export default class EntityKartBotClass extends EntityKartBaseClass
         //
         // find monster to fire at
         //
-
+        
+    checkFire()
+    {
+        return(false);
+    }
+/*
     checkFireAtMonster()
     {
                     // ray trace for entities
@@ -129,7 +139,7 @@ export default class EntityKartBotClass extends EntityKartBaseClass
         
         return(this.rayCollision(this.lookPoint,this.lookVector,this.lookHitPoint));
     }
-         
+   */      
 
     
         //
@@ -143,11 +153,9 @@ export default class EntityKartBotClass extends EntityKartBaseClass
         
         super.run();
         
-        return;
-        
             // have we hit the next drive to position?
             
-        if (this.position.distance(this.gotoPosition)<this.NODE_SLOP) {
+        if (this.position.distance(this.gotoPosition)<this.pathNodeSlop) {
             fromNodeIdx=this.nextNodeIdx;
             
             if (this.getNodeKey(this.nextNodeIdx)==='end') {
@@ -163,25 +171,11 @@ export default class EntityKartBotClass extends EntityKartBaseClass
             // turn towards the position
         
         turnAdd=this.angle.getTurnYTowards(this.position.angleYTo(this.gotoPosition));
-        drifting=(Math.abs(turnAdd)>this.DRIFT_MIN_ANGLE);
+        drifting=false; // (Math.abs(turnAdd)>this.driftMinAngle);
         
             // run the kart
             
-        this.moveKart(turnAdd,true,false,drifting,false,this.checkFireAtMonster(),false,false);
+        this.moveKart(turnAdd,true,false,drifting,false,this.checkFire(),false);
     }
-
-    drawSetup()
-    {
-        if (this.model===null) return(false);
-        
-        this.modelEntityAlter.position.setFromPoint(this.position);
-        this.modelEntityAlter.angle.setFromPoint(this.angle);
-        this.modelEntityAlter.scale.setFromPoint(this.scale);
-        this.modelEntityAlter.inCameraSpace=false;
-
-        return(true);
-    }
-         * 
-     */
 }
 

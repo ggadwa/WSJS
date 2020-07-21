@@ -585,6 +585,20 @@ export default class ImportGLTFClass
             }
         }
         
+            // finally we determine a root node (we assume
+            // a single skeleton)  Default is 0 (which most impoters
+            // put it but I've seen it in different places)  We
+            // determine by a node that has children but no parent.
+            
+        skeleton.rootNodeIdx=0;
+        
+        for (n=0;n!=skeleton.nodes.length;n++) {
+            if ((skeleton.nodes[n].parentNodeIdx===-1) && (skeleton.nodes[n].childNodeIdxs.length!==0)) {
+                skeleton.rootNodeIdx=n;
+                break;
+            }
+        }
+        
         return(true);
     }
     
@@ -1152,7 +1166,7 @@ export default class ImportGLTFClass
         let animations,channels,animateNode,channelNode,samplerNode;
         let animation,channel,pose;
         let timeArray,vectorArray,vIdx;
-            
+        
             // decode the animations
         
         animations=this.jsonData.animations;

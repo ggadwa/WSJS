@@ -24,6 +24,11 @@ export default class ModelSkeletonClass
             
         this.animations=[];
         
+            // the root node, right now we consider
+            // that there is only one root node in the skeleton
+            
+        this.rootNodeIdx=0;
+        
         Object.seal(this);
     }
     

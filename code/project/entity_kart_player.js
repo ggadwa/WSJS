@@ -23,6 +23,8 @@ export default class EntityKartPlayerClass extends EntityKartBaseClass
     {
         super.initialize();
         
+            // player specific json
+            
         this.thirdPersonCameraDistance=this.core.game.lookupValue(this.json.config.thirdPersonCameraDistance,this.data,0);
         this.thirdPersonCameraLookAngle=new PointClass(this.json.config.thirdPersonCameraLookAngle.x,this.json.config.thirdPersonCameraLookAngle.y,this.json.config.thirdPersonCameraLookAngle.z);
         
@@ -85,7 +87,7 @@ export default class EntityKartPlayerClass extends EntityKartBaseClass
             // run the kart
         
         fire=input.mouseButtonFlags[0];  
-        this.moveKart(turnAdd,forward,reverse,drifting,brake,fire,jump,true);
+        this.moveKart(turnAdd,forward,reverse,drifting,brake,fire,jump);
                 
             // calculate place
             

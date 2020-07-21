@@ -417,13 +417,13 @@ export default class ModelEntityAlterClass
             // now cumulative all the nodes for
             // their matrixes
  
-        this.runAnimationNode(this.nodes[0],null);
+        this.runAnimationNode(this.nodes[this.entity.model.skeleton.rootNodeIdx],null);
     }
     
     runAninimationDeveloper()
     {
         this.setupNoPoseNodes();
-        this.runAnimationNode(this.nodes[0],null);
+        this.runAnimationNode(this.nodes[this.entity.model.skeleton.rootNodeIdx],null);
     }
     
         //
@@ -521,8 +521,8 @@ export default class ModelEntityAlterClass
     }
     
         //
-        // hard set bone changes, these can only be used when
-        // an animation is not running
+        // hard set bone changes, only calls these after
+        // the animation has been calculated
         //
         
     setBoneTranslationPoint(name,translation)
