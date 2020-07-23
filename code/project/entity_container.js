@@ -22,6 +22,8 @@ export default class EntityContainerClass extends EntityClass
         
         this.opened=false;
         this.pauseTick=0;
+        
+        Object.seal(this);
     }
     
     initialize()

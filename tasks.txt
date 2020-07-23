@@ -4,25 +4,14 @@
 - need stalkByPath: true (dragon queen)
 
 
+- platform - monster chase
+- platform - monster jump
 
-
---> need uv movement for tank treads
---> what's with place working funky
-
-
-
-
-
-
-- all the project/entity_? need object seals
-
+- kart = place is wonky
 - kart = explosions push
 - kart = why are shell interface count always at 3?
 - kart = pickups seem to start on each other
-- kart = settings into json
 
-- platform = blocking rock is too thin
-- platform = slow down layer movement
 
 DEVELOPER
   - work on developer path split

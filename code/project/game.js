@@ -23,6 +23,8 @@ export default class GameClass
         this.scoreShow=false;
         this.scoreLastItemCount=0;
         this.scoreColor=new ColorClass(0,1,0.2);
+        
+        Object.seal(this);
     }
  
         //
@@ -63,7 +65,6 @@ export default class GameClass
     {
         let key,item,jsonEntity;
         let recurseInParentObject;
-        let map=this.core.map;
         
         for (key in obj) {
             

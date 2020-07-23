@@ -18,21 +18,20 @@ export default class EntityKartBaseClass extends EntityClass
     {
         super(core,name,jsonName,position,angle,data,mapSpawn,spawnedBy,heldBy,show);
         
-        this.maxTurnSpeed=1.5;
-        this.driftMaxTurnSpeed=2.5;
-        this.forwardAcceleration=8;
-        this.forwardDeceleration=25;
-        this.forwardMaxSpeed=2000;
-        this.reverseAcceleration=5;
-        this.reverseDeceleration=35;
-        this.reverseMaxSpeed=1500;
-        this.itemSpeedIncrease=50;
-        this.forwardBrakeDeceleration=50;
-        this.reverseBrakeDeceleration=50;
-        this.jumpHeight=1000;
-        this.bounceWaitCount=20;
-        this.spinOutSpeed=6;
-        this.driftDecelerationFactor=0.99;
+        this.maxTurnSpeed=0;
+        this.driftMaxTurnSpeed=0;
+        this.forwardAcceleration=0;
+        this.forwardDeceleration=0;
+        this.forwardMaxSpeed=0;
+        this.reverseAcceleration=0;
+        this.reverseDeceleration=0;
+        this.reverseMaxSpeed=0;
+        this.forwardBrakeDeceleration=0;
+        this.reverseBrakeDeceleration=0;
+        this.jumpHeight=0;
+        this.bounceWaitCount=0;
+        this.spinOutSpeed=0;
+        this.driftDecelerationFactor=0;
         
         this.maxSpeedItemCount=0;
         this.speedItemIncrease=0;
@@ -52,6 +51,7 @@ export default class EntityKartBaseClass extends EntityClass
         this.leftWheelBones=null;
         this.rightWheelBones=null;
         this.wheelMaxTurnAngle=0;
+        this.wheelRotateFactor=0;
         
         this.idleAnimation=null;
         this.driveAnimation=null;
@@ -65,7 +65,8 @@ export default class EntityKartBaseClass extends EntityClass
             
         this.stopped=true;
         this.inDrift=false;
-        this.wheelAngle=0;
+        this.wheelRotAngle=0;
+        this.wheelTurnAngle=0;
         
         this.smokeCoolDownCount=0;
         this.bounceCount=0;
@@ -111,12 +112,15 @@ export default class EntityKartBaseClass extends EntityClass
         this.rigidGotoAngle=new PointClass(0,0,0);
         this.drawAngle=new PointClass(0,0,0);
         
-        this.tempQuat=new QuaternionClass(0,0,0,1);
+        this.wheelRotQuat=new QuaternionClass(0,0,0,1);
+        this.wheelTurnQuat=new QuaternionClass(0,0,0,1);
         
             // some static nodes
             
         this.goalNodeIdx=-1;
         this.endNodeIdx=-1;
+        
+            // no seal, object is extended
     }
     
     initialize()
@@ -127,21 +131,20 @@ export default class EntityKartBaseClass extends EntityClass
         
             // kart settings
             
-        this.maxTurnSpeed=1.5;
-        this.driftMaxTurnSpeed=2.5;
-        this.forwardAcceleration=8;
-        this.forwardDeceleration=25;
-        this.forwardMaxSpeed=1500;
-        this.reverseAcceleration=5;
-        this.reverseDeceleration=35;
-        this.reverseMaxSpeed=1000;
-        this.itemSpeedIncrease=50;
-        this.forwardBrakeDeceleration=50;
-        this.reverseBrakeDeceleration=50;
-        this.jumpHeight=1000;
-        this.bounceWaitCount=20;
-        this.spinOutSpeed=6;
-        this.driftDecelerationFactor=0.99;
+        this.maxTurnSpeed=this.core.game.lookupValue(this.json.config.maxTurnSpeed,this.data,1.5);
+        this.driftMaxTurnSpeed=this.core.game.lookupValue(this.json.config.driftMaxTurnSpeed,this.data,2.5);
+        this.forwardAcceleration=this.core.game.lookupValue(this.json.config.forwardAcceleration,this.data,8);
+        this.forwardDeceleration=this.core.game.lookupValue(this.json.config.forwardDeceleration,this.data,25);
+        this.forwardMaxSpeed=this.core.game.lookupValue(this.json.config.forwardMaxSpeed,this.data,1500);
+        this.reverseAcceleration=this.core.game.lookupValue(this.json.config.reverseAcceleration,this.data,5);
+        this.reverseDeceleration=this.core.game.lookupValue(this.json.config.reverseDeceleration,this.data,35);
+        this.reverseMaxSpeed=this.core.game.lookupValue(this.json.config.reverseMaxSpeed,this.data,1000);
+        this.forwardBrakeDeceleration=this.core.game.lookupValue(this.json.config.forwardBrakeDeceleration,this.data,50);
+        this.reverseBrakeDeceleration=this.core.game.lookupValue(this.json.config.reverseBrakeDeceleration,this.data,50);
+        this.jumpHeight=this.core.game.lookupValue(this.json.config.jumpHeight,this.data,1000);
+        this.bounceWaitCount=this.core.game.lookupValue(this.json.config.bounceWaitCount,this.data,20);
+        this.spinOutSpeed=this.core.game.lookupValue(this.json.config.spinOutSpeed,this.data,6);
+        this.driftDecelerationFactor=this.core.game.lookupValue(this.json.config.driftDecelerationFactor,this.data,0.99);
         
         this.maxSpeedItemCount=this.core.game.lookupValue(this.json.config.maxSpeedItemCount,this.data,0);
         this.speedItemIncrease=this.core.game.lookupValue(this.json.config.speedItemIncrease,this.data,0);
@@ -161,6 +164,7 @@ export default class EntityKartBaseClass extends EntityClass
         this.leftWheelBones=this.json.config.leftWheelBones;
         this.rightWheelBones=this.json.config.rightWheelBones;
         this.wheelMaxTurnAngle=this.core.game.lookupValue(this.json.config.wheelMaxTurnAngle,this.data,null);
+        this.wheelRotateFactor=this.core.game.lookupValue(this.json.config.wheelRotateFactor,this.data,null);
         
         this.idleAnimation=this.core.game.lookupAnimationValue(this.json.animations.idleAnimation);
         this.driveAnimation=this.core.game.lookupAnimationValue(this.json.animations.driveAnimation);
@@ -197,7 +201,8 @@ export default class EntityKartBaseClass extends EntityClass
          
         this.stopped=true;
         this.inDrift=false;
-        this.wheelAngle=0;
+        this.wheelRotAngle=0;
+        this.wheelTurnAngle=0;
         
         this.smokeCoolDownCount=0;
         this.bounceCount=0;
@@ -370,16 +375,16 @@ export default class EntityKartBaseClass extends EntityClass
             maxTurnSpeed=(this.inDrift)?this.driftMaxTurnSpeed:this.maxTurnSpeed;
             if (Math.abs(turnAdd)>maxTurnSpeed) turnAdd=maxTurnSpeed*Math.sign(turnAdd);
             
-            this.wheelAngle+=Math.sign(turnAdd);
-            if (Math.abs(this.wheelAngle)>this.wheelMaxTurnAngle) this.wheelAngle=this.wheelMaxTurnAngle*Math.sign(this.wheelAngle);
+            this.wheelTurnAngle+=Math.sign(turnAdd);
+            if (Math.abs(this.wheelTurnAngle)>this.wheelMaxTurnAngle) this.wheelTurnAngle=this.wheelMaxTurnAngle*Math.sign(this.wheelTurnAngle);
 
             this.angle.y+=turnAdd;
             if (this.angle.y<0.0) this.angle.y+=360.0;
             if (this.angle.y>=360.00) this.angle.y-=360.0;
         }
         else {
-            if (this.wheelAngle>0) this.wheelAngle--;
-            if (this.wheelAngle<0) this.wheelAngle++;
+            if (this.wheelTurnAngle>0) this.wheelTurnAngle--;
+            if (this.wheelTurnAngle<0) this.wheelTurnAngle++;
         }
         
             // can we go into a drift?
@@ -437,6 +442,10 @@ export default class EntityKartBaseClass extends EntityClass
         this.movement.y=this.moveInMapY(this.rotMovement,1.0,false);
         this.moveInMapXZ(this.rotMovement,true,true);
         
+            // wheel rotations
+            
+        this.wheelRotAngle=(this.wheelRotAngle+(this.movement.z*this.wheelRotateFactor))%360;
+
             // any change in animation
             
         if (this.stopped) {
@@ -629,15 +638,19 @@ export default class EntityKartBaseClass extends EntityClass
         
         if (this.leftWheelBones!==null) {
             for (bone of this.leftWheelBones) {
-                this.tempQuat.setFromVectorAndAngle(1,0,0,-this.wheelAngle);
-                this.modelEntityAlter.setBoneRotationQuaternion(bone,this.tempQuat);
+                this.wheelRotQuat.setFromVectorAndAngle(0,1,0,this.wheelRotAngle);
+                this.wheelTurnQuat.setFromVectorAndAngle(1,0,0,-this.wheelTurnAngle);
+                this.wheelRotQuat.multiply(this.wheelTurnQuat);
+                this.modelEntityAlter.setBoneRotationQuaternion(bone,this.wheelRotQuat);
             }
         }
         
         if (this.rightWheelBones!==null) {
             for (bone of this.rightWheelBones) {
-                this.tempQuat.setFromVectorAndAngle(1,0,0,this.wheelAngle);
-                this.modelEntityAlter.setBoneRotationQuaternion(bone,this.tempQuat);
+                this.wheelRotQuat.setFromVectorAndAngle(0,1,0,-this.wheelRotAngle);
+                this.wheelTurnQuat.setFromVectorAndAngle(1,0,0,this.wheelTurnAngle);
+                this.wheelRotQuat.multiply(this.wheelTurnQuat);
+                this.modelEntityAlter.setBoneRotationQuaternion(bone,this.wheelRotQuat);
             }
         }
     }

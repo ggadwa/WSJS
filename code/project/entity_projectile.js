@@ -35,11 +35,15 @@ export default class EntityProjectileClass extends EntityClass
         this.rolling=false;
         this.stopped=false;
         
+        this.nextTrailTick=0;
+        
             // pre-allocations
 
         this.motion=new PointClass(0,0,0);
         this.savePoint=new PointClass(0,0,0);
         this.drawAngle=new PointClass(0,0,0);
+        
+        Object.seal(this);
     }
     
     initialize()

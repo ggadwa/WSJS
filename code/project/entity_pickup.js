@@ -21,6 +21,8 @@ export default class EntityPickupClass extends EntityClass
         
         this.idleAnimation=null;
         this.pickupSound=null;
+        
+        Object.seal(this);
     }
     
     initialize()

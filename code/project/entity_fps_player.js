@@ -41,6 +41,9 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.sideAcceleration=0;
         this.sideDeceleration=0;
         this.sideMaxSpeed=0;
+        this.swimAcceleration=0;
+        this.swimDeceleration=0;
+        this.swimMaxSpeed=0;
         this.flyAcceleration=0;
         this.flyDeceleration=0;
         this.flyMaxSpeed=0;
@@ -88,6 +91,8 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.movement=new PointClass(0,0,0);
         this.rotMovement=new PointClass(0,0,0);
         this.firePosition=new PointClass(0,0,0);
+        
+        Object.seal(this);
     }
         
     initialize()
@@ -584,7 +589,7 @@ export default class EntityFPSPlayerClass extends EntityClass
         weapChangeDir=input.mouseWheelRead()+input.getTouchSwipeLeftX();
         
         if (weapChangeDir<0) {
-            this.startWeaponIdx=this.currentCarouselWeaponIdx;
+            startWeaponIdx=this.currentCarouselWeaponIdx;
             
             while (true) {
                 this.currentCarouselWeaponIdx--;
@@ -600,7 +605,7 @@ export default class EntityFPSPlayerClass extends EntityClass
         }
 
         if (weapChangeDir>0) {
-            this.startWeaponIdx=this.currentCarouselWeaponIdx;
+            startWeaponIdx=this.currentCarouselWeaponIdx;
             
             while (true) {
                 this.currentCarouselWeaponIdx++;

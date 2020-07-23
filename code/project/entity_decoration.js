@@ -8,6 +8,8 @@ export default class EntityDecorationClass extends EntityClass
         super(core,name,jsonName,position,angle,data,mapSpawn,spawnedBy,heldBy,show);
         
         this.idleAnimation=null;
+        
+        Object.seal(this);
     }
     
     initialize()

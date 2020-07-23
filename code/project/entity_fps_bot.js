@@ -76,6 +76,9 @@ export default class EntityFPSBotClass extends EntityClass
         this.targetEntity=null;
         this.lastTargetAngleDif=360;
         this.currentTargetYScan=0;
+        
+        this.flying=false;
+        this.stuckCount=0;
 
         this.respawnTick=0;
         this.telefragTriggerEntity=null;
@@ -99,6 +102,8 @@ export default class EntityFPSBotClass extends EntityClass
         
         this.firePosition=new PointClass(0,0,0);
         this.drawAngle=new PointClass(0,0,0);
+        
+        Object.seal(this);
     }
     
     initialize()

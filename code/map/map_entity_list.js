@@ -67,10 +67,15 @@ export default class MapEntityListClass
     {
         let json;
         
+        let e=new Error('yes');
+        
             // get json
             
         json=this.core.game.jsonEntityCache.get(jsonName);
-        if (json===null) return(null);
+        if (json===undefined) {
+            console.log('Unable to find entity json in the cache, probably missing from game.json entities list: '+jsonName);
+            return(null);
+        }
         
             // lookup type
             

@@ -111,6 +111,8 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.fireAngle=new PointClass(0,0,0);
         this.fireVector=new PointClass(0,0,0);
         this.fireHitPoint=new PointClass(0,0,0);
+        
+        Object.seal(this);
     }
 
     initialize()
@@ -377,8 +379,6 @@ export default class EntityFPSMonsterClass extends EntityClass
         
         if (this.health<=0) {
             this.goDying();
-            
-            this.dead=true;
             return;
         }
         

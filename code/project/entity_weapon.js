@@ -32,6 +32,8 @@ class EntityWeaponFireClass
         
         this.lastFireTimestamp=0;
         this.lastRegenerateTimestamp=0;
+        
+        Object.seal(this);
     }
     
     ready()
