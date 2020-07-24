@@ -5,11 +5,10 @@
 
 
 - platform - monster chase
-- platform - monster jump
 
+- kart = drift is weird for bots
 - kart = place is wonky
 - kart = explosions push
-- kart = why are shell interface count always at 3?
 - kart = pickups seem to start on each other
 
 
