@@ -244,13 +244,13 @@ export default class EntityFPSPlayerClass extends EntityClass
     {
         if ((this.movement.x!==0) || (this.movement.z!==0)) {
             if ((this.inStandingAnimation) || (this.forceAnimationUpdate)) {
-                this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.currentRunAnimation[0],this.currentRunAnimation[1]);
+                this.modelEntityAlter.startAnimationChunkInFrames(this.currentRunAnimation);
             }
             this.inStandingAnimation=false;
         }
         else {
             if ((!this.inStandingAnimation) || (this.forceAnimationUpdate)) {
-                this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.currentIdleAnimation[0],this.currentIdleAnimation[1]);
+                this.modelEntityAlter.startAnimationChunkInFrames(this.currentIdleAnimation);
             }
             this.inStandingAnimation=true;
         }
@@ -399,7 +399,7 @@ export default class EntityFPSPlayerClass extends EntityClass
         if (this.isTopDownCameraOnDeath) this.core.camera.gotoTopDown(this.topDownCameraDistance);
 
         this.core.soundList.playJson(this.position,this.dieSound);
-        this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.dieAnimation[0],this.dieAnimation[1]);
+        this.modelEntityAlter.startAnimationChunkInFrames(this.dieAnimation);
         this.modelEntityAlter.queueAnimationStop();
         
         this.core.game.multiplayerAddScore(fromEntity,this,isTelefrag);

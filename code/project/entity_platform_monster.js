@@ -46,7 +46,7 @@ export default class EntityPlatformMonsterClass extends EntityClass
         
         this.patrolDistance=this.core.game.lookupValue(this.json.config.patrolDistance,this.data,200);
         
-        this.walkAnimation=this.json.animations.walkAnimation;
+        this.walkAnimation=this.core.game.lookupAnimationValue(this.json.animations.walkAnimation);
         
         return(true);
     }
@@ -62,7 +62,7 @@ export default class EntityPlatformMonsterClass extends EntityClass
         this.movement.setFromValues(0,0,0);
         this.angle.setFromValues(0,90,0);           // monsters don't have the camera so they can use the regular angle
         
-        this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.walkAnimation[0],this.walkAnimation[1]);
+        this.modelEntityAlter.startAnimationChunkInFrames(this.walkAnimation);
     }
         
     run()
@@ -74,22 +74,10 @@ export default class EntityPlatformMonsterClass extends EntityClass
         this.movement.x=0;
         
         if (this.walkDirection>0) {
-            if (this.angle.y>90) {
-                this.angle.y-=this.turnSpeed;
-                if (this.angle.y<90) this.angle.y=90;
-            }
-            else {
-                this.movement.x=this.walkSpeed;
-            }
+            if (this.angle.turnYTowards(90,this.turnSpeed)===0) this.movement.x=this.walkSpeed;
         }
         else {
-            if (this.angle.y<270) {
-                this.angle.y+=this.turnSpeed;
-                if (this.angle.y>270) this.angle.y=270;
-            }
-            else {
-                this.movement.x=-this.walkSpeed;
-            }
+            if (this.angle.turnYTowards(270,this.turnSpeed)===0) this.movement.x=-this.walkSpeed;
         }
         
             // jumping

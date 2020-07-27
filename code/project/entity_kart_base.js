@@ -18,6 +18,8 @@ export default class EntityKartBaseClass extends EntityClass
     {
         super(core,name,jsonName,position,angle,data,mapSpawn,spawnedBy,heldBy,show);
         
+        this.TURN_COOL_DOWN_PERIOD=15;
+        
         this.maxTurnSpeed=0;
         this.driftMaxTurnSpeed=0;
         this.forwardAcceleration=0;
@@ -48,13 +50,11 @@ export default class EntityKartBaseClass extends EntityClass
         this.smokeAngles=[];
         this.smokeEffect=null;
         
-        this.leftWheelBones=null;
-        this.rightWheelBones=null;
-        this.wheelMaxTurnAngle=0;
-        this.wheelRotateFactor=0;
-        
         this.idleAnimation=null;
         this.driveAnimation=null;
+        this.turnLeftAnimation=null;
+        this.turnRightAnimation=null;
+        this.spinOutAnimation=null;
         
         this.engineSound=null;
         this.skidSound=null;
@@ -63,15 +63,15 @@ export default class EntityKartBaseClass extends EntityClass
         
             // variables
             
-        this.stopped=true;
         this.inDrift=false;
-        this.wheelRotAngle=0;
-        this.wheelTurnAngle=0;
         
         this.smokeCoolDownCount=0;
         this.bounceCount=0;
         this.spinOutCount=0;
         this.lastDriftSoundPlayIdx=-1;
+        
+        this.turnSmooth=0;
+        this.turnCoolDown=0;
     
         this.hitMidpoint=false;
     
@@ -111,9 +111,6 @@ export default class EntityKartBaseClass extends EntityClass
         this.rigidAngle=new PointClass(0,0,0);
         this.rigidGotoAngle=new PointClass(0,0,0);
         this.drawAngle=new PointClass(0,0,0);
-        
-        this.wheelRotQuat=new QuaternionClass(0,0,0,1);
-        this.wheelTurnQuat=new QuaternionClass(0,0,0,1);
         
             // some static nodes
             
@@ -161,13 +158,11 @@ export default class EntityKartBaseClass extends EntityClass
         this.smokeAngles=this.json.config.smokeAngles;
         this.smokeEffect=this.core.game.lookupValue(this.json.config.smokeEffect,this.data,null);
         
-        this.leftWheelBones=this.json.config.leftWheelBones;
-        this.rightWheelBones=this.json.config.rightWheelBones;
-        this.wheelMaxTurnAngle=this.core.game.lookupValue(this.json.config.wheelMaxTurnAngle,this.data,null);
-        this.wheelRotateFactor=this.core.game.lookupValue(this.json.config.wheelRotateFactor,this.data,null);
-        
         this.idleAnimation=this.core.game.lookupAnimationValue(this.json.animations.idleAnimation);
         this.driveAnimation=this.core.game.lookupAnimationValue(this.json.animations.driveAnimation);
+        this.turnLeftAnimation=this.core.game.lookupAnimationValue(this.json.animations.turnLeftAnimation);
+        this.turnRightAnimation=this.core.game.lookupAnimationValue(this.json.animations.turnRightAnimation);
+        this.spinOutAnimation=this.core.game.lookupAnimationValue(this.json.animations.spinOutAnimation);
         
         this.engineSound=this.core.game.lookupSoundValue(this.json.sounds.engineSound);
         this.skidSound=this.core.game.lookupSoundValue(this.json.sounds.skidSound);
@@ -199,15 +194,15 @@ export default class EntityKartBaseClass extends EntityClass
 
         super.ready();
          
-        this.stopped=true;
         this.inDrift=false;
-        this.wheelRotAngle=0;
-        this.wheelTurnAngle=0;
         
         this.smokeCoolDownCount=0;
         this.bounceCount=0;
         this.spinOutCount=0;
         this.lastDriftSoundPlayIdx=-1;
+        
+        this.turnSmooth=0;
+        this.turnCoolDown=0;
         
         this.lap=-1;
         this.hitMidpoint=true;      // first lap starts the laps
@@ -231,7 +226,7 @@ export default class EntityKartBaseClass extends EntityClass
         this.goalNodeIdx=this.findKeyNodeIndex('goal');
         this.endNodeIdx=this.findKeyNodeIndex('end');
         
-        this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.idleAnimation[0],this.idleAnimation[1]);
+        this.modelEntityAlter.startAnimationChunkInFrames(this.idleAnimation);
     }
     
         //
@@ -374,17 +369,10 @@ export default class EntityKartBaseClass extends EntityClass
                 
             maxTurnSpeed=(this.inDrift)?this.driftMaxTurnSpeed:this.maxTurnSpeed;
             if (Math.abs(turnAdd)>maxTurnSpeed) turnAdd=maxTurnSpeed*Math.sign(turnAdd);
-            
-            this.wheelTurnAngle+=Math.sign(turnAdd);
-            if (Math.abs(this.wheelTurnAngle)>this.wheelMaxTurnAngle) this.wheelTurnAngle=this.wheelMaxTurnAngle*Math.sign(this.wheelTurnAngle);
 
             this.angle.y+=turnAdd;
             if (this.angle.y<0.0) this.angle.y+=360.0;
             if (this.angle.y>=360.00) this.angle.y-=360.0;
-        }
-        else {
-            if (this.wheelTurnAngle>0) this.wheelTurnAngle--;
-            if (this.wheelTurnAngle<0) this.wheelTurnAngle++;
         }
         
             // can we go into a drift?
@@ -442,25 +430,37 @@ export default class EntityKartBaseClass extends EntityClass
         this.movement.y=this.moveInMapY(this.rotMovement,1.0,false);
         this.moveInMapXZ(this.rotMovement,true,true);
         
-            // wheel rotations
-            
-        this.wheelRotAngle=(this.wheelRotAngle+(this.movement.z*this.wheelRotateFactor))%360;
+            // animations
 
-            // any change in animation
-            
-        if (this.stopped) {
-            if (moveForward) {
-                this.stopped=false;
-                this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.driveAnimation[0],this.driveAnimation[1]);
-            }
+        if (this.bounceCount!==0) {
+            this.modelEntityAlter.continueAnimationChunkInFrames(this.spinOutAnimation);
         }
         else {
-            if ((!moveForward) && (this.movement.x===0) && (this.movement.z===0)) {
-                this.stopped=true;
-                this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.idleAnimation[0],this.idleAnimation[1]);
+            if (this.movement.z===0) {
+                this.modelEntityAlter.continueAnimationChunkInFrames(this.idleAnimation);
+            }
+            else {
+                if (this.turnCoolDown===0) {
+                    this.turnCoolDown=this.TURN_COOL_DOWN_PERIOD;
+                    this.turnSmooth=turnAdd;
+                }
+                
+                if (this.turnSmooth>0.1) {
+                    this.modelEntityAlter.continueAnimationChunkInFrames(this.turnLeftAnimation);
+                }
+                else {
+                    if (this.turnSmooth<-0.1) {
+                        this.modelEntityAlter.continueAnimationChunkInFrames(this.turnRightAnimation);
+                    }
+                    else {
+                        this.modelEntityAlter.continueAnimationChunkInFrames(this.driveAnimation);
+                    }
+                }
+                
+                if (this.turnCoolDown!==0) this.turnCoolDown--;
             }
         }
-        
+       
             // bounce and spin out if hit wall
         
         if (this.bounceCount!==0) {
@@ -631,29 +631,6 @@ export default class EntityKartBaseClass extends EntityClass
         //
         // drawing
         //
-    
-    animatedBoneSetup()
-    {
-        let bone;
-        
-        if (this.leftWheelBones!==null) {
-            for (bone of this.leftWheelBones) {
-                this.wheelRotQuat.setFromVectorAndAngle(0,1,0,this.wheelRotAngle);
-                this.wheelTurnQuat.setFromVectorAndAngle(1,0,0,-this.wheelTurnAngle);
-                this.wheelRotQuat.multiply(this.wheelTurnQuat);
-                this.modelEntityAlter.setBoneRotationQuaternion(bone,this.wheelRotQuat);
-            }
-        }
-        
-        if (this.rightWheelBones!==null) {
-            for (bone of this.rightWheelBones) {
-                this.wheelRotQuat.setFromVectorAndAngle(0,1,0,-this.wheelRotAngle);
-                this.wheelTurnQuat.setFromVectorAndAngle(1,0,0,this.wheelTurnAngle);
-                this.wheelRotQuat.multiply(this.wheelTurnQuat);
-                this.modelEntityAlter.setBoneRotationQuaternion(bone,this.wheelRotQuat);
-            }
-        }
-    }
 
     drawSetup()
     {

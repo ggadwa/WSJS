@@ -18,6 +18,7 @@ export default class EntityFPSBotClass extends EntityClass
         this.armorMaxCount=0;
         
         this.idleAnimation=null;
+        this.waitAnimation=null;
         this.runAnimation=null;
         this.dieAnimation=null;
         
@@ -116,6 +117,7 @@ export default class EntityFPSBotClass extends EntityClass
             // regular config
             
         this.idleAnimation=this.core.game.lookupAnimationValue(this.json.animations.idleAnimation);
+        this.waitAnimation=this.core.game.lookupAnimationValue(this.json.animations.waitAnimation);
         this.runAnimation=this.core.game.lookupAnimationValue(this.json.animations.runAnimation);
         this.dieAnimation=this.core.game.lookupAnimationValue(this.json.animations.dieAnimation);
         
@@ -264,7 +266,7 @@ export default class EntityFPSBotClass extends EntityClass
 
             // start animation
             
-        this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.runAnimation[0],this.runAnimation[1]);
+        this.modelEntityAlter.startAnimationChunkInFrames(this.runAnimation);
     }
     
         //
@@ -277,7 +279,7 @@ export default class EntityFPSBotClass extends EntityClass
         this.passThrough=true;
         
         this.core.soundList.playJson(this.position,this.dieSound);
-        this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.dieAnimation[0],this.dieAnimation[1]);
+        this.modelEntityAlter.startAnimationChunkInFrames(this.dieAnimation);
         this.modelEntityAlter.queueAnimationStop();
 
         this.core.game.multiplayerAddScore(fromEntity,this,isTelefrag);
@@ -620,7 +622,7 @@ export default class EntityFPSBotClass extends EntityClass
             if (this.pausedTriggerName!==null) {
                 if (!this.core.checkTrigger(this.pausedTriggerName)) {
                     idleAnimation=this.carouselWeapons[this.currentCarouselWeaponIdx].parentIdleAnimation;
-                    this.modelEntityAlter.startAnimationChunkInFrames(null,30,idleAnimation[0],idleAnimation[1]);
+                    this.modelEntityAlter.startAnimationChunkInFrames(idleAnimation);
                     return;
                 }
             }
@@ -639,7 +641,7 @@ export default class EntityFPSBotClass extends EntityClass
             }
             else {
                 this.pausedTriggerName=null;
-                this.modelEntityAlter.startAnimationChunkInFrames(null,30,960,996);
+                this.modelEntityAlter.startAnimationChunkInFrames(this.waitAnimation);
             }
         }
         

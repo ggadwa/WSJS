@@ -120,6 +120,7 @@ export default class EntityClass
             this.modelEntityAlter=new ModelEntityAlterClass(this.core,this);
             this.modelEntityAlter.initialize();
 
+            this.modelEntityAlter.frameRate=this.json.setup.frameRate;
             this.modelEntityAlter.rotationOrder=this.MODEL_ROTATION_ORDER_LIST.indexOf(this.json.setup.rotationOrder);
             this.scale.setFromValues(this.json.setup.scale.x,this.json.setup.scale.y,this.json.setup.scale.z);
             

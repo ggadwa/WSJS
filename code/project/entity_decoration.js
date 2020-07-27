@@ -25,7 +25,7 @@ export default class EntityDecorationClass extends EntityClass
     {
         super.ready();
         
-        if (this.idleAnimation!==null) this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.idleAnimation[0],this.idleAnimation[1]);
+        if (this.idleAnimation!==null) this.modelEntityAlter.startAnimationChunkInFrames(this.idleAnimation);
     }
    
     drawSetup()

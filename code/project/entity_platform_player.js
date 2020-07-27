@@ -17,11 +17,14 @@ export default class EntityPlatformPlayerClass extends EntityClass
         
         this.idleAnimation=null;
         this.walkAnimation=null;
+        this.runAnimation=null;
+        this.jumpAnimation=null;
+        this.fallAnimation=null;
+        this.hurtAnimation=null;
+        this.dieAnimation=null;
         
             // variables
             
-        this.inIdle=true;
-
 
             // pre-allocates
             
@@ -43,8 +46,13 @@ export default class EntityPlatformPlayerClass extends EntityClass
         this.thirdPersonCameraDistance=this.core.game.lookupValue(this.json.config.thirdPersonCameraDistance,this.data,0);
         this.thirdPersonCameraLookAngle=new PointClass(this.json.config.thirdPersonCameraLookAngle.x,this.json.config.thirdPersonCameraLookAngle.y,this.json.config.thirdPersonCameraLookAngle.z);
         
-        this.idleAnimation=this.json.animations.idleAnimation;
-        this.walkAnimation=this.json.animations.walkAnimation;
+        this.idleAnimation=this.core.game.lookupAnimationValue(this.json.animations.idleAnimation);
+        this.walkAnimation=this.core.game.lookupAnimationValue(this.json.animations.walkAnimation);
+        this.runAnimation=this.core.game.lookupAnimationValue(this.json.animations.runAnimation);
+        this.jumpAnimation=this.core.game.lookupAnimationValue(this.json.animations.jumpAnimation);
+        this.fallAnimation=this.core.game.lookupAnimationValue(this.json.animations.fallAnimation);
+        this.hurtAnimation=this.core.game.lookupAnimationValue(this.json.animations.hurtAnimation);
+        this.dieAnimation=this.core.game.lookupAnimationValue(this.json.animations.dieAnimation);
         
         return(true);
     }
@@ -54,17 +62,16 @@ export default class EntityPlatformPlayerClass extends EntityClass
         super.ready();
         
         this.movement.setFromValues(0,0,0);
-        this.drawAngle.setFromValues(0,90,0);
+        this.drawAngle.setFromValues(0,0,0);
         
         this.core.camera.gotoThirdPerson(this.thirdPersonCameraDistance,this.thirdPersonCameraLookAngle);
         
-        this.inIdle=true;
-        this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.idleAnimation[0],this.idleAnimation[1]);
+        this.modelEntityAlter.startAnimationChunkInFrames(this.idleAnimation);
     }
         
     run()
     {
-        let speed,moveKeyDown;
+        let speed,moveKeyDown,runKeyDown;
         let input=this.core.input;
         
         super.run();
@@ -72,32 +79,33 @@ export default class EntityPlatformPlayerClass extends EntityClass
             // movement keys
             
         speed=this.walkSpeed;
-        if ((this.runSpeed!==0) && (input.isKeyDown('Shift'))) speed=this.runSpeed;
-            
+        runKeyDown=false;
+        
+        if (this.runSpeed!==0) {
+            if (input.isKeyDown('Shift')) {
+                runKeyDown=true;
+                speed=this.runSpeed;
+            }
+        }
+        
         this.movement.x=0;
         moveKeyDown=false;
         
         if (input.isKeyDown('d')) {
             moveKeyDown=true;
-            if (this.drawAngle.y>90) {
-                this.drawAngle.y-=this.turnSpeed;
-                if (this.drawAngle.y<90) this.drawAngle.y=90;
-            }
-            else {
-                this.movement.x=speed;
-            }
+            if (this.drawAngle.turnYTowards(90,this.turnSpeed)===0) this.movement.x=speed;
         }
         else {
             if (input.isKeyDown('a')) {
                 moveKeyDown=true;
-                if (this.drawAngle.y<270) {
-                    this.drawAngle.y+=this.turnSpeed;
-                    if (this.drawAngle.y>270) this.drawAngle.y=270;
-                }
-                else {
-                    this.movement.x=-speed;
-                }
+                if (this.drawAngle.turnYTowards(270,this.turnSpeed)===0) this.movement.x=-speed;
             }
+        }
+        
+            // if no movement and not falling/jumping face foward
+            
+        if ((this.movement.y===0) && (!moveKeyDown)) {
+            this.drawAngle.turnYTowards(0,this.turnSpeed);
         }
         
             // jumping
@@ -105,6 +113,7 @@ export default class EntityPlatformPlayerClass extends EntityClass
         if (this.jumpHeight!==0) {
             if ((input.isKeyDown(' ')) && ((this.standOnMeshIdx!==-1) || (this.standOnEntity!==null))) {
                 this.movement.y=this.jumpHeight;
+                this.modelEntityAlter.startAnimationChunkInFrames(this.jumpAnimation);
             }
         }
         
@@ -115,16 +124,17 @@ export default class EntityPlatformPlayerClass extends EntityClass
         
             // animation changes
             
-        if (moveKeyDown) {
-            if (this.inIdle) {
-                this.inIdle=false;
-                this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.walkAnimation[0],this.walkAnimation[1]);
-            }
+        if ((this.movement.y<=0) && (this.standOnMeshIdx===-1)) {
+            this.modelEntityAlter.continueAnimationChunkInFrames(this.fallAnimation);
         }
         else {
-            if (!this.inIdle) {
-                this.inIdle=true;
-                this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.idleAnimation[0],this.idleAnimation[1]);
+            if (this.movement.y<=0) {
+                if (moveKeyDown) {
+                    this.modelEntityAlter.continueAnimationChunkInFrames(runKeyDown?this.runAnimation:this.walkAnimation);
+                }
+                else {
+                    this.modelEntityAlter.continueAnimationChunkInFrames(this.idleAnimation);
+                }
             }
         }
     }

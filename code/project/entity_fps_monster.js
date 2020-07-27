@@ -199,7 +199,7 @@ export default class EntityFPSMonsterClass extends EntityClass
             
             // start idle animation
         
-        this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.sleepAnimation[0],this.sleepAnimation[1]);
+        this.modelEntityAlter.startAnimationChunkInFrames(this.sleepAnimation);
     }
     
         //
@@ -228,8 +228,8 @@ export default class EntityFPSMonsterClass extends EntityClass
             
         this.state=this.STATE_WAKING_UP;
         
-        this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.wakeUpAnimation[0],this.wakeUpAnimation[1]);
-        this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(null,30,this.wakeUpAnimation[0],this.wakeUpAnimation[1]);
+        this.modelEntityAlter.startAnimationChunkInFrames(this.wakeUpAnimation);
+        this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(this.wakeUpAnimation);
         
         this.core.soundList.playJson(this.position,this.wakeUpSound);
         if (this.wakeUpSetTriggerName!==null) this.core.setTrigger(this.wakeUpSetTriggerName);
@@ -254,7 +254,7 @@ export default class EntityFPSMonsterClass extends EntityClass
     {
         this.state=this.STATE_IDLE;
         
-        this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.idleAnimation[0],this.idleAnimation[1]);
+        this.modelEntityAlter.startAnimationChunkInFrames(this.idleAnimation);
     }   
     
     goStalk(resetTimers)
@@ -269,7 +269,7 @@ export default class EntityFPSMonsterClass extends EntityClass
             this.nextJumpTick=this.core.timestamp+this.jumpWaitTick;
         }
         
-        this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.walkAnimation[0],this.walkAnimation[1]);
+        this.modelEntityAlter.startAnimationChunkInFrames(this.walkAnimation);
     }
     
     goHurt()
@@ -290,8 +290,8 @@ export default class EntityFPSMonsterClass extends EntityClass
             
         this.state=this.STATE_HURT;
         
-        this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.hitAnimation[0],this.hitAnimation[1]);
-        this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(null,30,this.hitAnimation[0],this.hitAnimation[1]);
+        this.modelEntityAlter.startAnimationChunkInFrames(this.hitAnimation);
+        this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(this.hitAnimation);
     }
     
     goMelee(distToPlayer)
@@ -301,14 +301,14 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.state=this.STATE_MELEE;
         
         if (Math.random()<0.5) {
-            this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.meleeLeftAnimation[0],this.meleeLeftAnimation[1]);
-            this.meleeHitNextTick=this.core.timestamp+Math.trunc(((this.meleeLeftHitFrame-this.meleeLeftAnimation[0])/30)*1000);
-            this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(null,30,this.meleeLeftAnimation[0],this.meleeLeftAnimation[1]);
+            this.modelEntityAlter.startAnimationChunkInFrames(this.meleeLeftAnimation);
+            this.meleeHitNextTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.meleeLeftHitFrame,this.meleeLeftAnimation);
+            this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(this.meleeLeftAnimation);
         }
         else {
-            this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.meleeRightAnimation[0],this.meleeRightAnimation[1]);
-            this.meleeHitNextTick=this.core.timestamp+Math.trunc(((this.meleeRightHitFrame-this.meleeRightAnimation[0])/30)*1000);
-            this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(null,30,this.meleeRightAnimation[0],this.meleeRightAnimation[1]);
+            this.modelEntityAlter.startAnimationChunkInFrames(this.meleeRightAnimation);
+            this.meleeHitNextTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.meleeRightHitFrame,this.meleeRightAnimation);
+            this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(this.meleeRightAnimation);
         }
     }
     
@@ -337,9 +337,9 @@ export default class EntityFPSMonsterClass extends EntityClass
 
             // projectile animaton
             
-        this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.projectileAnimation[0],this.projectileAnimation[1]);
-        this.projectileFireNextTick=this.core.timestamp+Math.trunc(((this.projectileFireFrame-this.projectileAnimation[0])/30)*1000);
-        this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(null,30,this.projectileAnimation[0],this.projectileAnimation[1]);
+        this.modelEntityAlter.startAnimationChunkInFrames(this.projectileAnimation);
+        this.projectileFireNextTick=this.core.timestamp+Math.trunc(((this.projectileFireFrame-this.projectileAnimation[0])/this.modelEntityAlter.frameRate)*1000);
+        this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(this.projectileAnimation);
     }
     
     goDying()
@@ -348,13 +348,13 @@ export default class EntityFPSMonsterClass extends EntityClass
         
         this.passThrough=true;
 
-        this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.deathAnimation[0],this.deathAnimation[1]);
+        this.modelEntityAlter.startAnimationChunkInFrames(this.deathAnimation);
         this.modelEntityAlter.queueAnimationStop();
-        this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(null,30,this.deathAnimation[0],this.deathAnimation[1]);
+        this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(this.deathAnimation);
 
         this.core.soundList.playJson(this.position,this.deathSound);
 
-        this.fallSoundNextTick=this.core.timestamp+Math.trunc(((this.deathFallSoundFrame-this.deathAnimation[0])/30)*1000);
+        this.fallSoundNextTick=this.core.timestamp+Math.trunc(((this.deathFallSoundFrame-this.deathAnimation[0])/this.modelEntityAlter.frameRate)*1000);
     }
     
     goDead()

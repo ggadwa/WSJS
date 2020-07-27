@@ -137,7 +137,7 @@ export default class EntityWeaponClass extends EntityClass
             this.handOffset=new PointClass(this.json.config.handOffset.x,this.json.config.handOffset.y,this.json.config.handOffset.z);
             this.handAngle=new PointClass(this.json.config.handAngle.x,this.json.config.handAngle.y,this.json.config.handAngle.z);
 
-            this.modelEntityAlter.startAnimationChunkInFrames(null,30,this.idleAnimation[0],this.idleAnimation[1]);
+            this.modelEntityAlter.startAnimationChunkInFrames(this.idleAnimation);
         }
         
             // fire setup
@@ -312,8 +312,8 @@ export default class EntityWeaponClass extends EntityClass
            // weapon animation
            
         if (this.model!==null) {
-            if (fireAnimation!==null) this.modelEntityAlter.startAnimationChunkInFrames(null,30,fire.animation[0],fire.animation[1]);
-            if (this.idleAnimation!==null) this.modelEntityAlter.queueAnimationChunkInFrames(null,30,this.idleAnimation[0],this.idleAnimation[1]);
+            if (fireAnimation!==null) this.modelEntityAlter.startAnimationChunkInFrames(fire.animation);
+            if (this.idleAnimation!==null) this.modelEntityAlter.queueAnimationChunkInFrames(this.idleAnimation);
         }
         
             // parent animation
@@ -322,14 +322,14 @@ export default class EntityWeaponClass extends EntityClass
             if (!parentEntity.modelEntityAlter.isAnimationQueued()) {   // don't do this if we have a queue, which means another fire is still going on
                 if ((parentEntity.movement.x!==0) || (parentEntity.movement.z!==0)) {
                     if (fireAnimation!==null) {
-                        parentEntity.modelEntityAlter.interuptAnimationChunkInFrames(null,30,fireAnimation[0],fireAnimation[1]);
+                        parentEntity.modelEntityAlter.interuptAnimationChunkInFrames(fireAnimation);
                         if ((fireAnimationFreezeMovement) && (parentEntity.movementFreezeTick!==undefined)) {
-                            parentEntity.movementFreezeTick=this.core.timestamp+parentEntity.modelEntityAlter.getAnimationTickCount(null,30,fireAnimation[0],fireAnimation[1]);
+                            parentEntity.movementFreezeTick=this.core.timestamp+parentEntity.modelEntityAlter.getAnimationTickCount(fireAnimation[0],fireAnimation[1]);
                         }
                     }
                 }
                 else {
-                    if (this.parentFireIdleAnimation!==null) parentEntity.modelEntityAlter.interuptAnimationChunkInFrames(null,30,this.parentFireIdleAnimation[0],this.parentFireIdleAnimation[1]);
+                    if (this.parentFireIdleAnimation!==null) parentEntity.modelEntityAlter.interuptAnimationChunkInFrames(this.parentFireIdleAnimation);
                 }
             }
         }
