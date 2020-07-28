@@ -3,8 +3,7 @@
 - need idlePath: ["abc","def","hij"] (vampires)
 - need stalkByPath: true (dragon queen)
 
-- platform - spikes have edges closer, first spike further down
-- platform - rocks taller
+- platform - can't climb rocks
 - platform - bounce off monster (on the monster json)
 - platform - monster chase
 
@@ -28,7 +27,7 @@ BOTS
 MISC
   - death messages by game with json setup
   - eventually clean up entity and unnecessary pass through APIs
- - get rid of animation index in modelentityalter (only ever have one track)
+  - get rid of animation index in modelentityalter (only ever have one track)
 
 NETWORKING
     - multiplayer needs a complete rebuild
