@@ -70,7 +70,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.meleeRightAnimation=null;
         this.projectileAnimation=null;
         this.hitAnimation=null;
-        this.deathAnimation=null;
+        this.dieAnimation=null;
         this.meleeLeftHitFrame=0;
         this.meleeRightHitFrame=0;
         this.projectileFireFrame=0;
@@ -160,7 +160,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.meleeRightAnimation=this.core.game.lookupAnimationValue(this.json.animations.meleeRightAnimation);
         this.projectileAnimation=this.core.game.lookupAnimationValue(this.json.animations.projectileAnimation);
         this.hitAnimation=this.core.game.lookupAnimationValue(this.json.animations.hitAnimation);
-        this.deathAnimation=this.core.game.lookupAnimationValue(this.json.animations.deathAnimation);
+        this.dieAnimation=this.core.game.lookupAnimationValue(this.json.animations.dieAnimation);
         this.meleeLeftHitFrame=this.core.game.lookupValue(this.json.animations.meleeLeftHitFrame,this.data,0);
         this.meleeRightHitFrame=this.core.game.lookupValue(this.json.animations.meleeRightHitFrame,this.data,0);
         this.projectileFireFrame=this.core.game.lookupValue(this.json.animations.projectileFireFrame,this.data,0);
@@ -338,7 +338,7 @@ export default class EntityFPSMonsterClass extends EntityClass
             // projectile animaton
             
         this.modelEntityAlter.startAnimationChunkInFrames(this.projectileAnimation);
-        this.projectileFireNextTick=this.core.timestamp+Math.trunc(((this.projectileFireFrame-this.projectileAnimation[0])/this.modelEntityAlter.frameRate)*1000);
+        this.projectileFireNextTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.projectileFireFrame,this.projectileAnimation);
         this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(this.projectileAnimation);
     }
     
@@ -348,13 +348,13 @@ export default class EntityFPSMonsterClass extends EntityClass
         
         this.passThrough=true;
 
-        this.modelEntityAlter.startAnimationChunkInFrames(this.deathAnimation);
+        this.modelEntityAlter.startAnimationChunkInFrames(this.dieAnimation);
         this.modelEntityAlter.queueAnimationStop();
-        this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(this.deathAnimation);
+        this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(this.dieAnimation);
 
         this.core.soundList.playJson(this.position,this.deathSound);
 
-        this.fallSoundNextTick=this.core.timestamp+Math.trunc(((this.deathFallSoundFrame-this.deathAnimation[0])/this.modelEntityAlter.frameRate)*1000);
+        this.fallSoundNextTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.deathFallSoundFrame,this.dieAnimation);
     }
     
     goDead()

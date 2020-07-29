@@ -12,6 +12,9 @@ export default class EntityPlatformPlayerClass extends EntityClass
         this.turnSpeed=0;
         this.jumpHeight=0;
         
+        this.stompable=false;
+        this.stompBounceFactor=0;
+        
         this.thirdPersonCameraDistance=0;
         this.thirdPersonCameraLookAngle=null;
         
@@ -41,7 +44,10 @@ export default class EntityPlatformPlayerClass extends EntityClass
         this.walkSpeed=this.core.game.lookupValue(this.json.config.walkSpeed,this.data,150);
         this.runSpeed=this.core.game.lookupValue(this.json.config.runSpeed,this.data,200);
         this.turnSpeed=this.core.game.lookupValue(this.json.config.turnSpeed,this.data,20);
-        this.jumpHeight=this.core.game.lookupValue(this.json.config.jumpHeight,this.data,600);
+        this.jumpHeight=this.core.game.lookupValue(this.json.config.jumpHeight,this.data,0);
+        
+        this.stompable=this.core.game.lookupValue(this.json.config.stompable,this.data,false);
+        this.stompBounceFactor=this.core.game.lookupValue(this.json.config.stompBounceFactor,this.data,0);
         
         this.thirdPersonCameraDistance=this.core.game.lookupValue(this.json.config.thirdPersonCameraDistance,this.data,0);
         this.thirdPersonCameraLookAngle=new PointClass(this.json.config.thirdPersonCameraLookAngle.x,this.json.config.thirdPersonCameraLookAngle.y,this.json.config.thirdPersonCameraLookAngle.z);
@@ -71,7 +77,8 @@ export default class EntityPlatformPlayerClass extends EntityClass
         
     run()
     {
-        let speed,moveKeyDown,runKeyDown;
+        let speed,fallY;
+        let moveKeyDown,runKeyDown;
         let input=this.core.input;
         
         super.run();
@@ -114,6 +121,16 @@ export default class EntityPlatformPlayerClass extends EntityClass
             if ((input.isKeyDown(' ')) && ((this.standOnMeshIdx!==-1) || (this.standOnEntity!==null))) {
                 this.movement.y=this.jumpHeight;
                 this.modelEntityAlter.startAnimationChunkInFrames(this.jumpAnimation);
+            }
+        }
+        
+            // falling and bouncing
+            
+        fallY=this.gravity-this.core.map.gravityMinValue;
+        if (fallY>0) {
+            if (this.standOnEntity!==null) {
+                if (this.standOnEntity.stompable) this.standOnEntity.die();
+                this.movement.y+=(fallY*this.standOnEntity.stompBounceFactor);
             }
         }
         

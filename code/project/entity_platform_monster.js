@@ -14,9 +14,17 @@ export default class EntityPlatformMonsterClass extends EntityClass
         this.jumpHeight=0;
         this.jumpWaitTick=0;
         
+        this.stompable=false;
+        this.stompBounceFactor=0;
+        
         this.patrolDistance=0;
         
+        this.disappearShrinkFactor=0;
+        this.disappearEffectFrame=0;
+        this.disappearEffect=null;
+        
         this.walkAnimation=null;
+        this.dieAnimation=null;
         
             // variables
             
@@ -24,6 +32,11 @@ export default class EntityPlatformMonsterClass extends EntityClass
         
         this.walkDirection=1;
         this.nextJumpTick=0;
+        
+        this.dead=false;
+        this.shrinkFactor=0;
+        this.effectLaunchTick=0;
+        this.animationFinishTick=0;
 
             // pre-allocates
             
@@ -44,9 +57,17 @@ export default class EntityPlatformMonsterClass extends EntityClass
         this.jumpHeight=this.core.game.lookupValue(this.json.config.jumpHeight,this.data,0);
         this.jumpWaitTick=this.core.game.lookupValue(this.json.config.jumpWaitTick,this.data,0);
         
+        this.stompable=this.core.game.lookupValue(this.json.config.stompable,this.data,false);
+        this.stompBounceFactor=this.core.game.lookupValue(this.json.config.stompBounceFactor,this.data,0);
+        
         this.patrolDistance=this.core.game.lookupValue(this.json.config.patrolDistance,this.data,200);
         
+        this.disappearShrinkFactor=this.core.game.lookupValue(this.json.config.disappearShrinkFactor,this.data,0);
+        this.disappearEffectFrame=this.core.game.lookupValue(this.json.config.disappearEffectFrame,this.data,0);
+        this.disappearEffect=this.core.game.lookupValue(this.json.config.disappearEffect,this.data,null);
+        
         this.walkAnimation=this.core.game.lookupAnimationValue(this.json.animations.walkAnimation);
+        this.dieAnimation=this.core.game.lookupAnimationValue(this.json.animations.dieAnimation);
         
         return(true);
     }
@@ -59,17 +80,54 @@ export default class EntityPlatformMonsterClass extends EntityClass
         this.walkDirection=this.initialWalkDirection;
         this.nextJumpTick=0;
         
+        this.dead=false;
+        this.passThrough=false;
+        this.shrinkFactor=0;
+        this.effectLaunchTick=0;
+        this.animationFinishTick=0;
+        
         this.movement.setFromValues(0,0,0);
         this.angle.setFromValues(0,90,0);           // monsters don't have the camera so they can use the regular angle
         
         this.modelEntityAlter.startAnimationChunkInFrames(this.walkAnimation);
+    }
+    
+    die()
+    {
+        this.dead=true;
+        this.passThrough=true;
+        
+        this.modelEntityAlter.startAnimationChunkInFrames(this.dieAnimation);
+        
+        this.effectLaunchTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.disappearEffectFrame,this.dieAnimation);
+        this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(this.dieAnimation);
     }
         
     run()
     {
         super.run();
         
-            // movement keys
+            // if dead
+            
+        if (this.dead) {
+            if (this.animationFinishTick===0) return;
+            
+            if ((this.core.timestamp>this.effectLaunchTick) && (this.effectLaunchTick!==0)) {
+                this.effectLaunchTick=0;
+                if (this.disappearEffect!==null) this.addEffect(this,this.disappearEffect,this.position,null,true);
+            }
+            
+            if (this.core.timestamp>this.animationFinishTick) {
+                this.animationFinishTick=0;
+                this.show=false;
+            }
+            
+            if (this.disappearShrinkFactor!==0) this.scale.scale(this.disappearShrinkFactor);
+            
+            return;
+        }
+        
+            // movement
             
         this.movement.x=0;
         

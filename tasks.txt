@@ -1,16 +1,20 @@
+#### separate the demos, own archives, etc ####
+      1. separate
+      2. rename
 
 - path generator needs to detect unreachable paths
 - need idlePath: ["abc","def","hij"] (vampires)
 - need stalkByPath: true (dragon queen)
 
 - platform - can't climb rocks
-- platform - bounce off monster (on the monster json)
 - platform - monster chase
+- platform - make a camera slop Y follow so camera doesn't move as fast when jumping
 
+- kart = balls hit other karts
+- kart = bots pickup and fire
 - kart = drift is weird for bots
 - kart = place is wonky
-- kart = explosions push
-- kart = pickups seem to start on each other
+- kart = pickups seem to start too high or two low (respawn, maybe?)
 
 
 DEVELOPER

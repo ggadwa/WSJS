@@ -552,7 +552,7 @@ export default class ModelEntityAlterClass
     
     getAnimationFinishTimestampFromFrame(frameIdx,animationFrames)
     {
-        return(Math.trunc(((frameIdx-animationFrames[0])/this.frameRate)*1000));
+        return(this.core.timestamp+Math.trunc(((frameIdx-animationFrames[0])/this.frameRate)*1000));
     }
     
         //
