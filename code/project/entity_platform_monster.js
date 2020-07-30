@@ -15,7 +15,7 @@ export default class EntityPlatformMonsterClass extends EntityClass
         this.jumpWaitTick=0;
         
         this.stompable=false;
-        this.stompBounceFactor=0;
+        this.stompBounceHeight=0;
         
         this.patrolDistance=0;
         
@@ -58,7 +58,7 @@ export default class EntityPlatformMonsterClass extends EntityClass
         this.jumpWaitTick=this.core.game.lookupValue(this.json.config.jumpWaitTick,this.data,0);
         
         this.stompable=this.core.game.lookupValue(this.json.config.stompable,this.data,false);
-        this.stompBounceFactor=this.core.game.lookupValue(this.json.config.stompBounceFactor,this.data,0);
+        this.stompBounceHeight=this.core.game.lookupValue(this.json.config.stompBounceHeight,this.data,0);
         
         this.patrolDistance=this.core.game.lookupValue(this.json.config.patrolDistance,this.data,200);
         

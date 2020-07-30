@@ -8,7 +8,6 @@
 
 - platform - can't climb rocks
 - platform - monster chase
-- platform - make a camera slop Y follow so camera doesn't move as fast when jumping
 
 - kart = balls hit other karts
 - kart = bots pickup and fire

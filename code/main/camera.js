@@ -8,6 +8,7 @@ export default class CameraClass
         this.CAMERA_MODE_FIRST_PERSON=0;
         this.CAMERA_MODE_THIRD_PERSON=1;
         this.CAMERA_MODE_TOP_DOWN=2;
+        this.CAMERA_MODE_PLATFORM=3;
         
         this.core=core;
     
@@ -21,9 +22,12 @@ export default class CameraClass
         this.thirdPersonLookAngle=null;
         
         this.topDownDistance=0;
+        
+        this.platformDistance=0;
+        this.platformYOffset=0;
     
-        this.position=new PointClass(0.0,0.0,0.0);
-        this.angle=new PointClass(0.0,0.0,0.0);
+        this.position=new PointClass(0,0,0);
+        this.angle=new PointClass(0,0,0);
         
         this.thirdPersonAngle=new PointClass(0,0,0);
         
@@ -77,6 +81,23 @@ export default class CameraClass
         return(this.mode===this.CAMERA_MODE_TOP_DOWN);
     }
     
+    gotoPlatform(platformDistance)
+    {
+        this.mode=this.CAMERA_MODE_PLATFORM;
+        this.platformDistance=platformDistance;
+        this.platformYOffset=0;
+    }
+    
+    isPlatform()
+    {
+        return(this.mode===this.CAMERA_MODE_PLATFORM);
+    }
+    
+    setPlatformYOffset(y)
+    {
+        this.platformYOffset=y;
+    }
+    
         //
         // setup the camera for this frame
         //
@@ -99,7 +120,7 @@ export default class CameraClass
             yAng=entity.angle.y+this.thirdPersonLookAngle.y;
             if (yAng>360) yAng-=360;
             if (yAng<0) yAng=360+yAng;
-                
+            
             this.rayVector.setFromValues(0,0,this.thirdPersonDistance);
             this.rayVector.rotateX(null,this.thirdPersonLookAngle.x);
             this.rayVector.rotateZ(null,this.thirdPersonLookAngle.z);
@@ -123,8 +144,8 @@ export default class CameraClass
             this.rayVector.rotateZ(null,this.thirdPersonLookAngle.z);
             this.rayVector.rotateY(null,yAng);
             this.position.addPoint(this.rayVector);
-
-                // and finally look back at entity
+            
+                // look back at entity
                 
             yAng+=180;
             if (yAng>360) yAng-=360;
@@ -152,10 +173,10 @@ export default class CameraClass
                 // from the hit point
                 
             if (this.collision.rayCollisionCamera(entity,this.position,this.rayVector,true,this.rayHitPosition)) {
-                dist=this.position.distance(this.rayHitPosition)-Math.trunc(this.thirdPersonDistance*0.1);
+                dist=this.position.distance(this.rayHitPosition)-Math.trunc(this.topDownDistance*0.1);
             }
             else {
-                dist=this.thirdPersonDistance;
+                dist=this.topDownDistance;
             }
 
                 // get the final camera point
@@ -169,6 +190,23 @@ export default class CameraClass
             
             return;
         }
+        
+            // platform
+            
+        if (this.mode===this.CAMERA_MODE_PLATFORM) {
+            
+                // the eye point is always distance down the Z
+                
+            this.position.setFromPoint(entity.position);
+            this.position.y+=(entity.eyeOffset+this.platformYOffset);
+            this.position.z+=this.platformDistance;
+            
+                // look back at entity
+                
+            this.angle.setFromValues(0,180,0);
+            
+            return;
+        }            
         
             // anything else defaults to first person
             

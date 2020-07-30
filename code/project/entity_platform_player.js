@@ -13,10 +13,12 @@ export default class EntityPlatformPlayerClass extends EntityClass
         this.jumpHeight=0;
         
         this.stompable=false;
-        this.stompBounceFactor=0;
+        this.stompBounceHeight=0;
         
-        this.thirdPersonCameraDistance=0;
-        this.thirdPersonCameraLookAngle=null;
+        this.platformCameraDistance=0;
+        this.platformCameraYUpMoveFactor=1;
+        this.platformCameraYDownMoveFactor=1;
+        this.platformCameraJumpPause=false;
         
         this.idleAnimation=null;
         this.walkAnimation=null;
@@ -27,6 +29,11 @@ export default class EntityPlatformPlayerClass extends EntityClass
         this.dieAnimation=null;
         
             // variables
+            
+        this.currentCameraY=0;
+        this.lastGroundY=0;
+        
+        this.inJumpCameraPause=false;
             
 
             // pre-allocates
@@ -47,10 +54,12 @@ export default class EntityPlatformPlayerClass extends EntityClass
         this.jumpHeight=this.core.game.lookupValue(this.json.config.jumpHeight,this.data,0);
         
         this.stompable=this.core.game.lookupValue(this.json.config.stompable,this.data,false);
-        this.stompBounceFactor=this.core.game.lookupValue(this.json.config.stompBounceFactor,this.data,0);
+        this.stompBounceHeight=this.core.game.lookupValue(this.json.config.stompBounceHeight,this.data,0);
         
-        this.thirdPersonCameraDistance=this.core.game.lookupValue(this.json.config.thirdPersonCameraDistance,this.data,0);
-        this.thirdPersonCameraLookAngle=new PointClass(this.json.config.thirdPersonCameraLookAngle.x,this.json.config.thirdPersonCameraLookAngle.y,this.json.config.thirdPersonCameraLookAngle.z);
+        this.platformCameraDistance=this.core.game.lookupValue(this.json.config.platformCameraDistance,this.data,0);
+        this.platformCameraYUpMoveFactor=this.core.game.lookupValue(this.json.config.platformCameraYUpMoveFactor,this.data,1);
+        this.platformCameraYDownMoveFactor=this.core.game.lookupValue(this.json.config.platformCameraYDownMoveFactor,this.data,1);
+        this.platformCameraJumpPause=this.core.game.lookupValue(this.json.config.platformCameraJumpPause,this.data,false);
         
         this.idleAnimation=this.core.game.lookupAnimationValue(this.json.animations.idleAnimation);
         this.walkAnimation=this.core.game.lookupAnimationValue(this.json.animations.walkAnimation);
@@ -70,14 +79,18 @@ export default class EntityPlatformPlayerClass extends EntityClass
         this.movement.setFromValues(0,0,0);
         this.drawAngle.setFromValues(0,0,0);
         
-        this.core.camera.gotoThirdPerson(this.thirdPersonCameraDistance,this.thirdPersonCameraLookAngle);
+        this.currentCameraY=this.position.y;
+        this.lastGroundY=this.position.y;
+        this.inJumpCameraPause=false;
+        
+        this.core.camera.gotoPlatform(this.platformCameraDistance,this.platformCameraYUpMoveFactor,this.platformCameraYDownMoveFactor);
         
         this.modelEntityAlter.startAnimationChunkInFrames(this.idleAnimation);
     }
         
     run()
     {
-        let speed,fallY;
+        let speed,fallY,cameraDiff;
         let moveKeyDown,runKeyDown;
         let input=this.core.input;
         
@@ -120,6 +133,7 @@ export default class EntityPlatformPlayerClass extends EntityClass
         if (this.jumpHeight!==0) {
             if ((input.isKeyDown(' ')) && ((this.standOnMeshIdx!==-1) || (this.standOnEntity!==null))) {
                 this.movement.y=this.jumpHeight;
+                this.inJumpCameraPause=this.platformCameraJumpPause;
                 this.modelEntityAlter.startAnimationChunkInFrames(this.jumpAnimation);
             }
         }
@@ -130,7 +144,8 @@ export default class EntityPlatformPlayerClass extends EntityClass
         if (fallY>0) {
             if (this.standOnEntity!==null) {
                 if (this.standOnEntity.stompable) this.standOnEntity.die();
-                this.movement.y+=(fallY*this.standOnEntity.stompBounceFactor);
+                this.inJumpCameraPause=this.platformCameraJumpPause;
+                if (this.standOnEntity.stompBounceHeight!==0) this.movement.y=this.standOnEntity.stompBounceHeight;
             }
         }
         
@@ -154,6 +169,31 @@ export default class EntityPlatformPlayerClass extends EntityClass
                 }
             }
         }
+        
+            // the camera Y has a slop, if you are standing
+            // on something it always moves towards the player,
+            // but if you are jumping it pauses until another
+            // ground comes up or if it's falling past the original ground
+            // this makes it easier to make run-and-stomp type games
+            
+        cameraDiff=this.currentCameraY-this.position.y;
+        
+        if (this.inJumpCameraPause) {
+            if (this.standOnMeshIdx!==-1) this.inJumpCameraPause=false;
+        }
+        
+        if (cameraDiff<0) {
+            if (!this.inJumpCameraPause) {
+                this.currentCameraY-=(cameraDiff*this.platformCameraYUpMoveFactor);
+                if (this.currentCameraY>this.position.y) this.currentCameraY=this.position.y;
+            }
+        }
+        else {
+            this.currentCameraY-=(cameraDiff*this.platformCameraYDownMoveFactor);
+            if (this.currentCameraY<this.position.y) this.currentCameraY=this.position.y;
+        }
+
+        this.core.camera.setPlatformYOffset(this.currentCameraY-this.position.y);
     }
 
     drawSetup()
