@@ -18,7 +18,8 @@ more information.
 ## Installation
 
 To install, clone this (WSJS) repository into a directory.  For this example we will say the directory is WSJS.
-Next, clone the WSJS_Demo into a folder inside the WSJS folder, for this example, the folder will be named demo.
+Next, clone any of the WSJS_Demo_* projects into a folder inside the WSJS folder, for this example, the folder
+will be named demo.
 
 To start the demonstration project, start a webserver whose root is pointed at the WSJS directory
 and navigate to this URL: WSJS/demo/html/index.html
