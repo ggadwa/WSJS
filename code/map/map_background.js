@@ -126,7 +126,12 @@ export default class MapBackgroundClass
     
     getUShift(player,shiftFactor)
     {
-        let f=player.position.x*shiftFactor;
+            // we use the 10000 figure so the shift
+            // numbers don't have to be so small, this is
+            // important because small numbers will get clipped
+            // in the glTF translation
+            
+        let f=(player.position.x/10000.0)*shiftFactor;
         return(f-Math.floor(f));
     }
         

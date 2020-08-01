@@ -75,6 +75,7 @@ export default class MeshClass
             // collision lists
 
         this.noCollisions=false;
+        this.simpleCollisions=false;
         
         this.collisionWallTrigs=[];
         this.collisionFloorTrigs=[];
@@ -247,6 +248,31 @@ export default class MeshClass
             // webs or bushes, etc
             
         if (this.noCollisions) return(false);
+        
+            // simple collisions are just boxes
+            
+        if (this.simpleCollisions) {
+            
+            this.collisionFloorTrigs.push(new CollisionTrigClass(new PointClass(this.xBound.min,this.yBound.max,this.zBound.max),new PointClass(this.xBound.min,this.yBound.max,this.zBound.min),new PointClass(this.xBound.max,this.yBound.max,this.zBound.min),new PointClass(0,1,0)));
+            this.collisionFloorTrigs.push(new CollisionTrigClass(new PointClass(this.xBound.max,this.yBound.max,this.zBound.min),new PointClass(this.xBound.max,this.yBound.max,this.zBound.max),new PointClass(this.xBound.min,this.yBound.max,this.zBound.max),new PointClass(0,1,0)));
+            
+            this.collisionCeilingTrigs.push(new CollisionTrigClass(new PointClass(this.xBound.min,this.yBound.min,this.zBound.max),new PointClass(this.xBound.min,this.yBound.min,this.zBound.min),new PointClass(this.xBound.max,this.yBound.min,this.zBound.min),new PointClass(0,-1,0)));
+            this.collisionCeilingTrigs.push(new CollisionTrigClass(new PointClass(this.xBound.max,this.yBound.min,this.zBound.min),new PointClass(this.xBound.max,this.yBound.min,this.zBound.max),new PointClass(this.xBound.min,this.yBound.min,this.zBound.max),new PointClass(0,-1,0)));
+
+            this.collisionWallTrigs.push(new CollisionTrigClass(new PointClass(this.xBound.min,this.yBound.min,this.zBound.min),new PointClass(this.xBound.min,this.yBound.max,this.zBound.min),new PointClass(this.xBound.min,this.yBound.max,this.zBound.max),new PointClass(-1,0,0)));
+            this.collisionWallTrigs.push(new CollisionTrigClass(new PointClass(this.xBound.min,this.yBound.max,this.zBound.max),new PointClass(this.xBound.min,this.yBound.min,this.zBound.max),new PointClass(this.xBound.min,this.yBound.min,this.zBound.min),new PointClass(-1,0,0)));
+
+            this.collisionWallTrigs.push(new CollisionTrigClass(new PointClass(this.xBound.max,this.yBound.min,this.zBound.min),new PointClass(this.xBound.max,this.yBound.max,this.zBound.min),new PointClass(this.xBound.max,this.yBound.max,this.zBound.max),new PointClass(1,0,0)));
+            this.collisionWallTrigs.push(new CollisionTrigClass(new PointClass(this.xBound.max,this.yBound.max,this.zBound.max),new PointClass(this.xBound.max,this.yBound.min,this.zBound.max),new PointClass(this.xBound.max,this.yBound.min,this.zBound.min),new PointClass(1,0,0)));
+
+            this.collisionWallTrigs.push(new CollisionTrigClass(new PointClass(this.xBound.min,this.yBound.min,this.zBound.min),new PointClass(this.xBound.min,this.yBound.max,this.zBound.min),new PointClass(this.xBound.max,this.yBound.max,this.zBound.min),new PointClass(0,0,-1)));
+            this.collisionWallTrigs.push(new CollisionTrigClass(new PointClass(this.xBound.max,this.yBound.max,this.zBound.min),new PointClass(this.xBound.max,this.yBound.min,this.zBound.min),new PointClass(this.xBound.min,this.yBound.min,this.zBound.min),new PointClass(0,0,-1)));
+
+            this.collisionWallTrigs.push(new CollisionTrigClass(new PointClass(this.xBound.min,this.yBound.min,this.zBound.max),new PointClass(this.xBound.min,this.yBound.max,this.zBound.max),new PointClass(this.xBound.max,this.yBound.max,this.zBound.max),new PointClass(0,0,1)));
+            this.collisionWallTrigs.push(new CollisionTrigClass(new PointClass(this.xBound.max,this.yBound.max,this.zBound.max),new PointClass(this.xBound.max,this.yBound.min,this.zBound.max),new PointClass(this.xBound.min,this.yBound.min,this.zBound.max),new PointClass(0,0,1)));
+            
+            return(true);
+        }
                
             // run through the triangles
             // and find any that make a wall to
@@ -304,7 +330,6 @@ export default class MeshClass
                     // else consider it a wall
 
                 else {
-
                     this.collisionWallTrigs.push(new CollisionTrigClass(new PointClass(x0,y0,z0),new PointClass(x1,y1,z1),new PointClass(x2,y2,z2),new PointClass(this.normalArray[vIdx],this.normalArray[vIdx+1],this.normalArray[vIdx+2])));
                 }
             }

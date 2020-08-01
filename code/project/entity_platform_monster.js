@@ -17,13 +17,19 @@ export default class EntityPlatformMonsterClass extends EntityClass
         this.stompable=false;
         this.stompBounceHeight=0;
         
+        this.shoveSpeed=0;
+        this.shoveFadeFactor=0;
+        this.shoveHitFrame=0;
+        
         this.patrolDistance=0;
         
         this.disappearShrinkFactor=0;
         this.disappearEffectFrame=0;
         this.disappearEffect=null;
         
+        this.idleAnimation=null;
         this.walkAnimation=null;
+        this.shoveAnimation=null;
         this.dieAnimation=null;
         
             // variables
@@ -32,6 +38,9 @@ export default class EntityPlatformMonsterClass extends EntityClass
         
         this.walkDirection=1;
         this.nextJumpTick=0;
+        
+        this.shoveNextTick=0;
+        this.shoveEntity=null;
         
         this.dead=false;
         this.shrinkFactor=0;
@@ -60,13 +69,19 @@ export default class EntityPlatformMonsterClass extends EntityClass
         this.stompable=this.core.game.lookupValue(this.json.config.stompable,this.data,false);
         this.stompBounceHeight=this.core.game.lookupValue(this.json.config.stompBounceHeight,this.data,0);
         
+        this.shoveSpeed=this.core.game.lookupValue(this.json.config.shoveSpeed,this.data,0);
+        this.shoveFadeFactor=this.core.game.lookupValue(this.json.config.shoveFadeFactor,this.data,0.9);
+        this.shoveHitFrame=this.core.game.lookupValue(this.json.config.shoveHitFrame,this.data,0);
+        
         this.patrolDistance=this.core.game.lookupValue(this.json.config.patrolDistance,this.data,200);
         
         this.disappearShrinkFactor=this.core.game.lookupValue(this.json.config.disappearShrinkFactor,this.data,0);
         this.disappearEffectFrame=this.core.game.lookupValue(this.json.config.disappearEffectFrame,this.data,0);
         this.disappearEffect=this.core.game.lookupValue(this.json.config.disappearEffect,this.data,null);
         
+        this.idleAnimation=this.core.game.lookupAnimationValue(this.json.animations.idleAnimation);
         this.walkAnimation=this.core.game.lookupAnimationValue(this.json.animations.walkAnimation);
+        this.shoveAnimation=this.core.game.lookupAnimationValue(this.json.animations.shoveAnimation);
         this.dieAnimation=this.core.game.lookupAnimationValue(this.json.animations.dieAnimation);
         
         return(true);
@@ -79,6 +94,9 @@ export default class EntityPlatformMonsterClass extends EntityClass
         this.startX=this.position.x;
         this.walkDirection=this.initialWalkDirection;
         this.nextJumpTick=0;
+        
+        this.shoveNextTick=0;
+        this.shoveEntity=null;
         
         this.dead=false;
         this.passThrough=false;
@@ -105,6 +123,8 @@ export default class EntityPlatformMonsterClass extends EntityClass
         
     run()
     {
+        let halfHigh;
+        
         super.run();
         
             // if dead
@@ -124,6 +144,24 @@ export default class EntityPlatformMonsterClass extends EntityClass
             
             if (this.disappearShrinkFactor!==0) this.scale.scale(this.disappearShrinkFactor);
             
+            return;
+        }
+        
+            // any waiting shove
+            
+                    
+        if (this.shoveNextTick!==0) {
+            if (this.core.timestamp>=this.shoveNextTick) {
+                this.shoveNextTick=0;
+                this.shoveEntity.shove((Math.sign(this.shoveEntity.position.x-this.position.x)*this.shoveSpeed),this.shoveFadeFactor);
+                this.shoveEntity=null;
+            }
+        }
+        
+            // frozen in a finishing animation
+            
+        if (this.animationFinishTick!==0) {
+            if (this.core.timestamp>this.animationFinishTick) this.animationFinishTick=0;
             return;
         }
         
@@ -157,6 +195,26 @@ export default class EntityPlatformMonsterClass extends EntityClass
             
         this.movement.y=this.moveInMapY(this.movement,1.0,false);
         this.moveInMapXZ(this.movement,false,false);
+        
+            // any shoving
+            // entity has to allow shoving and not be half above or below
+            
+        if (this.shoveSpeed!==0) {
+            if ((this.touchEntity) && (this.shoveEntity===null)) {
+                if (this.touchEntity.shove!==undefined) {
+                    
+                    halfHigh=Math.abs(this.height*0.5);
+                    if ((this.touchEntity.position.y<(this.position.y+halfHigh)) && (this.touchEntity.position.y>(this.position.y-halfHigh))) {
+                        this.modelEntityAlter.startAnimationChunkInFrames(this.shoveAnimation);
+                        this.modelEntityAlter.queueAnimationChunkInFrames(this.walkAnimation);
+                        
+                        this.shoveEntity=this.touchEntity;
+                        this.shoveNextTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.shoveHitFrame,this.shoveAnimation);
+                        this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(this.shoveAnimation);
+                    }
+                }
+            }
+        }
         
             // hitting something turns patrols around
             

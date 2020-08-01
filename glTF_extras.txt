@@ -9,6 +9,7 @@ The chart below explains the specific names and gives one or more JSON examples.
 Name                        Description
 ----                        -----------
 wsjsNoCollision             Mesh has no collision (value ignored)
+wsjsSimpleCollision         Mesh has simple box collision
 
 wsjsMap                     Misc map settings
                                 {

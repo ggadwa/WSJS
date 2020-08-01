@@ -12,9 +12,6 @@ export default class EntityPlatformPlayerClass extends EntityClass
         this.turnSpeed=0;
         this.jumpHeight=0;
         
-        this.stompable=false;
-        this.stompBounceHeight=0;
-        
         this.platformCameraDistance=0;
         this.platformCameraYUpMoveFactor=1;
         this.platformCameraYDownMoveFactor=1;
@@ -26,15 +23,16 @@ export default class EntityPlatformPlayerClass extends EntityClass
         this.jumpAnimation=null;
         this.fallAnimation=null;
         this.hurtAnimation=null;
+        this.shovedAnimation=null;
         this.dieAnimation=null;
         
             // variables
             
         this.currentCameraY=0;
-        this.lastGroundY=0;
-        
         this.inJumpCameraPause=false;
-            
+        
+        this.shoveSpeed=0;
+        this.shoveFadeFactor=0;
 
             // pre-allocates
             
@@ -53,9 +51,6 @@ export default class EntityPlatformPlayerClass extends EntityClass
         this.turnSpeed=this.core.game.lookupValue(this.json.config.turnSpeed,this.data,20);
         this.jumpHeight=this.core.game.lookupValue(this.json.config.jumpHeight,this.data,0);
         
-        this.stompable=this.core.game.lookupValue(this.json.config.stompable,this.data,false);
-        this.stompBounceHeight=this.core.game.lookupValue(this.json.config.stompBounceHeight,this.data,0);
-        
         this.platformCameraDistance=this.core.game.lookupValue(this.json.config.platformCameraDistance,this.data,0);
         this.platformCameraYUpMoveFactor=this.core.game.lookupValue(this.json.config.platformCameraYUpMoveFactor,this.data,1);
         this.platformCameraYDownMoveFactor=this.core.game.lookupValue(this.json.config.platformCameraYDownMoveFactor,this.data,1);
@@ -67,6 +62,7 @@ export default class EntityPlatformPlayerClass extends EntityClass
         this.jumpAnimation=this.core.game.lookupAnimationValue(this.json.animations.jumpAnimation);
         this.fallAnimation=this.core.game.lookupAnimationValue(this.json.animations.fallAnimation);
         this.hurtAnimation=this.core.game.lookupAnimationValue(this.json.animations.hurtAnimation);
+        this.shovedAnimation=this.core.game.lookupAnimationValue(this.json.animations.shovedAnimation);
         this.dieAnimation=this.core.game.lookupAnimationValue(this.json.animations.dieAnimation);
         
         return(true);
@@ -80,12 +76,20 @@ export default class EntityPlatformPlayerClass extends EntityClass
         this.drawAngle.setFromValues(0,0,0);
         
         this.currentCameraY=this.position.y;
-        this.lastGroundY=this.position.y;
         this.inJumpCameraPause=false;
+        
+        this.shoveSpeed=0;
+        this.shoveFadeFactor=0;
         
         this.core.camera.gotoPlatform(this.platformCameraDistance,this.platformCameraYUpMoveFactor,this.platformCameraYDownMoveFactor);
         
         this.modelEntityAlter.startAnimationChunkInFrames(this.idleAnimation);
+    }
+    
+    shove(shoveSpeed,shoveFadeFactor)
+    {
+        this.shoveSpeed=shoveSpeed;
+        this.shoveFadeFactor=shoveFadeFactor;
     }
         
     run()
@@ -108,17 +112,27 @@ export default class EntityPlatformPlayerClass extends EntityClass
             }
         }
         
-        this.movement.x=0;
+            // movement
+            
         moveKeyDown=false;
-        
-        if (input.isKeyDown('d')) {
-            moveKeyDown=true;
-            if (this.drawAngle.turnYTowards(90,this.turnSpeed)===0) this.movement.x=speed;
+            
+        if (this.shoveSpeed!==0) {
+            this.movement.x=this.shoveSpeed;
+            this.shoveSpeed*=this.shoveFadeFactor;
+            if (Math.abs(this.shoveSpeed)<(this.walkSpeed*0.1)) this.shoveSpeed=0;
         }
         else {
-            if (input.isKeyDown('a')) {
+            this.movement.x=0;
+
+            if (input.isKeyDown('d')) {
                 moveKeyDown=true;
-                if (this.drawAngle.turnYTowards(270,this.turnSpeed)===0) this.movement.x=-speed;
+                if (this.drawAngle.turnYTowards(90,this.turnSpeed)===0) this.movement.x=speed;
+            }
+            else {
+                if (input.isKeyDown('a')) {
+                    moveKeyDown=true;
+                    if (this.drawAngle.turnYTowards(270,this.turnSpeed)===0) this.movement.x=-speed;
+                }
             }
         }
         
@@ -156,16 +170,21 @@ export default class EntityPlatformPlayerClass extends EntityClass
         
             // animation changes
             
-        if ((this.movement.y<=0) && (this.standOnMeshIdx===-1)) {
-            this.modelEntityAlter.continueAnimationChunkInFrames(this.fallAnimation);
+        if (this.shoveSpeed!==0) {
+            this.modelEntityAlter.continueAnimationChunkInFrames(this.shovedAnimation);
         }
         else {
-            if (this.movement.y<=0) {
-                if (moveKeyDown) {
-                    this.modelEntityAlter.continueAnimationChunkInFrames(runKeyDown?this.runAnimation:this.walkAnimation);
-                }
-                else {
-                    this.modelEntityAlter.continueAnimationChunkInFrames(this.idleAnimation);
+            if ((this.movement.y<=0) && (this.standOnMeshIdx===-1)) {
+                this.modelEntityAlter.continueAnimationChunkInFrames(this.fallAnimation);
+            }
+            else {
+                if (this.movement.y<=0) {
+                    if (moveKeyDown) {
+                        this.modelEntityAlter.continueAnimationChunkInFrames(runKeyDown?this.runAnimation:this.walkAnimation);
+                    }
+                    else {
+                        this.modelEntityAlter.continueAnimationChunkInFrames(this.idleAnimation);
+                    }
                 }
             }
         }
@@ -194,6 +213,10 @@ export default class EntityPlatformPlayerClass extends EntityClass
         }
 
         this.core.camera.setPlatformYOffset(this.currentCameraY-this.position.y);
+        
+        
+        let cube=this.core.map.cubeList.findCubeContainingEntity(this);
+        if (cube!==null) console.info(cube.name);
     }
 
     drawSetup()

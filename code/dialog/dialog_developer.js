@@ -45,7 +45,8 @@ export default class DialogDeveloperClass extends DialogBaseClass
     addBuilderControls(viewDiv)
     {
         this.addButton(viewDiv,'buildPathHints','Save and Compile Paths',this.buildPathHints.bind(this));
-        this.addButton(viewDiv,'buildShadowmap','Build Shadowmap',this.buildShadowmap.bind(this));
+        this.addButton(viewDiv,'buildShadowmap','Build Shadowmap',this.buildShadowmap.bind(this,false));
+        this.addButton(viewDiv,'buildShadowmapIgnoreNormals','Build Shadowmap (Ignore Normals)',this.buildShadowmap.bind(this,true));
         
         /*
         this.addInput(viewDiv,'localGame','Local Game:','checkbox',null,this.core.setup.localGame,this.localGameChange.bind(this));
@@ -107,7 +108,7 @@ export default class DialogDeveloperClass extends DialogBaseClass
         // shadowmap build
         //
     
-    buildShadowmap()
+    buildShadowmap(ignoreNormals)
     {
             // already building?
             
@@ -120,10 +121,10 @@ export default class DialogDeveloperClass extends DialogBaseClass
         
         this.shadowmapTimestamp=Date.now();
                 
-        setTimeout(this.buildShadowmapSetup.bind(this),1);
+        setTimeout(this.buildShadowmapSetup.bind(this,ignoreNormals),1);
     }
     
-    buildShadowmapSetup()
+    buildShadowmapSetup(ignoreNormals)
     {
         let n,k,nMesh,data;
         let thread,perThreadMeshCount;
@@ -210,6 +211,7 @@ export default class DialogDeveloperClass extends DialogBaseClass
             data.threadIdx=n;
             data.startMeshIdx=n*perThreadMeshCount;
             data.endMeshIdx=(n===(this.SHADOWMAP_THREAD_COUNT-1))?nMesh:(data.startMeshIdx+perThreadMeshCount);
+            data.ignoreNormals=ignoreNormals;
             thread.postMessage(data);
             
             this.shadowmapThreads.push(thread);

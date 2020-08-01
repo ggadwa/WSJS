@@ -320,19 +320,24 @@ class ShadowmapGeneratorClass
                 // only eliminate if all vertexes are
                 // behind
 
-            this.lightVectorNormal.setFromValues((light.position.x-v0.x),(light.position.y-v0.y),(light.position.z-v0.z));
-            this.lightVectorNormal.normalize();
-            normalOK=(this.lightVectorNormal.dot(normal)>=0.0);
-            
-            if (!normalOK) {
-                this.lightVectorNormal.setFromValues((light.position.x-v1.x),(light.position.y-v1.y),(light.position.z-v1.z));
+            if (this.data.ignoreNormals) {
+                normalOK=true;
+            }
+            else {
+                this.lightVectorNormal.setFromValues((light.position.x-v0.x),(light.position.y-v0.y),(light.position.z-v0.z));
                 this.lightVectorNormal.normalize();
                 normalOK=(this.lightVectorNormal.dot(normal)>=0.0);
-                
+
                 if (!normalOK) {
-                    this.lightVectorNormal.setFromValues((light.position.x-v2.x),(light.position.y-v2.y),(light.position.z-v2.z));
+                    this.lightVectorNormal.setFromValues((light.position.x-v1.x),(light.position.y-v1.y),(light.position.z-v1.z));
                     this.lightVectorNormal.normalize();
                     normalOK=(this.lightVectorNormal.dot(normal)>=0.0);
+
+                    if (!normalOK) {
+                        this.lightVectorNormal.setFromValues((light.position.x-v2.x),(light.position.y-v2.y),(light.position.z-v2.z));
+                        this.lightVectorNormal.normalize();
+                        normalOK=(this.lightVectorNormal.dot(normal)>=0.0);
+                    }
                 }
             }
             
