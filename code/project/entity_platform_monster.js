@@ -29,7 +29,7 @@ export default class EntityPlatformMonsterClass extends EntityClass
         
         this.idleAnimation=null;
         this.walkAnimation=null;
-        this.shoveAnimation=null;
+        this.hitAnimation=null;
         this.dieAnimation=null;
         
             // variables
@@ -81,7 +81,7 @@ export default class EntityPlatformMonsterClass extends EntityClass
         
         this.idleAnimation=this.core.game.lookupAnimationValue(this.json.animations.idleAnimation);
         this.walkAnimation=this.core.game.lookupAnimationValue(this.json.animations.walkAnimation);
-        this.shoveAnimation=this.core.game.lookupAnimationValue(this.json.animations.shoveAnimation);
+        this.hitAnimation=this.core.game.lookupAnimationValue(this.json.animations.hitAnimation);
         this.dieAnimation=this.core.game.lookupAnimationValue(this.json.animations.dieAnimation);
         
         return(true);
@@ -205,12 +205,12 @@ export default class EntityPlatformMonsterClass extends EntityClass
                     
                     halfHigh=Math.abs(this.height*0.5);
                     if ((this.touchEntity.position.y<(this.position.y+halfHigh)) && (this.touchEntity.position.y>(this.position.y-halfHigh))) {
-                        this.modelEntityAlter.startAnimationChunkInFrames(this.shoveAnimation);
+                        this.modelEntityAlter.startAnimationChunkInFrames(this.hitAnimation);
                         this.modelEntityAlter.queueAnimationChunkInFrames(this.walkAnimation);
                         
                         this.shoveEntity=this.touchEntity;
-                        this.shoveNextTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.shoveHitFrame,this.shoveAnimation);
-                        this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(this.shoveAnimation);
+                        this.shoveNextTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.shoveHitFrame,this.hitAnimation);
+                        this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(this.hitAnimation);
                     }
                 }
             }
