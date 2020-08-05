@@ -313,6 +313,9 @@ export default class EntityClass
                 case 'addSpeed':
                     if (entity.addSpeed===undefined) return(false);
                     break;
+                case 'addWinCollect':
+                    if (entity.addWinCollect===undefined) return(false);
+                    break;
                 case 'kill':
                     if (entity.die===undefined) return(false);
                     break;
@@ -348,6 +351,9 @@ export default class EntityClass
                     break;
                 case 'addSpeed':
                     entity.addSpeed(this.core.game.lookupValue(action.count,this.data,0));
+                    break;
+                case 'addWinCollect':
+                    entity.addWinCollect(this.core.game.lookupValue(action.winCount,this.data,10));
                     break;
                 case 'kill':
                     entity.die(null,false);

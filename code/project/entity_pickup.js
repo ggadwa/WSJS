@@ -65,7 +65,10 @@ export default class EntityPickupClass extends EntityClass
         
         this.position.setFromPoint(node.position);
         this.position.addPoint(this.randomPositionAdd);
-        this.position.addValues(Math.trunc(Math.random()*this.randomPositionOffset.x),Math.trunc(Math.random()*this.randomPositionOffset.y),Math.trunc(Math.random()*this.randomPositionOffset.z));
+        
+        this.position.x+=(((Math.random()*2.0)-1.0)*this.randomPositionOffset.x);
+        this.position.y+=(((Math.random()*2.0)-1.0)*this.randomPositionOffset.y);
+        this.position.z+=(((Math.random()*2.0)-1.0)*this.randomPositionOffset.z);
     }
         
     run()
@@ -82,7 +85,10 @@ export default class EntityPickupClass extends EntityClass
             this.touchEntity=null;          // clear any touches
             this.show=true;
             
-            if (this.randomPosition) this.setRandomPosition();
+            if (this.randomPosition) {
+                this.setRandomPosition();
+                this.originalY=this.position.y;     // need to reset floating position
+            }
         }
         
             // animation

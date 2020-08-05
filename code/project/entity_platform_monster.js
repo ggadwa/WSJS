@@ -17,9 +17,12 @@ export default class EntityPlatformMonsterClass extends EntityClass
         this.stompable=false;
         this.stompBounceHeight=0;
         
+        this.melee=false;
+        this.meleeDistance=0;
+        this.meleeDamage=0;
+        this.meleeHitFrame=0;
         this.shoveSpeed=0;
         this.shoveFadeFactor=0;
-        this.shoveHitFrame=0;
         
         this.patrolDistance=0;
         
@@ -32,6 +35,11 @@ export default class EntityPlatformMonsterClass extends EntityClass
         this.hitAnimation=null;
         this.dieAnimation=null;
         
+        this.hurtSound=null;
+        this.stompSound=null;
+        this.meleeSound=null;
+        this.dieSound=null;
+        
             // variables
             
         this.startX=0;
@@ -39,8 +47,7 @@ export default class EntityPlatformMonsterClass extends EntityClass
         this.walkDirection=1;
         this.nextJumpTick=0;
         
-        this.shoveNextTick=0;
-        this.shoveEntity=null;
+        this.meleeNextTick=0;
         
         this.dead=false;
         this.shrinkFactor=0;
@@ -69,9 +76,13 @@ export default class EntityPlatformMonsterClass extends EntityClass
         this.stompable=this.core.game.lookupValue(this.json.config.stompable,this.data,false);
         this.stompBounceHeight=this.core.game.lookupValue(this.json.config.stompBounceHeight,this.data,0);
         
+        this.melee=this.core.game.lookupValue(this.json.config.melee,this.data,false);
+        this.meleeDistance=this.core.game.lookupValue(this.json.config.meleeDistance,this.data,0);
+        this.meleeDamage=this.core.game.lookupValue(this.json.config.meleeDamage,this.data,0);
+        this.meleeHitFrame=this.core.game.lookupValue(this.json.config.meleeHitFrame,this.data,0);
+        
         this.shoveSpeed=this.core.game.lookupValue(this.json.config.shoveSpeed,this.data,0);
         this.shoveFadeFactor=this.core.game.lookupValue(this.json.config.shoveFadeFactor,this.data,0.9);
-        this.shoveHitFrame=this.core.game.lookupValue(this.json.config.shoveHitFrame,this.data,0);
         
         this.patrolDistance=this.core.game.lookupValue(this.json.config.patrolDistance,this.data,200);
         
@@ -84,6 +95,11 @@ export default class EntityPlatformMonsterClass extends EntityClass
         this.hitAnimation=this.core.game.lookupAnimationValue(this.json.animations.hitAnimation);
         this.dieAnimation=this.core.game.lookupAnimationValue(this.json.animations.dieAnimation);
         
+        this.hurtSound=this.core.game.lookupSoundValue(this.json.sounds.hurtSound);
+        this.stompSound=this.core.game.lookupSoundValue(this.json.sounds.stompSound);
+        this.meleeSound=this.core.game.lookupSoundValue(this.json.sounds.meleeSound);
+        this.dieSound=this.core.game.lookupSoundValue(this.json.sounds.dieSound);
+        
         return(true);
     }
     
@@ -95,9 +111,8 @@ export default class EntityPlatformMonsterClass extends EntityClass
         this.walkDirection=this.initialWalkDirection;
         this.nextJumpTick=0;
         
-        this.shoveNextTick=0;
-        this.shoveEntity=null;
-        
+        this.meleeNextTick=0;
+
         this.dead=false;
         this.passThrough=false;
         this.shrinkFactor=0;
@@ -119,11 +134,27 @@ export default class EntityPlatformMonsterClass extends EntityClass
         
         this.effectLaunchTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.disappearEffectFrame,this.dieAnimation);
         this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(this.dieAnimation);
+        
+        this.core.soundList.playJson(this.position,this.dieSound);
+    }
+    
+    isMeleeOK(player)
+    {
+        let dist,halfHigh;
+        
+            // melees only count if within distance
+            // and within half the height of each other
+
+        dist=player.position.x-this.position.x;
+        if (Math.abs(dist)>this.meleeDistance) return(false);
+                
+        halfHigh=Math.abs(this.height*0.5);
+        return((player.position.y<(this.position.y+halfHigh)) && (player.position.y>(this.position.y-halfHigh)));
     }
         
     run()
     {
-        let halfHigh;
+        let player=this.core.map.entityList.getPlayer();
         
         super.run();
         
@@ -147,22 +178,14 @@ export default class EntityPlatformMonsterClass extends EntityClass
             return;
         }
         
-            // any waiting shove
-            
+            // any waiting melee
                     
-        if (this.shoveNextTick!==0) {
-            if (this.core.timestamp>=this.shoveNextTick) {
-                this.shoveNextTick=0;
-                this.shoveEntity.shove((Math.sign(this.shoveEntity.position.x-this.position.x)*this.shoveSpeed),this.shoveFadeFactor);
-                this.shoveEntity=null;
+        if (this.meleeNextTick!==0) {
+            if (this.core.timestamp>=this.meleeNextTick) {
+                this.meleeNextTick=0;
+                if (this.isMeleeOK(player)) player.meleeHit(this.meleeDamage,(Math.sign(player.position.x-this.position.x)*this.shoveSpeed),this.shoveFadeFactor);
+                this.core.soundList.playJson(this.position,this.meleeSound);
             }
-        }
-        
-            // frozen in a finishing animation
-            
-        if (this.animationFinishTick!==0) {
-            if (this.core.timestamp>this.animationFinishTick) this.animationFinishTick=0;
-            return;
         }
         
             // movement
@@ -174,6 +197,14 @@ export default class EntityPlatformMonsterClass extends EntityClass
         }
         else {
             if (this.angle.turnYTowards(270,this.turnSpeed)===0) this.movement.x=-this.walkSpeed;
+        }
+        
+            // frozen in a finishing animation
+            
+        if (this.animationFinishTick!==0) {
+            if (this.core.timestamp>this.animationFinishTick) this.animationFinishTick=0;
+            this.movement.y=this.moveInMapY(this.movement,1.0,false);
+            return;
         }
         
             // jumping
@@ -196,23 +227,18 @@ export default class EntityPlatformMonsterClass extends EntityClass
         this.movement.y=this.moveInMapY(this.movement,1.0,false);
         this.moveInMapXZ(this.movement,false,false);
         
-            // any shoving
-            // entity has to allow shoving and not be half above or below
+            // melee
+            // don't run if already waiting on a melee
             
-        if (this.shoveSpeed!==0) {
-            if ((this.touchEntity) && (this.shoveEntity===null)) {
-                if (this.touchEntity.shove!==undefined) {
-                    
-                    halfHigh=Math.abs(this.height*0.5);
-                    if ((this.touchEntity.position.y<(this.position.y+halfHigh)) && (this.touchEntity.position.y>(this.position.y-halfHigh))) {
-                        this.modelEntityAlter.startAnimationChunkInFrames(this.hitAnimation);
-                        this.modelEntityAlter.queueAnimationChunkInFrames(this.walkAnimation);
-                        
-                        this.shoveEntity=this.touchEntity;
-                        this.shoveNextTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.shoveHitFrame,this.hitAnimation);
-                        this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(this.hitAnimation);
-                    }
-                }
+        if ((this.melee) && (this.meleeNextTick===0)) {
+            if (this.isMeleeOK(player)) {
+                this.walkDirection=Math.sign(player.position.x-this.position.x);     // always turn towards player
+
+                this.modelEntityAlter.startAnimationChunkInFrames(this.hitAnimation);
+                this.modelEntityAlter.queueAnimationChunkInFrames(this.walkAnimation);
+
+                this.meleeNextTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.meleeHitFrame,this.hitAnimation);
+                this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(this.hitAnimation);
             }
         }
         

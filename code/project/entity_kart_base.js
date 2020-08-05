@@ -190,8 +190,6 @@ export default class EntityKartBaseClass extends EntityClass
         
     ready()
     {
-        let n,weaponBlock;
-
         super.ready();
          
         this.inDrift=false;
@@ -250,6 +248,7 @@ export default class EntityKartBaseClass extends EntityClass
         
     addSpeed(count)
     {
+        console.info(this.name+' SPEED');
         this.speedItemCount+=count;
         if (this.speedItemCount>this.maxSpeedItemCount) this.speedItemCount=this.maxSpeedItemCount;
     }
@@ -263,6 +262,8 @@ export default class EntityKartBaseClass extends EntityClass
     addAmmo(weaponName,fireMethod,count)
     {
         let weapon;
+        
+        console.info(this.name+' AMMO');
         
         for (weapon of this.weapons) {
             if (weapon.name===weaponName) {

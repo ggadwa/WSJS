@@ -13,6 +13,7 @@ export default class EntityKartBotClass extends EntityKartBaseClass
         super(core,name,jsonName,position,angle,data,mapSpawn,spawnedBy,heldBy,show);
         
         this.targetScanYRange=0;
+        this.targetScanDistance=0;
         this.pathNodeSlop=0;
         this.driftMinAngle=0;
         
@@ -28,6 +29,10 @@ export default class EntityKartBotClass extends EntityKartBaseClass
         this.gotoRotPoint=new PointClass(0,0,0);
         this.gotoPosition=new PointClass(0,0,0);
         
+        this.lookPoint=new PointClass(0,0,0);
+        this.lookVector=new PointClass(0,0,0);
+        this.lookHitPoint=new PointClass(0,0,0);
+        
         Object.seal(this);
     }
     
@@ -38,6 +43,7 @@ export default class EntityKartBotClass extends EntityKartBaseClass
             // bot specific json
             
         this.targetScanYRange=this.core.game.lookupValue(this.json.config.targetScanYRange,this.data,0);
+        this.targetScanDistance=this.core.game.lookupValue(this.json.config.targetScanDistance,this.data,0);
         this.pathNodeSlop=this.core.game.lookupValue(this.json.config.pathNodeSlop,this.data,0);
         this.driftMinAngle=this.core.game.lookupValue(this.json.config.driftMinAngle,this.data,0);
         
@@ -102,16 +108,16 @@ export default class EntityKartBotClass extends EntityKartBaseClass
     {
         return(false);
     }
-/*
-    checkFireAtMonster()
+
+    scan()
     {
-                    // ray trace for entities
+            // ray trace for entities
             // we do one look angle per tick
             
         this.lookPoint.setFromPoint(this.position);
-        this.lookPoint.y+=Math.trunc(this.height*0.5);      // use middle instead of eye position in case other stuff is smaller
+        this.lookPoint.y+=this.eyeOffset;
         
-        this.lookVector.setFromValues(0,0,this.targetForgetDistance);
+        this.lookVector.setFromValues(0,0,this.targetScanDistance);
         this.lookVector.rotateY(null,(this.currentTargetYScan-Math.trunc(this.targetScanYRange*0.5)));
         
         this.currentTargetYScan++;
@@ -119,27 +125,12 @@ export default class EntityKartBotClass extends EntityKartBaseClass
         
         if (this.rayCollision(this.lookPoint,this.lookVector,this.lookHitPoint)) {
             if (this.hitEntity!==null) {
-                //if (this.hitEntity.fighter) this.targetEntity=this.hitEntity;
+                console.info(this.name+' scanned '+this.hitEntity.name);
             }
         }
 
-
-
-            // ray trace for entities
-            // we do one look angle per tick
-            
-        this.lookPoint.setFromPoint(this.position);
-        this.lookPoint.y+=Math.trunc(this.height*0.5);      // use middle instead of eye position in case other stuff is smaller
-        
-        this.lookVector.setFromValues(0,0,this.FIRE_DISTANCE);
-        this.lookVector.rotateY(null,this.TARGET_SCAN_Y_ANGLES[this.currentLookIdx]);
-        
-        this.currentLookIdx++;
-        if (this.currentLookIdx>=this.TARGET_SCAN_Y_ANGLES.length) this.currentLookIdx=0;
-        
-        return(this.rayCollision(this.lookPoint,this.lookVector,this.lookHitPoint));
     }
-   */      
+     
 
     
         //
@@ -167,6 +158,10 @@ export default class EntityKartBotClass extends EntityKartBaseClass
             
             this.calcGotoPosition(fromNodeIdx,this.nextNodeIdx);
         }
+        
+            // scan for other karts
+            
+        //this.scan();
 
             // turn towards the position
         

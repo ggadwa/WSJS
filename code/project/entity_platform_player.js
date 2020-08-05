@@ -17,6 +17,8 @@ export default class EntityPlatformPlayerClass extends EntityClass
         this.platformCameraYDownMoveFactor=1;
         this.platformCameraJumpPause=false;
         
+        this.interfaceCollectItem=null;
+        
         this.idleAnimation=null;
         this.walkAnimation=null;
         this.runAnimation=null;
@@ -26,6 +28,11 @@ export default class EntityPlatformPlayerClass extends EntityClass
         this.shovedAnimation=null;
         this.dieAnimation=null;
         
+        this.jumpSound=null;
+        this.landSound=null;
+        this.hurtSound=null;
+        this.dieSound=null;
+        
             // variables
             
         this.currentCameraY=0;
@@ -33,6 +40,10 @@ export default class EntityPlatformPlayerClass extends EntityClass
         
         this.shoveSpeed=0;
         this.shoveFadeFactor=0;
+        
+        this.lastFall=false;
+        
+        this.collectItemCount=0;
 
             // pre-allocates
             
@@ -56,6 +67,8 @@ export default class EntityPlatformPlayerClass extends EntityClass
         this.platformCameraYDownMoveFactor=this.core.game.lookupValue(this.json.config.platformCameraYDownMoveFactor,this.data,1);
         this.platformCameraJumpPause=this.core.game.lookupValue(this.json.config.platformCameraJumpPause,this.data,false);
         
+        this.interfaceCollectItem=this.core.game.lookupValue(this.json.config.interfaceCollectItem,this.data,null);
+        
         this.idleAnimation=this.core.game.lookupAnimationValue(this.json.animations.idleAnimation);
         this.walkAnimation=this.core.game.lookupAnimationValue(this.json.animations.walkAnimation);
         this.runAnimation=this.core.game.lookupAnimationValue(this.json.animations.runAnimation);
@@ -64,6 +77,11 @@ export default class EntityPlatformPlayerClass extends EntityClass
         this.hurtAnimation=this.core.game.lookupAnimationValue(this.json.animations.hurtAnimation);
         this.shovedAnimation=this.core.game.lookupAnimationValue(this.json.animations.shovedAnimation);
         this.dieAnimation=this.core.game.lookupAnimationValue(this.json.animations.dieAnimation);
+        
+        this.jumpSound=this.core.game.lookupSoundValue(this.json.sounds.jumpSound);
+        this.landSound=this.core.game.lookupSoundValue(this.json.sounds.landSound);
+        this.hurtSound=this.core.game.lookupSoundValue(this.json.sounds.hurtSound);
+        this.dieSound=this.core.game.lookupSoundValue(this.json.sounds.dieSound);
         
         return(true);
     }
@@ -81,24 +99,40 @@ export default class EntityPlatformPlayerClass extends EntityClass
         this.shoveSpeed=0;
         this.shoveFadeFactor=0;
         
+        this.lastFall=false;
+        
+        this.collectItemCount=0;
+        
         this.core.camera.gotoPlatform(this.platformCameraDistance,this.platformCameraYUpMoveFactor,this.platformCameraYDownMoveFactor);
         
         this.modelEntityAlter.startAnimationChunkInFrames(this.idleAnimation);
     }
     
-    shove(shoveSpeed,shoveFadeFactor)
+    meleeHit(damage,shoveSpeed,shoveFadeFactor)
     {
         this.shoveSpeed=shoveSpeed;
         this.shoveFadeFactor=shoveFadeFactor;
+        
+        if (damage!==0) this.core.soundList.playJson(this.position,this.hurtSound);
+    }
+    
+    addWinCollect(winCount)
+    {
+        this.collectItemCount++;
+        if (this.collectItemCount>=winCount) console.info('won');
     }
         
     run()
     {
-        let speed,fallY,cameraDiff;
+        let speed,fallY,oldY,cameraDiff;
         let moveKeyDown,runKeyDown;
         let input=this.core.input;
         
         super.run();
+        
+            // interface updates
+            
+        if (this.interfaceCollectItem!==null) this.core.interface.setCount(this.interfaceCollectItem,this.collectItemCount);
         
             // movement keys
             
@@ -149,6 +183,7 @@ export default class EntityPlatformPlayerClass extends EntityClass
                 this.movement.y=this.jumpHeight;
                 this.inJumpCameraPause=this.platformCameraJumpPause;
                 this.modelEntityAlter.startAnimationChunkInFrames(this.jumpAnimation);
+                this.core.soundList.playJson(this.position,this.jumpSound);
             }
         }
         
@@ -159,14 +194,31 @@ export default class EntityPlatformPlayerClass extends EntityClass
             if (this.standOnEntity!==null) {
                 if (this.standOnEntity.stompable) this.standOnEntity.die();
                 this.inJumpCameraPause=this.platformCameraJumpPause;
-                if (this.standOnEntity.stompBounceHeight!==0) this.movement.y=this.standOnEntity.stompBounceHeight;
+                if (this.standOnEntity.stompBounceHeight!==0) {
+                    this.movement.y=this.standOnEntity.stompBounceHeight;
+                    this.core.soundList.playJson(this.position,this.standOnEntity.stompSound);
+                }
             }
         }
         
             // run the movement
             
+        oldY=this.position.y;
+        
         this.movement.y=this.moveInMapY(this.movement,1.0,false);
         this.moveInMapXZ(this.movement,false,false);
+        
+            // landing
+            
+        if ((this.position.y<oldY) && (this.standOnMeshIdx===-1)) {
+            this.lastFall=true;
+        }
+        else {
+            if (this.lastFall) {
+                this.lastFall=false;
+                this.core.soundList.playJson(this.position,this.landSound);
+            }
+        }
         
             // animation changes
             
