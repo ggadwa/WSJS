@@ -67,6 +67,7 @@ export default class EntityKartBaseClass extends EntityClass
         
         this.smokeCoolDownCount=0;
         this.bounceCount=0;
+        this.reflectCount=0;
         this.spinOutCount=0;
         this.lastDriftSoundPlayIdx=-1;
         
@@ -106,6 +107,7 @@ export default class EntityKartBaseClass extends EntityClass
         this.movement=new PointClass(0,0,0);
         this.rotMovement=new PointClass(0,0,0);
         this.driftMovement=new PointClass(0,0,0);
+        this.bounceReflectMovement=new PointClass(0,0,0);
         this.smokePosition=new PointClass(0,0,0);
         
         this.rigidAngle=new PointClass(0,0,0);
@@ -196,6 +198,7 @@ export default class EntityKartBaseClass extends EntityClass
         
         this.smokeCoolDownCount=0;
         this.bounceCount=0;
+        this.reflectCount=0;
         this.spinOutCount=0;
         this.lastDriftSoundPlayIdx=-1;
         
@@ -248,7 +251,6 @@ export default class EntityKartBaseClass extends EntityClass
         
     addSpeed(count)
     {
-        console.info(this.name+' SPEED');
         this.speedItemCount+=count;
         if (this.speedItemCount>this.maxSpeedItemCount) this.speedItemCount=this.maxSpeedItemCount;
     }
@@ -262,8 +264,6 @@ export default class EntityKartBaseClass extends EntityClass
     addAmmo(weaponName,fireMethod,count)
     {
         let weapon;
-        
-        console.info(this.name+' AMMO');
         
         for (weapon of this.weapons) {
             if (weapon.name===weaponName) {
@@ -296,15 +296,21 @@ export default class EntityKartBaseClass extends EntityClass
         }
     }
 
-    bounceStart(soundJson)
+    bounceStart()
     {
+        if ((this.bounceCount!==0) || (this.reflectCount!==0) || (this.spinOutCount!==0)) return;
+        
             // turn on bounce
             
         this.bounceCount=this.bounceWaitCount;
-        if (this.spinOutCount===0) this.spinOutCount=360;
-        this.core.soundList.playJson(this.position,soundJson);
+        this.bounceReflectMovement.setFromPoint(this.rotMovement);
+        this.bounceReflectMovement.scale(-1);
         
-            // all bounces cost a speed item
+        this.movement.z=0;          // clear all forward movement for a bounce
+        
+        this.core.soundList.playJson(this.position,this.crashWallSound);
+        
+            // bounce cost a speed item
             
         this.removeSpeed(1);
         
@@ -313,10 +319,40 @@ export default class EntityKartBaseClass extends EntityClass
         this.driftEnd();
     }
     
-    spinStart(soundJson)
+    reflectStart(hitEntity)
     {
+        if ((this.bounceCount!==0) || (this.reflectCount!==0) || (this.spinOutCount!==0)) return;
+        
+            // turn on reflect
+            
+        this.reflectCount=this.bounceWaitCount;
+        this.bounceReflectMovement.setFromPoint(this.movement);
+        this.bounceReflectMovement.rotateY(null,hitEntity.position.angleYTo(this.position));
+        
+        this.core.soundList.playJson(this.position,this.crashKartSound);
+        
+            // reflect cost a speed item
+            
+        this.removeSpeed(1);
+        
+            // reflect cancel drifts
+            
+        this.driftEnd();
+    }
+    
+        //
+        // damage
+        //
+        
+    damage(fromEntity,damage,hitPoint)
+    {
+            // projectile hits cost a speed and start
+            // a spin
+            
         this.spinOutCount=360;
-        this.core.soundList.playJson(this.position,soundJson);
+        this.removeSpeed(1);
+        
+        this.core.soundList.playJson(this.position,this.crashWallSound);
     }
 
         //
@@ -331,14 +367,7 @@ export default class EntityKartBaseClass extends EntityClass
         
             // start spinning if you touch a monster
             
-        if (this.spinOutCount===0) {
-            if (this.touchEntity!==null) {
-                if (this.touchEntity.name.startsWith('monster_')) {
-                    this.spinStart(this.crashKartSound);
-                }
-            }
-        }
-        else {
+        if (this.spinOutCount!==0) {
             moveForward=false;          // if spinning, you can't drive forward or backwards or drift
             moveReverse=false;
             drifting=false;
@@ -346,13 +375,6 @@ export default class EntityKartBaseClass extends EntityClass
             this.spinOutCount-=this.spinOutSpeed;
             if (this.spinOutCount<=0) this.spinOutCount=0;
         }
-        
-            // bounce if we hit another kart
-            
-        if (this.touchEntity!==null) {
-            if (this.touchEntity instanceof EntityKartBaseClass) this.bounceStart(this.crashKartSound);
-
-        }   
         
             // firing
         
@@ -379,7 +401,7 @@ export default class EntityKartBaseClass extends EntityClass
             // can we go into a drift?
             // if so we stick to the current movement
             
-        if ((drifting) && (this.bounceCount===0) && (this.spinOutCount===0)) {
+        if ((drifting) && (this.bounceCount===0) && (this.reflectCount===0) && (this.spinOutCount===0)) {
             if (!this.inDrift) {
                 this.driftStart();
             }
@@ -422,9 +444,11 @@ export default class EntityKartBaseClass extends EntityClass
             this.rotMovement.rotateY(null,this.angle.y);
         }
                 
-            // if we are bouncing, reverse movement
+            // change movement if bouncing or reflecting
             
-        if (this.bounceCount!==0) this.rotMovement.scale(-1);
+        if ((this.bounceCount!==0) || (this.reflectCount!==0)) {
+            this.rotMovement.addPoint(this.bounceReflectMovement);
+        }
         
             // move around the map
         
@@ -433,7 +457,7 @@ export default class EntityKartBaseClass extends EntityClass
         
             // animations
 
-        if (this.bounceCount!==0) {
+        if (this.spinOutCount!==0) {
             this.modelEntityAlter.continueAnimationChunkInFrames(this.spinOutAnimation);
         }
         else {
@@ -462,17 +486,24 @@ export default class EntityKartBaseClass extends EntityClass
             }
         }
        
-            // bounce and spin out if hit wall
+            // bounce and reflects
         
         if (this.bounceCount!==0) {
             this.bounceCount--;
         }
         else {
-            if ((this.collideWallMeshIdx!==-1) || (this.slideWallMeshIdx!==-1)) {
-                this.bounceStart(this.crashWallSound);
-            }
+            if ((this.collideWallMeshIdx!==-1) || (this.slideWallMeshIdx!==-1)) this.bounceStart();
         }
-
+        
+        if (this.reflectCount!==0) {
+            this.reflectCount--;
+        }
+        else {
+            if (this.touchEntity!==null) {
+                if (this.touchEntity instanceof EntityKartBaseClass) this.reflectStart(this.touchEntity);
+            }   
+        }
+        
             // smoke if drifting, spinning out, or turning
             // without moving
             

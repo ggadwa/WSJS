@@ -13,7 +13,10 @@ export default class EntityKartBotClass extends EntityKartBaseClass
         super(core,name,jsonName,position,angle,data,mapSpawn,spawnedBy,heldBy,show);
         
         this.targetScanYRange=0;
-        this.targetScanDistance=0;
+        this.maxFireDistance=0;
+        this.minFireDistance=0;
+        this.fireWaitTick=0;
+
         this.pathNodeSlop=0;
         this.driftMinAngle=0;
         
@@ -23,6 +26,7 @@ export default class EntityKartBotClass extends EntityKartBaseClass
         this.nextNodeIdx=-1;
         
         this.currentTargetYScan=0;
+        this.nextFireTick=0;
         
             // pre-allocates
             
@@ -43,7 +47,10 @@ export default class EntityKartBotClass extends EntityKartBaseClass
             // bot specific json
             
         this.targetScanYRange=this.core.game.lookupValue(this.json.config.targetScanYRange,this.data,0);
-        this.targetScanDistance=this.core.game.lookupValue(this.json.config.targetScanDistance,this.data,0);
+        this.maxFireDistance=this.core.game.lookupValue(this.json.config.maxFireDistance,this.data,0);
+        this.minFireDistance=this.core.game.lookupValue(this.json.config.minFireDistance,this.data,0);
+        this.fireWaitTick=this.core.game.lookupValue(this.json.config.fireWaitTick,this.data,0);
+
         this.pathNodeSlop=this.core.game.lookupValue(this.json.config.pathNodeSlop,this.data,0);
         this.driftMinAngle=this.core.game.lookupValue(this.json.config.driftMinAngle,this.data,0);
         
@@ -76,6 +83,10 @@ export default class EntityKartBotClass extends EntityKartBaseClass
             // start scanning in middle
             
         this.currentTargetYScan=Math.trunc(this.targetScanYRange*0.5);
+        
+            // can fire at any time
+            
+        this.nextFireTick=this.core.timestamp;
     }
     
         //
@@ -106,32 +117,33 @@ export default class EntityKartBotClass extends EntityKartBaseClass
         
     checkFire()
     {
-        return(false);
-    }
-
-    scan()
-    {
+            // is it time to fire?
+        
+        if (this.core.timestamp<this.nextFireTick) return(false);
+        
             // ray trace for entities
             // we do one look angle per tick
             
         this.lookPoint.setFromPoint(this.position);
         this.lookPoint.y+=this.eyeOffset;
         
-        this.lookVector.setFromValues(0,0,this.targetScanDistance);
-        this.lookVector.rotateY(null,(this.currentTargetYScan-Math.trunc(this.targetScanYRange*0.5)));
+        this.lookVector.setFromValues(0,0,this.maxFireDistance);
+        this.lookVector.rotateY(null,(this.angle.y+(this.currentTargetYScan-Math.trunc(this.targetScanYRange*0.5))));
         
         this.currentTargetYScan++;
         if (this.currentTargetYScan>=this.targetScanYRange) this.currentTargetYScan=0;
         
-        if (this.rayCollision(this.lookPoint,this.lookVector,this.lookHitPoint)) {
-            if (this.hitEntity!==null) {
-                console.info(this.name+' scanned '+this.hitEntity.name);
-            }
-        }
-
+        if (!this.rayCollision(this.lookPoint,this.lookVector,this.lookHitPoint)) return(false);
+        
+            // have we hit a kart entity, and right distance to fire?
+            
+        if (this.hitEntity===null) return(false);
+        if (!(this.hitEntity instanceof EntityKartBaseClass)) return(false);
+        if (this.hitEntity.position.distance(this.position)<this.minFireDistance) return(false);
+        
+        this.nextFireTick=this.core.timestamp+this.fireWaitTick;
+        return(true);
     }
-     
-
     
         //
         // run bot kart

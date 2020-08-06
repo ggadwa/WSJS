@@ -618,7 +618,7 @@ export default class CoreClass
         
             // interface
             
-        //this.interface.draw();
+        this.interface.draw();
     }
     
         //
