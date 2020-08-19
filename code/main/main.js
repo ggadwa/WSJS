@@ -331,6 +331,7 @@ function mainLoop(timestamp)
                 core.lastPhysicTimestamp+=PHYSICS_MILLISECONDS;
 
                 map.meshList.run();
+                core.run();
                 core.game.run();
                 map.entityList.run();
             }

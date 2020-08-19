@@ -2,9 +2,11 @@
 - need idlePath: ["abc","def","hij"] (vampires)
 - need stalkByPath: true (dragon queen)
 
-- kart = need pause before pick up again
-- kart = balls can track a bit
-- kart = drift is weird for bots (especially when they get too fast)
+
+- effect indexes not needed as field
+
+- kart = need ready set go opening
+- kart = balls track closest (not spawner) kart a bit (settable, like 2 degrees?) -- need a track obj on launch
 - kart = place is wonky
 
 DEVELOPER

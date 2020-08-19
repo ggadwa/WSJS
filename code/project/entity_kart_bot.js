@@ -171,14 +171,10 @@ export default class EntityKartBotClass extends EntityKartBaseClass
             this.calcGotoPosition(fromNodeIdx,this.nextNodeIdx);
         }
         
-            // scan for other karts
-            
-        //this.scan();
-
             // turn towards the position
         
         turnAdd=this.angle.getTurnYTowards(this.position.angleYTo(this.gotoPosition));
-        drifting=false; // (Math.abs(turnAdd)>this.driftMinAngle);
+        drifting=(Math.abs(turnAdd)>this.driftMinAngle);
         
             // run the kart
             

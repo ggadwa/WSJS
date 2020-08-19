@@ -16,6 +16,7 @@ import InputClass from '../main/input.js';
 import CameraClass from '../main/camera.js';
 import NetworkClass from '../main/network.js';
 import SetupClass from '../main/setup.js';
+import SequenceClass from '../project/sequence.js';
 import DialogSettingsClass from '../dialog/dialog_settings.js';
 import DialogConnectClass from '../dialog/dialog_connect.js';
 import DialogDeveloperClass from '../dialog/dialog_developer.js';
@@ -128,6 +129,8 @@ export default class CoreClass
         this.lastPhysicTimestamp=0;
         this.drawTick=0;
         this.lastDrawTimestamp=0;
+        
+        this.currentSequence=null;
         
             // triggers
             
@@ -448,6 +451,29 @@ export default class CoreClass
     }
     
         //
+        // sequences
+        //
+        
+    startSequence(jsonName)
+    {
+        this.currentSequence=new SequenceClass(this,jsonName);
+        
+        if (!this.currentSequence.initialize()) {
+            console.log('unable to start sequence: '+jsonName);
+            this.currentSequence=null;
+        }
+    }
+    
+        //
+        // main run
+        //
+        
+    run()
+    {
+        if (this.currentSequence!==null) this.currentSequence.run();
+    }
+    
+        //
         // convert coordinate to eye coordinates
         //
     
@@ -619,6 +645,18 @@ export default class CoreClass
             // interface
             
         this.interface.draw();
+        
+            // sequences
+            
+        if (this.currentSequence!==null) {
+            if (this.currentSequence.isFinished()) {
+                this.currentSequence.release();
+                this.currentSequence=null;
+            }
+            else {
+                this.currentSequence.draw();
+            }
+        }
     }
     
         //

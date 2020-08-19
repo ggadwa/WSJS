@@ -18,6 +18,7 @@ export default class GameClass
         this.json=null;
         this.jsonEntityCache=new Map();
         this.jsonEffectCache=new Map();
+        this.jsonSequenceCache=new Map();
         
         this.scores=null;
         this.scoreShow=false;
@@ -205,6 +206,32 @@ export default class GameClass
                         success=false;
                     }
                 );
+        
+        if (!success) return(false);
+        
+            // cache all the sequence json
+            
+        promises=[];
+        
+        for (name of this.json.sequences) {
+            promises.push(this.fetchJson('sequences/'+name));
+        }
+            
+        success=true;
+        
+        await Promise.all(promises)
+            .then
+                (
+                    values=>{
+                        for (n=0;n<values.length;n++) {
+                            this.jsonSequenceCache.set(this.json.sequences[n],values[n]);
+                        }
+                    },
+                    reason=>{
+                        console.log(reason);
+                        success=false;
+                    }
+                );
 
         return(success);
     }
@@ -261,6 +288,10 @@ export default class GameClass
         if (this.json.developer) {
             if (!this.developer.initialize()) return(false);
         }
+        
+            // and any starting sequence
+            
+        if (this.json.config.sequenceStart!==null) this.core.startSequence(this.json.config.sequenceStart);
         
         return(true);
     }
