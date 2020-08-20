@@ -61,6 +61,8 @@ export default class EntityKartPlayerClass extends EntityKartBaseClass
         let input=this.core.input;
         let setup=this.getSetup();
         
+        if (this.core.freezePlayer) return;
+        
             // interface updates
             
         if (this.interfaceSpeedItem!==null) this.core.interface.setCount(this.interfaceSpeedItem,this.speedItemCount);

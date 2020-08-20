@@ -106,7 +106,7 @@ export default class SoundListClass
     {
         let soundSet,name,sound;
         let mesh,move,liquid;
-        let entity,jsonEntity,jsonEffect;
+        let entity,jsonEntity,jsonEffect,jsonSequence;
         let success,promises;
         let game=this.core.game;
         let map=this.core.map;
@@ -145,6 +145,13 @@ export default class SoundListClass
         for (jsonEffect of game.jsonEffectCache.values())
         {
             game.addJsonObjectToLoadSet(soundSet,null,"sounds",false,['name'],jsonEffect);
+        }
+        
+            // sequence sounds
+            
+        for (jsonSequence of game.jsonSequenceCache.values())
+        {
+            game.addJsonObjectToLoadSet(soundSet,null,"sounds",false,['name'],jsonSequence);
         }
 
         
@@ -276,7 +283,7 @@ export default class SoundListClass
         
             // set it to entity
             
-        soundPlay.play(this.ctx,this.currentListenerEntity,position,sound,rate,distance,loopStart,loopEnd,loop);
+        if (!soundPlay.play(this.ctx,this.currentListenerEntity,position,sound,rate,distance,loopStart,loopEnd,loop)) return(-1);
         
         return(idx);
     }
@@ -305,8 +312,11 @@ export default class SoundListClass
     
     stop(playIdx)
     {
-        let soundPlay=this.soundPlays[playIdx];
+        let soundPlay;
         
+        if (playIdx===-1) return;
+                
+        soundPlay=this.soundPlays[playIdx];
         if (!soundPlay.free) soundPlay.stop();
     }
     
@@ -321,8 +331,11 @@ export default class SoundListClass
     
     changeRate(playIdx,rate)
     {
-        let soundPlay=this.soundPlays[playIdx];
+        let soundPlay;
         
+        if (playIdx===-1) return;
+                
+        soundPlay=this.soundPlays[playIdx];
         if (!soundPlay.free) soundPlay.changeRate(rate);
     }
     

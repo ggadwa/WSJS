@@ -65,6 +65,11 @@ export default class CoreClass
             
         this.paused=true;
         
+            // freeze flags
+            
+        this.freezePlayer=false;
+        this.freezeAI=false;
+        
             // the core setup
 
         this.wid=0;
@@ -354,7 +359,7 @@ export default class CoreClass
             // if we are leaving pause, turn
             // off pause window
             
-        if (!pause) {
+        if ((!pause) && (!initState)) {
             if (!this.game.developer.on) {
                 this.settingsDialog.close();
             }
@@ -470,7 +475,15 @@ export default class CoreClass
         
     run()
     {
-        if (this.currentSequence!==null) this.currentSequence.run();
+        if (this.currentSequence!==null) {
+            if (this.currentSequence.isFinished()) {
+                this.currentSequence.release();
+                this.currentSequence=null;
+            }
+            else {  
+                this.currentSequence.run();
+            }
+        }
     }
     
         //
@@ -648,15 +661,7 @@ export default class CoreClass
         
             // sequences
             
-        if (this.currentSequence!==null) {
-            if (this.currentSequence.isFinished()) {
-                this.currentSequence.release();
-                this.currentSequence=null;
-            }
-            else {
-                this.currentSequence.draw();
-            }
-        }
+        if (this.currentSequence!==null) this.currentSequence.draw();
     }
     
         //

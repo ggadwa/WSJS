@@ -3,11 +3,13 @@
 - need stalkByPath: true (dragon queen)
 
 
-- effect indexes not needed as field
-
-- kart = need ready set go opening
-- kart = balls track closest (not spawner) kart a bit (settable, like 2 degrees?) -- need a track obj on launch
+- kart = need win closing
 - kart = place is wonky
+- platformer = need health
+            "healthInitialCount":4,
+            "healthMaxCount":4,
+            "interfaceHealthBitmapList":["health_1","health_2","health_3","health_4"],
+
 
 DEVELOPER
   - work on developer path split

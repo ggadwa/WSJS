@@ -655,6 +655,8 @@ export default class EntityFPSMonsterClass extends EntityClass
     {
         let player,distToPlayer,liquid,liquidIdx,gravityFactor;
         
+        if (this.core.freezeAI) return;
+        
             // liquids
             
         liquidIdx=this.core.map.liquidList.getLiquidForPoint(this.position);

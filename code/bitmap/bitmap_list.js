@@ -63,7 +63,7 @@ export default class BitmapListClass
     async loadAllBitmaps()
     {
         let keyIter,rtn,colorURL,bitmap;
-        let entity,jsonEntity,jsonEffect;
+        let entity,jsonEntity,jsonSequence,jsonEffect;
         let success,promises;
         let bitmapSet;
         let game=this.core.game;
@@ -82,7 +82,11 @@ export default class BitmapListClass
             jsonEntity=game.jsonEntityCache.get(entity.jsonName);
             if (jsonEntity!==null) game.addJsonObjectToLoadSet(bitmapSet,entity.data,null,false,['bitmap'],jsonEntity);
         }
-        
+
+        for (jsonSequence of game.jsonSequenceCache) {
+            game.addJsonObjectToLoadSet(bitmapSet,null,"bitmaps",false,['bitmap'],jsonSequence);
+        }
+
         for (colorURL of bitmapSet) {
             if (!this.bitmaps.has(colorURL)) {
                 bitmap=new BitmapInterfaceClass(this.core,colorURL);

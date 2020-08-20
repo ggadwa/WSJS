@@ -140,7 +140,6 @@ export default class EffectClass
         
         this.vertexes=null;
         this.uvs=null;
-        this.indexes=null;
         
         this.vertexIdx=0;
         this.uvIdx=0;
@@ -169,7 +168,7 @@ export default class EffectClass
     
     initialize()
     {
-        let n,chunk,billboard,triangle,particle,bitmap;
+        let n,indexes,chunk,billboard,triangle,particle,bitmap;
         let name,mode,drawMode,grid,gridPeriod,gridOffset;
         let wave,waveRandomStart,wavePeriod,waveSize;
         let pmx,pmy,pmz,dx,dy,dz,motionPoints,dist;
@@ -343,7 +342,7 @@ export default class EffectClass
 
             this.vertexes=new Float32Array(vertexCount*3);
             this.uvs=new Float32Array(vertexCount*2);
-            this.indexes=new Uint16Array(indexCount);
+            indexes=new Uint16Array(indexCount);    // static
 
                 // add data to buffer so we can use
                 // subdata later, vertexes and uv are dynamic
@@ -371,30 +370,30 @@ export default class EffectClass
                     
 
                     case this.CHUNK_BILLBOARD:
-                        this.indexes[iIdx++]=elementIdx;     // triangle 1
-                        this.indexes[iIdx++]=elementIdx+1;
-                        this.indexes[iIdx++]=elementIdx+2;
-                        this.indexes[iIdx++]=elementIdx;     // triangle 2
-                        this.indexes[iIdx++]=elementIdx+2;
-                        this.indexes[iIdx++]=elementIdx+3;
+                        indexes[iIdx++]=elementIdx;     // triangle 1
+                        indexes[iIdx++]=elementIdx+1;
+                        indexes[iIdx++]=elementIdx+2;
+                        indexes[iIdx++]=elementIdx;     // triangle 2
+                        indexes[iIdx++]=elementIdx+2;
+                        indexes[iIdx++]=elementIdx+3;
                         elementIdx+=4;
                         break;
 
                     case this.CHUNK_TRIANGLE:
-                        this.indexes[iIdx++]=elementIdx;     // triangle 1
-                        this.indexes[iIdx++]=elementIdx+1;
-                        this.indexes[iIdx++]=elementIdx+2;
+                        indexes[iIdx++]=elementIdx;     // triangle 1
+                        indexes[iIdx++]=elementIdx+1;
+                        indexes[iIdx++]=elementIdx+2;
                         elementIdx+=3;
                         break;
 
                     case this.CHUNK_PARTICLE:
                         for (n=0;n!==chunk.particleCount;n++) {
-                            this.indexes[iIdx++]=elementIdx;     // triangle 1
-                            this.indexes[iIdx++]=elementIdx+1;
-                            this.indexes[iIdx++]=elementIdx+2;
-                            this.indexes[iIdx++]=elementIdx;     // triangle 2
-                            this.indexes[iIdx++]=elementIdx+2;
-                            this.indexes[iIdx++]=elementIdx+3;
+                            indexes[iIdx++]=elementIdx;     // triangle 1
+                            indexes[iIdx++]=elementIdx+1;
+                            indexes[iIdx++]=elementIdx+2;
+                            indexes[iIdx++]=elementIdx;     // triangle 2
+                            indexes[iIdx++]=elementIdx+2;
+                            indexes[iIdx++]=elementIdx+3;
                             elementIdx+=4;
                         }
                         break;
@@ -404,7 +403,7 @@ export default class EffectClass
             
             this.indexBuffer=gl.createBuffer();
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
-            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.indexes,gl.STATIC_DRAW);
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,indexes,gl.STATIC_DRAW);
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
         }
         

@@ -773,6 +773,7 @@ export default class PointClass
         if (f<0) f=360+f;
         return(f);
     }
+    
     angleFix()
     {
         this.x=this.singleAxisAngleFix(this.x);

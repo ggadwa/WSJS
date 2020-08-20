@@ -279,6 +279,29 @@ export default class MapEntityListClass
         return(null);
     }
     
+    findClosest(position,typeList)
+    {
+        let d,dist;
+        let entity,foundEntity;
+        
+        dist=0;
+        foundEntity=null;
+         
+        for (entity of this.entities) {
+            if (typeList!==null) {
+                if (typeList.indexOf(entity.json.type)===-1) continue;
+            }
+            
+            d=entity.position.distance(position);
+            if ((foundEntity===null) || (d<dist)) {
+                dist=d;
+                foundEntity=entity;
+            }
+        }
+        
+        return(foundEntity);
+    }
+    
         //
         // multi entity routines
         //

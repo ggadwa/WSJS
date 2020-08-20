@@ -23,6 +23,9 @@ export default class EntityProjectileClass extends EntityClass
         this.canRoll=false;
         this.rollDeceleration=0;
         this.bounceFactor=0;
+        this.trackList=null;
+        this.trackSpeed=0;
+        
         this.bounceSound=null;
         this.reflectSound=null;
         this.spawnSound=null;
@@ -65,6 +68,9 @@ export default class EntityProjectileClass extends EntityClass
         this.canRoll=this.core.game.lookupValue(this.json.config.canRoll,this.data,false);
         this.rollDeceleration=this.core.game.lookupValue(this.json.config.rollDeceleration,this.data,0);
         this.bounceFactor=this.core.game.lookupValue(this.json.config.bounceFactor,this.data,0);
+        
+        this.trackList=(this.json.config.trackList===undefined)?null:this.json.config.trackList;
+        this.trackSpeed=this.core.game.lookupValue(this.json.config.trackSpeed,this.data,0);
         
         this.bounceSound=this.core.game.lookupSoundValue(this.json.sounds.bounceSound);
         this.reflectSound=this.core.game.lookupSoundValue(this.json.sounds.reflectSound);
@@ -124,6 +130,8 @@ export default class EntityProjectileClass extends EntityClass
         
     run()
     {
+        let trackEntity;
+        
         super.run();
         
             // are we over our life time
@@ -140,6 +148,17 @@ export default class EntityProjectileClass extends EntityClass
                 this.nextTrailTick+=this.trailSpawnTick;
 
                 this.addEffect(this,this.trailEffect,this.position,null,true);
+            }
+        }
+        
+            // tracking
+            
+        if (this.trackList!==null) {
+            trackEntity=this.core.map.entityList.findClosest(this.position,this.trackList);
+            if ((trackEntity!==null) && (trackEntity!==this.spawnedBy)) {
+                this.motion.x+=Math.sign(trackEntity.position.x-this.position.x)*this.trackSpeed;
+                this.motion.y+=Math.sign(trackEntity.position.y-this.position.y)*this.trackSpeed;
+                this.motion.z+=Math.sign(trackEntity.position.z-this.position.z)*this.trackSpeed;
             }
         }
         

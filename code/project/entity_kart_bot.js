@@ -19,6 +19,7 @@ export default class EntityKartBotClass extends EntityKartBaseClass
 
         this.pathNodeSlop=0;
         this.driftMinAngle=0;
+        this.brakeMinAngle=0;
         
             // variables
             
@@ -52,7 +53,8 @@ export default class EntityKartBotClass extends EntityKartBaseClass
         this.fireWaitTick=this.core.game.lookupValue(this.json.config.fireWaitTick,this.data,0);
 
         this.pathNodeSlop=this.core.game.lookupValue(this.json.config.pathNodeSlop,this.data,0);
-        this.driftMinAngle=this.core.game.lookupValue(this.json.config.driftMinAngle,this.data,0);
+        this.driftMinAngle=this.core.game.lookupValue(this.json.config.driftMinAngle,this.data,60);
+        this.brakeMinAngle=this.core.game.lookupValue(this.json.config.brakeMinAngle,this.data,90);
         
         return(true);
     }
@@ -151,8 +153,14 @@ export default class EntityKartBotClass extends EntityKartBaseClass
         
     run()
     {
-        let turnAdd,drifting;
+        let turnAdd,ang,drifting,brake;
         let fromNodeIdx;
+        
+            // skip if AI is frozen
+            
+        if (this.core.freezeAI) return;
+        
+            // run the kart base
         
         super.run();
         
@@ -172,13 +180,17 @@ export default class EntityKartBotClass extends EntityKartBaseClass
         }
         
             // turn towards the position
+            // and figure out if we need to drift or break
         
         turnAdd=this.angle.getTurnYTowards(this.position.angleYTo(this.gotoPosition));
-        drifting=(Math.abs(turnAdd)>this.driftMinAngle);
+        
+        ang=Math.abs(turnAdd);
+        brake=(ang>=this.brakeMinAngle);
+        drifting=brake?false:(ang>this.driftMinAngle);
         
             // run the kart
             
-        this.moveKart(turnAdd,true,false,drifting,false,this.checkFire(),false);
+        this.moveKart(turnAdd,true,false,drifting,brake,this.checkFire(),false);
     }
 }
 

@@ -328,6 +328,13 @@ export default class SequenceClass
 
         console.log('DONE');
         
+            // all freezes end
+         
+        this.core.freezePlayer=false;
+        this.core.freezeAI=false;
+        
+            // release any bitmaps
+            
         for (sequenceBitmap of this.bitmaps) {
             sequenceBitmap.release();
         }
@@ -343,10 +350,21 @@ export default class SequenceClass
         
         tick=this.core.timestamp-this.startTimestamp;
         
+            // freezes
+         
+        if (this.json.freezePlayer!==null) {
+            this.core.freezePlayer=((tick>=this.json.freezePlayer[0])&&(tick<this.json.freezePlayer[1]));
+        }
+        if (this.json.freezeAI!==null) {
+            this.core.freezeAI=((tick>=this.json.freezeAI[0])&&(tick<this.json.freezeAI[1]));
+        }
+        
+            // sound effects
+        
         for (n=this.lastSoundPlayIdx;n<this.json.sounds.length;n++) {
             if (tick>=this.json.sounds[n].tick) {
                 this.lastSoundPlayIdx=n+1;
-                this.core.soundList.playJson(this.core.map.entityList.getPlayer().position,this.json.sounds[n]);
+                this.core.soundList.playJson(null,this.json.sounds[n]);
             }
         }
     }

@@ -31,8 +31,11 @@ export default class SoundPlayClass
         let dist;
         
             // skip if over max distance from position
+            // null position = always play
+            // loop = always play as looped sounds are infinite
+            // and might come into position later
         
-        if (position!==null) {
+        if ((position!==null) && (!loop)) {
             dist=position.distance(entityListener.position);
             if (dist>distance) return(false);
         }
@@ -105,6 +108,8 @@ export default class SoundPlayClass
             // finally play the sound
             
         this.sourceNode.start();
+        
+        return(true);
     }
     
     ended()

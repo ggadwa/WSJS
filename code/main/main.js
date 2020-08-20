@@ -238,6 +238,7 @@ class MainClass
         this.core.loopCancel=false;
         
             // start the main loop in paused mode
+            // we have to do this because without a click we can't capture screen
 
         this.core.setPauseState(true,true);
         

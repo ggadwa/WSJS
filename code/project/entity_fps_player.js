@@ -500,6 +500,8 @@ export default class EntityFPSPlayerClass extends EntityClass
         let input=this.core.input;
         let setup=this.core.setup;
         
+        if (this.core.freezePlayer) return;
+        
             // liquid changes
             
         liquidIdx=this.core.map.liquidList.getLiquidForEyePoint(this.position,this.eyeOffset);
