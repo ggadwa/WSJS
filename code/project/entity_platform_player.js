@@ -12,6 +12,13 @@ export default class EntityPlatformPlayerClass extends EntityClass
         this.turnSpeed=0;
         this.jumpHeight=0;
         
+        this.healthInitialCount=0;
+        this.healthMaxCount=0;
+        this.interfaceHealthBackground=null;
+        this.interfaceHealthBackgroundPulseSize=0;
+        this.interfaceHealthBackgroundPulseTick=0;
+        this.interfaceHealthBitmapList=null;
+        
         this.platformCameraDistance=0;
         this.platformCameraYUpMoveFactor=1;
         this.platformCameraYDownMoveFactor=1;
@@ -34,6 +41,8 @@ export default class EntityPlatformPlayerClass extends EntityClass
         this.dieSound=null;
         
             // variables
+            
+        this.health=0;
             
         this.currentCameraY=0;
         this.inJumpCameraPause=false;
@@ -61,6 +70,13 @@ export default class EntityPlatformPlayerClass extends EntityClass
         this.runSpeed=this.core.game.lookupValue(this.json.config.runSpeed,this.data,200);
         this.turnSpeed=this.core.game.lookupValue(this.json.config.turnSpeed,this.data,20);
         this.jumpHeight=this.core.game.lookupValue(this.json.config.jumpHeight,this.data,0);
+        
+        this.healthInitialCount=this.core.game.lookupValue(this.json.config.healthInitialCount,this.data,1);
+        this.healthMaxCount=this.core.game.lookupValue(this.json.config.healthMaxCount,this.data,1);
+        this.interfaceHealthBackground=this.core.game.lookupValue(this.json.config.interfaceHealthBackground,this.data,null);
+        this.interfaceHealthBackgroundPulseSize=this.core.game.lookupValue(this.json.config.interfaceHealthBackgroundPulseSize,this.data,0);
+        this.interfaceHealthBackgroundPulseTick=this.core.game.lookupValue(this.json.config.interfaceHealthBackgroundPulseTick,this.data,0);
+        this.interfaceHealthBitmapList=(this.json.config.interfaceHealthBitmapList===undefined)?null:this.json.config.interfaceHealthBitmapList;
         
         this.platformCameraDistance=this.core.game.lookupValue(this.json.config.platformCameraDistance,this.data,0);
         this.platformCameraYUpMoveFactor=this.core.game.lookupValue(this.json.config.platformCameraYUpMoveFactor,this.data,1);
@@ -93,6 +109,8 @@ export default class EntityPlatformPlayerClass extends EntityClass
         this.movement.setFromValues(0,0,0);
         this.drawAngle.setFromValues(0,0,0);
         
+        this.health=this.healthInitialCount;
+        
         this.currentCameraY=this.position.y;
         this.inJumpCameraPause=false;
         
@@ -108,12 +126,44 @@ export default class EntityPlatformPlayerClass extends EntityClass
         this.modelEntityAlter.startAnimationChunkInFrames(this.idleAnimation);
     }
     
+    die()
+    {
+        this.health=0;
+        
+        this.core.soundList.playJson(this.position,this.dieSound);
+        
+        this.modelEntityAlter.startAnimationChunkInFrames(this.dieAnimation);
+        this.modelEntityAlter.queueAnimationStop();
+    }
+    
+    damage(damage)
+    {
+            // already dead?
+            
+        if (this.health<=0) return;
+        
+            // take damage
+            
+        this.health-=damage;
+        
+        if ((this.interfaceHealthBackground!==null) && (this.interfaceHealthBackgroundPulseSize!==0) && (this.interfaceHealthBackgroundPulseTick!==0)) {
+            this.core.interface.pulseElement(this.interfaceHealthBackground,this.interfaceHealthBackgroundPulseTick,this.interfaceHealthBackgroundPulseSize);
+        }
+        
+        if (this.health>0) {
+            this.core.soundList.playJson(this.position,this.hurtSound);
+        }
+        else {
+            this.die();
+        } 
+    }
+    
     meleeHit(damage,shoveSpeed,shoveFadeFactor)
     {
         this.shoveSpeed=shoveSpeed;
         this.shoveFadeFactor=shoveFadeFactor;
         
-        if (damage!==0) this.core.soundList.playJson(this.position,this.hurtSound);
+        if (damage!==0) this.damage(damage);
     }
     
     addWinCollect(winCount)
@@ -124,7 +174,7 @@ export default class EntityPlatformPlayerClass extends EntityClass
         
     run()
     {
-        let speed,fallY,oldY,cameraDiff;
+        let n,speed,fallY,oldY,cameraDiff;
         let moveKeyDown,runKeyDown;
         let input=this.core.input;
         
@@ -133,6 +183,19 @@ export default class EntityPlatformPlayerClass extends EntityClass
             // interface updates
             
         if (this.interfaceCollectItem!==null) this.core.interface.setCount(this.interfaceCollectItem,this.collectItemCount);
+        
+        if (this.interfaceHealthBitmapList!==null) {
+            for (n=0;n!==this.interfaceHealthBitmapList.length;n++) {
+                this.core.interface.showElement(this.interfaceHealthBitmapList[n],((n+1)===this.health));
+            }
+        }
+        
+            // dead, can only fall
+            
+        if (this.health<=0) {
+            this.movement.y=this.moveInMapY(this.movement,1.0,false);
+            return;
+        }
         
             // movement keys
             
@@ -268,7 +331,7 @@ export default class EntityPlatformPlayerClass extends EntityClass
         
         
         let cube=this.core.map.cubeList.findCubeContainingEntity(this);
-        if (cube!==null) console.info(cube.name);
+        if (cube!==null) this.runActions(this,cube.actions);
     }
 
     drawSetup()

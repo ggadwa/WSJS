@@ -5,10 +5,8 @@
 
 - kart = need win closing
 - kart = place is wonky
-- platformer = need health
-            "healthInitialCount":4,
-            "healthMaxCount":4,
-            "interfaceHealthBitmapList":["health_1","health_2","health_3","health_4"],
+- platform = needs win/lose state
+- fps = pulses need to be in json
 
 
 DEVELOPER

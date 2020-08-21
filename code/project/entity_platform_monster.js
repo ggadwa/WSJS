@@ -131,6 +131,7 @@ export default class EntityPlatformMonsterClass extends EntityClass
         this.passThrough=true;
         
         this.modelEntityAlter.startAnimationChunkInFrames(this.dieAnimation);
+        this.modelEntityAlter.queueAnimationStop();
         
         this.effectLaunchTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.disappearEffectFrame,this.dieAnimation);
         this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(this.dieAnimation);
@@ -141,6 +142,10 @@ export default class EntityPlatformMonsterClass extends EntityClass
     isMeleeOK(player)
     {
         let dist,halfHigh;
+        
+            // don't attack dead players
+            
+        if (player.health<=0) return(false);
         
             // melees only count if within distance
             // and within half the height of each other
