@@ -3,8 +3,10 @@
 - need stalkByPath: true (dragon queen)
 
 
+- sequence = freeze music
+- kart/platformer = music
 - kart = need win closing
-- kart = place is wonky
+- kart = going backwards
 - platform = needs win/lose state
 - fps = pulses need to be in json
 

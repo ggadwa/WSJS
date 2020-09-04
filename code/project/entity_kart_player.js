@@ -90,7 +90,7 @@ export default class EntityKartPlayerClass extends EntityKartBaseClass
         
         fire=input.mouseButtonFlags[0];  
         this.moveKart(turnAdd,forward,reverse,drifting,brake,fire,jump);
-                
+        
             // calculate place
             
         this.calculatePlaces();

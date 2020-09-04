@@ -17,15 +17,13 @@ export default class EntityKartBotClass extends EntityKartBaseClass
         this.minFireDistance=0;
         this.fireWaitTick=0;
 
-        this.pathNodeSlop=0;
         this.driftMinAngle=0;
         this.brakeMinAngle=0;
+        this.pathNodeSlop=0;
         
             // variables
             
         this.trackZOffset=0;
-        this.nextNodeIdx=-1;
-        
         this.currentTargetYScan=0;
         this.nextFireTick=0;
         
@@ -52,10 +50,10 @@ export default class EntityKartBotClass extends EntityKartBaseClass
         this.minFireDistance=this.core.game.lookupValue(this.json.config.minFireDistance,this.data,0);
         this.fireWaitTick=this.core.game.lookupValue(this.json.config.fireWaitTick,this.data,0);
 
-        this.pathNodeSlop=this.core.game.lookupValue(this.json.config.pathNodeSlop,this.data,0);
         this.driftMinAngle=this.core.game.lookupValue(this.json.config.driftMinAngle,this.data,60);
         this.brakeMinAngle=this.core.game.lookupValue(this.json.config.brakeMinAngle,this.data,90);
-        
+        this.pathNodeSlop=this.core.game.lookupValue(this.json.config.pathNodeSlop,this.data,0);
+
         return(true);
     }
     

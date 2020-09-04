@@ -326,8 +326,6 @@ export default class SequenceClass
     {
         let sequenceBitmap;
 
-        console.log('DONE');
-        
             // all freezes end
          
         this.core.freezePlayer=false;
