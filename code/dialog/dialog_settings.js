@@ -39,6 +39,7 @@ export default class DialogSettingsClass extends DialogBaseClass
     {
         this.addInput(viewDiv,'soundVolume','Sound Volume:','range',null,Math.trunc(this.core.setup.soundVolume*100),null);
         this.addInput(viewDiv,'musicVolume','Music Volume:','range',null,Math.trunc(this.core.setup.musicVolume*100),null);
+        this.addInput(viewDiv,'musicOn','Music:','checkbox',null,this.core.setup.musicOn,null);
     }
     
         //
@@ -84,6 +85,7 @@ export default class DialogSettingsClass extends DialogBaseClass
 
         this.core.setup.soundVolume=document.getElementById('soundVolume').value/100.0;
         this.core.setup.musicVolume=document.getElementById('musicVolume').value/100.0;
+        this.core.setup.musicOn=document.getElementById('musicOn').checked;
         
         this.core.setup.name=document.getElementById('name').value;
 

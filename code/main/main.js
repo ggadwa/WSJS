@@ -171,6 +171,7 @@ class MainClass
     async initLoadSounds()
     {
         if (!(await this.core.soundList.loadAllSounds())) return;
+        if (!(await this.core.music.load())) return;
     
         this.core.loadingScreenUpdate();
         this.core.loadingScreenAddString('Load Images');
@@ -232,6 +233,10 @@ class MainClass
             // ready all the entities
             
         this.core.map.entityList.ready();
+        
+            // start the music
+            
+        this.core.music.start();
         
             // the cancel loop flag
             

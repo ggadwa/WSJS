@@ -769,6 +769,17 @@ export default class ImportGLTFClass
             return(this.MESH_INFORMATIONAL_REMOVE);
         }
         
+            // music settings
+            
+        value=this.getCustomProperty(materialNode,meshNode,'wsjsMusic');
+        if (value!==null) {
+            obj=this.decideMapMeshInformationalParseJSON(meshNode,value);
+            if (obj===null) return(this.MESH_INFORMATIONAL_ERROR);
+            
+            this.core.music.setMusic(obj.name,((obj.loopStart===undefined)?0:obj.loopStart),((obj.loopEnd===undefined)?0:obj.loopEnd));
+            return(this.MESH_INFORMATIONAL_REMOVE);
+        }
+        
             // skyboxes
             
         value=this.getCustomProperty(materialNode,meshNode,'wsjsSky');
@@ -1146,8 +1157,8 @@ export default class ImportGLTFClass
                 map.meshList.maxFloorCeilingDetectionFactor=1.0-obj.maxFloorCeilingDetectionFactor;     // 0 = walls facing straight up only, to 1 which is pretty much anything
             }
 
-            if (obj.lightMin!==undefined) this.core.map.lightList.lightMin.setFromValues(obj.lightMin.r,obj.lightMin.g,obj.lightMin.b);
-            if (obj.lightMax!==undefined) this.core.map.lightList.lightMax.setFromValues(obj.lightMax.r,obj.lightMax.g,obj.lightMax.b);
+            if (obj.lightMin!==undefined) map.lightList.lightMin.setFromValues(obj.lightMin.r,obj.lightMin.g,obj.lightMin.b);
+            if (obj.lightMax!==undefined) map.lightList.lightMax.setFromValues(obj.lightMax.r,obj.lightMax.g,obj.lightMax.b);
             
             return(true);
         }

@@ -35,6 +35,8 @@ export default class EntityKartBaseClass extends EntityClass
         
         this.maxSpeedItemCount=0;
         this.speedItemIncrease=0;
+        this.burstSpeed=0;
+        this.burstEndTimestamp=0;
         
         this.turnCoolDownPeriod=0;
         
@@ -50,6 +52,10 @@ export default class EntityKartBaseClass extends EntityClass
         this.smokeAngles=[];
         this.smokeEffect=null;
         
+        this.burstThickness=0;
+        this.burstAngles=[];
+        this.burstEffect=null;
+        
         this.idleAnimation=null;
         this.driveAnimation=null;
         this.turnLeftAnimation=null;
@@ -58,6 +64,7 @@ export default class EntityKartBaseClass extends EntityClass
         
         this.engineSound=null;
         this.skidSound=null;
+        this.burstSound=null;
         this.crashKartSound=null;
         this.crashWallSound=null;
         
@@ -66,6 +73,7 @@ export default class EntityKartBaseClass extends EntityClass
         this.inDrift=false;
         
         this.smokeCoolDownCount=0;
+        this.burstCoolDownCount=0;
         this.bounceCount=0;
         this.reflectCount=0;
         this.spinOutCount=0;
@@ -110,6 +118,7 @@ export default class EntityKartBaseClass extends EntityClass
         this.driftMovement=new PointClass(0,0,0);
         this.bounceReflectMovement=new PointClass(0,0,0);
         this.smokePosition=new PointClass(0,0,0);
+        this.burstPosition=new PointClass(0,0,0);
         
         this.placeCalcRotPoint=new PointClass(0,0,0);
         this.placeCalcPassLine1=new PointClass(0,0,0);
@@ -169,6 +178,10 @@ export default class EntityKartBaseClass extends EntityClass
         this.smokeAngles=this.json.config.smokeAngles;
         this.smokeEffect=this.core.game.lookupValue(this.json.config.smokeEffect,this.data,null);
         
+        this.burstThickness=this.core.game.lookupValue(this.json.config.burstThickness,this.data,5);
+        this.burstAngles=this.json.config.burstAngles;
+        this.burstEffect=this.core.game.lookupValue(this.json.config.burstEffect,this.data,null);
+        
         this.idleAnimation=this.core.game.lookupAnimationValue(this.json.animations.idleAnimation);
         this.driveAnimation=this.core.game.lookupAnimationValue(this.json.animations.driveAnimation);
         this.turnLeftAnimation=this.core.game.lookupAnimationValue(this.json.animations.turnLeftAnimation);
@@ -177,6 +190,7 @@ export default class EntityKartBaseClass extends EntityClass
         
         this.engineSound=this.core.game.lookupSoundValue(this.json.sounds.engineSound);
         this.skidSound=this.core.game.lookupSoundValue(this.json.sounds.skidSound);
+        this.burstSound=this.core.game.lookupSoundValue(this.json.sounds.burstSound);
         this.crashKartSound=this.core.game.lookupSoundValue(this.json.sounds.crashKartSound);
         this.crashWallSound=this.core.game.lookupSoundValue(this.json.sounds.crashWallSound);
         
@@ -206,6 +220,7 @@ export default class EntityKartBaseClass extends EntityClass
         this.inDrift=false;
         
         this.smokeCoolDownCount=0;
+        this.burstCoolDownCount=0;
         this.bounceCount=0;
         this.reflectCount=0;
         this.spinOutCount=0;
@@ -213,6 +228,9 @@ export default class EntityKartBaseClass extends EntityClass
         
         this.turnSmooth=0;
         this.turnCoolDown=0;
+        
+        this.burstSpeed=0;
+        this.burstEndTimestamp=0
         
         this.lap=-1;
         this.hitMidpoint=true;      // first lap starts the laps
@@ -240,7 +258,7 @@ export default class EntityKartBaseClass extends EntityClass
     }
     
         //
-        // drift smoke
+        // smoke and burst effects
         //
         
     createSmoke(offsetAngleY)
@@ -252,6 +270,17 @@ export default class EntityKartBaseClass extends EntityClass
         this.smokePosition.addPoint(this.position);
 
         this.addEffect(this,this.smokeEffect,this.smokePosition,null,true);
+    }
+    
+    createBurst(offsetAngleY)
+    {
+        this.burstPosition.setFromValues(0,Math.trunc(this.height*0.25),this.radius);
+        this.burstPosition.rotateX(null,this.angle.x);
+        this.burstPosition.rotateZ(null,this.angle.z);
+        this.burstPosition.rotateY(null,((this.angle.y+offsetAngleY)%360));
+        this.burstPosition.addPoint(this.position);
+
+        this.addEffect(this,this.burstEffect,this.burstPosition,null,true);
     }
     
         //
@@ -268,6 +297,14 @@ export default class EntityKartBaseClass extends EntityClass
     {
         this.speedItemCount-=count;
         if (this.speedItemCount<0) this.speedItemCount=0;
+    }
+    
+    addBurst(burstSpeed,burstLifeTick)
+    {
+        this.burstSpeed=burstSpeed;
+        this.burstEndTimestamp=this.core.timestamp+burstLifeTick;
+        
+        this.core.soundList.playJson(this.position,this.burstSound);
     }
     
     addAmmo(weaponName,fireMethod,count)
@@ -372,9 +409,9 @@ export default class EntityKartBaseClass extends EntityClass
     {
         let maxTurnSpeed,speed,rate;
         let cube;
-        let smokeAngle;
+        let smokeAngle,burstAngle;
         
-            // start spinning if you touch a monster
+            // spinning
             
         if (this.spinOutCount!==0) {
             moveForward=false;          // if spinning, you can't drive forward or backwards or drift
@@ -445,6 +482,14 @@ export default class EntityKartBaseClass extends EntityClass
             else {
                 if (this.isStandingOnFloor()) {
                     speed=this.forwardMaxSpeed+(this.speedItemIncrease*this.speedItemCount);
+                    if (this.burstEndTimestamp!==0) {
+                        if (this.burstEndTimestamp<this.core.timestamp) {
+                            this.burstEndTimestamp=0;
+                        }
+                        else {
+                            speed+=this.burstSpeed;
+                        }
+                    }
                     this.movement.moveZWithAcceleration(moveForward,moveReverse,this.forwardAcceleration,this.forwardDeceleration,speed,this.reverseAcceleration,this.reverseDeceleration,this.reverseMaxSpeed);
                 }
             }
@@ -513,7 +558,7 @@ export default class EntityKartBaseClass extends EntityClass
             }   
         }
         
-            // smoke if drifting, spinning out, or turning
+            // smoke if drifting, spinning out, bursting, or turning
             // without moving
             
         if (this.smokeEffect!==null) {
@@ -526,6 +571,22 @@ export default class EntityKartBaseClass extends EntityClass
                 }
                 else {
                     this.smokeCoolDownCount--;
+                }
+            }
+        }
+        
+            // burst if bursting
+            
+        if (this.burstEffect!==null) {
+            if (this.burstEndTimestamp!==0) {
+                if (this.burstCoolDownCount===0) {
+                    this.burstCoolDownCount=this.burstThickness;
+                    for (burstAngle of this.burstAngles) {
+                        this.createBurst(burstAngle);
+                    }
+                }
+                else {
+                    this.burstCoolDownCount--;
                 }
             }
         }

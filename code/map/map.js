@@ -39,6 +39,10 @@ export default class MapClass
         this.sky=new MapSkyClass(core);
         this.background=new MapBackgroundClass(core);
         
+        this.musicName=null;
+        this.musicLoopStart=0;
+        this.musicLoopEnd=0;
+        
         this.hasShadowmap=false;
         
         Object.seal(this);

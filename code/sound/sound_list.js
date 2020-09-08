@@ -16,9 +16,8 @@ export default class SoundListClass
         
         this.sounds=new Map();
         
-            // global audio setup
+            // listener setup
             
-        this.ctx=null;
         this.listener=null;
         
         this.currentListenerEntity=null;
@@ -39,16 +38,6 @@ export default class SoundListClass
     {
         let n;
         
-            // initialize the audio context
-            
-        let initAudioContext=window.AudioContext||window.webkitAudioContext;
-        this.ctx=new initAudioContext();
-        
-        if (this.ctx===null) {
-            alert('Could not initialize audio context');
-            return(false);
-        }
-        
             // list of playing sounds
         
         this.soundPlays=[];
@@ -59,7 +48,7 @@ export default class SoundListClass
        
             // get a reference to the listener
             
-        this.listener=this.ctx.listener;
+        this.listener=this.core.audioCTX.listener;
         
         return(true);
     }
@@ -71,7 +60,7 @@ export default class SoundListClass
         for (n=0;n!==this.MAX_CONCURRENT_SOUNDS;n++) {
             this.soundPlays[n].close();
         }
-        
+      
         this.soundPlays=[];
     }
     
@@ -81,12 +70,12 @@ export default class SoundListClass
         
     suspend()
     {
-        this.ctx.suspend();
+        this.core.audioCTX.suspend();
     }
     
     resume()
     {
-        this.ctx.resume();
+        this.core.audioCTX.resume();
     }
     
         //
@@ -153,14 +142,13 @@ export default class SoundListClass
         {
             game.addJsonObjectToLoadSet(soundSet,null,"sounds",false,['name'],jsonSequence);
         }
-
         
             // load the sounds
             
         promises=[];
         
         for (name of soundSet) {
-            sound=new SoundClass(this.core,this.ctx,name);
+            sound=new SoundClass(this.core,name);
             sound.initialize();
             promises.push(sound.load());
             
@@ -178,8 +166,10 @@ export default class SoundListClass
                         success=!values.includes(false);
                     },
                 );
+                
+        if (!success) return(false);
 
-        return(success);
+        return(true);
     }
     
         //
@@ -283,7 +273,7 @@ export default class SoundListClass
         
             // set it to entity
             
-        if (!soundPlay.play(this.ctx,this.currentListenerEntity,position,sound,rate,distance,loopStart,loopEnd,loop)) return(-1);
+        if (!soundPlay.play(this.core.audioCTX,this.currentListenerEntity,position,sound,rate,distance,loopStart,loopEnd,loop)) return(-1);
         
         return(idx);
     }

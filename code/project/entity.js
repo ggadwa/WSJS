@@ -149,24 +149,11 @@ export default class EntityClass
         if (this.modelEntityAlter!==null) this.modelEntityAlter.release();
     }
     
-    /**
-     * Gets the project setup object, which contains all the
-     * information on how the user setup this game (for instance,
-     * things like mouse speed, etc.)
-     * 
-     * @returns {SetupClass} The setup object
-     */    
     getSetup()
     {
         return(this.core.setup);
     }
     
-    /**
-     * Gets the projects camera class, which you can use to
-     * change the camera.
-     * 
-     * @returns {CameraClass} The camera
-     */
     getCamera()
     {
         return(this.core.camera);
@@ -313,6 +300,9 @@ export default class EntityClass
                 case 'addSpeed':
                     if (entity.addSpeed===undefined) return(false);
                     break;
+                case 'addBurst':
+                    if (entity.addBurst===undefined) return(false);
+                    break;
                 case 'addWinCollect':
                     if (entity.addWinCollect===undefined) return(false);
                     break;
@@ -351,6 +341,9 @@ export default class EntityClass
                     break;
                 case 'addSpeed':
                     entity.addSpeed(this.core.game.lookupValue(action.count,this.data,0));
+                    break;
+                case 'addBurst':
+                    entity.addBurst(this.core.game.lookupValue(action.speed,this.data,0),this.core.game.lookupValue(action.lifeTick,this.data,0));
                     break;
                 case 'addWinCollect':
                     entity.addWinCollect(this.core.game.lookupValue(action.winCount,this.data,10));

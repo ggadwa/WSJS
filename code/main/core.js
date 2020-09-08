@@ -3,6 +3,7 @@ import BitmapListClass from '../bitmap/bitmap_list.js';
 import SoundListClass from '../sound/sound_list.js';
 import ShaderListClass from '../shader/shader_list.js';
 import ModelListClass from '../model/model_list.js';
+import MusicClass from '../sound/music.js';
 import PointClass from '../utility/point.js';
 import RectClass from '../utility/rect.js';
 import PlaneClass from '../utility/plane.js';
@@ -37,6 +38,10 @@ export default class CoreClass
         this.gl=null;
         this.canvas=null;
         
+            // the audio context
+            
+        this.audioCTX=null;
+        
             // the cached objects
             // list, these are usually created by
             // name and loaded after all the imports
@@ -50,6 +55,7 @@ export default class CoreClass
             
         this.game=null;
         this.map=null;
+        this.music=null;
         
             // input
             
@@ -220,13 +226,14 @@ export default class CoreClass
             preserveDrawingBuffer:true,
             failIfMajorPerformanceCaveat:false
         }; 
-
+        let initAudioContext=window.AudioContext||window.webkitAudioContext;
+        
             // get the gl context
 
         this.gl=this.canvas.getContext("webgl2",glOptions);
         if (this.gl===null) {
             alert('WebGL2 not available, try a newer browser');
-            return;
+            return(false);
         }
         
             // some initial setups
@@ -241,6 +248,15 @@ export default class CoreClass
         this.wid=this.canvas.width;
         this.high=this.canvas.height;
         this.aspect=this.canvas.width/this.canvas.height;
+        
+            // the audio context
+            
+        this.audioCTX=new initAudioContext();
+        
+        if (this.audioCTX===null) {
+            alert('Could not initialize audio context');
+            return(false);
+        }
         
             // bitmap, sound, shader, and model list
             // a lot of these are deffered load or
@@ -266,6 +282,9 @@ export default class CoreClass
         this.interface=new InterfaceClass(this);
         if (!this.interface.initialize()) return;
         
+        this.music=new MusicClass(this);
+        if (!this.music.initialize()) return;
+        
             // create misc objects
             
         this.camera=new CameraClass(this);
@@ -282,6 +301,7 @@ export default class CoreClass
 
     release()
     {
+        this.music.release();
         this.interface.release();
         this.game.release();
         this.modelList.release();

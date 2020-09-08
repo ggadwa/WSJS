@@ -6,10 +6,9 @@ import PointClass from '../utility/point.js';
 
 export default class SoundClass
 {
-    constructor(core,ctx,name)
+    constructor(core,name)
     {
         this.core=core;
-        this.ctx=ctx;
         this.name=name;
         
         this.buffer=null;
@@ -62,7 +61,7 @@ export default class SoundClass
         return(
                 new Promise((resolve,reject) =>
                     {
-                        this.ctx.decodeAudioData(data,resolve,reject);
+                        this.core.audioCTX.decodeAudioData(data,resolve,reject);
                     }
                 )
            );
@@ -97,7 +96,7 @@ export default class SoundClass
         this.buffer=null;
         
         await this.decodeAudioPromise(data)
-        //await this.ctx.decodeAudioData(data)      // safari doesn't have the promise version of this
+        //await this.core.audioCTX.decodeAudioData(data)      // safari doesn't have the promise version of this
             .then
                 (
                         // resolved
