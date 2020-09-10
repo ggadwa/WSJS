@@ -41,7 +41,7 @@ export default class SetupClass
         this.snapLook=false;
 
         this.soundVolume=0.3;
-        this.musicVolume=0.3;
+        this.musicVolume=0.5;
         this.musicOn=true;
     }
     

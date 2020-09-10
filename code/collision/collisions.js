@@ -12,7 +12,7 @@ export default class CollisionClass
     constructor(core)
     {
         this.MAX_BUMP_COUNT=2;
-        this.FLOOR_RISE_HEIGHT=2000;                  // heights we can move up or down on a slanted triangle
+        this.FLOOR_RISE_HEIGHT=4000;                  // heights we can move up or down on a slanted triangle -- todo -- should be settable somewhere
         this.COLLISION_SPOKE_COUNT=24;                // how many ray spokes we check collisions across x/z
         this.COLLISION_HEIGHT_SEGMENT_COUNT=4;        // how many segements we check collisions across the height
         this.COLLISION_HEIGHT_MARGIN=10;              // sometimes wall segments can extend a couple pixels off of floors or ceilings, so this slop fixes getting stuck on edges

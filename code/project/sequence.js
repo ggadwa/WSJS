@@ -277,6 +277,10 @@ export default class SequenceClass
         this.json=this.core.game.jsonSequenceCache.get(this.jsonName);
         if (this.json===null) return(false);
         
+            // stop any music
+            
+        this.core.music.stop();
+        
             // setup the bitmaps
             
         this.bitmaps=[];
@@ -336,6 +340,10 @@ export default class SequenceClass
         for (sequenceBitmap of this.bitmaps) {
             sequenceBitmap.release();
         }
+        
+            // restart any music
+            
+        this.core.music.start();
     }
     
         //

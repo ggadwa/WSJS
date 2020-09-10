@@ -123,7 +123,7 @@ export default class DeveloperClass
     pathEditor()
     {
         let n,k,nodeIdx,selNodeIdx;
-        let node,links;
+        let node,links,rtn;
         let rayEndPoint=this.developerRay.lookEndPoint;
         let path=this.core.map.path;
         let input=this.core.input;
@@ -209,19 +209,25 @@ export default class DeveloperClass
         }
         
             // u key adds a key to selected node
+            // leave blank to delete
             
         if (input.isKeyDownAndClear('u')) {
             selNodeIdx=this.getSelectNode();
             if (selNodeIdx===-1) return;
             
-            if (path.nodes[selNodeIdx].key!==null) {
-                console.info('Node already has a key='+path.nodes[selNodeIdx].key);
+            node=path.nodes[selNodeIdx];
+            
+            rtn=prompt('Enter the key name',((node.key===null)?'':node.key));
+            if (rtn===null) return;
+            
+            if (rtn==='') {
+                node.key=null;
+                console.info('Removed key from '+selNodeIdx);
                 return;
             }
 
-            path.nodes[selNodeIdx].key='KEY_'+selNodeIdx;
-
-            console.info('Added temp key '+selNodeIdx);
+            node.key=rtn;
+            console.info('Added key '+node.key+' to '+selNodeIdx);
             return;
         }
         

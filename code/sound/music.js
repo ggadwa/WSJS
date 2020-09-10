@@ -78,7 +78,7 @@ export default class MusicClass
     
     stop()
     {
-        this.sourceNode.stop();
+        if (this.sourceNode!==null) this.sourceNode.stop();
     }
     
         //

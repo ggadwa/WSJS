@@ -61,6 +61,9 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.nextJumpTick=0;
         this.jumpHeight=0;
         this.nextDamageTick=0;
+        
+        this.idlePath=null;
+        this.stalkByPath=false;
        
         this.sleepAnimation=null;
         this.wakeUpAnimation=null;
@@ -151,6 +154,9 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.jumpHeight=this.core.game.lookupValue(this.json.config.jumpHeight,this.data,0);
         this.angleYProjectileRange=this.core.game.lookupValue(this.json.config.angleYProjectileRange,this.data,0);
         this.angleYMeleeRange=this.core.game.lookupValue(this.json.config.angleYMeleeRange,this.data,0);
+        
+        this.idlePath=this.core.game.lookupValue(this.json.config.idlePath,this.data,null);
+        this.stalkByPath=this.core.game.lookupValue(this.json.config.stalkByPath,this.data,false);
         
         this.sleepAnimation=this.core.game.lookupAnimationValue(this.json.animations.sleepAnimation);
         this.wakeUpAnimation=this.core.game.lookupAnimationValue(this.json.animations.wakeUpAnimation);

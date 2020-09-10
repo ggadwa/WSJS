@@ -238,6 +238,10 @@ class MainClass
             
         this.core.music.start();
         
+            // start any sequence
+            
+        this.core.game.runStartSequence();
+        
             // the cancel loop flag
             
         this.core.loopCancel=false;

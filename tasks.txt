@@ -1,10 +1,7 @@
-- path generator needs to detect unreachable paths
 - need idlePath: ["abc","def","hij"] (vampires)
 - need stalkByPath: true (dragon queen)
 
 
-- sequence = freeze music
-- kart = track floor broken on bridge
 - kart = need win closing
 - kart = going backwards
 - platform = needs win/lose state
@@ -13,7 +10,6 @@
 
 DEVELOPER
   - work on developer path split
-  - way to put in node key name
   - stop all movements / liquids
 
 PHYSICS

@@ -289,11 +289,16 @@ export default class GameClass
             if (!this.developer.initialize()) return(false);
         }
         
-            // and any starting sequence
-            
-        if (this.json.config.sequenceStart!==null) this.core.startSequence(this.json.config.sequenceStart);
-        
         return(true);
+    }
+    
+        //
+        // sequences
+        //
+        
+    runStartSequence()
+    {
+        if (this.json.config.sequenceStart!==null) this.core.startSequence(this.json.config.sequenceStart);
     }
     
         //
