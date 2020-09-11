@@ -43,6 +43,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.projectileJson=null;
         this.projectileData=null;
         this.projectileRequiresSight=true;
+        this.noSelfDamage=false;
         this.maxTurnSpeed=0;
         this.forwardAcceleration=0;
         this.forwardDeceleration=0;
@@ -64,6 +65,9 @@ export default class EntityFPSMonsterClass extends EntityClass
         
         this.idlePath=null;
         this.stalkByPath=false;
+        this.seekNodeDistanceSlop=0;
+        this.seekNodeAngleSlop=0;
+        this.seekPauseDistance=0;
        
         this.sleepAnimation=null;
         this.wakeUpAnimation=null;
@@ -103,6 +107,9 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.animationFinishTick=0;
         this.noiseFinishTick=0;
         
+        this.nextNodeIdx=-1;
+        this.playerNodeIdx=-1;
+        
             // pre-allocations
 
         this.movement=new PointClass(0,0,0);
@@ -137,6 +144,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.projectileJson=this.core.game.lookupValue(this.json.config.projectileJson,this.data,null);
         this.projectileData=this.json.config.projectileData;
         this.projectileRequiresSight=this.core.game.lookupValue(this.json.config.projectileRequiresSight,this.data,0);
+        this.noSelfDamage=this.core.game.lookupValue(this.json.config.noSelfDamage,this.data,false);
         
         this.maxTurnSpeed=this.core.game.lookupValue(this.json.config.maxTurnSpeed,this.data,0);
         this.forwardAcceleration=this.core.game.lookupValue(this.json.config.forwardAcceleration,this.data,0);
@@ -157,6 +165,9 @@ export default class EntityFPSMonsterClass extends EntityClass
         
         this.idlePath=this.core.game.lookupValue(this.json.config.idlePath,this.data,null);
         this.stalkByPath=this.core.game.lookupValue(this.json.config.stalkByPath,this.data,false);
+        this.seekNodeDistanceSlop=this.core.game.lookupValue(this.json.config.seekNodeDistanceSlop,this.data,0);
+        this.seekNodeAngleSlop=this.core.game.lookupValue(this.json.config.seekNodeAngleSlop,this.data,0);
+        this.seekPauseDistance=this.core.game.lookupValue(this.json.config.seekPauseDistance,this.data,0);
         
         this.sleepAnimation=this.core.game.lookupAnimationValue(this.json.animations.sleepAnimation);
         this.wakeUpAnimation=this.core.game.lookupAnimationValue(this.json.animations.wakeUpAnimation);
@@ -275,6 +286,11 @@ export default class EntityFPSMonsterClass extends EntityClass
             this.nextJumpTick=this.core.timestamp+this.jumpWaitTick;
         }
         
+        if (this.stalkByPath) {
+            this.playerNodeIdx=this.core.map.entityList.getPlayer().findNearestPathNode(-1);
+            this.nextNodeIdx=this.nextNodeInPath(this.findNearestPathNode(-1),this.playerNodeIdx);  // always assume monster starts on node
+        }
+        
         this.modelEntityAlter.startAnimationChunkInFrames(this.walkAnimation);
     }
     
@@ -379,6 +395,12 @@ export default class EntityFPSMonsterClass extends EntityClass
     {
         if ((this.state===this.STATE_HIDDEN) || (this.state===this.STATE_DYING) || (this.state===this.STATE_DEAD)) return;
         
+            // no self damage
+            
+        if (this.noSelfDamage) {
+            if (fromEntity===this) return;
+        }
+        
             // the damage and death
             
         this.health-=damage;
@@ -480,7 +502,7 @@ export default class EntityFPSMonsterClass extends EntityClass
     
     runStalk(player,distToPlayer,gravityFactor)
     {
-        let angleDif;
+        let angleDif,pauseMoveForward,node;
         let speedFactor,maxForwardSpeed,maxReverseSpeed,maxSideSpeed;
         
             // if to far away from player,
@@ -495,11 +517,46 @@ export default class EntityFPSMonsterClass extends EntityClass
             
         speedFactor=((this.startHealth-this.health)*this.damageSpeedFactor)/this.startHealth;
         
+            // path stalking
+            
+        pauseMoveForward=false;
+            
+        if (this.stalkByPath) {
+            
+                // keep pathing towards node closest to player
+                // if these nodes are equal, always keep trying to repick
+                
+            if ((this.hitPathNode(this.nextNodeIdx,this.seekNodeDistanceSlop)) || (this.nextNodeIdx===this.playerNodeIdx)) {
+                this.playerNodeIdx=player.findNearestPathNode(-1);
+                this.nextNodeIdx=this.nextNodeInPath(this.nextNodeIdx,this.playerNodeIdx);
+            }
+            
+                // if we are stuck on a node, just turn towards player and
+                // don't move, otherwise turn towards next node
+                // if we have to turn to hard to make a node, then
+                // pause movement
+                
+            if (this.nextNodeIdx===this.playerNodeIdx) {
+                angleDif=this.turnYTowardsEntity(player,(this.maxTurnSpeed+Math.trunc(this.maxTurnSpeed*speedFactor)));
+            }
+            else {
+                angleDif=this.turnYTowardsNode(this.nextNodeIdx,(this.maxTurnSpeed+Math.trunc(this.maxTurnSpeed*speedFactor)));
+                if (angleDif>this.seekNodeAngleSlop) pauseMoveForward=true;
+            }
+
+                // if we are in seek pause distance, don't keep moving
+            
+            pauseMoveForward=pauseMoveForward||(distToPlayer<=this.seekPauseDistance);
+        }
+
+            // regular stalking
             // turn towards player, remember how far we had to turn
             // to see if we are facing within a certain distance so
             // we can attack
          
-        angleDif=this.turnYTowardsEntity(player,(this.maxTurnSpeed+Math.trunc(this.maxTurnSpeed*speedFactor)));
+        else {
+            angleDif=this.turnYTowardsEntity(player,(this.maxTurnSpeed+Math.trunc(this.maxTurnSpeed*speedFactor)));
+        }
         
             // projectiles and melee starts
         
@@ -517,7 +574,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         
             // chase player (don't move if in flinch)
 
-        if (this.core.timestamp>this.movementFreezeNextTick) {
+        if ((this.core.timestamp>this.movementFreezeNextTick) && (!pauseMoveForward)) {
             
             maxForwardSpeed=this.forwardMaxSpeed+(this.forwardMaxSpeed*speedFactor);
             maxReverseSpeed=this.reverseMaxSpeed+(this.reverseMaxSpeed*speedFactor);
@@ -565,7 +622,9 @@ export default class EntityFPSMonsterClass extends EntityClass
                 }
             }
         }
-        
+        else {
+            this.movement.y=this.moveInMapY(this.rotMovement,gravityFactor,false);
+        }
     }
     
     runHurt(gravityFactor)

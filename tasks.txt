@@ -1,7 +1,8 @@
 - need idlePath: ["abc","def","hij"] (vampires)
-- need stalkByPath: true (dragon queen)
 
 
+- fps = implement vampire idle path
+- fps = dragon queen pauses (can I recreate, has to be a state change flubs)
 - kart = need win closing
 - kart = going backwards
 - platform = needs win/lose state
