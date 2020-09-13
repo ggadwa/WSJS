@@ -31,6 +31,12 @@ export default class EntityClass
         this.height=1;
         this.scale=new PointClass(1,1,1);
         
+        this.maxBumpCount=2;
+        this.floorRiseHeight=2000;                  // heights we can move up or down on a slanted triangle
+        this.collisionSpokeCount=48;                // how many ray spokes we check collisions across x/z
+        this.collisionHeightSegmentCount=4;         // how many segements we check collisions across the height
+        this.collisionHeightMargin=10;              // sometimes wall segments can extend a couple pixels off of floors or ceilings, so this slop fixes getting stuck on edges
+        
         this.position=position.copy();
         this.angle=angle.copy();
         this.data=data;
@@ -137,15 +143,28 @@ export default class EntityClass
         
         this.originalScale.setFromPoint(this.scale);
         
+            // physics
+            
+        this.maxBumpCount=this.json.physics.maxBumpCount;
+        this.floorRiseHeight=this.json.physics.floorRiseHeight;
+        this.collisionSpokeCount=this.json.physics.collisionSpokeCount;
+        this.collisionHeightSegmentCount=this.json.physics.collisionHeightSegmentCount;
+        this.collisionHeightMargin=this.json.physics.collisionHeightMargin;
+
             // add any interface elements
             
         if (!this.core.interface.addFromJson(this.json.interface)) return(false);
+        
+            // the collision
+            
+        this.collision.initialize(this);
         
         return(true);
     }
     
     release()
     {
+        this.collision.release();
         if (this.modelEntityAlter!==null) this.modelEntityAlter.release();
     }
     

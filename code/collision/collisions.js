@@ -11,26 +11,22 @@ export default class CollisionClass
 {
     constructor(core)
     {
-        this.MAX_BUMP_COUNT=2;
-        this.FLOOR_RISE_HEIGHT=4000;                  // heights we can move up or down on a slanted triangle -- todo -- should be settable somewhere
-        this.COLLISION_SPOKE_COUNT=24;                // how many ray spokes we check collisions across x/z
-        this.COLLISION_HEIGHT_SEGMENT_COUNT=4;        // how many segements we check collisions across the height
-        this.COLLISION_HEIGHT_MARGIN=10;              // sometimes wall segments can extend a couple pixels off of floors or ceilings, so this slop fixes getting stuck on edges
-    
         this.core=core;
         
+        this.collisionSpokeCount=0;
+        this.collisionHeightSegmentCount=0;
+        this.collisionHeightMargin=0;
+        
         this.spokeCenterPnt=new PointClass(0,0,0);
-        this.spokeCalcSin=new Float32Array(this.COLLISION_SPOKE_COUNT);    // circular collision pre-calcs
-        this.spokeCalcCos=new Float32Array(this.COLLISION_SPOKE_COUNT);
-        this.createSpokeSinCos();
+        this.spokeCalcSin=null;
+        this.spokeCalcCos=null;
 
         this.entityTestPnt=new PointClass(0,0,0);
         this.entityTestIntersectPnt=new PointClass(0,0,0);
         
         this.rayHitPnt=new PointClass(0,0,0);
         this.rayIntersectPnt=new PointClass(0,0,0);
-        this.rayPoints=[];
-        this.createRayPoints();
+        this.rayPoints=null;
         
         this.rayVector=new PointClass(0,0,0);
         
@@ -51,26 +47,48 @@ export default class CollisionClass
         Object.seal(this);
     }
     
-    createSpokeSinCos()
+    initialize(entity)
     {
-        let n;
-        let rad=0.0;
-        let radAdd=(Math.PI*2.0)/this.COLLISION_SPOKE_COUNT;
+        let n,rad,radAdd;
         
-        for (n=0;n!==this.COLLISION_SPOKE_COUNT;n++) {
+        if (entity!==null) {
+            this.collisionSpokeCount=entity.collisionSpokeCount;
+            this.collisionHeightSegmentCount=entity.collisionHeightSegmentCount;
+            this.collisionHeightMargin=entity.collisionHeightMargin;
+        }
+        else {
+            this.collisionSpokeCount=24;
+            this.collisionHeightSegmentCount=8;
+            this.collisionHeightMargin=10;
+        }
+        
+            // sin and cos for spokes
+            
+        this.spokeCalcSin=new Float32Array(this.collisionSpokeCount);
+        this.spokeCalcCos=new Float32Array(this.collisionSpokeCount);
+            
+        rad=0.0;
+        radAdd=(Math.PI*2.0)/this.collisionSpokeCount;
+            
+        for (n=0;n!==this.collisionSpokeCount;n++) {
             this.spokeCalcSin[n]=Math.sin(rad);
             this.spokeCalcCos[n]=Math.cos(rad);
             rad+=radAdd;
         }
-    }
-    
-    createRayPoints()
-    {
-        let n;
         
-        for (n=0;n!=(this.COLLISION_SPOKE_COUNT+1);n++) {
+            // ray points
+            
+        this.rayPoints=[];
+        
+        for (n=0;n!=(this.collisionSpokeCount+1);n++) {
             this.rayPoints.push(new PointClass(0,0,0));
         }
+        
+        return(true);
+    }
+    
+    release()
+    {
     }
     
         //
@@ -93,18 +111,18 @@ export default class CollisionClass
             // we need to do the height in parts so we
             // hit things collisions up and down the cylinder
 
-        yAdd=Math.trunc((high-(this.COLLISION_HEIGHT_MARGIN*2))/this.COLLISION_HEIGHT_SEGMENT_COUNT);
+        yAdd=Math.trunc((high-(this.collisionHeightMargin*2))/this.collisionHeightSegmentCount);
 
             // now the spokes across the y
-            // we start up COLLISION_HEIGHT_MARGIN because
+            // we start up collisionHeightMargin because
             // sometimes walls can be a couple pixels above floors
             // and we'd get stuck on edges
             
-        this.spokeCenterPnt.setFromValues(circlePnt.x,(circlePnt.y+this.COLLISION_HEIGHT_MARGIN),circlePnt.z);
+        this.spokeCenterPnt.setFromValues(circlePnt.x,(circlePnt.y+this.collisionHeightMargin),circlePnt.z);
             
-        for (n=0;n!==this.COLLISION_HEIGHT_SEGMENT_COUNT;n++) {
+        for (n=0;n!==this.collisionHeightSegmentCount;n++) {
  
-            for (k=0;k!==this.COLLISION_SPOKE_COUNT;k++) {
+            for (k=0;k!==this.collisionSpokeCount;k++) {
                 this.rayVector.x=radius*this.spokeCalcSin[k];
                 this.rayVector.z=-(radius*this.spokeCalcCos[k]);
                 
@@ -162,11 +180,11 @@ export default class CollisionClass
             // create a series of quads and ray trace
             // against their triangles
             
-        for (n=0;n!==this.COLLISION_SPOKE_COUNT;n++) {
+        for (n=0;n!==this.collisionSpokeCount;n++) {
             x1=circlePnt.x+(radius*this.spokeCalcSin[n]);
             z1=circlePnt.z-(radius*this.spokeCalcCos[n]);
             
-            k=(n===(this.COLLISION_SPOKE_COUNT-1))?0:(n+1);
+            k=(n===(this.collisionSpokeCount-1))?0:(n+1);
             x2=circlePnt.x+(radius*this.spokeCalcSin[k]);
             z2=circlePnt.z-(radius*this.spokeCalcCos[k]);
             
@@ -458,7 +476,7 @@ export default class CollisionClass
                 // if no bump or not a bumpable
                 // hit or already bumped then just return hit
                 
-            if ((!bump) || (bumpY===-1) || (bumpCount>=this.MAX_BUMP_COUNT)) return(true);
+            if ((!bump) || (bumpY===-1) || (bumpCount>=entity.maxBumpCount)) return(true);
                 
                 // can try the bump a couple times
                 // as we might be moving fast enough to
@@ -514,11 +532,11 @@ export default class CollisionClass
         x=entity.position.x;
         z=entity.position.z;
         
-        for (n=0;n!==this.COLLISION_SPOKE_COUNT;n++) {
+        for (n=0;n!==this.collisionSpokeCount;n++) {
             this.rayPoints[n].setFromValues((x+(radius*this.spokeCalcSin[n])),y,(z-(radius*this.spokeCalcCos[n])));
         }
         
-        this.rayPoints[this.COLLISION_SPOKE_COUNT].setFromValues(x,y,z);
+        this.rayPoints[this.collisionSpokeCount].setFromValues(x,y,z);
     }
     
     fallEntityInMap(entity,fallY)
@@ -528,12 +546,12 @@ export default class CollisionClass
         let nEntity,checkEntity,entityTop,entityBot,checkEntityTop;
         
             // the rough collide boxes
-            // FLOOR_RISE_HEIGHT is the farthest
+            // floorRiseHeight is the farthest
             // we can move up and down a floor segment
             // and fallY is negative (moving down)
             
         this.objXBound.setFromValues((entity.position.x-entity.radius),(entity.position.x+entity.radius));
-        this.objYBound.setFromValues((entity.position.y+fallY),(entity.position.y+this.FLOOR_RISE_HEIGHT));
+        this.objYBound.setFromValues((entity.position.y+fallY),(entity.position.y+entity.floorRiseHeight));
         this.objZBound.setFromValues((entity.position.z-entity.radius),(entity.position.z+entity.radius));
         
             // build the ray trace points
@@ -542,10 +560,10 @@ export default class CollisionClass
             // slanted floors) to the floor rise height + fallY
             // (which is negative as the Y is up)
             
-        this.buildYCollisionRayPoints(entity,(entity.position.y+this.FLOOR_RISE_HEIGHT));
+        this.buildYCollisionRayPoints(entity,(entity.position.y+entity.floorRiseHeight));
         
         this.rayVector.x=0;
-        this.rayVector.y=(-this.FLOOR_RISE_HEIGHT)+fallY;
+        this.rayVector.y=(-entity.floorRiseHeight)+fallY;
         this.rayVector.z=0;
        
             // start with no hits
@@ -577,7 +595,7 @@ export default class CollisionClass
                 collisionTrig=mesh.collisionFloorTrigs[k];
                 if (!collisionTrig.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) continue;
                 
-                for (i=0;i!==(this.COLLISION_SPOKE_COUNT+1);i++) {
+                for (i=0;i!==(this.collisionSpokeCount+1);i++) {
                     if (collisionTrig.rayTrace(this.rayPoints[i],this.rayVector,this.rayHitPnt)) {
                         if (this.rayHitPnt.y>=y) {
                             entity.standOnMeshIdx=n;
@@ -691,7 +709,7 @@ export default class CollisionClass
                 collisionTrig=mesh.collisionCeilingTrigs[k];
                 if (!collisionTrig.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) continue;
                 
-                for (i=0;i!==(this.COLLISION_SPOKE_COUNT+1);i++) {
+                for (i=0;i!==(this.collisionSpokeCount+1);i++) {
                     if (collisionTrig.rayTrace(this.rayPoints[i],this.rayVector,this.rayHitPnt)) {
                         if (this.rayHitPnt.y<=y) {
                             entity.collideCeilingMeshIdx=n;

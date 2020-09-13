@@ -1,8 +1,6 @@
-- need idlePath: ["abc","def","hij"] (vampires)
 
 
-- fps = implement vampire idle path
-- fps = dragon queen pauses (can I recreate, has to be a state change flubs)
+- kart = place fails when crossing finish line
 - kart = need win closing
 - kart = going backwards
 - platform = needs win/lose state

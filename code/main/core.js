@@ -288,6 +288,7 @@ export default class CoreClass
             // create misc objects
             
         this.camera=new CameraClass(this);
+        if (!this.camera.initialize()) return;
         
         this.setup=new SetupClass();
         this.setup.load(this);      // requires game to be initialized, so we do this later
@@ -301,6 +302,7 @@ export default class CoreClass
 
     release()
     {
+        this.camera.release();
         this.music.release();
         this.interface.release();
         this.game.release();

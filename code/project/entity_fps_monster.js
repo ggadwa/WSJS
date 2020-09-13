@@ -28,6 +28,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         
         this.health=0;
         this.startHealth=0;
+        this.startAsleep=false;
         this.wakeUpDistance=0;
         this.wakeUpOnOtherWakeUpDistance=0;
         this.idleDistance=0;
@@ -56,6 +57,8 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.sideMaxSpeed=0;
         this.damageSpeedFactor=0;
         this.slideMoveTick=0;
+        this.canBump=true;
+        this.canSlide=true;
         this.angleYProjectileRange=5;
         this.angleYMeleeRange=15;
         this.jumpWaitTick=0;
@@ -109,6 +112,8 @@ export default class EntityFPSMonsterClass extends EntityClass
         
         this.nextNodeIdx=-1;
         this.playerNodeIdx=-1;
+        this.idlePathIdx=0;
+        this.idleGoalNodeIdx=-1;
         
             // pre-allocations
 
@@ -130,6 +135,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         super.initialize();            
         
         this.startHealth=this.core.game.lookupValue(this.json.config.startHealth,this.data,0);
+        this.startAsleep=this.core.game.lookupValue(this.json.config.startAsleep,this.data,false);
         this.wakeUpDistance=this.core.game.lookupValue(this.json.config.wakeUpDistance,this.data,0);
         this.wakeUpOnOtherWakeUpDistance=this.core.game.lookupValue(this.json.config.wakeUpOnOtherWakeUpDistance,this.data,0);
         this.idleDistance=this.core.game.lookupValue(this.json.config.idleDistance,this.data,0);
@@ -160,6 +166,8 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.slideMoveTick=this.core.game.lookupValue(this.json.config.slideMoveTick,this.data,0);
         this.jumpWaitTick=this.core.game.lookupValue(this.json.config.jumpWaitTick,this.data,0);
         this.jumpHeight=this.core.game.lookupValue(this.json.config.jumpHeight,this.data,0);
+        this.canBump=this.core.game.lookupValue(this.json.config.canBump,this.data,true);
+        this.canSlide=this.core.game.lookupValue(this.json.config.canSlide,this.data,true);
         this.angleYProjectileRange=this.core.game.lookupValue(this.json.config.angleYProjectileRange,this.data,0);
         this.angleYMeleeRange=this.core.game.lookupValue(this.json.config.angleYMeleeRange,this.data,0);
         
@@ -200,10 +208,6 @@ export default class EntityFPSMonsterClass extends EntityClass
     {
         super.ready();
         
-            // sleeping with all health
-            
-        this.state=(this.showTriggerName===null)?this.STATE_ASLEEP:this.STATE_HIDDEN;
-        
         this.health=this.startHealth;
         
             // misc
@@ -214,9 +218,19 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.animationFinishTick=0;
         this.noiseFinishTick=0;
             
-            // start idle animation
-        
-        this.modelEntityAlter.startAnimationChunkInFrames(this.sleepAnimation);
+            // start proper state
+            
+        if (this.showTriggerName!==null) {
+            this.goHidden();
+        }
+        else {
+            if (this.startAsleep) {
+                this.goAsleep();
+            }
+            else {
+                this.goIdle();
+            }
+        }
     }
     
         //
@@ -236,6 +250,20 @@ export default class EntityFPSMonsterClass extends EntityClass
         //
         // state changes
         //
+        
+    goHidden()
+    {
+        this.state=this.STATE_HIDDEN;
+        
+        this.modelEntityAlter.startAnimationChunkInFrames(this.idleAnimation);
+    }
+    
+    goAsleep()
+    {
+        this.state=this.STATE_ASLEEP;
+        
+        this.modelEntityAlter.startAnimationChunkInFrames(this.sleepAnimation);
+    }   
         
     goWakeUp(noRecurse)
     {
@@ -271,7 +299,18 @@ export default class EntityFPSMonsterClass extends EntityClass
     {
         this.state=this.STATE_IDLE;
         
-        this.modelEntityAlter.startAnimationChunkInFrames(this.idleAnimation);
+            // if there's a path, walk it, otherwise just idle in place
+            
+        if (this.idlePath!==null) {
+            this.idlePathIdx=0;
+            this.idleGoalNodeIdx=this.findKeyNodeIndex(this.idlePath[this.idlePathIdx]);
+            this.nextNodeIdx=this.nextNodeInPath(this.findNearestPathNode(-1),this.idleGoalNodeIdx); 
+            
+            this.modelEntityAlter.startAnimationChunkInFrames(this.walkAnimation);
+        }
+        else {
+            this.modelEntityAlter.startAnimationChunkInFrames(this.idleAnimation);
+        }
     }   
     
     goStalk(resetTimers)
@@ -500,6 +539,57 @@ export default class EntityFPSMonsterClass extends EntityClass
         if (this.animationFinishTick<=this.core.timestamp) this.goStalk(true);
     }
     
+    runIdle(distToPlayer,gravityFactor)
+    {
+        let angleDif;
+        
+            // time to stalk?
+   
+        if (distToPlayer<this.wakeUpDistance) {
+            this.goWakeUp(false);
+            return;
+        }
+
+            // if no idle path, can only fall
+            
+        if ((this.idlePath===null) || (this.nextNodeIdx===-1)) {
+            this.rotMovement.setFromValues(0,0,0);
+            this.moveInMapY(this.rotMovement,gravityFactor,false);
+            return;
+        }
+        
+            // run the idle path
+                 
+        if (this.hitPathNode(this.nextNodeIdx,this.seekNodeDistanceSlop)) {
+            if (this.nextNodeIdx===this.idleGoalNodeIdx) {
+                this.idlePathIdx++;
+                if (this.idlePathIdx>=this.idlePath.length) this.idlePathIdx=0;
+                this.idleGoalNodeIdx=this.findKeyNodeIndex(this.idlePath[this.idlePathIdx]);
+            }
+
+            this.nextNodeIdx=this.nextNodeInPath(this.nextNodeIdx,this.idleGoalNodeIdx);
+        }
+            
+            // if we have to turn to hard to make a node, then
+            // pause movement
+
+        angleDif=this.turnYTowardsNode(this.nextNodeIdx,this.maxTurnSpeed);
+        
+        if (angleDif<this.seekNodeAngleSlop) {
+            this.movement.moveZWithAcceleration(true,false,this.forwardAcceleration,this.forwardDeceleration,this.forwardMaxSpeed,this.forwardAcceleration,this.forwardDeceleration,this.forwardMaxSpeed);        
+
+            this.rotMovement.setFromPoint(this.movement);
+            this.rotMovement.rotateY(null,this.angle.y);
+            
+            this.movement.y=this.moveInMapY(this.rotMovement,gravityFactor,false);
+            this.moveInMapXZ(this.rotMovement,this.canBump,this.canSlide);
+        }
+        else {
+            this.rotMovement.setFromValues(0,0,0);
+            this.movement.y=this.moveInMapY(this.rotMovement,gravityFactor,false);
+        }  
+    }
+    
     runStalk(player,distToPlayer,gravityFactor)
     {
         let angleDif,pauseMoveForward,node;
@@ -558,11 +648,6 @@ export default class EntityFPSMonsterClass extends EntityClass
             angleDif=this.turnYTowardsEntity(player,(this.maxTurnSpeed+Math.trunc(this.maxTurnSpeed*speedFactor)));
         }
         
-            // projectiles and melee starts
-        
-        if ((this.projectileJson!=null) && (Math.abs(angleDif)<=this.angleYProjectileRange)) this.goProjectile(player,distToPlayer);
-        if (Math.abs(angleDif)<=this.angleYMeleeRange) this.goMelee(distToPlayer);
-        
             // time to jump?
             
         if (this.jumpHeight!==0) {
@@ -591,7 +676,7 @@ export default class EntityFPSMonsterClass extends EntityClass
                 this.origPosition.setFromPoint(this.position);
 
                 this.movement.y=this.moveInMapY(this.rotMovement,gravityFactor,false);
-                this.moveInMapXZ(this.rotMovement,true,true);
+                this.moveInMapXZ(this.rotMovement,this.canBump,this.canSlide);
 
                     // if we hit a wall, try a random slide left or right
                     // while backing up a bit
@@ -614,7 +699,7 @@ export default class EntityFPSMonsterClass extends EntityClass
                 this.rotMovement.rotateY(null,this.angle.y);
                 
                 this.sideMovement.y=this.moveInMapY(this.rotMovement,gravityFactor,false);
-                this.moveInMapXZ(this.rotMovement,true,true);
+                this.moveInMapXZ(this.rotMovement,this.canBump,this.canSlide);
                
                 if (this.core.timestamp>this.slideNextTick) {
                     this.slideNextTick=0;
@@ -623,8 +708,23 @@ export default class EntityFPSMonsterClass extends EntityClass
             }
         }
         else {
+            this.rotMovement.setFromValues(0,0,0);
             this.movement.y=this.moveInMapY(this.rotMovement,gravityFactor,false);
         }
+        
+            // animation changes
+            
+        if (pauseMoveForward) {
+            this.modelEntityAlter.continueAnimationChunkInFrames(this.idleAnimation);
+        }
+        else {
+            this.modelEntityAlter.continueAnimationChunkInFrames(this.walkAnimation);
+        }
+        
+            // projectiles and melee starts
+        
+        if ((this.projectileJson!=null) && (Math.abs(angleDif)<=this.angleYProjectileRange)) this.goProjectile(player,distToPlayer);
+        if (Math.abs(angleDif)<=this.angleYMeleeRange) this.goMelee(distToPlayer);
     }
     
     runHurt(gravityFactor)
@@ -756,6 +856,7 @@ export default class EntityFPSMonsterClass extends EntityClass
                 this.runWakeUp(gravityFactor);
                 return;
             case this.STATE_IDLE:
+                this.runIdle(distToPlayer,gravityFactor);
                 return;
             case this.STATE_STALKING:
                 this.runStalk(player,distToPlayer,gravityFactor);

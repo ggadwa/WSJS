@@ -39,11 +39,13 @@ export default class DeveloperRayClass
     
     initialize()
     {
+        this.collision.initialize(null);
         return(true);
     }
     
     release()
     {
+        this.collision.release();
     }
     
         //

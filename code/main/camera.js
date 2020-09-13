@@ -39,6 +39,21 @@ export default class CameraClass
     }
     
         //
+        // initialize and release
+        //
+    
+    initialize()
+    {
+        this.collision.initialize(null);
+        return(true);
+    }
+    
+    release()
+    {
+        this.collision.release();
+    }
+    
+        //
         // camera setup
         //
     
