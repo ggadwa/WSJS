@@ -71,10 +71,11 @@ export default class CoreClass
             
         this.paused=true;
         
-            // freeze flags
+            // sequence flags
             
         this.freezePlayer=false;
         this.freezeAI=false;
+        this.hideUI=false;
         
             // the core setup
 
@@ -679,7 +680,7 @@ export default class CoreClass
         
             // interface
             
-        this.interface.draw();
+        if (!this.hideUI) this.interface.draw();
         
             // sequences
             

@@ -23,6 +23,8 @@ export default class EntityKartBotClass extends EntityKartBaseClass
         
             // variables
             
+        this.pathNodeIdx=-1;
+        
         this.trackZOffset=0;
         this.currentTargetYScan=0;
         this.nextFireTick=0;
@@ -77,8 +79,8 @@ export default class EntityKartBotClass extends EntityKartBaseClass
         
             // always start by going to node directly after goal
             
-        this.nextNodeIdx=this.goalNodeIdx+1;
-        this.calcGotoPosition(this.goalNodeIdx,this.nextNodeIdx);
+        this.pathNodeIdx=this.goalNodeIdx+1;
+        this.calcGotoPosition(this.goalNodeIdx,this.pathNodeIdx);
         
             // start scanning in middle
             
@@ -165,16 +167,16 @@ export default class EntityKartBotClass extends EntityKartBaseClass
             // have we hit the next drive to position?
             
         if (this.position.distance(this.gotoPosition)<this.pathNodeSlop) {
-            fromNodeIdx=this.nextNodeIdx;
+            fromNodeIdx=this.pathNodeIdx;
             
-            if (this.getNodeKey(this.nextNodeIdx)==='end') {
-                this.nextNodeIdx=this.findKeyNodeIndex('goal');
+            if (this.getNodeKey(this.pathNodeIdx)==='end') {
+                this.pathNodeIdx=this.findKeyNodeIndex('goal');
             }
             else {
-                this.nextNodeIdx++;
+                this.pathNodeIdx++;
             }
             
-            this.calcGotoPosition(fromNodeIdx,this.nextNodeIdx);
+            this.calcGotoPosition(fromNodeIdx,this.pathNodeIdx);
         }
         
             // turn towards the position

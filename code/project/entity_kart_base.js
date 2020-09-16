@@ -82,9 +82,6 @@ export default class EntityKartBaseClass extends EntityClass
         this.turnSmooth=0;
         this.turnCoolDown=0;
     
-        this.hitMidpoint=false;
-        this.nextNodeIdx=-1;        // bots always have this, player calculates it, used for place
-    
         this.lastDrawTick=0;
         
         this.engineSoundPlayIdx=0;
@@ -94,18 +91,25 @@ export default class EntityKartBaseClass extends EntityClass
         
             // lap calculations
             
+        this.LAP_STATUS_BEFORE_GOAL=0;
+        this.LAP_STATUS_PASS_GOAL=1;
+        this.LAP_STATUS_PASSING_MIDPOINT=2;
+        
+        this.lapStatus=0;
+            
         this.lap=0;
         this.previousLap=-1;
         this.place=0;
         this.previousPlace=-1;
         this.placeNodeIdx=0;
         this.placeNodeDistance=0;
-        this.placeLap=0;
-        this.hitMidpoint=false;
+        this.placeLap=-1;
         
-        this.goalNodeIdx=0;
         this.endNodeIdx=0;
-
+        this.goalNodeIdx=0;
+        this.firstNodeIdx=0;
+        this.midpointNodeIdx=0;
+        
             // weapons
         
         this.currentWeaponIdx=-1;
@@ -215,6 +219,8 @@ export default class EntityKartBaseClass extends EntityClass
         
     ready()
     {
+        let startIdx;
+        
         super.ready();
          
         this.inDrift=false;
@@ -232,8 +238,9 @@ export default class EntityKartBaseClass extends EntityClass
         this.burstSpeed=0;
         this.burstEndTimestamp=0
         
+        this.lapStatus=this.LAP_STATUS_BEFORE_GOAL;
+        
         this.lap=-1;
-        this.hitMidpoint=true;      // first lap starts the laps
         
         this.lastDrawTick=this.getTimestamp();
         this.rigidGotoAngle.setFromValues(0,0,0);
@@ -251,9 +258,20 @@ export default class EntityKartBaseClass extends EntityClass
         
             // some specific nodes
             
-        this.goalNodeIdx=this.findKeyNodeIndex('goal');
         this.endNodeIdx=this.findKeyNodeIndex('end');
+        this.goalNodeIdx=this.findKeyNodeIndex('goal');
+        this.firstNodeIdx=this.findKeyNodeIndex('first');
+        this.midpointNodeIdx=this.findKeyNodeIndex('midpoint');
         
+            // get a random place
+            
+        startIdx=Math.trunc(this.core.map.kartStartPositions.length*Math.random());
+        this.position.setFromPoint(this.core.map.kartStartPositions[startIdx]);
+        
+        this.core.map.kartStartPositions.splice(startIdx,1);
+
+            // idle animation
+            
         this.modelEntityAlter.startAnimationChunkInFrames(this.idleAnimation);
     }
     
@@ -408,7 +426,6 @@ export default class EntityKartBaseClass extends EntityClass
     moveKart(turnAdd,moveForward,moveReverse,drifting,brake,fire,jump)
     {
         let maxTurnSpeed,speed,rate;
-        let cube;
         let smokeAngle,burstAngle;
         
             // spinning
@@ -608,23 +625,6 @@ export default class EntityKartBaseClass extends EntityClass
         }
         
         this.core.soundList.changeRate(this.engineSoundPlayIdx,rate);
-        
-            // determine any cube hits
-            
-        cube=this.core.map.cubeList.findCubeContainingEntity(this);
-        if (cube!==null) {
-            if (cube.name==='goal') {
-                if (this.hitMidpoint) {
-                    this.hitMidpoint=false;
-                    this.lap++;
-                }
-            }
-            else {
-                if (cube.name==='mid') {
-                    this.hitMidpoint=true;
-                }
-            }
-        }
     }
     
         //
@@ -693,8 +693,8 @@ export default class EntityKartBaseClass extends EntityClass
 
     calculatePlaces()
     {
-        let n,nodeDist,nextNodeDist;
-        let nodeIdx,nextNodeIdx,spliceIdx,entity;
+        let n,nodeDist,prevNodeDist,nextNodeDist;
+        let nodeIdx,prevNodeIdx,nextNodeIdx,spliceIdx,entity;
         let entityList=this.getEntityList();
         let placeList=[];
 
@@ -707,37 +707,74 @@ export default class EntityKartBaseClass extends EntityClass
         for (entity of entityList.entities) {
             if (!(entity instanceof EntityKartBaseClass)) continue;
             
-                // we try two nodes, the closest and the next
-                // node from the closest, if we are pass the travel
-                // line than we'll get -1 and try the other node
+                // we try three nodes, the one closest to the kart
+                // and the one before and after, -1 means we passed
+                // the travel line, take the closest node as the one
+                // we are heading two
 
             nodeIdx=entity.findNearestPathNode(-1);
-            nextNodeIdx=(nodeIdx===this.endNodeIdx)?this.goalNodeIdx:(nodeIdx+1);
-            
+            prevNodeIdx=(nodeIdx===entity.goalNodeIdx)?entity.endNodeIdx:(nodeIdx-1);
+            nextNodeIdx=(nodeIdx===entity.endNodeIdx)?entity.goalNodeIdx:(nodeIdx+1);
+    
             nodeDist=this.collideEntityWithNodeLine(entity,nodeIdx);
+            prevNodeDist=this.collideEntityWithNodeLine(entity,prevNodeIdx);
             nextNodeDist=this.collideEntityWithNodeLine(entity,nextNodeIdx);
             
-            if (nodeDist===-1) {
+            if ((prevNodeDist===-1) && (nodeDist===-1)) {
                 entity.placeNodeIdx=nextNodeIdx;
                 entity.placeNodeDistance=nextNodeDist;
             }
             else {
-                if ((nextNodeDist===-1) || (nodeDist<nextNodeDist)) {
-                    entity.placeNodeIdx=nodeIdx;
-                    entity.placeNodeDistance=nodeDist;
+                if (prevNodeDist===-1) {
+                    if (nodeDist<nextNodeDist) {
+                        entity.placeNodeIdx=nodeIdx;
+                        entity.placeNodeDistance=nodeDist;
+                    }
+                    else {
+                        entity.placeNodeIdx=nextNodeIdx;
+                        entity.placeNodeDistance=nextNodeDist;
+                    }
                 }
                 else {
-                    entity.placeNodeIdx=nextNodeIdx;
-                    entity.placeNodeDistance=nextNodeDist;
+                    if (nodeDist<prevNodeDist) {
+                        entity.placeNodeIdx=nodeIdx;
+                        entity.placeNodeDistance=nodeDist;
+                    }
+                    else {
+                        entity.placeNodeIdx=prevNodeIdx;
+                        entity.placeNodeDistance=prevNodeDist;
+                    }
                 }
             }
-
-                // if we are heading towards the goal node,
-                // we are still in an earlier lap but we have to count
-                // it as the next lap else we fall behind right before the goal
-                
-            entity.placeLap=(entity.placeNodeIdx===this.goalNodeIdx)?(entity.lap+1):entity.lap;
             
+                // determine lap status
+                // we have to pass a midpoint before we can be
+                // before goal, and we have to be before goal
+                // before we can add up a lap
+                
+            if (entity.placeNodeIdx===entity.midpointNodeIdx) {
+                entity.lapStatus=this.LAP_STATUS_PASSING_MIDPOINT;
+            }
+            else {
+                if (entity.placeNodeIdx===entity.endNodeIdx) {
+                    if (entity.lapStatus===this.LAP_STATUS_PASSING_MIDPOINT) entity.lapStatus=this.LAP_STATUS_BEFORE_GOAL;
+                }
+                else {
+                    if (entity.placeNodeIdx===entity.firstNodeIdx) {
+                        if (entity.lapStatus===this.LAP_STATUS_BEFORE_GOAL) {
+                            entity.lapStatus=this.LAP_STATUS_PASS_GOAL;
+                            entity.lap++;
+                        }
+                    }
+                }
+            }
+            
+                // if we are heading towards the goal (which is
+                // node 0) then we need to push the lap ahead one
+                // or else we end up in last place
+                
+            entity.placeLap=((entity.lapStatus===this.LAP_STATUS_BEFORE_GOAL) && (entity.placeNodeIdx===entity.goalNodeIdx))?(entity.lap+1):entity.lap;
+
                 // sort it
                 
             spliceIdx=-1;

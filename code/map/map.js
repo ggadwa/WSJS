@@ -45,6 +45,8 @@ export default class MapClass
         
         this.hasShadowmap=false;
         
+        this.kartStartPositions=[];
+        
         Object.seal(this);
     }
     

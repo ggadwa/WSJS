@@ -902,6 +902,17 @@ export default class ImportGLTFClass
             if (map.entityList.addFromMap(obj.entity,meshNode.name,pos,ang,((obj.data===undefined)?null:obj.data),((obj.show===undefined)?true:obj.show))===null) return(this.MESH_INFORMATIONAL_ERROR);
             return(this.MESH_INFORMATIONAL_REMOVE);
         }
+        
+            // kart starts
+            
+        value=this.getCustomProperty(materialNode,meshNode,'wsjsKartStart');
+        if (value!==null) {
+            obj=this.decideMapMeshInformationalParseJSON(meshNode,value);
+            if (obj===null) return(this.MESH_INFORMATIONAL_ERROR);
+
+            map.kartStartPositions.push(new PointClass(mesh.center.x,mesh.yBound.min,mesh.center.z));
+            return(this.MESH_INFORMATIONAL_REMOVE);
+        }
 
         return(this.MESH_INFORMATIONAL_KEEP);
     }

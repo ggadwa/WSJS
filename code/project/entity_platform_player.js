@@ -31,6 +31,7 @@ export default class EntityPlatformPlayerClass extends EntityClass
         this.runAnimation=null;
         this.jumpAnimation=null;
         this.fallAnimation=null;
+        this.danceAnimation=null;
         this.hurtAnimation=null;
         this.shovedAnimation=null;
         this.dieAnimation=null;
@@ -90,6 +91,7 @@ export default class EntityPlatformPlayerClass extends EntityClass
         this.runAnimation=this.core.game.lookupAnimationValue(this.json.animations.runAnimation);
         this.jumpAnimation=this.core.game.lookupAnimationValue(this.json.animations.jumpAnimation);
         this.fallAnimation=this.core.game.lookupAnimationValue(this.json.animations.fallAnimation);
+        this.danceAnimation=this.core.game.lookupAnimationValue(this.json.animations.danceAnimation);
         this.hurtAnimation=this.core.game.lookupAnimationValue(this.json.animations.hurtAnimation);
         this.shovedAnimation=this.core.game.lookupAnimationValue(this.json.animations.shovedAnimation);
         this.dieAnimation=this.core.game.lookupAnimationValue(this.json.animations.dieAnimation);

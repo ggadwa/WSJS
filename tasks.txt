@@ -1,9 +1,10 @@
 
+- fix developer breaking with music/keys
 
-- kart = place fails when crossing finish line
+- kart = weird bug with laps near goal line
 - kart = need win closing
 - kart = going backwards
-- platform = needs win/lose state
+- platform = warp in/dance warp out sequence
 - fps = pulses need to be in json
 
 

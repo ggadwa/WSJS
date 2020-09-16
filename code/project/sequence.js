@@ -334,6 +334,7 @@ export default class SequenceClass
          
         this.core.freezePlayer=false;
         this.core.freezeAI=false;
+        this.core.hideUI=false;
         
             // release any bitmaps
             
@@ -363,6 +364,9 @@ export default class SequenceClass
         }
         if (this.json.freezeAI!==null) {
             this.core.freezeAI=((tick>=this.json.freezeAI[0])&&(tick<this.json.freezeAI[1]));
+        }
+        if (this.json.hideUI!==null) {
+            this.core.hideUI=((tick>=this.json.hideUI[0])&&(tick<this.json.hideUI[1]));
         }
         
             // sound effects
