@@ -293,6 +293,22 @@ export default class GameClass
     }
     
         //
+        // won-lost
+        //
+        
+    won()
+    {
+        console.info('win');
+        if (this.json.config.sequenceWon!==null) this.core.startSequence(this.json.config.sequenceWon);
+    }
+    
+    lost()
+    {
+        console.info('lost');
+        if (this.json.config.sequenceLost!==null) this.core.startSequence(this.json.config.sequenceLost);
+    }
+    
+        //
         // sequences
         //
         

@@ -136,6 +136,8 @@ export default class EntityPlatformPlayerClass extends EntityClass
         
         this.modelEntityAlter.startAnimationChunkInFrames(this.dieAnimation);
         this.modelEntityAlter.queueAnimationStop();
+        
+        this.core.game.lost();
     }
     
     damage(damage)
@@ -171,7 +173,10 @@ export default class EntityPlatformPlayerClass extends EntityClass
     addWinCollect(winCount)
     {
         this.collectItemCount++;
-        if (this.collectItemCount>=winCount) console.info('won');
+        
+            // going into win
+            
+        if (this.collectItemCount>=winCount) this.core.game.won();
     }
         
     run()
@@ -181,6 +186,8 @@ export default class EntityPlatformPlayerClass extends EntityClass
         let input=this.core.input;
         
         super.run();
+        
+        if (this.core.freezePlayer) return;
         
             // interface updates
             

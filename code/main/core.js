@@ -17,7 +17,7 @@ import InputClass from '../main/input.js';
 import CameraClass from '../main/camera.js';
 import NetworkClass from '../main/network.js';
 import SetupClass from '../main/setup.js';
-import SequenceClass from '../project/sequence.js';
+import SequenceClass from '../sequence/sequence.js';
 import DialogSettingsClass from '../dialog/dialog_settings.js';
 import DialogConnectClass from '../dialog/dialog_connect.js';
 import DialogDeveloperClass from '../dialog/dialog_developer.js';
@@ -143,6 +143,8 @@ export default class CoreClass
         this.lastDrawTimestamp=0;
         
         this.currentSequence=null;
+        
+        this.exitLevel=false;
         
             // triggers
             
@@ -498,6 +500,8 @@ export default class CoreClass
         
     run()
     {
+            // sequences
+            
         if (this.currentSequence!==null) {
             if (this.currentSequence.isFinished()) {
                 this.currentSequence.release();
@@ -506,6 +510,13 @@ export default class CoreClass
             else {  
                 this.currentSequence.run();
             }
+        }
+        
+            // the exit level flag, for now
+            // it just refreshes the html
+            
+        if (this.exitLevel) {
+            window.location=window.location;
         }
     }
     

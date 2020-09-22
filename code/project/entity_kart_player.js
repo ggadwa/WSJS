@@ -16,6 +16,8 @@ export default class EntityKartPlayerClass extends EntityKartBaseClass
 
         this.interfaceSpeedItem=null;
         
+        this.lapCount=0;
+        
         Object.seal(this);
     }
     
@@ -29,6 +31,8 @@ export default class EntityKartPlayerClass extends EntityKartBaseClass
         this.thirdPersonCameraLookAngle=new PointClass(this.json.config.thirdPersonCameraLookAngle.x,this.json.config.thirdPersonCameraLookAngle.y,this.json.config.thirdPersonCameraLookAngle.z);
         
         this.interfaceSpeedItem=this.core.game.lookupValue(this.json.config.interfaceSpeedItem,this.data,null);
+        
+        this.lapCount=this.core.game.lookupValue(this.json.config.lapCount,this.data,3);
             
         return(true);
     }
@@ -107,6 +111,17 @@ export default class EntityKartPlayerClass extends EntityKartBaseClass
             if ((this.previousPlace!==-1) && (this.previousLap!==-1)) this.core.interface.pulseElement('lap_background',500,10);
             this.previousPlace=this.place;
             this.previousLap=this.lap;
+        }
+        
+            // win or lose
+            
+        if (textLap===this.lapCount) {
+            if (this.place===0) {
+                this.core.game.won();
+            }
+            else {
+                this.core.game.lost();
+            }
         }
     }
 }

@@ -555,6 +555,12 @@ export default class ModelEntityAlterClass
         return(this.core.timestamp+Math.trunc(((frameIdx-animationFrames[0])/this.frameRate)*1000));
     }
     
+    getAnimationCurrentFrames(frameArr)
+    {
+        frameArr[0]=this.currentAnimationStartFrame;
+        frameArr[1]=this.currentAnimationEndFrame;
+    }
+    
         //
         // hard set bone changes, only calls these after
         // the animation has been calculated
