@@ -393,7 +393,7 @@ export default class EntityFPSPlayerClass extends EntityClass
         
     die(fromEntity,isTelefrag)
     {
-        this.respawnTick=this.core.timestamp+this.respawnWaitTick;
+        this.respawnTick=this.core.game.timestamp+this.respawnWaitTick;
         this.passThrough=true;
         
         if (this.isTopDownCameraOnDeath) this.core.camera.gotoTopDown(this.topDownCameraDistance);
@@ -474,8 +474,8 @@ export default class EntityFPSPlayerClass extends EntityClass
         
             // hurt sound
             
-        if (this.core.timestamp>this.nextDamageTick) {
-            this.nextDamageTick=this.core.timestamp+this.damageFlinchWaitTick;
+        if (this.core.game.timestamp>this.nextDamageTick) {
+            this.nextDamageTick=this.core.game.timestamp+this.damageFlinchWaitTick;
             this.core.soundList.playJson(this.position,this.hurtSound);
         }
     }
@@ -550,7 +550,7 @@ export default class EntityFPSPlayerClass extends EntityClass
                 // only recover in multiplayer
                 
             if (this.isMultiplayer()) {
-                if (this.core.timestamp>this.respawnTick)  this.ready();
+                if (this.core.game.timestamp>this.respawnTick)  this.ready();
             }
             
             return;

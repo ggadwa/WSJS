@@ -229,7 +229,7 @@ export default class InterfaceTextClass
             // check for temporary time out
          
         if (this.hideTick!==-1) {
-            if (this.hideTick<this.core.timestamp) {
+            if (this.hideTick<this.core.game.timestamp) {
                 this.hideTick=-1;
                 this.show=false;
                 return;

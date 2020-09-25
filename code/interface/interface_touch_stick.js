@@ -108,7 +108,7 @@ export default class InterfaceTouchStickClass
         this.thumbX=x;
         this.thumbY=y;
         
-        this.timestamp=this.core.timestamp;
+        this.timestamp=this.core.game.timestamp;
         this.show=true;
     }
     
@@ -117,7 +117,7 @@ export default class InterfaceTouchStickClass
         this.id=null;
         this.show=false;
         
-        return((this.core.timestamp-this.timestamp)<=this.TOUCH_CLICK_TICK);        // return TRUE if this counts as a click
+        return((this.core.game.timestamp-this.timestamp)<=this.TOUCH_CLICK_TICK);        // return TRUE if this counts as a click
     }
     
     touchMove(x,y)

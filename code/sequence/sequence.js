@@ -36,7 +36,7 @@ export default class SequenceClass
     
     isFinished()
     {
-        return(this.core.timestamp>(this.startTimestamp+this.json.lifeTick));
+        return(this.core.game.timestamp>(this.startTimestamp+this.json.lifeTick));
     }
     
     lookupValue(value)
@@ -50,7 +50,7 @@ export default class SequenceClass
         let entityDef,sequenceEntity;
         let name,mode,drawMode,positionMode;
         
-        this.startTimestamp=this.core.timestamp;
+        this.startTimestamp=this.core.game.timestamp;
         
             // get the named json
             
@@ -162,7 +162,7 @@ export default class SequenceClass
     {
         let n,tick,sequenceEntity;
         
-        tick=this.core.timestamp-this.startTimestamp;
+        tick=this.core.game.timestamp-this.startTimestamp;
         
             // freezes
          

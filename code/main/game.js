@@ -1,5 +1,7 @@
 import PointClass from '../utility/point.js';
 import ColorClass from '../utility/color.js';
+import MapClass from '../map/map.js';
+import ShadowmapLoadClass from '../light/shadowmap_load.js';
 import EntityFPSPlayerClass from '../project/entity_fps_player.js';
 import EntityFPSBotClass from '../project/entity_fps_bot.js';
 import DeveloperClass from '../developer/developer.js';
@@ -24,6 +26,17 @@ export default class GameClass
         this.scoreShow=false;
         this.scoreLastItemCount=0;
         this.scoreColor=new ColorClass(0,1,0.2);
+        
+        this.timestamp=0;
+        this.lastSystemTimestamp=0;
+        this.physicsTick=0;
+        this.drawTick=0;
+        this.lastPhysicTimestamp=0;
+        this.lastDrawTimestamp=0;
+            
+        this.triggers=new Map();
+        
+        this.exitGame=false;
         
         Object.seal(this);
     }
@@ -250,6 +263,8 @@ export default class GameClass
         let n,y;
         let entity;
         
+        this.triggers.clear();
+        
             // json interface
             
         if (!this.core.interface.addFromJson(this.json.interface)) return(false);
@@ -290,6 +305,47 @@ export default class GameClass
         }
         
         return(true);
+    }
+    
+        //
+        // timing utilities
+        //
+        
+    getPeriodicCos(millisecondPeriod,amplitude)
+    {
+        let freq=((this.timestamp%millisecondPeriod)/millisecondPeriod)*(Math.PI*2);
+        return(Math.trunc(Math.cos(freq)*amplitude));
+    }
+    
+    getPeriodicSin(millisecondPeriod,amplitude)
+    {
+        let freq=((this.timestamp%millisecondPeriod)/millisecondPeriod)*(Math.PI*2);
+        return(Math.trunc(Math.sin(freq)*amplitude));
+    }
+    
+    getPeriodicLinear(millisecondPeriod,amplitude)
+    {
+        return(((this.timestamp%millisecondPeriod)/millisecondPeriod)*amplitude);
+    }
+    
+        //
+        // triggers
+        //
+        
+    setTrigger(triggerName)
+    {
+        if (triggerName!==null) this.triggers.set(triggerName,true);
+    }
+    
+    clearTrigger(triggerName)
+    {
+        if (triggerName!==null) this.triggers.set(triggerName,false);
+    }
+    
+    checkTrigger(triggerName)
+    {
+        let value=this.triggers.get(triggerName);
+        return((value===null)?false:value);
     }
     
         //
@@ -444,7 +500,250 @@ export default class GameClass
         this.scores.delete(name);
         if (this.json.config.multiplayerMessageText!==null) this.core.interface.updateTemporaryText(this.json.config.multiplayerMessageText,(name+' has left'),5000);
     }
+    
+        //
+        // start the game
+        //
+        
+    startGameLoop()
+    {
+        let startMap;
+        
+          // initialize the map
+          
+        startMap=this.core.game.lookupValue(this.core.game.json.startMap,this.data);
+        
+        this.core.map=new MapClass(this.core,startMap,this.core.game.autoGenerate);
+        if (!this.core.map.initialize()) return;
 
+            // next step
+
+        //if (!this.core.isMultiplayer) {
+            this.core.loadingScreenUpdate();
+            this.core.loadingScreenAddString('Loading Map');
+            this.core.loadingScreenDraw();
+
+            setTimeout(this.initLoadMap.bind(this),1);
+            /*
+        }
+        else {
+            this.core.loadingScreenUpdate();
+            this.core.loadingScreenAddString('Waiting for Setup');
+            this.core.loadingScreenDraw();
+            
+            setTimeout(this.runMultiplayerDialog.bind(this),1);
+        }
+
+             */
+    }
+    /*
+    runMultiplayerDialog()
+    {
+        this.core.connectDialog.open(this.runMultiplayerDialogContinueLoad.bind(this));     // return here, exit of this dialog will continue on to runMultiplayerDialogContinueLoad()
+    }
+        
+    runMultiplayerDialogContinueLoad()
+    {
+        this.core.connectDialog.close();
+        
+            // local games don't connect
+            
+        if (this.core.setup.localGame) {
+            this.runMultiplayerConnectedOK();
+            return;
+        }
+        
+            // connect to server
+            
+        this.core.loadingScreenUpdate();
+        this.core.loadingScreenAddString('Connecting to Server');
+        this.core.loadingScreenDraw();
+        
+        this.core.network.connect(this.runMultiplayerConnectedOK.bind(this),this.runMultiplayerConnectedError.bind(this));     // return here, callback from connection or error
+    }
+    
+    runMultiplayerConnectedOK()
+    {
+        this.core.loadingScreenUpdate();
+        this.core.loadingScreenAddString('Loading Map');
+        this.core.loadingScreenDraw();
+        
+        setTimeout(this.initLoadMap.bind(this),1);
+    }
+    
+    runMultiplayerConnectedError()
+    {
+        alert(this.core.network.lastErrorMessage);
+        this.runMultiplayerDialog();
+    }
+    */
+    async initLoadMap()
+    {
+        if (!(await this.core.map.loadMap())) return;
+        
+        this.core.loadingScreenUpdate();
+        this.core.loadingScreenAddString('Building Collision Geometry');
+        this.core.loadingScreenDraw();
+        
+        setTimeout(this.initCollisionGeometry.bind(this),1);
+    }
+    
+    initCollisionGeometry()
+    {
+        this.core.map.meshList.buildCollisionGeometry();
+        
+        this.core.loadingScreenUpdate();
+
+        this.core.loadingScreenAddString('Loading Shadowmap');
+        this.core.loadingScreenDraw();
+
+        setTimeout(this.initLoadShadowmap.bind(this),1);
+    }
+    
+    async initLoadShadowmap()
+    {
+        let shadowmapLoad=new ShadowmapLoadClass(this.core);
+        
+        if (!(await shadowmapLoad.load())) return;
+        
+        this.core.loadingScreenUpdate();
+        this.core.loadingScreenAddString('Load Models');
+        this.core.loadingScreenDraw();
+       
+        setTimeout(this.initLoadModels.bind(this),1);    
+    }
+    
+    async initLoadModels()
+    {
+        if (!(await this.core.modelList.loadAllModels())) return;
+        
+        this.core.loadingScreenUpdate();
+        this.core.loadingScreenAddString('Load Sounds');
+        this.core.loadingScreenDraw();
+        
+        setTimeout(this.initLoadSounds.bind(this),1);
+    }
+    
+    async initLoadSounds()
+    {
+        if (!(await this.core.soundList.loadAllSounds())) return;
+        if (!(await this.core.music.load())) return;
+    
+        this.core.loadingScreenUpdate();
+        this.core.loadingScreenAddString('Load Images');
+        this.core.loadingScreenDraw();
+
+        setTimeout(this.initLoadImages.bind(this),1);
+    }
+    
+    async initLoadImages()
+    {
+        if (!(await this.core.bitmapList.loadAllBitmaps())) return;
+        
+        this.core.loadingScreenUpdate();
+        this.core.loadingScreenAddString('Initializing Entities and Effects');
+        this.core.loadingScreenDraw();
+        
+        setTimeout(this.initLoadEntities.bind(this),1);
+    }
+    
+    initLoadEntities()
+    {
+            // call the map ready
+        
+        this.core.map.ready();
+        
+            // initialize any map effects
+            
+        if (!this.core.map.effectList.initializeMapEffects()) return;        // halt on bad effect start
+
+            // initialize any map entities
+            
+        if (!this.core.map.entityList.initializeMapEntities()) return;    // halt on bad entity start
+        
+        this.core.loadingScreenUpdate();
+        this.core.loadingScreenAddString('CLICK TO START');
+        this.core.loadingScreenDraw();
+        this.core.canvas.style.display='';
+        
+        setTimeout(this.initFinalSetup.bind(this),1);
+    }
+    
+    initFinalSetup()
+    {
+            // setup the interface
+
+        if (!this.core.game.ready()) return;       // halt on bad ready
+        
+            // setup draw buffers
+
+        this.core.map.setupBuffers();
+        
+            // set the listener to this entity
+            
+        this.core.soundList.setListenerToEntity(this.core.map.entityList.getPlayer());
+
+            // start the input
+
+        this.core.input.initialize(this.core.map.entityList.getPlayer());
+        
+            // ready all the entities
+            
+        this.core.map.entityList.ready();
+        
+            // start the music
+            
+        this.core.music.start();
+        
+            // start any sequence
+            
+        this.core.game.runStartSequence();
+        
+            // start the main loop in paused mode
+            // we have to do this because without a click we can't capture screen
+
+        //this.core.setPauseState(false,true);
+        
+            // if we are in a networked game, last thing to
+            // do is request a map_sync to get the map in the right time
+            
+            /*
+        if (this.core.isMultiplayer) {
+            this.core.loadingScreenUpdate();
+            this.core.loadingScreenAddString('Connecting to Server');
+            this.core.loadingScreenDraw();
+        
+            this.core.network.sync(this.runMultiplayerSyncOK.bind(this),this.runMultiplayerSyncError.bind(this));     // return here, callback from connection or error
+            return;
+        }
+        */
+       
+            // start the main loop
+        
+        this.timestamp=0;
+        this.lastSystemTimestamp=Math.trunc(window.performance.now());
+        
+        this.physicsTick=0;
+        this.drawTick=0;
+        this.lastPhysicTimestamp=0;
+        this.lastDrawTimestamp=0;
+        
+        this.exitGame=false;
+
+        window.requestAnimationFrame(gameMainLoop);
+    }
+    
+    runMultiplayerSyncOK()
+    {
+        this.core.game.startGameLoop();
+    }
+    
+    runMultiplayerSyncError()
+    {
+        alert(this.core.network.lastErrorMessage);
+        this.network.disconnect();
+    }
+    
         //
         // game run
         //
@@ -461,4 +760,123 @@ export default class GameClass
             
         if (this.json.developer) this.developer.run();
     }
+}
+
+//
+// game main loop
+//
+
+const PHYSICS_MILLISECONDS=16;
+const DRAW_MILLISECONDS=16;
+const BAIL_MILLISECONDS=5000;
+
+function gameMainLoop(timestamp)
+{
+    let fpsTime,systemTick,isNetworkGame;
+    let core=window.main.core;
+    let game=core.game;
+    let map=core.map;
+    
+        // if paused, and not in a network
+        // game than nothing to do
+        
+    isNetworkGame=(core.isMultiplayer) && (!core.setup.localGame);
+    //if ((core.paused) && (!isNetworkGame)) return;
+    
+        // loop uses it's own tick (so it
+        // can be paused, etc) and calculates
+        // it from the system tick
+        
+    systemTick=Math.trunc(window.performance.now());
+    game.timestamp+=(systemTick-game.lastSystemTimestamp);
+    game.lastSystemTimestamp=systemTick;
+    
+        // map movement, entities, and
+        // other physics, we only do this if we've
+        // moved unto another physics tick
+        
+        // this timing needs to be precise so
+        // physics remains constants
+        
+    game.physicsTick=game.timestamp-game.lastPhysicTimestamp;
+
+    if (game.physicsTick>PHYSICS_MILLISECONDS) {
+
+        if (game.physicsTick<BAIL_MILLISECONDS) {       // this is a temporary bail measure in case something held the browser up for a long time
+
+            while (game.physicsTick>PHYSICS_MILLISECONDS) {
+                game.physicsTick-=PHYSICS_MILLISECONDS;
+                game.lastPhysicTimestamp+=PHYSICS_MILLISECONDS;
+
+                map.meshList.run();
+                core.run();
+                core.game.run();
+                map.entityList.run();
+            }
+        }
+        else {
+            game.lastPhysicTimestamp=game.timestamp;
+        }
+
+            // update the listener and all current
+            // playing sound positions
+
+        core.soundList.updateListener();
+    
+            // if multiplayer, handle all
+            // the network updates and messages
+        
+        if (isNetworkGame) core.network.run();
+    }
+    
+        // clean up deleted entities
+        // and effects
+        
+    map.entityList.cleanUpMarkedAsDeleted();
+    map.effectList.cleanUpMarkedAsDeleted();
+    
+        // time to exit loop?
+        
+    if (game.exitGame) {
+        setTimeout(window.main.core.title.startTitleLoop.bind(window.main.core.title),1);  // always force it to start on next go around
+        return;
+    }
+    
+        // drawing
+        
+        // this timing is loose, as it's only there to
+        // draw frames
+        
+    game.drawTick=game.timestamp-game.lastDrawTimestamp;
+    
+    if (game.drawTick>DRAW_MILLISECONDS) {
+        game.lastDrawTimestamp=game.timestamp; 
+
+        core.draw();
+        
+        core.fpsTotal+=game.drawTick;
+        core.fpsCount++;
+    }
+    
+        // the fps
+        
+    if (core.fpsStartTimestamp===-1) core.fpsStartTimestamp=game.timestamp; // a reset from paused state
+    
+    fpsTime=game.timestamp-core.fpsStartTimestamp;
+    if (fpsTime>=1000) {
+        core.fps=(core.fpsCount*1000.0)/core.fpsTotal;
+        core.fpsStartTimestamp=game.timestamp;
+
+        core.fpsTotal=0;
+        core.fpsCount=0;
+    }
+    
+        // special check for touch controls
+        // pausing the game
+
+    if (core.input.touchMenuTrigger) core.setPauseState(true,false);
+    
+        // next frame
+        
+    window.requestAnimationFrame(gameMainLoop);
 }

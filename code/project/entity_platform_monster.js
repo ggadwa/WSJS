@@ -134,7 +134,7 @@ export default class EntityPlatformMonsterClass extends EntityClass
         this.modelEntityAlter.queueAnimationStop();
         
         this.effectLaunchTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.disappearEffectFrame,this.dieAnimation);
-        this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(this.dieAnimation);
+        this.animationFinishTick=this.core.game.timestamp+this.modelEntityAlter.getAnimationTickCount(this.dieAnimation);
         
         this.core.soundList.playJson(this.position,this.dieSound);
     }
@@ -168,12 +168,12 @@ export default class EntityPlatformMonsterClass extends EntityClass
         if (this.dead) {
             if (this.animationFinishTick===0) return;
             
-            if ((this.core.timestamp>this.effectLaunchTick) && (this.effectLaunchTick!==0)) {
+            if ((this.core.game.timestamp>this.effectLaunchTick) && (this.effectLaunchTick!==0)) {
                 this.effectLaunchTick=0;
                 if (this.disappearEffect!==null) this.addEffect(this,this.disappearEffect,this.position,null,true);
             }
             
-            if (this.core.timestamp>this.animationFinishTick) {
+            if (this.core.game.timestamp>this.animationFinishTick) {
                 this.animationFinishTick=0;
                 this.show=false;
             }
@@ -186,7 +186,7 @@ export default class EntityPlatformMonsterClass extends EntityClass
             // any waiting melee
                     
         if (this.meleeNextTick!==0) {
-            if (this.core.timestamp>=this.meleeNextTick) {
+            if (this.core.game.timestamp>=this.meleeNextTick) {
                 this.meleeNextTick=0;
                 if (this.isMeleeOK(player)) player.meleeHit(this.meleeDamage,(Math.sign(player.position.x-this.position.x)*this.shoveSpeed),this.shoveFadeFactor);
                 this.core.soundList.playJson(this.position,this.meleeSound);
@@ -207,7 +207,7 @@ export default class EntityPlatformMonsterClass extends EntityClass
             // frozen in a finishing animation
             
         if (this.animationFinishTick!==0) {
-            if (this.core.timestamp>this.animationFinishTick) this.animationFinishTick=0;
+            if (this.core.game.timestamp>this.animationFinishTick) this.animationFinishTick=0;
             this.movement.y=this.moveInMapY(this.movement,1.0,false);
             return;
         }
@@ -216,14 +216,14 @@ export default class EntityPlatformMonsterClass extends EntityClass
             
         if (this.jumpHeight!==0) {
             if ((this.standOnMeshIdx!==-1) || (this.standOnEntity!==null)) {
-                if (this.core.timestamp>this.nextJumpTick) {
-                    this.nextJumpTick=this.core.timestamp+this.jumpWaitTick;
+                if (this.core.game.timestamp>this.nextJumpTick) {
+                    this.nextJumpTick=this.core.game.timestamp+this.jumpWaitTick;
 
                     this.movement.y=this.jumpHeight;
                 }
             }
             else {
-                this.nextJumpTick=this.core.timestamp+this.jumpWaitTick;
+                this.nextJumpTick=this.core.game.timestamp+this.jumpWaitTick;
             }
         }
         
@@ -243,7 +243,7 @@ export default class EntityPlatformMonsterClass extends EntityClass
                 this.modelEntityAlter.queueAnimationChunkInFrames(this.walkAnimation);
 
                 this.meleeNextTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.meleeHitFrame,this.hitAnimation);
-                this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(this.hitAnimation);
+                this.animationFinishTick=this.core.game.timestamp+this.modelEntityAlter.getAnimationTickCount(this.hitAnimation);
             }
         }
         

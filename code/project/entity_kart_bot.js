@@ -88,7 +88,7 @@ export default class EntityKartBotClass extends EntityKartBaseClass
         
             // can fire at any time
             
-        this.nextFireTick=this.core.timestamp;
+        this.nextFireTick=this.core.game.timestamp;
     }
     
         //
@@ -121,7 +121,7 @@ export default class EntityKartBotClass extends EntityKartBaseClass
     {
             // is it time to fire?
         
-        if (this.core.timestamp<this.nextFireTick) return(false);
+        if (this.core.game.timestamp<this.nextFireTick) return(false);
         
             // ray trace for entities
             // we do one look angle per tick
@@ -143,7 +143,7 @@ export default class EntityKartBotClass extends EntityKartBaseClass
         if (!(this.hitEntity instanceof EntityKartBaseClass)) return(false);
         if (this.hitEntity.position.distance(this.position)<this.minFireDistance) return(false);
         
-        this.nextFireTick=this.core.timestamp+this.fireWaitTick;
+        this.nextFireTick=this.core.game.timestamp+this.fireWaitTick;
         return(true);
     }
     

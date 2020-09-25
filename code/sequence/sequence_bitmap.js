@@ -90,7 +90,7 @@ export default class SequenceBitmapClass
         frameCount=this.frames.length;
         if (frameCount===1) return;
         
-        tick=this.core.timestamp-startTimestamp;
+        tick=this.core.game.timestamp-startTimestamp;
         if ((tick<this.frames[0].tick) || (tick>=this.frames[frameCount-1].tick)) return;
         
             // find the tween points

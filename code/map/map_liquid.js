@@ -92,7 +92,7 @@ export default class MapLiquidClass
         
             // get the y offsets for waves
         
-        let offY=this.core.getPeriodicCos(this.wavePeriod,this.waveHeight);
+        let offY=this.core.game.getPeriodicCos(this.wavePeriod,this.waveHeight);
         
             // create mesh
             
@@ -100,11 +100,11 @@ export default class MapLiquidClass
         uvIdx=0;
         
         vz=this.zBound.min;
-        gz=((Math.abs(vz)/this.waveSize)*this.waveUVStamp)+(this.core.timestamp*this.uvShift.y);
+        gz=((Math.abs(vz)/this.waveSize)*this.waveUVStamp)+(this.core.game.timestamp*this.uvShift.y);
         gz=gz-Math.trunc(gz);
         offRow=Math.trunc(vz/this.waveSize)&0x1;
         
-        gxStart=((Math.abs(this.xBound.min)/this.waveSize)*this.waveUVStamp)+(this.core.timestamp*this.uvShift.x);
+        gxStart=((Math.abs(this.xBound.min)/this.waveSize)*this.waveUVStamp)+(this.core.game.timestamp*this.uvShift.x);
         gxStart=gxStart-Math.trunc(gxStart);
         offColStart=Math.trunc(this.xBound.min/this.waveSize)&0x1;
         

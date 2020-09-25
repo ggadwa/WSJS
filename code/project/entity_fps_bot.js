@@ -275,7 +275,7 @@ export default class EntityFPSBotClass extends EntityClass
         
     die(fromEntity,isTelefrag)
     {
-        this.respawnTick=this.core.timestamp+this.respawnWaitTick;
+        this.respawnTick=this.core.game.timestamp+this.respawnWaitTick;
         this.passThrough=true;
         
         this.core.soundList.playJson(this.position,this.dieSound);
@@ -539,7 +539,7 @@ export default class EntityFPSBotClass extends EntityClass
             
                 // bots always recover
                 
-            if (this.core.timestamp>this.respawnTick)  this.ready();
+            if (this.core.game.timestamp>this.respawnTick)  this.ready();
             
             return;
         }
@@ -622,7 +622,7 @@ export default class EntityFPSBotClass extends EntityClass
 
             this.pausedTriggerName=this.isNodeATriggerPauseNode(prevNodeIdx,this.nextNodeIdx);
             if (this.pausedTriggerName!==null) {
-                if (!this.core.checkTrigger(this.pausedTriggerName)) {
+                if (!this.core.game.checkTrigger(this.pausedTriggerName)) {
                     idleAnimation=this.carouselWeapons[this.currentCarouselWeaponIdx].parentIdleAnimation;
                     this.modelEntityAlter.startAnimationChunkInFrames(idleAnimation);
                     return;
@@ -638,7 +638,7 @@ export default class EntityFPSBotClass extends EntityClass
             // then do nothing until trigger
             
         if (this.pausedTriggerName!==null) {
-            if (!this.core.checkTrigger(this.pausedTriggerName)) {
+            if (!this.core.game.checkTrigger(this.pausedTriggerName)) {
                 moveForward=false;
             }
             else {
@@ -660,7 +660,7 @@ export default class EntityFPSBotClass extends EntityClass
             // mostly happens from certain weapon fires
             
         if (this.movementFreezeTick!==0) {
-            if (this.movementFreezeTick>this.core.timestamp) {
+            if (this.movementFreezeTick>this.core.game.timestamp) {
                 moveForward=false;
                 slideLeft=false;
             }

@@ -41,7 +41,7 @@ class EntityWeaponFireClass
         this.ammo=this.ammoInitialCount;
         
         this.lastFireTimestamp=0;
-        this.lastRegenerateTimestamp=this.core.timestamp+this.ammoRegenerateTick;
+        this.lastRegenerateTimestamp=this.core.game.timestamp+this.ammoRegenerateTick;
     }
     
     addAmmo(count)
@@ -60,14 +60,14 @@ class EntityWeaponFireClass
     
     resetRegenerateAmmo()
     {
-        this.lastRegenerateTimestamp=this.core.timestamp+this.ammoRegenerateTick;
+        this.lastRegenerateTimestamp=this.core.game.timestamp+this.ammoRegenerateTick;
     }
     
     regenerateAmmo()
     {
         if (this.ammoRegenerateTick!==-1) {
-            if (this.core.timestamp>this.lastRegenerateTimestamp) {
-                this.lastRegenerateTimestamp=this.core.timestamp+this.ammoRegenerateTick;
+            if (this.core.game.timestamp>this.lastRegenerateTimestamp) {
+                this.lastRegenerateTimestamp=this.core.game.timestamp+this.ammoRegenerateTick;
                 this.addAmmo(1);
             }
         }
@@ -299,8 +299,8 @@ export default class EntityWeaponClass extends EntityClass
     {
         if (fire.ammo===0) return;
         
-        if ((fire.lastFireTimestamp+fire.waitTick)>this.core.timestamp) return;
-        fire.lastFireTimestamp=this.core.timestamp;
+        if ((fire.lastFireTimestamp+fire.waitTick)>this.core.game.timestamp) return;
+        fire.lastFireTimestamp=this.core.game.timestamp;
         
             // fire
             
@@ -324,7 +324,7 @@ export default class EntityWeaponClass extends EntityClass
                     if (fireAnimation!==null) {
                         parentEntity.modelEntityAlter.interuptAnimationChunkInFrames(fireAnimation);
                         if ((fireAnimationFreezeMovement) && (parentEntity.movementFreezeTick!==undefined)) {
-                            parentEntity.movementFreezeTick=this.core.timestamp+parentEntity.modelEntityAlter.getAnimationTickCount(fireAnimation[0],fireAnimation[1]);
+                            parentEntity.movementFreezeTick=this.core.game.timestamp+parentEntity.modelEntityAlter.getAnimationTickCount(fireAnimation[0],fireAnimation[1]);
                         }
                     }
                 }

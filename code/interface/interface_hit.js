@@ -75,7 +75,7 @@ export default class InterfaceHitClass
     
     flash(flashTick)
     {
-        this.flashStartTick=this.core.timestamp;
+        this.flashStartTick=this.core.game.timestamp;
         this.flashTick=flashTick;
     }
     
@@ -90,7 +90,7 @@ export default class InterfaceHitClass
             
         if (this.flashStartTick===0) return;
         
-        tick=this.core.timestamp-this.flashStartTick;
+        tick=this.core.game.timestamp-this.flashStartTick;
         if (tick>this.flashTick) {
             this.flashStartTick=0;
             return;

@@ -1,3 +1,4 @@
+import TitleClass from '../main/title.js';
 import MapClass from '../map/map.js';
 import BitmapListClass from '../bitmap/bitmap_list.js';
 import SoundListClass from '../sound/sound_list.js';
@@ -11,7 +12,7 @@ import ColorClass from '../utility/color.js';
 import QuaternionClass from '../utility/quaternion.js';
 import Matrix4Class from '../utility/matrix4.js';
 import Matrix3Class from '../utility/matrix3.js';
-import GameClass from '../project/game.js';
+import GameClass from '../main/game.js';
 import InterfaceClass from '../interface/interface.js';
 import InputClass from '../main/input.js';
 import CameraClass from '../main/camera.js';
@@ -32,6 +33,17 @@ export default class CoreClass
     {
         this.MAX_LIGHT_COUNT=24;        // max lights in scene, needs to be the same as lights[x] in shaders
         this.MAX_SKELETON_JOINT=64;    // max joints in a skeleton, needs to be the same as jointMatrix[x] in shaders
+        
+        this.GL_OPTIONS={
+            alpha:false,
+            depth:true,
+            stencil:false,
+            antialias:false,
+            premultipliedAlpha:false,
+            desynchronized:true,
+            preserveDrawingBuffer:true,
+            failIfMajorPerformanceCaveat:false
+        };
 
             // the opengl context
 
@@ -53,6 +65,7 @@ export default class CoreClass
         
             // the game and map
             
+        this.title=null;
         this.game=null;
         this.map=null;
         this.music=null;
@@ -132,23 +145,9 @@ export default class CoreClass
 
             // main loop
 
-        this.timestamp=0;
-        this.lastTimestamp=Math.trunc(window.performance.now());
-
-        this.loopCancel=false;
-        
-        this.physicsTick=0;
-        this.lastPhysicTimestamp=0;
-        this.drawTick=0;
-        this.lastDrawTimestamp=0;
-        
         this.currentSequence=null;
         
         this.exitLevel=false;
-        
-            // triggers
-            
-        this.triggers=new Map();
         
             // random numbers
             
@@ -171,21 +170,21 @@ export default class CoreClass
     }
     
         //
-        // canvas
+        // initialize and release
         //
-
-    createCanvas()
+    
+    async initialize(data)
     {
         let lft,top,wid,high;
-        let margin=0;
+        let initAudioContext=window.AudioContext||window.webkitAudioContext;
         
             // canvas position
             
-        wid=window.innerWidth-margin;
+        wid=window.innerWidth;
         high=Math.trunc((wid*9)/16);
         
-        if (high>(window.innerHeight-margin)) {
-            high=window.innerHeight-margin;
+        if (high>window.innerHeight) {
+            high=window.innerHeight;
             wid=Math.trunc((high*16)/9);
         }
         
@@ -205,35 +204,10 @@ export default class CoreClass
         this.canvas.oncontextmenu=this.canvasRightClickCancel.bind(this);
         
         document.body.appendChild(this.canvas);
-    }
-    
-    canvasRightClickCancel(event)
-    {
-        event.preventDefault();
-        return(false);
-    }
-    
-        //
-        // initialize and release
-        //
-    
-    async initialize(data)
-    {
-        let glOptions={
-            alpha:false,
-            depth:true,
-            stencil:false,
-            antialias:false,
-            premultipliedAlpha:false,
-            desynchronized:true,
-            preserveDrawingBuffer:true,
-            failIfMajorPerformanceCaveat:false
-        }; 
-        let initAudioContext=window.AudioContext||window.webkitAudioContext;
         
             // get the gl context
 
-        this.gl=this.canvas.getContext("webgl2",glOptions);
+        this.gl=this.canvas.getContext("webgl2",this.GL_OPTIONS);
         if (this.gl===null) {
             alert('WebGL2 not available, try a newer browser');
             return(false);
@@ -277,6 +251,11 @@ export default class CoreClass
         this.modelList=new ModelListClass(this);
         this.modelList.initialize();
         
+            // title (non game interface)
+            
+        this.title=new TitleClass(this,data);
+        if (!(await this.title.initialize())) return;
+        
             // game and interface
             
         this.game=new GameClass(this,data);
@@ -300,6 +279,10 @@ export default class CoreClass
         this.connectDialog=new DialogConnectClass(this);
         this.developerDialog=new DialogDeveloperClass(this);
         
+            // finally start the input
+            
+        this.input.startInput();
+        
         return(true);
     }
 
@@ -309,10 +292,21 @@ export default class CoreClass
         this.music.release();
         this.interface.release();
         this.game.release();
+        this.title.release();
         this.modelList.release();
         this.shaderList.release();
         this.soundList.release();
         this.bitmapList.release();
+    }
+    
+        //
+        // canvas right click, always disabled
+        //
+        
+    canvasRightClickCancel(event)
+    {
+        event.preventDefault();
+        return(false);
     }
     
         //
@@ -322,47 +316,6 @@ export default class CoreClass
     async loadShaders(callback)
     {
         return(await this.shaderList.loadShaders(callback));
-    }
-    
-        //
-        // timing utilities
-        //
-        
-    getPeriodicCos(millisecondPeriod,amplitude)
-    {
-        let freq=((this.timestamp%millisecondPeriod)/millisecondPeriod)*(Math.PI*2);
-        return(Math.trunc(Math.cos(freq)*amplitude));
-    }
-    
-    getPeriodicSin(millisecondPeriod,amplitude)
-    {
-        let freq=((this.timestamp%millisecondPeriod)/millisecondPeriod)*(Math.PI*2);
-        return(Math.trunc(Math.sin(freq)*amplitude));
-    }
-    
-    getPeriodicLinear(millisecondPeriod,amplitude)
-    {
-        return(((this.timestamp%millisecondPeriod)/millisecondPeriod)*amplitude);
-    }
-    
-        //
-        // triggers
-        //
-        
-    setTrigger(triggerName)
-    {
-        if (triggerName!==null) this.triggers.set(triggerName,true);
-    }
-    
-    clearTrigger(triggerName)
-    {
-        if (triggerName!==null) this.triggers.set(triggerName,false);
-    }
-    
-    checkTrigger(triggerName)
-    {
-        let value=this.triggers.get(triggerName);
-        return((value===null)?false:value);
     }
     
         //
@@ -379,7 +332,7 @@ export default class CoreClass
         
             // if unpausing, reset the last timestamp
          
-        if (!pause) this.lastTimestamp=Math.trunc(window.performance.now());
+        //if (!pause) this.lastTimestamp=Math.trunc(window.performance.now());
         
             // if we are leaving pause, turn
             // off pause window
@@ -391,14 +344,6 @@ export default class CoreClass
             else {
                 this.developerDialog.close();
             }
-        }
-        
-            // if this is the init state, then we
-            // start the stamps at 0
-        
-        if (initState) {
-            this.lastPhysicTimestamp=0;
-            this.lastDrawTimestamp=0;
         }
 
             // start the fps over again
@@ -419,10 +364,10 @@ export default class CoreClass
             // turn on/off the input
         
         if (pause) {    
-            this.input.stopInput();
+        //    this.input.stopInput();
         }
         else {
-            this.input.startInput();
+        //    this.input.startInput();
         }
         
             // suspend/resume the sound
@@ -453,7 +398,7 @@ export default class CoreClass
         
     startCameraShake(shakeTick,shakeShift)
     {
-        this.cameraShakeStartTick=this.timestamp;
+        this.cameraShakeStartTick=this.game.timestamp;
         this.cameraShakeTick=shakeTick;
         this.cameraShakeShift=shakeShift;
     }
@@ -466,7 +411,7 @@ export default class CoreClass
         
             // time to end shake?
             
-        tick=this.timestamp-this.cameraShakeStartTick;
+        tick=this.game.timestamp-this.cameraShakeStartTick;
         if (tick>this.cameraShakeTick) {
             this.cameraShakeStartTick=-1;
             return;
@@ -516,7 +461,7 @@ export default class CoreClass
             // it just refreshes the html
             
         if (this.exitLevel) {
-            window.location=window.location;
+            this.game.exitGame=true;
         }
     }
     

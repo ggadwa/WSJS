@@ -72,7 +72,7 @@ export default class InterfaceElementClass
     
     pulse(tick,expand)
     {
-        this.pulseStartTick=this.core.timestamp;
+        this.pulseStartTick=this.core.game.timestamp;
         this.pulseTick=tick;
         this.pulseExpand=expand;
     }
@@ -90,7 +90,7 @@ export default class InterfaceElementClass
             // handle any pulses
             
         if (this.pulseTick!==-1) {
-            tick=this.core.timestamp-this.pulseStartTick;
+            tick=this.core.game.timestamp-this.pulseStartTick;
             factor=Math.trunc(Math.sin((tick/this.pulseTick)*Math.PI)*this.pulseExpand);
             
             if (tick>this.pulseTick) {

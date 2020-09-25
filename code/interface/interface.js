@@ -400,7 +400,7 @@ export default class InterfaceClass
         
         text.str=''+str;      // make sure it's a string
         text.show=true;
-        text.hideTick=this.core.timestamp+tick;
+        text.hideTick=this.core.game.timestamp+tick;
     }
     
         //

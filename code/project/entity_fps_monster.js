@@ -274,10 +274,10 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.state=this.STATE_WAKING_UP;
         
         this.modelEntityAlter.startAnimationChunkInFrames(this.wakeUpAnimation);
-        this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(this.wakeUpAnimation);
+        this.animationFinishTick=this.core.game.timestamp+this.modelEntityAlter.getAnimationTickCount(this.wakeUpAnimation);
         
         this.core.soundList.playJson(this.position,this.wakeUpSound);
-        if (this.wakeUpSetTriggerName!==null) this.core.setTrigger(this.wakeUpSetTriggerName);
+        if (this.wakeUpSetTriggerName!==null) this.core.game.setTrigger(this.wakeUpSetTriggerName);
         
         if (noRecurse) return;
         
@@ -320,9 +320,9 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.movement.setFromValues(0,0,0);
         
         if (resetTimers) {
-            this.nextProjectileTick=this.core.timestamp+this.projectileWaitTick;
-            this.nextMeleeTick=this.core.timestamp+this.meleeWaitTick;
-            this.nextJumpTick=this.core.timestamp+this.jumpWaitTick;
+            this.nextProjectileTick=this.core.game.timestamp+this.projectileWaitTick;
+            this.nextMeleeTick=this.core.game.timestamp+this.meleeWaitTick;
+            this.nextJumpTick=this.core.game.timestamp+this.jumpWaitTick;
         }
         
         if (this.stalkByPath) {
@@ -337,8 +337,8 @@ export default class EntityFPSMonsterClass extends EntityClass
     {
             // we always make a noise if possible
         
-        if (this.noiseFinishTick<=this.core.timestamp) {
-            this.noiseFinishTick=this.core.timestamp+this.core.soundList.getMillisecondDurationJson(this.hurtSound);
+        if (this.noiseFinishTick<=this.core.game.timestamp) {
+            this.noiseFinishTick=this.core.game.timestamp+this.core.soundList.getMillisecondDurationJson(this.hurtSound);
             this.core.soundList.playJson(this.position,this.hurtSound);
         }
         
@@ -352,24 +352,24 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.state=this.STATE_HURT;
         
         this.modelEntityAlter.startAnimationChunkInFrames(this.hitAnimation);
-        this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(this.hitAnimation);
+        this.animationFinishTick=this.core.game.timestamp+this.modelEntityAlter.getAnimationTickCount(this.hitAnimation);
     }
     
     goMelee(distToPlayer)
     {
-        if ((distToPlayer>this.meleeDistance) || (this.core.timestamp<this.nextMeleeTick)) return;
+        if ((distToPlayer>this.meleeDistance) || (this.core.game.timestamp<this.nextMeleeTick)) return;
         
         this.state=this.STATE_MELEE;
         
         if (Math.random()<0.5) {
             this.modelEntityAlter.startAnimationChunkInFrames(this.meleeLeftAnimation);
             this.meleeHitNextTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.meleeLeftHitFrame,this.meleeLeftAnimation);
-            this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(this.meleeLeftAnimation);
+            this.animationFinishTick=this.core.game.timestamp+this.modelEntityAlter.getAnimationTickCount(this.meleeLeftAnimation);
         }
         else {
             this.modelEntityAlter.startAnimationChunkInFrames(this.meleeRightAnimation);
             this.meleeHitNextTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.meleeRightHitFrame,this.meleeRightAnimation);
-            this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(this.meleeRightAnimation);
+            this.animationFinishTick=this.core.game.timestamp+this.modelEntityAlter.getAnimationTickCount(this.meleeRightAnimation);
         }
     }
     
@@ -377,7 +377,7 @@ export default class EntityFPSMonsterClass extends EntityClass
     {
             // don't fire if past projectile distance, or less than melee distance
             
-        if ((distToPlayer>this.projectileDistance) || (distToPlayer<this.meleeDistance) || (this.core.timestamp<this.nextProjectileTick)) return;
+        if ((distToPlayer>this.projectileDistance) || (distToPlayer<this.meleeDistance) || (this.core.game.timestamp<this.nextProjectileTick)) return;
         
             // does it sight the player?
             
@@ -400,7 +400,7 @@ export default class EntityFPSMonsterClass extends EntityClass
             
         this.modelEntityAlter.startAnimationChunkInFrames(this.projectileAnimation);
         this.projectileFireNextTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.projectileFireFrame,this.projectileAnimation);
-        this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(this.projectileAnimation);
+        this.animationFinishTick=this.core.game.timestamp+this.modelEntityAlter.getAnimationTickCount(this.projectileAnimation);
     }
     
     goDying()
@@ -411,7 +411,7 @@ export default class EntityFPSMonsterClass extends EntityClass
 
         this.modelEntityAlter.startAnimationChunkInFrames(this.dieAnimation);
         this.modelEntityAlter.queueAnimationStop();
-        this.animationFinishTick=this.core.timestamp+this.modelEntityAlter.getAnimationTickCount(this.dieAnimation);
+        this.animationFinishTick=this.core.game.timestamp+this.modelEntityAlter.getAnimationTickCount(this.dieAnimation);
 
         this.core.soundList.playJson(this.position,this.deathSound);
 
@@ -423,7 +423,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.state=this.STATE_DEAD;
         
         this.passThrough=true;
-        if (this.deathSetTriggerName!==null) this.core.setTrigger(this.deathSetTriggerName);
+        if (this.deathSetTriggerName!==null) this.core.game.setTrigger(this.deathSetTriggerName);
     }
     
         //
@@ -506,7 +506,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         
     runHidden()
     {
-        if (this.core.checkTrigger(this.showTriggerName)) {
+        if (this.core.game.checkTrigger(this.showTriggerName)) {
             this.show=true;
             this.goWakeUp(false);
         }
@@ -536,7 +536,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         
             // is animation over?
             
-        if (this.animationFinishTick<=this.core.timestamp) this.goStalk(true);
+        if (this.animationFinishTick<=this.core.game.timestamp) this.goStalk(true);
     }
     
     runIdle(distToPlayer,gravityFactor)
@@ -651,15 +651,15 @@ export default class EntityFPSMonsterClass extends EntityClass
             // time to jump?
             
         if (this.jumpHeight!==0) {
-            if (this.core.timestamp>this.nextJumpTick) {
-                this.nextJumpTick=this.core.timestamp+this.jumpWaitTick;
+            if (this.core.game.timestamp>this.nextJumpTick) {
+                this.nextJumpTick=this.core.game.timestamp+this.jumpWaitTick;
                 this.jump();
             }
         }
         
             // chase player (don't move if in flinch)
 
-        if ((this.core.timestamp>this.movementFreezeNextTick) && (!pauseMoveForward)) {
+        if ((this.core.game.timestamp>this.movementFreezeNextTick) && (!pauseMoveForward)) {
             
             maxForwardSpeed=this.forwardMaxSpeed+(this.forwardMaxSpeed*speedFactor);
             maxReverseSpeed=this.reverseMaxSpeed+(this.reverseMaxSpeed*speedFactor);
@@ -685,7 +685,7 @@ export default class EntityFPSMonsterClass extends EntityClass
                     this.position.setFromPoint(this.origPosition);
 
                     this.slideDirection=this.findSlideDirection(player);
-                    this.slideNextTick=this.core.timestamp+this.slideMoveTick;
+                    this.slideNextTick=this.core.game.timestamp+this.slideMoveTick;
                     this.sideMovement.setFromValues(0,this.movement.y,0);
                 }
             }
@@ -701,7 +701,7 @@ export default class EntityFPSMonsterClass extends EntityClass
                 this.sideMovement.y=this.moveInMapY(this.rotMovement,gravityFactor,false);
                 this.moveInMapXZ(this.rotMovement,this.canBump,this.canSlide);
                
-                if (this.core.timestamp>this.slideNextTick) {
+                if (this.core.game.timestamp>this.slideNextTick) {
                     this.slideNextTick=0;
                     this.movement.y=this.sideMovement.y;
                 }
@@ -736,7 +736,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         
             // is animation over?
             
-        if (this.animationFinishTick<=this.core.timestamp) this.goStalk(false);
+        if (this.animationFinishTick<=this.core.game.timestamp) this.goStalk(false);
     }
     
     runMelee(player,gravityFactor)
@@ -750,7 +750,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         
             // the hit itself
             
-        if ((this.meleeHitNextTick<=this.core.timestamp) && (this.meleeHitNextTick!==0)) {
+        if ((this.meleeHitNextTick<=this.core.game.timestamp) && (this.meleeHitNextTick!==0)) {
             this.core.soundList.playJson(this.position,this.meleeSound);
             player.damage(this,this.meleeDamage,this.position);
             
@@ -758,7 +758,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         }
             // is animation over?
             
-        if (this.animationFinishTick<=this.core.timestamp) this.goStalk(true);
+        if (this.animationFinishTick<=this.core.game.timestamp) this.goStalk(true);
     }
     
     runProjectile(player,gravityFactor)
@@ -774,7 +774,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         
             // the projectile itself
             
-        if ((this.projectileFireNextTick<=this.core.timestamp) && (this.projectileFireNextTick!==0)) {
+        if ((this.projectileFireNextTick<=this.core.game.timestamp) && (this.projectileFireNextTick!==0)) {
             this.projectileSetupFire(player);
 
             projEntity=this.addEntity(this.projectileJson,('projectile_'+this.name),this.firePosition,this.fireAngle,this.projectileData,this,null,true);
@@ -784,7 +784,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         }
             // is animation over?
             
-        if (this.animationFinishTick<=this.core.timestamp) this.goStalk(true);
+        if (this.animationFinishTick<=this.core.game.timestamp) this.goStalk(true);
     }
     
     runDying(gravityFactor)
@@ -797,7 +797,7 @@ export default class EntityFPSMonsterClass extends EntityClass
             // the fall sound
                
         if (this.fallSound!==null) {
-            if ((this.fallSoundNextTick<=this.core.timestamp) && (this.fallSoundNextTick!==0)) {
+            if ((this.fallSoundNextTick<=this.core.game.timestamp) && (this.fallSoundNextTick!==0)) {
                 this.core.soundList.playJson(this.position,this.fallSound);
                 this.fallSoundNextTick=0;
             }
@@ -805,7 +805,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         
             // is animation over?
             
-        if (this.animationFinishTick<=this.core.timestamp) this.goDead();
+        if (this.animationFinishTick<=this.core.game.timestamp) this.goDead();
     }
     
     runDead(gravityFactor)

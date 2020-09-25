@@ -72,7 +72,7 @@ export default class MeshMovementClass
         
             // are we moving to another movement?
             
-        if (this.nextMoveNextTick<this.core.timestamp) {
+        if (this.nextMoveNextTick<this.core.game.timestamp) {
             
             nextIdx=this.currentMoveIdx+1;
             if (nextIdx>=this.moves.length) nextIdx=0;
@@ -84,7 +84,7 @@ export default class MeshMovementClass
             
             switch (move.pauseType) {
                 case this.MOVEMENT_PAUSE_TRIGGER:
-                    paused=!this.core.checkTrigger(move.pauseData);
+                    paused=!this.core.game.checkTrigger(move.pauseData);
                     break;
                 case this.MOVEMENT_PAUSE_APPROACH:
                     paused=(this.originalCenterPnt.distance(this.core.map.entityList.getPlayer().position)>move.pauseData);
@@ -102,15 +102,15 @@ export default class MeshMovementClass
                 // current move, otherwise switch
             
             if (paused) {
-                this.nextMoveNextTick=this.core.timestamp;
+                this.nextMoveNextTick=this.core.game.timestamp;
             }
             else {
                 this.currentMoveIdx=nextIdx;
-                this.nextMoveNextTick=this.core.timestamp+this.moves[this.currentMoveIdx].lifeTick;
+                this.nextMoveNextTick=this.core.game.timestamp+this.moves[this.currentMoveIdx].lifeTick;
                 
                     // set any trigger or sound
                     
-                if (move.triggerName!==null) this.core.setTrigger(move.triggerName);
+                if (move.triggerName!==null) this.core.game.setTrigger(move.triggerName);
                 if (move.sound!==null) this.core.soundList.playJson(this.mesh.center,move.sound);
             }
         }
@@ -120,7 +120,7 @@ export default class MeshMovementClass
             
         else {
             move=this.moves[this.currentMoveIdx];
-            if (move.triggerName!==null) this.core.clearTrigger(move.triggerName);
+            if (move.triggerName!==null) this.core.game.clearTrigger(move.triggerName);
         }
             
             // the next offset we need to move to
@@ -128,7 +128,7 @@ export default class MeshMovementClass
             
         move=this.moves[this.currentMoveIdx];
         
-        f=1.0-((this.nextMoveNextTick-this.core.timestamp)/move.lifeTick);
+        f=1.0-((this.nextMoveNextTick-this.core.game.timestamp)/move.lifeTick);
         
         prevIdx=this.currentMoveIdx;
         prevIdx--;

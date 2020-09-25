@@ -24,7 +24,7 @@ export default class InputClass
         
         this.mouseButtonFlags=new Uint8Array(8);
         this.mouseWheelClick=0;
-        this.mouseWheelClickRefreshTick=core.timestamp;
+        this.mouseWheelClickRefreshTick=0;
         
         this.canvasLeft=0;
         this.canvasTop=0;
@@ -252,7 +252,7 @@ export default class InputClass
         }
         
         this.mouseWheelClick=0;
-        this.mouseWheelClickRefreshTick=this.core.timestamp;
+        this.mouseWheelClickRefreshTick=Math.trunc(window.performance.now());
     }
     
     mouseWheelRead()
@@ -264,7 +264,7 @@ export default class InputClass
         click=this.mouseWheelClick;
         
         this.mouseWheelClick=0;
-        this.mouseWheelClickRefreshTick=this.core.timestamp+this.INPUT_WHEEL_REFRESH_TICK;
+        this.mouseWheelClickRefreshTick=Math.trunc(window.performance.now())+this.INPUT_WHEEL_REFRESH_TICK;
         
         return(click);
     }
@@ -291,7 +291,7 @@ export default class InputClass
         
             // otherwise register if over click refresh
             
-        if (this.core.timestamp<this.mouseWheelClickRefreshTick) return;
+        if (Math.trunc(window.performance.now())<this.mouseWheelClickRefreshTick) return;
         
         this.mouseWheelClick=Math.sign(deltaY);
     }

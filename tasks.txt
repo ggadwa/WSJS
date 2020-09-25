@@ -1,9 +1,21 @@
 
+2. a lot of stuff from core and main into game
+    - drawing
+3. esc needs to cancel out of title
+4. title needs to work on iPad
+6. core.paused is not needed
+7. need game release
+8. move sequence, "exitLevel" from core to game
+9. move camera shake to game
+10. move fpsXXX to game
+11. remove "main" leave only "core" (maybe?)
 
-- startup needs click to play
+- multiplayer complete redo
 
 - fix developer breaking with music/keys
 - need float over window for developer UI (do div upper right hand first, draggable later)
+
+- won/lost songs (kart/platformer)
 
 - kart = weird bug with laps near goal line
 - kart = need win closing

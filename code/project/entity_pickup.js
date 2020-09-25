@@ -94,8 +94,8 @@ export default class EntityPickupClass extends EntityClass
             // animation
             
         if (this.spinTick!==0) {
-            if (this.floatMove!==0) this.position.y=this.originalY+this.core.getPeriodicCos(this.spinTick,this.floatMove);
-            this.angle.y=this.getPeriodicLinear(this.spinTick,360);
+            if (this.floatMove!==0) this.position.y=this.originalY+this.core.game.getPeriodicCos(this.spinTick,this.floatMove);
+            this.angle.y=this.core.game.getPeriodicLinear(this.spinTick,360);
         }
         
             // check for collisions

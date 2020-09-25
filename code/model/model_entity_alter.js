@@ -323,10 +323,10 @@ export default class ModelEntityAlterClass
         
             // the global animation tick
             
-        tick=this.currentAnimationLoopStartTick+Math.trunc((this.core.timestamp-this.currentAnimationStartTimestamp)%(this.currentAnimationLoopEndTick-this.currentAnimationLoopStartTick));
+        tick=this.currentAnimationLoopStartTick+Math.trunc((this.core.game.timestamp-this.currentAnimationStartTimestamp)%(this.currentAnimationLoopEndTick-this.currentAnimationLoopStartTick));
         
         if (this.queuedAnimationStop) {
-            if ((this.core.timestamp-this.currentAnimationStartTimestamp)>=(this.currentAnimationLoopEndTick-this.currentAnimationLoopStartTick)) tick=this.currentAnimationLoopEndTick;
+            if ((this.core.game.timestamp-this.currentAnimationStartTimestamp)>=(this.currentAnimationLoopEndTick-this.currentAnimationLoopStartTick)) tick=this.currentAnimationLoopEndTick;
         }
         
             // each channel changes one node over time
@@ -400,7 +400,7 @@ export default class ModelEntityAlterClass
             
         if (this.currentAnimationIdx!==-1) {
             if (this.queuedAnimationIdx!==-1) {
-                if (this.core.timestamp>=this.queuedAnimationStartTimestamp) {
+                if (this.core.game.timestamp>=this.queuedAnimationStartTimestamp) {
                     this.currentAnimationIdx=this.queuedAnimationIdx;
                     this.currentAnimationStartFrame=this.queuedAnimationStartFrame;
                     this.currentAnimationEndFrame=this.queuedAnimationEndFrame;
@@ -444,7 +444,7 @@ export default class ModelEntityAlterClass
         this.currentAnimationIdx=0; // (name===null)?0:this.entity.model.skeleton.findAnimationIndex(name);  -- currently every model I have has a single animation track
         //if (this.currentAnimationIdx===-1) return(false);
         
-        this.currentAnimationStartTimestamp=this.core.timestamp;
+        this.currentAnimationStartTimestamp=this.core.game.timestamp;
         this.currentAnimationStartFrame=animationFrames[0];
         this.currentAnimationEndFrame=animationFrames[1];
         this.currentAnimationLoopStartTick=Math.trunc(animationFrames[0]*fps);
@@ -487,14 +487,14 @@ export default class ModelEntityAlterClass
             // find when this animation ends
             
         len=this.currentAnimationLoopEndTick-this.currentAnimationLoopStartTick;
-        len-=Math.trunc((this.core.timestamp-this.currentAnimationStartTimestamp)%len);
+        len-=Math.trunc((this.core.game.timestamp-this.currentAnimationStartTimestamp)%len);
         
             // queue up
 
         this.queuedAnimationIdx=0; // (name===null)?0:this.entity.model.skeleton.findAnimationIndex(name);
         //if (this.queuedAnimationIdx===-1) return(false);
         
-        this.queuedAnimationStartTimestamp=this.core.timestamp+len;
+        this.queuedAnimationStartTimestamp=this.core.game.timestamp+len;
         this.queuedAnimationStartFrame=animationFrames[0];
         this.queuedAnimationEndFrame=animationFrames[1];
         this.queuedAnimationLoopStartTick=Math.trunc(animationFrames[0]*fps);
@@ -524,10 +524,10 @@ export default class ModelEntityAlterClass
             
         if (oldIdx!==-1) {
             len=this.currentAnimationLoopEndTick-this.currentAnimationLoopStartTick;
-            len-=Math.trunc((this.core.timestamp-this.currentAnimationStartTimestamp)%len);
+            len-=Math.trunc((this.core.game.timestamp-this.currentAnimationStartTimestamp)%len);
         
             this.queuedAnimationIdx=oldIdx;
-            this.queuedAnimationStartTimestamp=this.core.timestamp+len;
+            this.queuedAnimationStartTimestamp=this.core.game.timestamp+len;
             this.queuedAnimationStartFrame=oldStartFrame;
             this.queuedAnimationEndFrame=oldEndFrame;
             this.queuedAnimationLoopStartTick=oldStartTick;
@@ -552,7 +552,7 @@ export default class ModelEntityAlterClass
     
     getAnimationFinishTimestampFromFrame(frameIdx,animationFrames)
     {
-        return(this.core.timestamp+Math.trunc(((frameIdx-animationFrames[0])/this.frameRate)*1000));
+        return(this.core.game.timestamp+Math.trunc(((frameIdx-animationFrames[0])/this.frameRate)*1000));
     }
     
     getAnimationCurrentFrames(frameArr)

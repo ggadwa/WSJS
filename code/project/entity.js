@@ -198,22 +198,7 @@ export default class EntityClass
         
     getTimestamp()
     {
-        return(this.core.timestamp);
-    }
-    
-    getPeriodicCos(millisecondPeriod,amplitude)
-    {
-        return(this.core.getPeriodicCos(millisecondPeriod,amplitude));
-    }
-    
-    getPeriodicSin(millisecondPeriod,amplitude)
-    {
-        return(this.core.getPeriodicSin(millisecondPeriod,amplitude));
-    }
-    
-    getPeriodicLinear(millisecondPeriod,amplitude)
-    {
-        return(this.core.getPeriodicLinear(millisecondPeriod,amplitude));
+        return(this.core.game.timestamp);
     }
     
         //
@@ -344,7 +329,7 @@ export default class EntityClass
             
             switch (action.action) {
                 case 'trigger':
-                    this.core.setTrigger(this.core.game.lookupValue(action.name,this.data,''));
+                    this.core.game.setTrigger(this.core.game.lookupValue(action.name,this.data,''));
                     break;
                 case 'addWeapon':
                     entity.addWeapon(this.core.game.lookupValue(action.weapon,this.data,''));
@@ -604,20 +589,6 @@ export default class EntityClass
     {
         let nodes=this.core.map.path.nodes;
         return(nodes[fromNodeIdx].position.angleYTo(nodes[toNodeIdx].position));
-    }
-    
-        //
-        // trigger utilities
-        //
-        
-    setTrigger(triggerName)
-    {
-        this.core.setTrigger(triggerName);
-    }
-    
-    checkTrigger(triggerName)
-    {
-        return(this.core.checkTrigger(triggerName));
     }
     
         //

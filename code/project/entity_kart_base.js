@@ -320,7 +320,7 @@ export default class EntityKartBaseClass extends EntityClass
     addBurst(burstSpeed,burstLifeTick)
     {
         this.burstSpeed=burstSpeed;
-        this.burstEndTimestamp=this.core.timestamp+burstLifeTick;
+        this.burstEndTimestamp=this.core.game.timestamp+burstLifeTick;
         
         this.core.soundList.playJson(this.position,this.burstSound);
     }
@@ -500,7 +500,7 @@ export default class EntityKartBaseClass extends EntityClass
                 if (this.isStandingOnFloor()) {
                     speed=this.forwardMaxSpeed+(this.speedItemIncrease*this.speedItemCount);
                     if (this.burstEndTimestamp!==0) {
-                        if (this.burstEndTimestamp<this.core.timestamp) {
+                        if (this.burstEndTimestamp<this.core.game.timestamp) {
                             this.burstEndTimestamp=0;
                         }
                         else {

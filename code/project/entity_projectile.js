@@ -53,7 +53,7 @@ export default class EntityProjectileClass extends EntityClass
     {
         if (!super.initialize()) return(false);
         
-        this.lifeTimestamp=this.core.timestamp+this.core.game.lookupValue(this.json.config.lifeTick,this.data,0);
+        this.lifeTimestamp=this.core.game.timestamp+this.core.game.lookupValue(this.json.config.lifeTick,this.data,0);
         this.speed=this.core.game.lookupValue(this.json.config.speed,this.data,0);
         this.hitDamage=this.core.game.lookupValue(this.json.config.damage,this.data,0);
         
@@ -96,7 +96,7 @@ export default class EntityProjectileClass extends EntityClass
         
         if (this.spawnSound!==null) this.core.soundList.playJson(this.position,this.spawnSound);
         
-        this.nextTrailTick=this.core.timestamp;
+        this.nextTrailTick=this.core.game.timestamp;
     }
     
     finish()
@@ -136,7 +136,7 @@ export default class EntityProjectileClass extends EntityClass
         
             // are we over our life time
  
-        if (this.lifeTimestamp<this.core.timestamp) {
+        if (this.lifeTimestamp<this.core.game.timestamp) {
             this.finish();
             return;
         }
@@ -144,7 +144,7 @@ export default class EntityProjectileClass extends EntityClass
             // trails
 
         if (this.trailEffect!==null) {
-            if (this.core.timestamp>=this.nextTrailTick) {
+            if (this.core.game.timestamp>=this.nextTrailTick) {
                 this.nextTrailTick+=this.trailSpawnTick;
 
                 this.addEffect(this,this.trailEffect,this.position,null,true);
@@ -281,7 +281,7 @@ export default class EntityProjectileClass extends EntityClass
 
             if (!this.stopped) {
                 if (!this.rolling) {
-                    this.drawAngle.x=this.core.getPeriodicLinear(4000,360);
+                    this.drawAngle.x=this.core.game.getPeriodicLinear(4000,360);
                 }
                 else {
                     if (this.drawAngle.x!==90) {
@@ -294,10 +294,10 @@ export default class EntityProjectileClass extends EntityClass
                             if (this.drawAngle.x>90) this.drawAngle.x=90;
                         }
                     }
-                    this.drawAngle.z=this.core.getPeriodicLinear(4000,360);
+                    this.drawAngle.z=this.core.game.getPeriodicLinear(4000,360);
                 }
 
-                this.drawAngle.y=this.core.getPeriodicLinear(3000,360);
+                this.drawAngle.y=this.core.game.getPeriodicLinear(3000,360);
             }
 
                 // model is centered on Y so it needs
@@ -312,7 +312,7 @@ export default class EntityProjectileClass extends EntityClass
         else {
             this.modelEntityAlter.position.setFromPoint(this.position);
             if (this.spins) {
-                this.modelEntityAlter.angle.setFromValues(this.angle.x,this.core.getPeriodicLinear(this.spinRate,360),this.angle.z);
+                this.modelEntityAlter.angle.setFromValues(this.angle.x,this.core.game.getPeriodicLinear(this.spinRate,360),this.angle.z);
             }
             else {
                 this.modelEntityAlter.angle.setFromPoint(this.angle);

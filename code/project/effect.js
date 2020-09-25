@@ -176,7 +176,7 @@ export default class EffectClass
         let elementIdx,iIdx;
         let gl=this.core.gl;
         
-        this.startTimestamp=this.core.timestamp;
+        this.startTimestamp=this.core.game.timestamp;
         
             // get the named json
             
@@ -444,7 +444,7 @@ export default class EffectClass
             // the grid
             
         if (chunk.grid!==1) {
-            gridIdx=Math.trunc(((this.core.timestamp%chunk.gridPeriod)/chunk.gridPeriod)*chunk.grid);
+            gridIdx=Math.trunc(((this.core.game.timestamp%chunk.gridPeriod)/chunk.gridPeriod)*chunk.grid);
             gridIdx=(gridIdx+chunk.gridOffset)%chunk.grid;
             
             u=(gridIdx%chunk.gridSquareRoot)*chunk.vSize;
@@ -558,7 +558,7 @@ export default class EffectClass
         if (!chunk.wave) return;
         
         for (n=0;n!==vertexCount;n++) {
-            freq=(((this.core.timestamp+chunk.wavePeriodicTickOffset[n])%chunk.wavePeriod)/chunk.wavePeriod)*(Math.PI*2);
+            freq=(((this.core.game.timestamp+chunk.wavePeriodicTickOffset[n])%chunk.wavePeriod)/chunk.wavePeriod)*(Math.PI*2);
             this.vertexes[chunk.vertexOffset+n]+=Math.trunc(Math.sin(freq)*chunk.waveSize);
         }
     }
@@ -593,7 +593,7 @@ export default class EffectClass
             
         lastTick=frames[frameCount-1].tick;
         
-        tick=((this.core.timestamp-this.startTimestamp)%lastTick);
+        tick=((this.core.game.timestamp-this.startTimestamp)%lastTick);
         
             // find the tween points
             
@@ -658,13 +658,13 @@ export default class EffectClass
             // get the last frame and within cycle tick
             
         lastTick=chunk.frames[frameCount-1].tick;
-        tick=((this.core.timestamp-this.startTimestamp)%lastTick);
+        tick=((this.core.game.timestamp-this.startTimestamp)%lastTick);
         
             // if there is a life tick and we are equal
             // or over, just pick the last frame
             
         if (this.json.lifeTick!==undefined) {
-            if ((this.core.timestamp-this.startTimestamp)>=this.json.lifeTick) {
+            if ((this.core.game.timestamp-this.startTimestamp)>=this.json.lifeTick) {
                 startFrame=chunk.frames[frameCount-1];
                 if (startFrame.spread!==undefined) chunk.spread=startFrame.spread;
                 if (startFrame.width!==undefined) chunk.width=startFrame.width;
@@ -730,7 +730,7 @@ export default class EffectClass
             // effects with life tick
           
         if (this.json.lifeTick!==undefined) {
-            if ((this.core.timestamp-this.startTimestamp)>this.json.lifeTick) {
+            if ((this.core.game.timestamp-this.startTimestamp)>this.json.lifeTick) {
                 this.markDelete=true;
                 return(false);
             }

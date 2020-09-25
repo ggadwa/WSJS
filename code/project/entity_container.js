@@ -67,7 +67,7 @@ export default class EntityContainerClass extends EntityClass
         
             // in a pause tick means no changes
             
-        if (this.pauseTick>this.core.timestamp) return;
+        if (this.pauseTick>this.core.game.timestamp) return;
         
             // nothing to do if opened
             // and can only open once
@@ -89,7 +89,7 @@ export default class EntityContainerClass extends EntityClass
             
         if ((actionKeyDown) && (!this.opened)) {
             this.opened=true;
-            this.pauseTick=this.core.timestamp+this.openPause;
+            this.pauseTick=this.core.game.timestamp+this.openPause;
             
             if (this.openSound!==null) this.core.soundList.playJson(this.position,this.openSound);
             this.modelEntityAlter.startAnimationChunkInFrames(this.openingAnimation);
@@ -103,7 +103,7 @@ export default class EntityContainerClass extends EntityClass
         
         if ((actionKeyDown) && (this.opened)) {
             this.opened=false;
-            this.pauseTick=this.core.timestamp+this.openPause;
+            this.pauseTick=this.core.game.timestamp+this.openPause;
             
             if (this.closeSound!==null) this.core.soundList.playJson(this.position,this.closeSound);
             this.modelEntityAlter.startAnimationChunkInFrames(this.closingAnimation);
