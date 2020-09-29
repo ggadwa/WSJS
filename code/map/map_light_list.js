@@ -90,9 +90,9 @@ export default class MapLightListClass
         for (n=0;n!==nLight;n++) {
             light=this.lights[n];
 
-            x=this.core.camera.position.x-light.position.x;
-            y=this.core.camera.position.y-light.position.y;
-            z=this.core.camera.position.z-light.position.z;
+            x=this.core.game.camera.position.x-light.position.x;
+            y=this.core.game.camera.position.y-light.position.y;
+            z=this.core.game.camera.position.z-light.position.z;
             light.dist=Math.sqrt((x*x)+(y*y)+(z*z));
         }
         
@@ -114,8 +114,8 @@ export default class MapLightListClass
                 
             idx=-1;
 
-            for (k=0;k!==this.core.lights.length;k++) {
-                if (this.core.lights[k].dist>light.dist) {
+            for (k=0;k!==this.core.game.lights.length;k++) {
+                if (this.core.game.lights[k].dist>light.dist) {
                     idx=k;
                     break;
                 }
@@ -124,11 +124,11 @@ export default class MapLightListClass
                 // add the light
                 
             if (idx===-1) {
-                if (this.core.lights.length<this.core.MAX_LIGHT_COUNT) this.core.lights.push(light);
+                if (this.core.game.lights.length<this.core.MAX_LIGHT_COUNT) this.core.game.lights.push(light);
             }
             else {
-                this.core.lights.splice(idx,0,light);
-                if (this.core.lights.length>this.core.MAX_LIGHT_COUNT) this.core.lights.pop();
+                this.core.game.lights.splice(idx,0,light);
+                if (this.core.game.lights.length>this.core.MAX_LIGHT_COUNT) this.core.game.lights.pop();
             }
         }
     }
@@ -144,8 +144,8 @@ export default class MapLightListClass
             light=this.lights[n];
             if (!light.ambient) continue;
             
-            this.core.lights.splice(0,0,light);
-            if (this.core.lights.length>this.core.MAX_LIGHT_COUNT) this.core.lights.pop();
+            this.core.game.lights.splice(0,0,light);
+            if (this.core.game.lights.length>this.core.MAX_LIGHT_COUNT) this.core.game.lights.pop();
         }
     }
     

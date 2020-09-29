@@ -13,10 +13,6 @@ export default class EntityClass
 {
     constructor(core,name,jsonName,position,angle,data,mapSpawn,spawnedBy,heldBy,show)
     {
-        this.TEXT_ALIGN_LEFT=0;     // when we have statics (safari) then use the class static to create these (still don't want people to include other classes)
-        this.TEXT_ALIGN_CENTER=1;
-        this.TEXT_ALIGN_RIGHT=2;
-        
         this.MODEL_ROTATION_ORDER_XYZ=0;
         this.MODEL_ROTATION_ORDER_XZY=1;
         
@@ -168,48 +164,10 @@ export default class EntityClass
         if (this.modelEntityAlter!==null) this.modelEntityAlter.release();
     }
     
-    getSetup()
-    {
-        return(this.core.setup);
-    }
-    
-    getCamera()
-    {
-        return(this.core.camera);
-    }
-    
-        //
-        // meshes and liquids
-        //
-        
-    getMeshList()
-    {
-        return(this.core.map.meshList);
-    }
-    
-    getLiquidList()
-    {
-        return(this.core.map.liquidList);
-    }
-        
-        //
-        // ticks and periodics
-        //
-        
-    getTimestamp()
-    {
-        return(this.core.game.timestamp);
-    }
-    
         //
         // entity utilities
         //
         
-    getEntityList()
-    {
-        return(this.core.map.entityList);
-    }
-    
     getPlayerEntity()
     {
         return(this.core.map.entityList.getPlayer());
@@ -259,11 +217,6 @@ export default class EntityClass
         // effect utilities
         //
         
-    getEffectList()
-    {
-        return(this.core.map.effectList);
-    }
-    
     addEffect(spawnedByEntity,jsonName,position,data,show)
     {
         let effect;
@@ -373,7 +326,7 @@ export default class EntityClass
         entity=this.getPlayerEntity();
         
         dist=this.position.distance(entity.position);
-        if (dist<shakeDistance) this.core.startCameraShake(shakeTick,Math.trunc((shakeMaxShift*dist)/shakeDistance));
+        if (dist<shakeDistance) this.core.game.startCameraShake(shakeTick,Math.trunc((shakeMaxShift*dist)/shakeDistance));
     }
     
     /**

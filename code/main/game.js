@@ -1,7 +1,11 @@
 import PointClass from '../utility/point.js';
 import ColorClass from '../utility/color.js';
+import PlaneClass from '../utility/plane.js';
+import Matrix4Class from '../utility/matrix4.js';
 import MapClass from '../map/map.js';
+import CameraClass from '../main/camera.js';
 import ShadowmapLoadClass from '../light/shadowmap_load.js';
+import SequenceClass from '../sequence/sequence.js';
 import EntityFPSPlayerClass from '../project/entity_fps_player.js';
 import EntityFPSBotClass from '../project/entity_fps_bot.js';
 import DeveloperClass from '../developer/developer.js';
@@ -27,107 +31,82 @@ export default class GameClass
         this.scoreLastItemCount=0;
         this.scoreColor=new ColorClass(0,1,0.2);
         
+            // camera
+            
+        this.cameraShakeStartTick=-1;
+        this.cameraShakeTick=0;
+        this.cameraShakeShift=0;
+        
+        this.camera=null;
+        
+            // sequences
+            
+        this.currentSequence=null;
+        
+        this.freezePlayer=false;
+        this.freezeAI=false;
+        this.hideUI=false;
+ 
+            // triggers
+            
+        this.triggers=new Map();
+        
+            // stats
+            
+        this.fps=0.0;
+        this.fpsTotal=0;
+        this.fpsCount=0;
+        this.fpsStartTimestamp=0;
+        
+            // loading screen
+
+        this.loadingStrings=[];
+        this.loadingLastAddMsec=0;
+        
+            // loop
+            
         this.timestamp=0;
         this.lastSystemTimestamp=0;
         this.physicsTick=0;
         this.drawTick=0;
         this.lastPhysicTimestamp=0;
         this.lastDrawTimestamp=0;
-            
-        this.triggers=new Map();
         
         this.exitGame=false;
         
+            // eye
+            
+        this.lookAtUpVector=new PointClass(0.0,-1.0,0.0);
+        this.eyePos=new PointClass(0.0,0.0,0.0);
+        
+        this.cameraSpaceEyePos=new PointClass(0,0,0);
+        this.cameraSpacePos=new PointClass(0,0,0);
+        this.cameraSpaceViewMatrix=new Matrix4Class();
+
+        this.eyeRotMatrix=new Matrix4Class();
+        this.eyeRotMatrix2=new Matrix4Class();
+        this.billboardMatrix=new Matrix4Class();
+
+            // view lighting
+
+        this.lights=[];
+
+            // frustum planes
+
+        this.clipPlane=new Float32Array(16);            // global to avoid GCd
+
+        this.frustumLeftPlane=new PlaneClass(0.0,0.0,0.0,0.0);
+        this.frustumRightPlane=new PlaneClass(0.0,0.0,0.0,0.0);
+        this.frustumTopPlane=new PlaneClass(0.0,0.0,0.0,0.0);
+        this.frustumBottomPlane=new PlaneClass(0.0,0.0,0.0,0.0);
+        this.frustumNearPlane=new PlaneClass(0.0,0.0,0.0,0.0);
+        this.frustumFarPlane=new PlaneClass(0.0,0.0,0.0,0.0);
+        
         Object.seal(this);
     }
- 
+    
         //
-        // json lookup/load utilities
-        //
-        
-    lookupValue(value,data,valueDefault)
-    {
-        if ((data===undefined) || (data===null)) return(value);
-        if (value===undefined) return(valueDefault);
-        if (value===null) return(value);
-        if (typeof(value)!=='string') return(value);
-        if (value.length<2) return(value);
-        if (value.charAt(0)!=='@') return(value);
-        
-        return(data[value.substring(1)]);
-    }
-    
-    lookupAnimationValue(value)
-    {
-        if ((value===undefined) || (value===null)) return(null);
-        return(value);
-    }
-    
-    lookupSoundValue(value)
-    {
-        if ((value==undefined) || (value===null)) return(null);
-        return(value);
-    }
-    
-    lookupPointValue(value,valueDefaultX,valueDefaultY,valueDefaultZ)
-    {
-        if ((value==undefined) || (value===null)) return(new PointClass(valueDefaultX,valueDefaultY,valueDefaultZ));
-        return(new PointClass(value[0],value[1],value[2]));
-    }
-    
-    addJsonObjectToLoadSet(loadSet,data,requiredParentObjectKey,inParentObject,keyNames,obj)
-    {
-        let key,item,jsonEntity;
-        let recurseInParentObject;
-        
-        for (key in obj) {
-            
-                // recursal keys
-                
-            if (typeof(obj[key])==='object') {
-                
-                    // some properties are required to be within
-                    // a named parent object, check that here
-                
-                recurseInParentObject=inParentObject;
-                if (requiredParentObjectKey!==null) recurseInParentObject|=(key===requiredParentObjectKey);
-                
-                this.addJsonObjectToLoadSet(loadSet,data,requiredParentObjectKey,recurseInParentObject,keyNames,obj[key]);
-                continue;
-            }
-            
-            if (typeof(obj[key])==='array') {
-                for (item of obj[key]) {
-                    if (typeof(item)==='object') this.addJsonObjectToLoadSet(loadSet,data,requiredParentObjectKey,false,keyNames,item);
-                }
-                continue;
-            }
-                
-                // recurse into other entities
-                
-            if (key==='weaponJson') {
-                jsonEntity=this.jsonEntityCache.get(obj[key]);
-                if (jsonEntity!==null) this.addJsonObjectToLoadSet(loadSet,obj['weaponData'],requiredParentObjectKey,false,keyNames,jsonEntity);
-                continue;
-            }
-            
-            if (key==='projectileJson') {
-                jsonEntity=this.jsonEntityCache.get(obj[key]);
-                if (jsonEntity!==null) this.addJsonObjectToLoadSet(loadSet,obj['projectileData'],requiredParentObjectKey,false,keyNames,jsonEntity);
-                continue;
-            }
-            
-                // effect keys
-                
-            if (!keyNames.includes(key)) continue;
-            if ((requiredParentObjectKey!==null) && (!inParentObject)) continue;
-            
-            loadSet.add(this.lookupValue(obj[key],data,null));
-        }
-    }
-
-        //
-        // game initialize/release
+        // initialize and release
         //
         
     async fetchJson(name)
@@ -245,13 +224,106 @@ export default class GameClass
                         success=false;
                     }
                 );
+        
+        if (!success) return(false);
+        
+            // the camera
+            
+        this.camera=new CameraClass(this.core);
+        if (!this.camera.initialize()) return;
 
-        return(success);
+        return(true);
     }
     
     release()
     {
         if (this.json.developer) this.developer.release();
+        this.camera.release();
+    }
+ 
+        //
+        // json lookup/load utilities
+        //
+        
+    lookupValue(value,data,valueDefault)
+    {
+        if ((data===undefined) || (data===null)) return(value);
+        if (value===undefined) return(valueDefault);
+        if (value===null) return(value);
+        if (typeof(value)!=='string') return(value);
+        if (value.length<2) return(value);
+        if (value.charAt(0)!=='@') return(value);
+        
+        return(data[value.substring(1)]);
+    }
+    
+    lookupAnimationValue(value)
+    {
+        if ((value===undefined) || (value===null)) return(null);
+        return(value);
+    }
+    
+    lookupSoundValue(value)
+    {
+        if ((value==undefined) || (value===null)) return(null);
+        return(value);
+    }
+    
+    lookupPointValue(value,valueDefaultX,valueDefaultY,valueDefaultZ)
+    {
+        if ((value==undefined) || (value===null)) return(new PointClass(valueDefaultX,valueDefaultY,valueDefaultZ));
+        return(new PointClass(value[0],value[1],value[2]));
+    }
+    
+    addJsonObjectToLoadSet(loadSet,data,requiredParentObjectKey,inParentObject,keyNames,obj)
+    {
+        let key,item,jsonEntity;
+        let recurseInParentObject;
+        
+        for (key in obj) {
+            
+                // recursal keys
+                
+            if (typeof(obj[key])==='object') {
+                
+                    // some properties are required to be within
+                    // a named parent object, check that here
+                
+                recurseInParentObject=inParentObject;
+                if (requiredParentObjectKey!==null) recurseInParentObject|=(key===requiredParentObjectKey);
+                
+                this.addJsonObjectToLoadSet(loadSet,data,requiredParentObjectKey,recurseInParentObject,keyNames,obj[key]);
+                continue;
+            }
+            
+            if (typeof(obj[key])==='array') {
+                for (item of obj[key]) {
+                    if (typeof(item)==='object') this.addJsonObjectToLoadSet(loadSet,data,requiredParentObjectKey,false,keyNames,item);
+                }
+                continue;
+            }
+                
+                // recurse into other entities
+                
+            if (key==='weaponJson') {
+                jsonEntity=this.jsonEntityCache.get(obj[key]);
+                if (jsonEntity!==null) this.addJsonObjectToLoadSet(loadSet,obj['weaponData'],requiredParentObjectKey,false,keyNames,jsonEntity);
+                continue;
+            }
+            
+            if (key==='projectileJson') {
+                jsonEntity=this.jsonEntityCache.get(obj[key]);
+                if (jsonEntity!==null) this.addJsonObjectToLoadSet(loadSet,obj['projectileData'],requiredParentObjectKey,false,keyNames,jsonEntity);
+                continue;
+            }
+            
+                // effect keys
+                
+            if (!keyNames.includes(key)) continue;
+            if ((requiredParentObjectKey!==null) && (!inParentObject)) continue;
+            
+            loadSet.add(this.lookupValue(obj[key],data,null));
+        }
     }
 
         //
@@ -287,8 +359,8 @@ export default class GameClass
             y=-Math.trunc((35*(this.MAX_SCORE_COUNT-1))*0.5);
             
             for (n=0;n!==this.MAX_SCORE_COUNT;n++) {
-                this.core.interface.addText(('score_name_'+n),'',this.core.interface.POSITION_MODE_MIDDLE,{"x":0,"y":y},30,this.core.interface.TEXT_ALIGN_RIGHT,this.scoreColor,1,false);
-                this.core.interface.addText(('score_point_'+n),'',this.core.interface.POSITION_MODE_MIDDLE,{"x":10,"y":y},30,this.core.interface.TEXT_ALIGN_LEFT,this.scoreColor,1,false);
+                this.core.interface.addText(('score_name_'+n),'',this.core.interface.POSITION_MODE_MIDDLE,{"x":0,"y":y},30,InterfaceTextClass.TEXT_ALIGN_RIGHT,this.scoreColor,1,false);
+                this.core.interface.addText(('score_point_'+n),'',this.core.interface.POSITION_MODE_MIDDLE,{"x":10,"y":y},30,InterfaceTextClass.TEXT_ALIGN_LEFT,this.scoreColor,1,false);
                 y+=35;
             }
             
@@ -297,6 +369,14 @@ export default class GameClass
             this.scoreShow=false;
             this.scoreLastItemCount=0;
         }
+        
+            // no sequences
+            
+        this.currentSequence=null;
+        
+        this.freezePlayer=false;
+        this.freezeAI=false;
+        this.hideUI=false;
                 
             // developer mode initialization
         
@@ -355,13 +435,13 @@ export default class GameClass
     won()
     {
         console.info('win');
-        if (this.json.config.sequenceWon!==null) this.core.startSequence(this.json.config.sequenceWon);
+        if (this.json.config.sequenceWon!==null) this.startSequence(this.json.config.sequenceWon);
     }
     
     lost()
     {
         console.info('lost');
-        if (this.json.config.sequenceLost!==null) this.core.startSequence(this.json.config.sequenceLost);
+        if (this.json.config.sequenceLost!==null) this.startSequence(this.json.config.sequenceLost);
     }
     
         //
@@ -370,7 +450,7 @@ export default class GameClass
         
     runStartSequence()
     {
-        if (this.json.config.sequenceStart!==null) this.core.startSequence(this.json.config.sequenceStart);
+        if (this.json.config.sequenceStart!==null) this.startSequence(this.json.config.sequenceStart);
     }
     
         //
@@ -502,10 +582,10 @@ export default class GameClass
     }
     
         //
-        // start the game
+        // game loop
         //
         
-    startGameLoop()
+    startLoop()
     {
         let startMap;
         
@@ -519,23 +599,29 @@ export default class GameClass
             // next step
 
         //if (!this.core.isMultiplayer) {
-            this.core.loadingScreenUpdate();
-            this.core.loadingScreenAddString('Loading Map');
-            this.core.loadingScreenDraw();
+            this.loadingScreenUpdate();
+            this.loadingScreenAddString('Loading Map');
+            this.loadingScreenDraw();
 
             setTimeout(this.initLoadMap.bind(this),1);
             /*
         }
         else {
-            this.core.loadingScreenUpdate();
-            this.core.loadingScreenAddString('Waiting for Setup');
-            this.core.loadingScreenDraw();
+            this.loadingScreenUpdate();
+            this.loadingScreenAddString('Waiting for Setup');
+            this.loadingScreenDraw();
             
             setTimeout(this.runMultiplayerDialog.bind(this),1);
         }
 
              */
     }
+    
+        //
+        // game startup
+        //
+    
+    
     /*
     runMultiplayerDialog()
     {
@@ -555,18 +641,18 @@ export default class GameClass
         
             // connect to server
             
-        this.core.loadingScreenUpdate();
-        this.core.loadingScreenAddString('Connecting to Server');
-        this.core.loadingScreenDraw();
+        this.loadingScreenUpdate();
+        this.loadingScreenAddString('Connecting to Server');
+        this.loadingScreenDraw();
         
         this.core.network.connect(this.runMultiplayerConnectedOK.bind(this),this.runMultiplayerConnectedError.bind(this));     // return here, callback from connection or error
     }
     
     runMultiplayerConnectedOK()
     {
-        this.core.loadingScreenUpdate();
-        this.core.loadingScreenAddString('Loading Map');
-        this.core.loadingScreenDraw();
+        this.loadingScreenUpdate();
+        this.loadingScreenAddString('Loading Map');
+        this.loadingScreenDraw();
         
         setTimeout(this.initLoadMap.bind(this),1);
     }
@@ -581,9 +667,9 @@ export default class GameClass
     {
         if (!(await this.core.map.loadMap())) return;
         
-        this.core.loadingScreenUpdate();
-        this.core.loadingScreenAddString('Building Collision Geometry');
-        this.core.loadingScreenDraw();
+        this.loadingScreenUpdate();
+        this.loadingScreenAddString('Building Collision Geometry');
+        this.loadingScreenDraw();
         
         setTimeout(this.initCollisionGeometry.bind(this),1);
     }
@@ -592,10 +678,10 @@ export default class GameClass
     {
         this.core.map.meshList.buildCollisionGeometry();
         
-        this.core.loadingScreenUpdate();
+        this.loadingScreenUpdate();
 
-        this.core.loadingScreenAddString('Loading Shadowmap');
-        this.core.loadingScreenDraw();
+        this.loadingScreenAddString('Loading Shadowmap');
+        this.loadingScreenDraw();
 
         setTimeout(this.initLoadShadowmap.bind(this),1);
     }
@@ -606,9 +692,9 @@ export default class GameClass
         
         if (!(await shadowmapLoad.load())) return;
         
-        this.core.loadingScreenUpdate();
-        this.core.loadingScreenAddString('Load Models');
-        this.core.loadingScreenDraw();
+        this.loadingScreenUpdate();
+        this.loadingScreenAddString('Load Models');
+        this.loadingScreenDraw();
        
         setTimeout(this.initLoadModels.bind(this),1);    
     }
@@ -617,9 +703,9 @@ export default class GameClass
     {
         if (!(await this.core.modelList.loadAllModels())) return;
         
-        this.core.loadingScreenUpdate();
-        this.core.loadingScreenAddString('Load Sounds');
-        this.core.loadingScreenDraw();
+        this.loadingScreenUpdate();
+        this.loadingScreenAddString('Load Sounds');
+        this.loadingScreenDraw();
         
         setTimeout(this.initLoadSounds.bind(this),1);
     }
@@ -629,9 +715,9 @@ export default class GameClass
         if (!(await this.core.soundList.loadAllSounds())) return;
         if (!(await this.core.music.load())) return;
     
-        this.core.loadingScreenUpdate();
-        this.core.loadingScreenAddString('Load Images');
-        this.core.loadingScreenDraw();
+        this.loadingScreenUpdate();
+        this.loadingScreenAddString('Load Images');
+        this.loadingScreenDraw();
 
         setTimeout(this.initLoadImages.bind(this),1);
     }
@@ -640,9 +726,9 @@ export default class GameClass
     {
         if (!(await this.core.bitmapList.loadAllBitmaps())) return;
         
-        this.core.loadingScreenUpdate();
-        this.core.loadingScreenAddString('Initializing Entities and Effects');
-        this.core.loadingScreenDraw();
+        this.loadingScreenUpdate();
+        this.loadingScreenAddString('Initializing Entities and Effects');
+        this.loadingScreenDraw();
         
         setTimeout(this.initLoadEntities.bind(this),1);
     }
@@ -661,9 +747,9 @@ export default class GameClass
             
         if (!this.core.map.entityList.initializeMapEntities()) return;    // halt on bad entity start
         
-        this.core.loadingScreenUpdate();
-        this.core.loadingScreenAddString('CLICK TO START');
-        this.core.loadingScreenDraw();
+        this.loadingScreenUpdate();
+        this.loadingScreenAddString('CLICK TO START');
+        this.loadingScreenDraw();
         this.core.canvas.style.display='';
         
         setTimeout(this.initFinalSetup.bind(this),1);
@@ -697,21 +783,16 @@ export default class GameClass
         
             // start any sequence
             
-        this.core.game.runStartSequence();
-        
-            // start the main loop in paused mode
-            // we have to do this because without a click we can't capture screen
-
-        //this.core.setPauseState(false,true);
+        this.runStartSequence();
         
             // if we are in a networked game, last thing to
             // do is request a map_sync to get the map in the right time
             
             /*
         if (this.core.isMultiplayer) {
-            this.core.loadingScreenUpdate();
-            this.core.loadingScreenAddString('Connecting to Server');
-            this.core.loadingScreenDraw();
+            this.loadingScreenUpdate();
+            this.loadingScreenAddString('Connecting to Server');
+            this.loadingScreenDraw();
         
             this.core.network.sync(this.runMultiplayerSyncOK.bind(this),this.runMultiplayerSyncError.bind(this));     // return here, callback from connection or error
             return;
@@ -719,6 +800,8 @@ export default class GameClass
         */
        
             // start the main loop
+            
+        this.core.currentLoop=this.core.GAME_LOOP;
         
         this.timestamp=0;
         this.lastSystemTimestamp=Math.trunc(window.performance.now());
@@ -735,13 +818,168 @@ export default class GameClass
     
     runMultiplayerSyncOK()
     {
-        this.core.game.startGameLoop();
+        this.core.game.startLoop();
     }
     
     runMultiplayerSyncError()
     {
         alert(this.core.network.lastErrorMessage);
         this.network.disconnect();
+    }
+    
+        //
+        // camera shaking
+        //
+        
+    startCameraShake(shakeTick,shakeShift)
+    {
+        this.cameraShakeStartTick=this.timestamp;
+        this.cameraShakeTick=shakeTick;
+        this.cameraShakeShift=shakeShift;
+    }
+    
+    runCameraShake()
+    {
+        let tick,shakeSize;
+        
+        if (this.cameraShakeStartTick===-1) return;
+        
+            // time to end shake?
+            
+        tick=this.timestamp-this.cameraShakeStartTick;
+        if (tick>this.cameraShakeTick) {
+            this.cameraShakeStartTick=-1;
+            return;
+        }
+        
+            // shake camera
+         
+        shakeSize=this.cameraShakeShift*(1.0-(tick/this.cameraShakeTick));
+        this.eyePos.x+=Math.trunc(Math.random()*shakeSize);
+        this.eyePos.y+=Math.trunc(Math.random()*shakeSize);
+        this.eyePos.z+=Math.trunc(Math.random()*shakeSize);
+    }
+    
+        //
+        // sequences
+        //
+        
+    startSequence(jsonName)
+    {
+        this.currentSequence=new SequenceClass(this.core,jsonName);
+        
+        if (!this.currentSequence.initialize()) {
+            console.log('unable to start sequence: '+jsonName);
+            this.currentSequence=null;
+        }
+    }
+    
+        //
+        // coordinate and frustums
+        //
+    
+    convertToEyeCoordinates(pnt,eyePnt)
+    {
+        let viewMatrix=this.core.viewMatrix;
+        
+        eyePnt.x=(pnt.x*viewMatrix.data[0])+(pnt.y*viewMatrix.data[4])+(pnt.z*viewMatrix.data[8])+viewMatrix.data[12];
+        eyePnt.y=(pnt.x*viewMatrix.data[1])+(pnt.y*viewMatrix.data[5])+(pnt.z*viewMatrix.data[9])+viewMatrix.data[13];
+        eyePnt.z=(pnt.x*viewMatrix.data[2])+(pnt.y*viewMatrix.data[6])+(pnt.z*viewMatrix.data[10])+viewMatrix.data[14];
+    }
+
+    buildCullingFrustum()
+    {
+        let viewMatrix=this.core.viewMatrix;
+        let perspectiveMatrix=this.core.perspectiveMatrix;
+        
+            // combine the matrixes
+            // to build the frustum
+            // ABCD planes equations
+
+        this.clipPlane[0]=(viewMatrix.data[0]*perspectiveMatrix.data[0])+(viewMatrix.data[1]*perspectiveMatrix.data[4])+(viewMatrix.data[2]*perspectiveMatrix.data[8])+(viewMatrix.data[3]*perspectiveMatrix.data[12]);
+        this.clipPlane[1]=(viewMatrix.data[0]*perspectiveMatrix.data[1])+(viewMatrix.data[1]*perspectiveMatrix.data[5])+(viewMatrix.data[2]*perspectiveMatrix.data[9])+(viewMatrix.data[3]*perspectiveMatrix.data[13]);
+        this.clipPlane[2]=(viewMatrix.data[0]*perspectiveMatrix.data[2])+(viewMatrix.data[1]*perspectiveMatrix.data[6])+(viewMatrix.data[2]*perspectiveMatrix.data[10])+(viewMatrix.data[3]*perspectiveMatrix.data[14]);
+        this.clipPlane[3]=(viewMatrix.data[0]*perspectiveMatrix.data[3])+(viewMatrix.data[1]*perspectiveMatrix.data[7])+(viewMatrix.data[2]*perspectiveMatrix.data[11])+(viewMatrix.data[3]*perspectiveMatrix.data[15]);
+
+        this.clipPlane[4]=(viewMatrix.data[4]*perspectiveMatrix.data[0])+(viewMatrix.data[5]*perspectiveMatrix.data[4])+(viewMatrix.data[6]*perspectiveMatrix.data[8])+(viewMatrix.data[7]*perspectiveMatrix.data[12]);
+        this.clipPlane[5]=(viewMatrix.data[4]*perspectiveMatrix.data[1])+(viewMatrix.data[5]*perspectiveMatrix.data[5])+(viewMatrix.data[6]*perspectiveMatrix.data[9])+(viewMatrix.data[7]*perspectiveMatrix.data[13]);
+        this.clipPlane[6]=(viewMatrix.data[4]*perspectiveMatrix.data[2])+(viewMatrix.data[5]*perspectiveMatrix.data[6])+(viewMatrix.data[6]*perspectiveMatrix.data[10])+(viewMatrix.data[7]*perspectiveMatrix.data[14]);
+        this.clipPlane[7]=(viewMatrix.data[4]*perspectiveMatrix.data[3])+(viewMatrix.data[5]*perspectiveMatrix.data[7])+(viewMatrix.data[6]*perspectiveMatrix.data[11])+(viewMatrix.data[7]*perspectiveMatrix.data[15]);
+
+        this.clipPlane[8]=(viewMatrix.data[8]*perspectiveMatrix.data[0])+(viewMatrix.data[9]*perspectiveMatrix.data[4])+(viewMatrix.data[10]*perspectiveMatrix.data[8])+(viewMatrix.data[11]*perspectiveMatrix.data[12]);
+        this.clipPlane[9]=(viewMatrix.data[8]*perspectiveMatrix.data[1])+(viewMatrix.data[9]*perspectiveMatrix.data[5])+(viewMatrix.data[10]*perspectiveMatrix.data[9])+(viewMatrix.data[11]*perspectiveMatrix.data[13]);
+        this.clipPlane[10]=(viewMatrix.data[8]*perspectiveMatrix.data[2])+(viewMatrix.data[9]*perspectiveMatrix.data[6])+(viewMatrix.data[10]*perspectiveMatrix.data[10])+(viewMatrix.data[11]*perspectiveMatrix.data[14]);
+        this.clipPlane[11]=(viewMatrix.data[8]*perspectiveMatrix.data[3])+(viewMatrix.data[9]*perspectiveMatrix.data[7])+(viewMatrix.data[10]*perspectiveMatrix.data[11])+(viewMatrix.data[11]*perspectiveMatrix.data[15]);
+
+        this.clipPlane[12]=(viewMatrix.data[12]*perspectiveMatrix.data[0])+(viewMatrix.data[13]*perspectiveMatrix.data[4])+(viewMatrix.data[14]*perspectiveMatrix.data[8])+(viewMatrix.data[15]*perspectiveMatrix.data[12]);
+        this.clipPlane[13]=(viewMatrix.data[12]*perspectiveMatrix.data[1])+(viewMatrix.data[13]*perspectiveMatrix.data[5])+(viewMatrix.data[14]*perspectiveMatrix.data[9])+(viewMatrix.data[15]*perspectiveMatrix.data[13]);
+        this.clipPlane[14]=(viewMatrix.data[12]*perspectiveMatrix.data[2])+(viewMatrix.data[13]*perspectiveMatrix.data[6])+(viewMatrix.data[14]*perspectiveMatrix.data[10])+(viewMatrix.data[15]*perspectiveMatrix.data[14]);
+        this.clipPlane[15]=(viewMatrix.data[12]*perspectiveMatrix.data[3])+(viewMatrix.data[13]*perspectiveMatrix.data[7])+(viewMatrix.data[14]*perspectiveMatrix.data[11])+(viewMatrix.data[15]*perspectiveMatrix.data[15]);
+
+                // left plane
+
+        this.frustumLeftPlane.a=this.clipPlane[3]+this.clipPlane[0];
+        this.frustumLeftPlane.b=this.clipPlane[7]+this.clipPlane[4];
+        this.frustumLeftPlane.c=this.clipPlane[11]+this.clipPlane[8];
+        this.frustumLeftPlane.d=this.clipPlane[15]+this.clipPlane[12];
+        this.frustumLeftPlane.normalize();
+
+                // right plane
+
+        this.frustumRightPlane.a=this.clipPlane[3]-this.clipPlane[0];
+        this.frustumRightPlane.b=this.clipPlane[7]-this.clipPlane[4];
+        this.frustumRightPlane.c=this.clipPlane[11]-this.clipPlane[8];
+        this.frustumRightPlane.d=this.clipPlane[15]-this.clipPlane[12];
+        this.frustumRightPlane.normalize();
+
+                // top plane
+
+        this.frustumTopPlane.a=this.clipPlane[3]-this.clipPlane[1];
+        this.frustumTopPlane.b=this.clipPlane[7]-this.clipPlane[5];
+        this.frustumTopPlane.c=this.clipPlane[11]-this.clipPlane[9];
+        this.frustumTopPlane.d=this.clipPlane[15]-this.clipPlane[13];
+        this.frustumTopPlane.normalize();
+
+                // bottom plane
+
+        this.frustumBottomPlane.a=this.clipPlane[3]+this.clipPlane[1];
+        this.frustumBottomPlane.b=this.clipPlane[7]+this.clipPlane[5];
+        this.frustumBottomPlane.c=this.clipPlane[11]+this.clipPlane[9];
+        this.frustumBottomPlane.d=this.clipPlane[15]+this.clipPlane[13];
+        this.frustumBottomPlane.normalize();
+
+                // near plane
+
+        this.frustumNearPlane.a=this.clipPlane[3]+this.clipPlane[2];
+        this.frustumNearPlane.b=this.clipPlane[7]+this.clipPlane[6];
+        this.frustumNearPlane.c=this.clipPlane[11]+this.clipPlane[10];
+        this.frustumNearPlane.d=this.clipPlane[15]+this.clipPlane[14];
+        this.frustumNearPlane.normalize();
+
+                // far plane
+
+        this.frustumFarPlane.a=this.clipPlane[3]-this.clipPlane[2];
+        this.frustumFarPlane.b=this.clipPlane[7]-this.clipPlane[6];
+        this.frustumFarPlane.c=this.clipPlane[11]-this.clipPlane[10];
+        this.frustumFarPlane.d=this.clipPlane[15]-this.clipPlane[14];
+        this.frustumFarPlane.normalize();
+    }
+
+    boundBoxInFrustum(xBound,yBound,zBound)
+    {
+            // check if outside the plane, if it is,
+            // then it's considered outside the bounds
+
+        if (!this.frustumLeftPlane.boundBoxOutsidePlane(xBound,yBound,zBound)) return(false);
+        if (!this.frustumRightPlane.boundBoxOutsidePlane(xBound,yBound,zBound)) return(false);
+        if (!this.frustumTopPlane.boundBoxOutsidePlane(xBound,yBound,zBound)) return(false);
+        if (!this.frustumBottomPlane.boundBoxOutsidePlane(xBound,yBound,zBound)) return(false);
+        if (!this.frustumNearPlane.boundBoxOutsidePlane(xBound,yBound,zBound)) return(false);
+        if (!this.frustumFarPlane.boundBoxOutsidePlane(xBound,yBound,zBound)) return(false);
+
+            // otherwise considered within the frustum planes
+
+        return(true);
     }
     
         //
@@ -759,6 +997,238 @@ export default class GameClass
             // developer functions
             
         if (this.json.developer) this.developer.run();
+
+            // sequences
+            
+        if (this.currentSequence!==null) {
+            if (this.currentSequence.isFinished()) {
+                this.currentSequence.release();
+                this.currentSequence=null;
+            }
+            else {  
+                this.currentSequence.run();
+            }
+        }
+        
+    }
+    
+        //
+        // draw view
+        //
+
+    draw()
+    {
+        let n;
+        let light;
+        let player=this.core.map.entityList.getPlayer();
+        let developerOn=this.developer.on;
+        let gl=this.core.gl;
+         
+            // everything overdraws except
+            // clear the depth buffer
+            
+        gl.clear(gl.DEPTH_BUFFER_BIT);
+        
+            // if in developer, clear the background
+            // because we can float outside maps without
+            // skies
+          
+        if (developerOn) {
+            gl.clearColor(0.5,0.5,1,0);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+        }
+        
+            // setup the view camera based on
+            // the camera settings and the camera entity
+            
+        if (!developerOn) {
+            this.camera.setup(player);
+        }
+        else {
+            this.camera.setupDeveloper();
+        }
+        
+            // create the perspective matrix
+            // note this function has a translate in it for NEAR_Z
+
+        this.core.perspectiveMatrix.setPerspectiveMatrix(this.camera.glFOV,this.core.aspect,this.camera.glNearZ,this.camera.glFarZ);
+
+            // the eye point is -this.camera.glNearZ behind
+            // the player
+
+        this.eyePos.setFromValues(0,0,-this.camera.glNearZ);
+        this.eyeRotMatrix.setTranslationFromPoint(this.camera.position);
+        this.eyeRotMatrix2.setRotationFromYAngle(this.camera.angle.y);
+        this.eyeRotMatrix.multiply(this.eyeRotMatrix2);
+        this.eyeRotMatrix2.setRotationFromXAngle(this.camera.angle.x);
+        this.eyeRotMatrix.multiply(this.eyeRotMatrix2);
+        this.eyePos.matrixMultiply(this.eyeRotMatrix);
+        
+        this.runCameraShake();
+
+            // setup the look at
+
+        this.core.viewMatrix.setLookAtMatrix(this.eyePos,this.camera.position,this.lookAtUpVector);
+        
+            // camera space view matrix
+            // (for things like weapons)
+            
+        this.cameraSpaceEyePos=new PointClass(0,0,-this.camera.glNearZ);
+        this.cameraSpacePos=new PointClass(0,0,0);
+        this.cameraSpaceViewMatrix.setLookAtMatrix(this.cameraSpaceEyePos,this.cameraSpacePos,this.lookAtUpVector);
+
+            // the 2D ortho matrix (at the core level)
+
+        this.core.orthoMatrix.setOrthoMatrix(this.core.wid,this.core.high,-1.0,1.0);
+        
+            // build the billboarding matrixes
+            // mostly used for particles
+            
+        this.billboardMatrix.setRotationFromYAngle(this.camera.angle.y);
+        this.eyeRotMatrix.setRotationFromXAngle(this.camera.angle.x);
+        this.billboardMatrix.multiply(this.eyeRotMatrix);
+
+            // build the culling frustum
+
+        this.buildCullingFrustum();
+        
+            // run the effect draw setups first
+            // so lighting positions are set
+            
+        this.core.map.effectList.drawSetup();
+        
+            // convert view lights to shader lights
+            // all lights need a eye coordinate, so calc
+            // that here
+            
+        this.lights=[];
+
+        this.core.map.lightList.addLightsToViewLights();
+        this.core.map.effectList.addLightsToViewLights();
+        this.core.map.lightList.addLightsToViewLightsAmbients();     // there is a special ambient flag, which always gets into the list
+        
+            // fill in any missing lights with NULL
+
+        while (this.lights.length<this.core.MAX_LIGHT_COUNT) {
+            this.lights.push(null);
+        }
+        
+            // and create light eye cordinates
+
+        for (n=0;n!==this.core.MAX_LIGHT_COUNT;n++) {
+            light=this.lights[n];
+            if (light!==null) this.convertToEyeCoordinates(light.position,light.eyePosition);
+        }
+        
+            // draw the map
+            
+        if (!developerOn) {
+            this.core.map.background.draw();
+            this.core.map.sky.draw();
+            this.core.map.meshList.drawMap();
+            if (this.core.map.hasShadowmap) this.core.map.meshList.drawMapShadow();
+        }
+        else {
+            switch (this.developer.drawMode) {
+                case this.developer.DRAW_MODE_NORMAL:
+                    this.core.map.meshList.drawMap();
+                    break;
+                case this.developer.DRAW_MODE_SHADOW:
+                    this.core.map.meshList.drawMapShadow();
+                    break;
+                case this.developer.DRAW_MODE_COLLISION:
+                    this.core.map.meshList.drawCollisionSurfaces();
+                    break;
+            }
+        }
+        
+            // draw any non held entities
+            
+        this.core.map.entityList.draw(null);
+        
+            // liquids
+            
+        this.core.map.liquidList.draw();
+        
+            // effects
+            
+        this.core.map.effectList.draw();
+        if (developerOn) this.core.map.lightList.draw();
+        
+            // and finally held entities,
+            // clearing the z buffer first
+            // (skip this if in developer)
+            
+        if (!developerOn) {
+            gl.clear(gl.DEPTH_BUFFER_BIT);
+            this.core.map.entityList.draw(player);
+        }
+        
+            // path and ray developer
+            
+        if (developerOn) {
+            this.core.map.path.drawPath();
+            this.developer.developerRay.draw();
+        }
+        
+            // interface
+            
+        if (!this.hideUI) this.core.interface.draw();
+        
+            // sequences
+            
+        if (this.currentSequence!==null) this.currentSequence.draw();
+        
+            // any paused text
+            
+        if (this.core.input.paused) this.core.interface.drawPauseMessage();
+    }
+    
+        //
+        // loading screen
+        //
+    
+    loadingScreenClear()
+    {
+        this.loadingStrings=[];
+    }
+    
+    loadingScreenAddString(str)
+    {
+        this.loadingStrings.push(str);
+        
+        this.loadingLastAddMsec=Date.now();
+    }
+    
+    loadingScreenUpdate()
+    {
+        let msec;
+        let idx=this.loadingStrings.length-1;
+        if (idx<0) return;
+        
+        msec=Date.now()-this.loadingLastAddMsec;
+        
+        this.loadingStrings[idx]+=(' ['+msec+'ms]');
+        
+        console.info(this.loadingStrings[idx]);      // supergumba -- temporary for optimization testing
+    }
+    
+    loadingScreenDraw()
+    {
+        let gl=this.core.gl;
+        
+            // the 2D ortho matrix
+
+        this.core.orthoMatrix.setOrthoMatrix(this.core.wid,this.core.high,-1.0,1.0);
+        
+            // clear to black
+            
+        gl.clearColor(0.0,0.0,0.0,1.0);
+        gl.clear(gl.COLOR_BUFFER_BIT,gl.DEPTH_BUFFER_BIT);
+        
+            // debug console
+            
+        this.core.interface.drawDebugConsole(this.loadingStrings);
     }
 }
 
@@ -809,8 +1279,7 @@ function gameMainLoop(timestamp)
                 game.lastPhysicTimestamp+=PHYSICS_MILLISECONDS;
 
                 map.meshList.run();
-                core.run();
-                core.game.run();
+                game.run();
                 map.entityList.run();
             }
         }
@@ -838,7 +1307,7 @@ function gameMainLoop(timestamp)
         // time to exit loop?
         
     if (game.exitGame) {
-        setTimeout(window.main.core.title.startTitleLoop.bind(window.main.core.title),1);  // always force it to start on next go around
+        setTimeout(window.main.core.title.startLoop.bind(window.main.core.title),1);  // always force it to start on next go around
         return;
     }
     
@@ -852,29 +1321,29 @@ function gameMainLoop(timestamp)
     if (game.drawTick>DRAW_MILLISECONDS) {
         game.lastDrawTimestamp=game.timestamp; 
 
-        core.draw();
+        game.draw();
         
-        core.fpsTotal+=game.drawTick;
-        core.fpsCount++;
+        game.fpsTotal+=game.drawTick;
+        game.fpsCount++;
     }
     
         // the fps
         
-    if (core.fpsStartTimestamp===-1) core.fpsStartTimestamp=game.timestamp; // a reset from paused state
+    if (game.fpsStartTimestamp===-1) game.fpsStartTimestamp=game.timestamp; // a reset from paused state
     
-    fpsTime=game.timestamp-core.fpsStartTimestamp;
+    fpsTime=game.timestamp-game.fpsStartTimestamp;
     if (fpsTime>=1000) {
-        core.fps=(core.fpsCount*1000.0)/core.fpsTotal;
-        core.fpsStartTimestamp=game.timestamp;
+        game.fps=(game.fpsCount*1000.0)/game.fpsTotal;
+        game.fpsStartTimestamp=game.timestamp;
 
-        core.fpsTotal=0;
-        core.fpsCount=0;
+        game.fpsTotal=0;
+        game.fpsCount=0;
     }
     
         // special check for touch controls
         // pausing the game
 
-    if (core.input.touchMenuTrigger) core.setPauseState(true,false);
+    //if (core.input.touchMenuTrigger) core.setPauseState(true,false);
     
         // next frame
         

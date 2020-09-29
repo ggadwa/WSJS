@@ -50,7 +50,7 @@ export default class EntityKartPlayerClass extends EntityKartBaseClass
     {
         super.ready();
         
-        this.core.camera.gotoThirdPerson(this.thirdPersonCameraDistance,this.thirdPersonCameraLookAngle);
+        this.core.game.camera.gotoThirdPerson(this.thirdPersonCameraDistance,this.thirdPersonCameraLookAngle);
     }
         
         //
@@ -63,9 +63,9 @@ export default class EntityKartPlayerClass extends EntityKartBaseClass
         let forward,reverse,drifting,brake,jump;
         let textLap;
         let input=this.core.input;
-        let setup=this.getSetup();
+        let setup=this.core.setup;
         
-        if (this.core.freezePlayer) return;
+        if (this.core.game.freezePlayer) return;
         
             // interface updates
             

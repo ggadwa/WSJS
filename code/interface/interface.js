@@ -25,12 +25,6 @@ export default class InterfaceClass
         this.TEXT_FONT_NAME='Arial';
         this.TEXT_FONT_SIZE=48;
         
-        this.TEXT_ALIGN_LEFT=0;
-        this.TEXT_ALIGN_CENTER=1;
-        this.TEXT_ALIGN_RIGHT=2;
-        
-        this.TEXT_ALIGN_LIST=['left','center','right'];
-        
         this.POSITION_MODE_TOP_LEFT=0;
         this.POSITION_MODE_TOP_RIGHT=1;
         this.POSITION_MODE_BOTTOM_LEFT=2;
@@ -452,7 +446,7 @@ export default class InterfaceClass
         
         if (jsonInterface.texts!==undefined) {
             for (text of jsonInterface.texts) {
-                align=this.core.interface.TEXT_ALIGN_LIST.indexOf(text.textAlign);
+                align=InterfaceTextClass.TEXT_ALIGN_LIST.indexOf(text.textAlign);
                 positionMode=this.POSITION_MODE_LIST.indexOf(text.positionMode);
                 this.addText(text.id,text.text,positionMode,text.positionOffset,text.textSize,align,new ColorClass(text.color.r,text.color.g,text.color.b),text.alpha,false);
                 this.showText(text.id,text.show);
@@ -549,7 +543,7 @@ export default class InterfaceClass
         
         for (n=0;n!==nLine;n++) {
             if (n===(nLine-1)) col=new ColorClass(1,0.3,0.3);
-            text=new InterfaceTextClass(this.core,consoleStrings[n],5,y,20,this.TEXT_ALIGN_LEFT,col,1,false);
+            text=new InterfaceTextClass(this.core,consoleStrings[n],5,y,20,InterfaceTextClass.TEXT_ALIGN_LEFT,col,1,false);
             text.initialize();
             text.draw();
             text.release();
@@ -559,6 +553,39 @@ export default class InterfaceClass
         
         this.core.shaderList.textShader.drawEnd();
 
+        gl.disable(gl.BLEND);
+        gl.enable(gl.DEPTH_TEST);
+    }
+    
+        //
+        // special pause message when control leaves the canvas
+        //
+        
+    drawPauseMessage()
+    {
+        let text;
+        let gl=this.core.gl;
+        
+            // only need the othro matrix for this
+            
+        this.core.orthoMatrix.setOrthoMatrix(this.core.wid,this.core.high,-1.0,1.0);
+        
+            // draw pause message
+            
+        gl.disable(gl.DEPTH_TEST);
+
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+        
+        this.core.shaderList.textShader.drawStart();
+            
+        text=new InterfaceTextClass(this.core,'Click to Capture Control',Math.trunc(this.core.wid*0.5),Math.trunc(this.core.high*0.5),40,InterfaceTextClass.TEXT_ALIGN_CENTER,new ColorClass(1,1,0),1,false);
+        text.initialize();
+        text.draw();
+        text.release();
+        
+        this.core.shaderList.textShader.drawEnd();
+        
         gl.disable(gl.BLEND);
         gl.enable(gl.DEPTH_TEST);
     }

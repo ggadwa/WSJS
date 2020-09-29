@@ -135,7 +135,7 @@ export default class ModelMeshShaderClass extends ShaderClass
         for (n=0;n!==this.core.MAX_LIGHT_COUNT;n++) {
 
             light=this.lights[n];
-            viewLight=this.core.lights[n];
+            viewLight=this.core.game.lights[n];
 
                 // no light sets intensity to 0
 

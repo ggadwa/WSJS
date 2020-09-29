@@ -309,7 +309,7 @@ export default class MapSkyClass
         
             // set the globe transforms
             
-        this.position.setFromAddPoint(this.core.camera.position,this.offset);
+        this.position.setFromAddPoint(this.core.game.camera.position,this.offset);
             
         this.transformMatrix.setTranslationFromPoint(this.position);
         this.tempMatrix.setScaleFromPoint(this.scale);

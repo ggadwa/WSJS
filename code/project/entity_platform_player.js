@@ -123,7 +123,7 @@ export default class EntityPlatformPlayerClass extends EntityClass
         
         this.collectItemCount=0;
         
-        this.core.camera.gotoPlatform(this.platformCameraDistance,this.platformCameraYUpMoveFactor,this.platformCameraYDownMoveFactor);
+        this.core.game.camera.gotoPlatform(this.platformCameraDistance,this.platformCameraYUpMoveFactor,this.platformCameraYDownMoveFactor);
         
         this.modelEntityAlter.startAnimationChunkInFrames(this.idleAnimation);
     }
@@ -187,7 +187,7 @@ export default class EntityPlatformPlayerClass extends EntityClass
         
         super.run();
         
-        if (this.core.freezePlayer) return;
+        if (this.core.game.freezePlayer) return;
         
             // interface updates
             
@@ -336,7 +336,7 @@ export default class EntityPlatformPlayerClass extends EntityClass
             if (this.currentCameraY<this.position.y) this.currentCameraY=this.position.y;
         }
 
-        this.core.camera.setPlatformYOffset(this.currentCameraY-this.position.y);
+        this.core.game.camera.setPlatformYOffset(this.currentCameraY-this.position.y);
         
         
         let cube=this.core.map.cubeList.findCubeContainingEntity(this);

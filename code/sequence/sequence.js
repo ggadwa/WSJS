@@ -128,9 +128,9 @@ export default class SequenceClass
 
             // all freezes end
          
-        this.core.freezePlayer=false;
-        this.core.freezeAI=false;
-        this.core.hideUI=false;
+        this.core.game.freezePlayer=false;
+        this.core.game.freezeAI=false;
+        this.core.game.hideUI=false;
         
             // release any bitmaps/entities
             
@@ -145,7 +145,7 @@ export default class SequenceClass
             // the exit flag
             
         if (this.json.exitLevel) {
-            this.core.exitLevel=true;
+            this.core.game.exitGame=true;
             return;
         }
         
@@ -161,19 +161,20 @@ export default class SequenceClass
     run()
     {
         let n,tick,sequenceEntity;
+        let game=this.core.game;
         
-        tick=this.core.game.timestamp-this.startTimestamp;
+        tick=game.timestamp-this.startTimestamp;
         
             // freezes
          
         if (this.json.freezePlayer!==null) {
-            this.core.freezePlayer=((tick>=this.json.freezePlayer[0])&&(tick<this.json.freezePlayer[1]));
+            game.freezePlayer=((tick>=this.json.freezePlayer[0])&&(tick<this.json.freezePlayer[1]));
         }
         if (this.json.freezeAI!==null) {
-            this.core.freezeAI=((tick>=this.json.freezeAI[0])&&(tick<this.json.freezeAI[1]));
+            game.freezeAI=((tick>=this.json.freezeAI[0])&&(tick<this.json.freezeAI[1]));
         }
         if (this.json.hideUI!==null) {
-            this.core.hideUI=((tick>=this.json.hideUI[0])&&(tick<this.json.hideUI[1]));
+            game.hideUI=((tick>=this.json.hideUI[0])&&(tick<this.json.hideUI[1]));
         }
         
             // entities

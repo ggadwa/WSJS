@@ -79,7 +79,7 @@ export default class DeveloperSpriteClass
         this.tempPoint.x=this.RADIUS;
         this.tempPoint.y=this.RADIUS;
         this.tempPoint.z=0.0;
-        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
+        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.game.billboardMatrix);
 
         this.vertexes[0]=this.tempPoint.x+position.x;
         this.vertexes[1]=this.tempPoint.y+position.y;
@@ -90,7 +90,7 @@ export default class DeveloperSpriteClass
         this.tempPoint.x=-this.RADIUS;
         this.tempPoint.y=this.RADIUS;
         this.tempPoint.z=0.0;
-        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
+        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.game.billboardMatrix);
 
         this.vertexes[3]=this.vertexes[9]=this.tempPoint.x+position.x;
         this.vertexes[4]=this.vertexes[10]=this.tempPoint.y+position.y;
@@ -101,7 +101,7 @@ export default class DeveloperSpriteClass
         this.tempPoint.x=this.RADIUS;
         this.tempPoint.y=-this.RADIUS;
         this.tempPoint.z=0.0;
-        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
+        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.game.billboardMatrix);
 
         this.vertexes[6]=this.vertexes[15]=this.tempPoint.x+position.x;
         this.vertexes[7]=this.vertexes[16]=this.tempPoint.y+position.y;
@@ -112,7 +112,7 @@ export default class DeveloperSpriteClass
         this.tempPoint.x=-this.RADIUS;
         this.tempPoint.y=-this.RADIUS;
         this.tempPoint.z=0.0;
-        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
+        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.game.billboardMatrix);
 
         this.vertexes[12]=this.tempPoint.x+position.x;
         this.vertexes[13]=this.tempPoint.y+position.y;

@@ -205,7 +205,7 @@ export default class MeshListClass
                 // map meshes cull against the view frustum
                 // on a per mesh basis
             
-            if (!this.core.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) continue;
+            if (!this.core.game.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) continue;
             
                 // time to change bitmap
 
@@ -264,7 +264,7 @@ export default class MeshListClass
             
                 // regular map mesh culling
                 
-            if (!this.core.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) continue;
+            if (!this.core.game.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) continue;
             
                 // do the runs
                 
@@ -326,7 +326,7 @@ export default class MeshListClass
             // the view here
             
         gl.uniformMatrix4fv(shader.modelMatrixUniform,false,modelEntityAlter.modelMatrix.data);
-        if (modelEntityAlter.inCameraSpace) gl.uniformMatrix4fv(shader.viewMatrixUniform,false,this.core.cameraSpaceViewMatrix.data);
+        if (modelEntityAlter.inCameraSpace) gl.uniformMatrix4fv(shader.viewMatrixUniform,false,this.core.game.cameraSpaceViewMatrix.data);
 
             // keep track of skin and bitmap
             // changes to reduce state changes
@@ -427,7 +427,7 @@ export default class MeshListClass
 
                 // skip if not in view frustum
 
-            if (!this.core.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) continue;
+            if (!this.core.game.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) continue;
             
                 // draw the walls in green
                 

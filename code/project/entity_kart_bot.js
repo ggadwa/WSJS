@@ -158,7 +158,7 @@ export default class EntityKartBotClass extends EntityKartBaseClass
         
             // skip if AI is frozen
             
-        if (this.core.freezeAI) return;
+        if (this.core.game.freezeAI) return;
         
             // run the kart base
         

@@ -142,7 +142,7 @@ export default class MapPathClass
             tempPoint.x=-nodeSize;
             tempPoint.y=-nodeSize;
             tempPoint.z=0.0;
-            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
+            tempPoint.matrixMultiplyIgnoreTransform(this.core.game.billboardMatrix);
 
             vertices[vIdx++]=tempPoint.x+node.position.x;
             vertices[vIdx++]=(tempPoint.y+node.position.y)+drawSlop;
@@ -151,7 +151,7 @@ export default class MapPathClass
             tempPoint.x=nodeSize;
             tempPoint.y=-nodeSize;
             tempPoint.z=0.0;
-            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
+            tempPoint.matrixMultiplyIgnoreTransform(this.core.game.billboardMatrix);
 
             vertices[vIdx++]=tempPoint.x+node.position.x;
             vertices[vIdx++]=(tempPoint.y+node.position.y)+drawSlop;
@@ -160,7 +160,7 @@ export default class MapPathClass
             tempPoint.x=nodeSize;
             tempPoint.y=nodeSize;
             tempPoint.z=0.0;
-            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
+            tempPoint.matrixMultiplyIgnoreTransform(this.core.game.billboardMatrix);
 
             vertices[vIdx++]=tempPoint.x+node.position.x;
             vertices[vIdx++]=(tempPoint.y+node.position.y)+drawSlop;
@@ -169,7 +169,7 @@ export default class MapPathClass
             tempPoint.x=-nodeSize;
             tempPoint.y=nodeSize;
             tempPoint.z=0.0;
-            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
+            tempPoint.matrixMultiplyIgnoreTransform(this.core.game.billboardMatrix);
 
             vertices[vIdx++]=tempPoint.x+node.position.x;
             vertices[vIdx++]=(tempPoint.y+node.position.y)+drawSlop;

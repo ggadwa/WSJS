@@ -413,7 +413,7 @@ export default class EffectClass
         
         if (this.json.shake!==undefined) {
             dist=this.position.distance(this.core.map.entityList.getPlayer().position);
-            if (dist<this.json.shake.distance) this.core.startCameraShake(this.json.shake.lifeTick,Math.trunc((this.json.shake.maxShift*dist)/this.json.shake.distance));
+            if (dist<this.json.shake.distance) this.core.game.startCameraShake(this.json.shake.lifeTick,Math.trunc((this.json.shake.maxShift*dist)/this.json.shake.distance));
         }
         
         if (this.json.damage!==undefined) this.core.map.entityList.damageForRadius(this.spawnedBy,this.position,this.json.damage.distance,this.json.damage.damage);
@@ -465,7 +465,7 @@ export default class EffectClass
         this.tempPoint.y=halfHigh;
         this.tempPoint.z=0.0;
         if (chunk.rotate!==0.0) this.tempPoint.rotateZ(null,chunk.rotate);
-        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
+        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.game.billboardMatrix);
 
         this.vertexes[this.vertexIdx++]=this.tempPoint.x+centerPnt.x;
         this.vertexes[this.vertexIdx++]=this.tempPoint.y+centerPnt.y;
@@ -480,7 +480,7 @@ export default class EffectClass
         this.tempPoint.y=halfHigh;
         this.tempPoint.z=0.0;
         if (chunk.rotate!==0.0) this.tempPoint.rotateZ(null,chunk.rotate);
-        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
+        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.game.billboardMatrix);
 
         this.vertexes[this.vertexIdx++]=this.tempPoint.x+centerPnt.x;
         this.vertexes[this.vertexIdx++]=this.tempPoint.y+centerPnt.y;
@@ -495,7 +495,7 @@ export default class EffectClass
         this.tempPoint.y=-halfHigh;
         this.tempPoint.z=0.0;
         if (chunk.rotate!==0.0) this.tempPoint.rotateZ(null,chunk.rotate);
-        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
+        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.game.billboardMatrix);
 
         this.vertexes[this.vertexIdx++]=this.tempPoint.x+centerPnt.x;
         this.vertexes[this.vertexIdx++]=this.tempPoint.y+centerPnt.y;
@@ -510,7 +510,7 @@ export default class EffectClass
         this.tempPoint.y=-halfHigh;
         this.tempPoint.z=0.0;
         if (chunk.rotate!==0.0) this.tempPoint.rotateZ(null,chunk.rotate);
-        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
+        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.game.billboardMatrix);
 
         this.vertexes[this.vertexIdx++]=this.tempPoint.x+centerPnt.x;
         this.vertexes[this.vertexIdx++]=this.tempPoint.y+centerPnt.y;
@@ -804,7 +804,7 @@ export default class EffectClass
 
             // now determine if we can draw this
             
-        return(this.core.boundBoxInFrustum(this.xBound,this.yBound,this.zBound,null));
+        return(this.core.game.boundBoxInFrustum(this.xBound,this.yBound,this.zBound,null));
     }
     
     draw()

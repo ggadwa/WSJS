@@ -130,7 +130,7 @@ export default class MapClass
         
             // setup camera
             
-        camera=this.core.camera;
+        camera=this.core.game.camera;
 
         camera.gotoFirstPerson();   // default until player script runs
         camera.setViewDistance(this.viewSetup.nearZ,this.viewSetup.farZ);

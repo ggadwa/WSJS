@@ -3,13 +3,15 @@ import InterfaceClass from '../interface/interface.js';
 
 export default class InterfaceTextClass
 {
+    static TEXT_ALIGN_LEFT=0;
+    static TEXT_ALIGN_CENTER=1;
+    static TEXT_ALIGN_RIGHT=2;
+        
+    static TEXT_ALIGN_LIST=['left','center','right'];
+
     constructor(core,str,x,y,fontSize,align,color,alpha,developer)
     {
         this.TEXT_MAX_STRING_LEN=256;
-
-        this.TEXT_ALIGN_LEFT=core.interface.TEXT_ALIGN_LEFT;
-        this.TEXT_ALIGN_CENTER=core.interface.TEXT_ALIGN_CENTER;
-        this.TEXT_ALIGN_RIGHT=core.interface.TEXT_ALIGN_RIGHT;
     
         this.core=core;
         this.str=str;
@@ -124,10 +126,10 @@ export default class InterfaceTextClass
             // and alignment
 
         switch (this.align) {
-            case this.TEXT_ALIGN_CENTER:
+            case InterfaceTextClass.TEXT_ALIGN_CENTER:
                 x-=Math.trunc(this.getStringDrawWidth(this.fontSize,this.str)*0.5);
                 break;
-            case this.TEXT_ALIGN_RIGHT:
+            case InterfaceTextClass.TEXT_ALIGN_RIGHT:
                 x-=this.getStringDrawWidth(this.fontSize,this.str);
                 break;
         }

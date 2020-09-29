@@ -267,10 +267,10 @@ export default class EntityFPSPlayerClass extends EntityClass
             // set the camera
             
         if (!this.isThirdPerson) {
-            this.core.camera.gotoFirstPerson();
+            this.core.game.camera.gotoFirstPerson();
         }
         else {
-            this.core.camera.gotoThirdPerson(this.thirdPersonCameraDistance,this.thirdPersonCameraAngle);
+            this.core.game.camera.gotoThirdPerson(this.thirdPersonCameraDistance,this.thirdPersonCameraAngle);
         }
         
             // health
@@ -396,7 +396,7 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.respawnTick=this.core.game.timestamp+this.respawnWaitTick;
         this.passThrough=true;
         
-        if (this.isTopDownCameraOnDeath) this.core.camera.gotoTopDown(this.topDownCameraDistance);
+        if (this.isTopDownCameraOnDeath) this.core.game.camera.gotoTopDown(this.topDownCameraDistance);
 
         this.core.soundList.playJson(this.position,this.dieSound);
         this.modelEntityAlter.startAnimationChunkInFrames(this.dieAnimation);
@@ -500,7 +500,7 @@ export default class EntityFPSPlayerClass extends EntityClass
         let input=this.core.input;
         let setup=this.core.setup;
         
-        if (this.core.freezePlayer) return;
+        if (this.core.game.freezePlayer) return;
         
             // liquid changes
             
@@ -692,7 +692,7 @@ export default class EntityFPSPlayerClass extends EntityClass
             
         lookAdd=0;
             
-        if (this.core.camera.isFirstPerson()) {
+        if (this.core.game.camera.isFirstPerson()) {
             y=input.getMouseMoveY();
             if (y!==0) {
                 lookAdd=y*setup.mouseYSensitivity;
@@ -777,7 +777,7 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.modelEntityAlter.scale.setFromPoint(this.scale);
         this.modelEntityAlter.inCameraSpace=false;
 
-        return(!this.core.camera.isFirstPerson());
+        return(!this.core.game.camera.isFirstPerson());
     }
 }
 

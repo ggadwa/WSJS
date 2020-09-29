@@ -32,7 +32,7 @@ class MainClass
         if (!(await this.core.initialize(data))) return;
         if (!(await this.core.loadShaders())) return;
         
-        this.core.title.startTitleLoop();
+        this.core.title.startLoop();
     }
 
 

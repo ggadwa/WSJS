@@ -242,7 +242,7 @@ export default class EntityKartBaseClass extends EntityClass
         
         this.lap=-1;
         
-        this.lastDrawTick=this.getTimestamp();
+        this.lastDrawTick=this.core.game.timestamp;
         this.rigidGotoAngle.setFromValues(0,0,0);
         
         this.currentWeaponIdx=0;
@@ -695,7 +695,7 @@ export default class EntityKartBaseClass extends EntityClass
     {
         let n,nodeDist,prevNodeDist,nextNodeDist;
         let nodeIdx,prevNodeIdx,nextNodeIdx,spliceIdx,entity;
-        let entityList=this.getEntityList();
+        let entityList=this.core.map.entityList;
         let placeList=[];
 
             // this is a bit complicated -- the path of travel
@@ -821,7 +821,7 @@ export default class EntityKartBaseClass extends EntityClass
     drawSetup()
     {
         let speed;
-        let timestamp=this.getTimestamp();
+        let timestamp=this.core.game.timestamp;
         
             // physics are guarenteed to be run 60fps, but
             // drawing could be slower so only do the rigid body stuff here

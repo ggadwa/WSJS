@@ -410,7 +410,7 @@ export default class EntityWeaponClass extends EntityClass
             // update any UI if player
             
         if (parentEntity===this.core.map.entityList.getPlayer()) {
-            if (this.interfaceCrosshair!==null) this.core.interface.showElement(this.interfaceCrosshair,((this.show)&&(this.core.camera.isFirstPerson())));
+            if (this.interfaceCrosshair!==null) this.core.interface.showElement(this.interfaceCrosshair,((this.show)&&(this.core.game.camera.isFirstPerson())));
             if (this.primary!==null) this.primary.updateUI();
             if (this.secondary!==null) this.secondary.updateUI();
             if (this.tertiary!==null) this.tertiary.updateUI();
@@ -426,7 +426,7 @@ export default class EntityWeaponClass extends EntityClass
         this.modelEntityAlter.scale.setFromPoint(this.scale);
         this.modelEntityAlter.inCameraSpace=true;
         
-        return(this.core.camera.isFirstPerson());
+        return(this.core.game.camera.isFirstPerson());
     }
 
 }

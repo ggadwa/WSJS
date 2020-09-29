@@ -510,7 +510,7 @@ export default class EntityFPSBotClass extends EntityClass
         let turnDiff,slideLeft,liquid,liquidIdx,gravityFactor,fallDist;
         let idleAnimation,cube;
         
-        if (this.core.freezeAI) return;
+        if (this.core.game.freezeAI) return;
         
             // liquids
             

@@ -245,7 +245,7 @@ export default class ModelEntityAlterClass
 
             // run the frustum
             
-        return(this.core.boundBoxInFrustum(this.xBound,this.yBound,this.zBound));
+        return(this.core.game.boundBoxInFrustum(this.xBound,this.yBound,this.zBound));
     }
     
     getPoseJointMatrixArray(skinIdx)
@@ -648,7 +648,7 @@ export default class ModelEntityAlterClass
             tempPoint.x=-nodeSize;
             tempPoint.y=-nodeSize;
             tempPoint.z=0.0;
-            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
+            tempPoint.matrixMultiplyIgnoreTransform(this.core.game.billboardMatrix);
 
             vertices[vIdx++]=tempPoint.x+posePoint.x;
             vertices[vIdx++]=tempPoint.y+posePoint.y;
@@ -657,7 +657,7 @@ export default class ModelEntityAlterClass
             tempPoint.x=nodeSize;
             tempPoint.y=-nodeSize;
             tempPoint.z=0.0;
-            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
+            tempPoint.matrixMultiplyIgnoreTransform(this.core.game.billboardMatrix);
 
             vertices[vIdx++]=tempPoint.x+posePoint.x;
             vertices[vIdx++]=tempPoint.y+posePoint.y;
@@ -666,7 +666,7 @@ export default class ModelEntityAlterClass
             tempPoint.x=nodeSize;
             tempPoint.y=nodeSize;
             tempPoint.z=0.0;
-            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
+            tempPoint.matrixMultiplyIgnoreTransform(this.core.game.billboardMatrix);
 
             vertices[vIdx++]=tempPoint.x+posePoint.x;
             vertices[vIdx++]=tempPoint.y+posePoint.y;
@@ -675,7 +675,7 @@ export default class ModelEntityAlterClass
             tempPoint.x=-nodeSize;
             tempPoint.y=nodeSize;
             tempPoint.z=0.0;
-            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
+            tempPoint.matrixMultiplyIgnoreTransform(this.core.game.billboardMatrix);
 
             vertices[vIdx++]=tempPoint.x+posePoint.x;
             vertices[vIdx++]=tempPoint.y+posePoint.y;

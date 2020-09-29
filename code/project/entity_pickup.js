@@ -80,7 +80,7 @@ export default class EntityPickupClass extends EntityClass
         if (!this.show) {
             if (this.pickupOnce) return;
             
-            if (this.getTimestamp()<(this.hideStartTick+this.hideTick)) return;
+            if (this.core.game.timestamp<(this.hideStartTick+this.hideTick)) return;
             
             this.touchEntity=null;          // clear any touches
             this.show=true;
@@ -110,7 +110,7 @@ export default class EntityPickupClass extends EntityClass
             // pickup and run actions
             
         this.show=false;
-        this.hideStartTick=this.getTimestamp();
+        this.hideStartTick=this.core.game.timestamp;
         
         this.core.soundList.playJson(this.position,this.pickupSound);
         

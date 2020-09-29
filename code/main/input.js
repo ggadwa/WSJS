@@ -31,6 +31,8 @@ export default class InputClass
         this.canvasMidX=0;
         this.canvasMidY=0;
         
+        this.paused=false;
+        
             // listeners
             // need to set them to a variables so remove
             // can find them later
@@ -216,19 +218,30 @@ export default class InputClass
     pointerLockChange(event)
     {
         if (document.pointerLockElement===this.core.canvas) {
+            this.paused=false;
+            
             document.addEventListener('mousedown',this.mouseDownListener,false);
             document.addEventListener('mouseup',this.mouseUpListener,false);
             document.addEventListener('wheel',this.mouseWheelListener,false);
             document.addEventListener('mousemove',this.mouseMovedListener,false);
+
+            this.core.canvas.onclick=null;
         }
         else {
+            this.paused=true;
+            
             document.removeEventListener('mousedown',this.mouseDownListener,false);
             document.removeEventListener('mouseup',this.mouseUpListener,false);
             document.removeEventListener('wheel',this.mouseWheelListener,false);
             document.removeEventListener('mousemove',this.mouseMovedListener,false);
-            
-            this.core.setPauseState(true,false);            // a pointer lock release auto pauses the game
+
+            this.core.canvas.onclick=this.pointerLockClickResume.bind(this);
         }
+    }
+    
+    pointerLockClickResume()
+    {
+        this.pointerLockStart();
     }
     
     pointerLockError(err)

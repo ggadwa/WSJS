@@ -820,7 +820,7 @@ export default class EntityFPSMonsterClass extends EntityClass
     {
         let player,distToPlayer,liquid,liquidIdx,gravityFactor;
         
-        if (this.core.freezeAI) return;
+        if (this.core.game.freezeAI) return;
         
             // liquids
             

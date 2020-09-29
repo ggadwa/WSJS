@@ -1,4 +1,7 @@
+import ColorClass from '../utility/color.js';
 import BitmapInterfaceClass from '../bitmap/bitmap_interface.js';
+import InterfaceTextClass from '../interface/interface_text.js';
+import TitleButtonClass from '../main/title_button.js';
 
 export default class TitleClass
 {
@@ -12,6 +15,9 @@ export default class TitleClass
         
         this.titleBitmap=null;
         this.cursorBitmap=null;
+        
+        this.optionButton=null;
+        this.playButton=null;
         
         this.vertexArray=new Float32Array(2*4);     // 2D, only 2 vertex coordinates
         
@@ -41,15 +47,32 @@ export default class TitleClass
     async initialize()
     {
         let uvArray,indexArray;
+        let lft,top,rgt,bot;
         let gl=this.core.gl;
         
             // any bitmaps
             
-        this.titleBitmap=new BitmapInterfaceClass(this.core,'textures/title.png');
+        this.titleBitmap=new BitmapInterfaceClass(this.core,'textures/ui_title.png');
         if (!(await this.titleBitmap.load())) return(false);
         
-        this.cursorBitmap=new BitmapInterfaceClass(this.core,'textures/cursor.png');
+        this.cursorBitmap=new BitmapInterfaceClass(this.core,'textures/ui_cursor.png');
         if (!(await this.cursorBitmap.load())) return(false);
+        
+            // buttons
+            
+        lft=Math.trunc(this.core.wid*0.79);
+        rgt=lft+Math.trunc(this.core.wid*0.2);
+        top=Math.trunc(this.core.high*0.75);
+        bot=top+Math.trunc(this.core.high*0.1);
+        
+        this.optionButton=new TitleButtonClass(this.core,lft,top,rgt,bot,'textures/ui_button_options.png','textures/ui_button_options_highlight.png');
+        if (!(await this.optionButton.initialize())) return(false);
+        
+        top+=Math.trunc(this.core.high*0.11);
+        bot=top+Math.trunc(this.core.high*0.1);
+        
+        this.playButton=new TitleButtonClass(this.core,lft,top,rgt,bot,'textures/ui_button_play.png','textures/ui_button_play_highlight.png');
+        if (!(await this.playButton.initialize())) return(false);
         
             // vertex array
             
@@ -101,16 +124,21 @@ export default class TitleClass
         gl.deleteBuffer(this.uvBuffer);
         gl.deleteBuffer(this.indexBuffer);
         
-        if (this.titleBitmap!==null) this.titleBitmap.release();
-        if (this.cursorBitmap!==null) this.cursorBitmap.release();
+        this.optionButton.release();
+        this.playButton.release();
+        
+        this.titleBitmap.release();
+        this.cursorBitmap.release();
     }
     
         //
         // start and stop title loop
         //
         
-    startTitleLoop()
+    startLoop()
     {
+        this.core.currentLoop=this.core.TITLE_LOOP;
+        
         this.timestamp=0;
         this.lastSystemTimestamp=Math.trunc(window.performance.now());
         
@@ -139,6 +167,8 @@ export default class TitleClass
     {
         let input=this.core.input;
         
+            // mouse move cursor
+            
         this.cursorX+=input.getMouseMoveX();
         if (this.cursorX<0) this.cursorX=0;
         if (this.cursorX>=this.core.wid) this.cursorX=this.core.wid-1;
@@ -146,6 +176,10 @@ export default class TitleClass
         this.cursorY+=input.getMouseMoveY();
         if (this.cursorY<0) this.cursorY=0;
         if (this.cursorY>=this.core.high) this.cursorY=this.core.high-1;
+        
+            // touch move cursor
+            
+        
         
         if (input.mouseButtonFlags[0]) {
             this.runGame=true;
@@ -189,7 +223,7 @@ export default class TitleClass
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
     }
-
+    
     draw()
     {
         let gl=this.core.gl;
@@ -208,12 +242,19 @@ export default class TitleClass
         this.core.shaderList.interfaceShader.drawStart();
         
         this.drawBitmap(this.titleBitmap,0,0,this.core.wid,this.core.high);
+        this.optionButton.draw(this.cursorX,this.cursorY);
+        this.playButton.draw(this.cursorX,this.cursorY);
+        
         this.drawBitmap(this.cursorBitmap,this.cursorX,this.cursorY,(this.cursorX+this.CURSOR_WIDTH),(this.cursorY+this.CURSOR_HEIGHT));
         
         this.core.shaderList.interfaceShader.drawEnd();
         
         gl.disable(gl.BLEND);
         gl.enable(gl.DEPTH_TEST);
+        
+            // any paused text
+            
+        if (this.core.input.paused) this.core.interface.drawPauseMessage();
     }
     
 }
@@ -263,7 +304,7 @@ function titleMainLoop(timestamp)
         // exiting to run game
         
     if (title.runGame) {
-        setTimeout(window.main.core.game.startGameLoop.bind(window.main.core.game),1);  // always force it to start on next go around
+        setTimeout(window.main.core.game.startLoop.bind(window.main.core.game),1);  // always force it to start on next go around
         return;
     }
     
