@@ -5,7 +5,6 @@ import QuaternionClass from '../utility/quaternion.js';
 import DeveloperSpriteClass from '../developer/developer_sprite.js';
 import DeveloperRayClass from '../developer/developer_ray.js';
 import MapPathNodeClass from '../map/map_path_node.js';
-import InterfaceTextClass from '../interface/interface_text.js';
 
 export default class DeveloperClass
 {
@@ -66,13 +65,13 @@ export default class DeveloperClass
     
     initialize()
     {
-        this.core.interface.addText('wsFPS','',this.core.interface.POSITION_MODE_TOP_RIGHT,{"x":-5,"y":23},20,InterfaceTextClass.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1,false);
+        this.core.interface.addText('wsFPS','',this.core.interface.POSITION_MODE_TOP_RIGHT,{"x":-5,"y":23},20,this.core.interface.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1,false);
         
-        this.core.interface.addText('wsPosition','',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-95},20,InterfaceTextClass.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
-        this.core.interface.addText('wsAngle','',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-72},20,InterfaceTextClass.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
-        this.core.interface.addText('wsMesh','',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-49},20,InterfaceTextClass.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
-        this.core.interface.addText('wsTarget','target:',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-26},20,InterfaceTextClass.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
-        this.core.interface.addText('wsSelect','select:',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-3},20,InterfaceTextClass.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
+        this.core.interface.addText('wsPosition','',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-95},20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
+        this.core.interface.addText('wsAngle','',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-72},20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
+        this.core.interface.addText('wsMesh','',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-49},20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
+        this.core.interface.addText('wsTarget','target:',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-26},20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
+        this.core.interface.addText('wsSelect','select:',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-3},20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
         
         if (!this.developerSprite.initialize()) return(false);
         if (!this.developerRay.initialize()) return(false);

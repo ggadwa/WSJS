@@ -35,6 +35,8 @@ export default class TitleClass
         this.cursorX=0;
         this.cursorY=0;
         
+        this.clickDown=false;
+        
         this.runGame=false;
         
         Object.seal(this);
@@ -150,39 +152,63 @@ export default class TitleClass
         this.cursorX=Math.trunc(this.core.wid*0.5);
         this.cursorY=Math.trunc(this.core.high*0.5);
         
+        this.clickDown=false;
+        
         this.runGame=false;
         
         window.requestAnimationFrame(titleMainLoop);
     }
     
         //
-        // click events
-        //
-        
-        //
         // running
         //
         
     run()
     {
+        let click;
         let input=this.core.input;
         
             // mouse move cursor
             
-        this.cursorX+=input.getMouseMoveX();
-        if (this.cursorX<0) this.cursorX=0;
-        if (this.cursorX>=this.core.wid) this.cursorX=this.core.wid-1;
+        if (input.hasTouch) {
+            this.cursorX=-1;
+            this.cursorY=-1;
+        }
+        else {
+            this.cursorX+=input.getMouseMoveX();
+            if (this.cursorX<0) this.cursorX=0;
+            if (this.cursorX>=this.core.wid) this.cursorX=this.core.wid-1;
+
+            this.cursorY+=input.getMouseMoveY();
+            if (this.cursorY<0) this.cursorY=0;
+            if (this.cursorY>=this.core.high) this.cursorY=this.core.high-1;
+        }
         
-        this.cursorY+=input.getMouseMoveY();
-        if (this.cursorY<0) this.cursorY=0;
-        if (this.cursorY>=this.core.high) this.cursorY=this.core.high-1;
-        
-            // touch move cursor
+            // clicks
             
-        
-        
-        if (input.mouseButtonFlags[0]) {
-            this.runGame=true;
+        if (input.hasTouch) {
+            click=false;
+        }
+        else {
+            click=input.mouseButtonFlags[0];
+        }
+            
+        if (click) {
+            this.clickDown=true;
+        }
+        else {
+            if (this.clickDown) {
+                this.clickDown=false;
+                
+                if (this.optionButton.cursorInButton(this.cursorX,this.cursorY)) {
+                    console.log('options');
+                    return;
+                }
+                if (this.playButton.cursorInButton(this.cursorX,this.cursorY)) {
+                    this.runGame=true;
+                    return;
+                }
+            }
         }
     }
     
@@ -245,7 +271,7 @@ export default class TitleClass
         this.optionButton.draw(this.cursorX,this.cursorY);
         this.playButton.draw(this.cursorX,this.cursorY);
         
-        this.drawBitmap(this.cursorBitmap,this.cursorX,this.cursorY,(this.cursorX+this.CURSOR_WIDTH),(this.cursorY+this.CURSOR_HEIGHT));
+        if (!this.core.input.hasTouch) this.drawBitmap(this.cursorBitmap,this.cursorX,this.cursorY,(this.cursorX+this.CURSOR_WIDTH),(this.cursorY+this.CURSOR_HEIGHT));
         
         this.core.shaderList.interfaceShader.drawEnd();
         

@@ -17,6 +17,12 @@ export default class InterfaceClass
 {
     constructor(core)
     {
+        this.TEXT_ALIGN_LEFT=0;
+        this.TEXT_ALIGN_CENTER=1;
+        this.TEXT_ALIGN_RIGHT=2;
+        
+        this.TEXT_ALIGN_LIST=['left','center','right'];
+
         this.TEXT_TEXTURE_WIDTH=512;
         this.TEXT_TEXTURE_HEIGHT=512;
         this.TEXT_CHAR_PER_ROW=10;
@@ -446,7 +452,7 @@ export default class InterfaceClass
         
         if (jsonInterface.texts!==undefined) {
             for (text of jsonInterface.texts) {
-                align=InterfaceTextClass.TEXT_ALIGN_LIST.indexOf(text.textAlign);
+                align=this.core.interface.TEXT_ALIGN_LIST.indexOf(text.textAlign);
                 positionMode=this.POSITION_MODE_LIST.indexOf(text.positionMode);
                 this.addText(text.id,text.text,positionMode,text.positionOffset,text.textSize,align,new ColorClass(text.color.r,text.color.g,text.color.b),text.alpha,false);
                 this.showText(text.id,text.show);
@@ -543,7 +549,7 @@ export default class InterfaceClass
         
         for (n=0;n!==nLine;n++) {
             if (n===(nLine-1)) col=new ColorClass(1,0.3,0.3);
-            text=new InterfaceTextClass(this.core,consoleStrings[n],5,y,20,InterfaceTextClass.TEXT_ALIGN_LEFT,col,1,false);
+            text=new InterfaceTextClass(this.core,consoleStrings[n],5,y,20,this.core.interface.TEXT_ALIGN_LEFT,col,1,false);
             text.initialize();
             text.draw();
             text.release();
@@ -579,7 +585,7 @@ export default class InterfaceClass
         
         this.core.shaderList.textShader.drawStart();
             
-        text=new InterfaceTextClass(this.core,'Click to Capture Control',Math.trunc(this.core.wid*0.5),Math.trunc(this.core.high*0.5),40,InterfaceTextClass.TEXT_ALIGN_CENTER,new ColorClass(1,1,0),1,false);
+        text=new InterfaceTextClass(this.core,'Click to Capture Control',Math.trunc(this.core.wid*0.5),Math.trunc(this.core.high*0.5),40,this.core.interface.TEXT_ALIGN_CENTER,new ColorClass(1,1,0),1,false);
         text.initialize();
         text.draw();
         text.release();

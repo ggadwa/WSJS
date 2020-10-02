@@ -1,22 +1,13 @@
 
 *** retest on iPad/mac/safari
 
-0. input pauses turns off keys too
-1. shake to camera object
+--> title buttons part of interface, in a control list (which will include the menu button)
 
-2. a lot of stuff from core and main into game
-    - drawing
-3. get rid of drawDebugConsole/new way of loading progress
-3.5 move to game??
-        this.MAX_LIGHT_COUNT=24;        // max lights in scene, needs to be the same as lights[x] in shaders
-        this.MAX_SKELETON_JOINT=64;    // max joints in a skeleton, needs to be the same as jointMatrix[x] in shaders
+0. input pauses turns off keys too
+2. map to game
 
 4. title needs to work on iPad
-6. core.paused is not needed
 7. need game release
-8. move sequence, "exitLevel" from core to game
-9. move camera shake to game
-10. move fpsXXX to game
 11. remove "main" leave only "core" (maybe?)
 12. iPad touchMenuTrigger (redo, search for it)
 
