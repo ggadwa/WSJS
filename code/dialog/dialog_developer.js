@@ -1,10 +1,10 @@
 import SetupClass from '../main/setup.js';
-import DialogBaseClass from '../dialog/dialog_base.js';
+import DialogClass from '../dialog/dialog.js';
 import UploadClass from '../main/upload.js';
 import ShadowmapLightClass from '../generate/shadowmap/shadowmap_light.js';
 import ShadowmapMeshClass from '../generate/shadowmap/shadowmap_mesh.js';
 
-export default class DialogDeveloperClass extends DialogBaseClass
+export default class DialogDeveloperClass extends DialogClass
 {
     constructor(core)
     {

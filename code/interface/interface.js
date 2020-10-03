@@ -1,6 +1,7 @@
 import PointClass from '../utility/point.js';
 import ColorClass from '../utility/color.js';
 import RectClass from '../utility/rect.js';
+import InterfaceCursorClass from '../interface/interface_cursor.js';
 import InterfaceLiquidClass from '../interface/interface_liquid.js';
 import InterfaceHitClass from '../interface/interface_hit.js';
 import InterfaceElementClass from '../interface/interface_element.js';
@@ -50,6 +51,8 @@ export default class InterfaceClass
         this.fontTexture=null;
         this.fontCharWidths=new Float32Array(128);
         
+        this.cursor=null;
+        
         this.liquid=null;
         
         this.hitLeft=null;
@@ -68,7 +71,7 @@ export default class InterfaceClass
         // initialize/release interface
         //
 
-    initialize()
+    async initialize()
     {
         let hitSize,hitMargin;
         let game=this.core.game;
@@ -82,6 +85,11 @@ export default class InterfaceClass
             // create the font texture
             
         this.createFontTexture();
+        
+            // shared cursor
+            
+        this.cursor=new InterfaceCursorClass(this.core);
+        if (!(await this.cursor.initialize())) return(false);
         
             // liquid tinting
             
@@ -156,6 +164,10 @@ export default class InterfaceClass
         for (text of this.texts) {
             text.release();
         }
+        
+            // the cursor
+            
+        this.cursor.release();
         
             // and the font texture
             

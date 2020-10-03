@@ -1,6 +1,6 @@
 import BitmapInterfaceClass from '../bitmap/bitmap_interface.js';
 
-export default class TitleButtonClass
+export default class DialogButtonClass
 {
     constructor(core,lft,top,rgt,bot,bitmapPath,highlightBitmapPath)
     {

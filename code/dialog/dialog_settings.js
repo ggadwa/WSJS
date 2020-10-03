@@ -1,7 +1,7 @@
 import SetupClass from '../main/setup.js';
-import DialogBaseClass from '../dialog/dialog_base.js';
+import DialogClass from '../dialog/dialog.js';
 
-export default class DialogSettingsClass extends DialogBaseClass
+export default class DialogSettingsClass extends DialogClass
 {
     constructor(core)
     {

@@ -1,7 +1,7 @@
 
-*** retest on iPad/mac/safari
 
---> title buttons part of interface, in a control list (which will include the menu button)
+
+
 
 0. input pauses turns off keys too
 2. map to game

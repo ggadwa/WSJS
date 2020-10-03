@@ -1,20 +1,16 @@
 import ColorClass from '../utility/color.js';
 import BitmapInterfaceClass from '../bitmap/bitmap_interface.js';
 import InterfaceTextClass from '../interface/interface_text.js';
-import TitleButtonClass from '../main/title_button.js';
+import DialogButtonClass from '../dialog/dialog_button.js';
 
 export default class TitleClass
 {
     constructor(core,data)
     {
-        this.CURSOR_WIDTH=32;
-        this.CURSOR_HEIGHT=32;
-        
         this.core=core;
         this.data=data;
         
         this.titleBitmap=null;
-        this.cursorBitmap=null;
         
         this.optionButton=null;
         this.playButton=null;
@@ -32,11 +28,9 @@ export default class TitleClass
         this.lastRunTimestamp=0;
         this.lastDrawTimestamp=0;
         
-        this.cursorX=0;
-        this.cursorY=0;
-        
         this.clickDown=false;
         
+        this.runSettings=false;
         this.runGame=false;
         
         Object.seal(this);
@@ -52,13 +46,10 @@ export default class TitleClass
         let lft,top,rgt,bot;
         let gl=this.core.gl;
         
-            // any bitmaps
+            // title bitmap
             
         this.titleBitmap=new BitmapInterfaceClass(this.core,'textures/ui_title.png');
         if (!(await this.titleBitmap.load())) return(false);
-        
-        this.cursorBitmap=new BitmapInterfaceClass(this.core,'textures/ui_cursor.png');
-        if (!(await this.cursorBitmap.load())) return(false);
         
             // buttons
             
@@ -67,13 +58,13 @@ export default class TitleClass
         top=Math.trunc(this.core.high*0.75);
         bot=top+Math.trunc(this.core.high*0.1);
         
-        this.optionButton=new TitleButtonClass(this.core,lft,top,rgt,bot,'textures/ui_button_options.png','textures/ui_button_options_highlight.png');
+        this.optionButton=new DialogButtonClass(this.core,lft,top,rgt,bot,'textures/ui_button_options.png','textures/ui_button_options_highlight.png');
         if (!(await this.optionButton.initialize())) return(false);
         
         top+=Math.trunc(this.core.high*0.11);
         bot=top+Math.trunc(this.core.high*0.1);
         
-        this.playButton=new TitleButtonClass(this.core,lft,top,rgt,bot,'textures/ui_button_play.png','textures/ui_button_play_highlight.png');
+        this.playButton=new DialogButtonClass(this.core,lft,top,rgt,bot,'textures/ui_button_play.png','textures/ui_button_play_highlight.png');
         if (!(await this.playButton.initialize())) return(false);
         
             // vertex array
@@ -130,7 +121,6 @@ export default class TitleClass
         this.playButton.release();
         
         this.titleBitmap.release();
-        this.cursorBitmap.release();
     }
     
         //
@@ -149,11 +139,11 @@ export default class TitleClass
         this.lastRunTimestamp=0;
         this.lastDrawTimestamp=0;
         
-        this.cursorX=Math.trunc(this.core.wid*0.5);
-        this.cursorY=Math.trunc(this.core.high*0.5);
+        this.core.interface.cursor.center();
         
         this.clickDown=false;
         
+        this.runSettings=false;
         this.runGame=false;
         
         window.requestAnimationFrame(titleMainLoop);
@@ -165,46 +155,22 @@ export default class TitleClass
         
     run()
     {
-        let click;
-        let input=this.core.input;
+        let cursor=this.core.interface.cursor;
         
             // mouse move cursor
             
-        if (input.hasTouch) {
-            this.cursorX=-1;
-            this.cursorY=-1;
-        }
-        else {
-            this.cursorX+=input.getMouseMoveX();
-            if (this.cursorX<0) this.cursorX=0;
-            if (this.cursorX>=this.core.wid) this.cursorX=this.core.wid-1;
-
-            this.cursorY+=input.getMouseMoveY();
-            if (this.cursorY<0) this.cursorY=0;
-            if (this.cursorY>=this.core.high) this.cursorY=this.core.high-1;
-        }
-        
-            // clicks
-            
-        if (input.hasTouch) {
-            click=false;
-        }
-        else {
-            click=input.mouseButtonFlags[0];
-        }
-            
-        if (click) {
+        if (cursor.run()) {
             this.clickDown=true;
         }
         else {
             if (this.clickDown) {
                 this.clickDown=false;
                 
-                if (this.optionButton.cursorInButton(this.cursorX,this.cursorY)) {
-                    console.log('options');
+                if (this.optionButton.cursorInButton(cursor.x,cursor.y)) {
+                    this.runSettings=true;
                     return;
                 }
-                if (this.playButton.cursorInButton(this.cursorX,this.cursorY)) {
+                if (this.playButton.cursorInButton(cursor.x,cursor.y)) {
                     this.runGame=true;
                     return;
                 }
@@ -252,6 +218,7 @@ export default class TitleClass
     
     draw()
     {
+        let cursor=this.core.interface.cursor;
         let gl=this.core.gl;
         
             // only need the othro matrix for this
@@ -268,10 +235,10 @@ export default class TitleClass
         this.core.shaderList.interfaceShader.drawStart();
         
         this.drawBitmap(this.titleBitmap,0,0,this.core.wid,this.core.high);
-        this.optionButton.draw(this.cursorX,this.cursorY);
-        this.playButton.draw(this.cursorX,this.cursorY);
+        this.optionButton.draw(cursor.x,cursor.y);
+        this.playButton.draw(cursor.x,cursor.y);
         
-        if (!this.core.input.hasTouch) this.drawBitmap(this.cursorBitmap,this.cursorX,this.cursorY,(this.cursorX+this.CURSOR_WIDTH),(this.cursorY+this.CURSOR_HEIGHT));
+        if (!this.core.input.hasTouch) cursor.draw();
         
         this.core.shaderList.interfaceShader.drawEnd();
         
@@ -327,10 +294,16 @@ function titleMainLoop(timestamp)
         }
     }
     
-        // exiting to run game
+        // exiting this loop
+        // always force it to start on next go around
+        
+    if (title.runSettings) {
+        setTimeout(window.main.core.dialog.startLoop.bind(window.main.core.dialog),1);  
+        return;
+    }
         
     if (title.runGame) {
-        setTimeout(window.main.core.game.startLoop.bind(window.main.core.game),1);  // always force it to start on next go around
+        setTimeout(window.main.core.game.startLoop.bind(window.main.core.game),1);
         return;
     }
     

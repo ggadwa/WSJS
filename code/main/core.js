@@ -1,4 +1,5 @@
 import TitleClass from '../main/title.js';
+import DialogClass from '../dialog/dialog.js';
 import MapClass from '../map/map.js';
 import BitmapListClass from '../bitmap/bitmap_list.js';
 import SoundListClass from '../sound/sound_list.js';
@@ -66,6 +67,7 @@ export default class CoreClass
             // the game and map
             
         this.title=null;
+        this.dialog=null;
         this.game=null;
         this.map=null;
         this.music=null;
@@ -192,10 +194,13 @@ export default class CoreClass
         this.modelList=new ModelListClass(this);
         this.modelList.initialize();
         
-            // title (non game interface)
+            // title/dialogs (non game interface)
             
         this.title=new TitleClass(this,data);
         if (!(await this.title.initialize())) return;
+        
+        this.dialog=new DialogClass(this,data);
+        if (!(await this.dialog.initialize())) return;
         
             // game and interface
             
@@ -203,7 +208,7 @@ export default class CoreClass
         if (!(await this.game.initialize())) return;
         
         this.interface=new InterfaceClass(this);
-        if (!this.interface.initialize()) return;
+        if (!(await this.interface.initialize())) return;
         
         this.music=new MusicClass(this);
         if (!this.music.initialize()) return;
@@ -230,6 +235,7 @@ export default class CoreClass
         this.interface.release();
         this.game.release();
         this.title.release();
+        this.dialog.release();
         this.modelList.release();
         this.shaderList.release();
         this.soundList.release();
