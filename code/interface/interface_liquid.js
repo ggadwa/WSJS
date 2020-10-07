@@ -65,7 +65,7 @@ export default class InterfaceLiquidClass
     draw()
     {
         let liquidIdx,liquid;
-        let player=this.core.map.entityList.getPlayer();
+        let player=this.core.game.map.entityList.getPlayer();
         let shader=this.core.shaderList.tintShader;
         let gl=this.core.gl;
         
@@ -74,7 +74,7 @@ export default class InterfaceLiquidClass
         liquidIdx=player.getUnderLiquidIndex();
         if (liquidIdx===-1) return;
         
-        liquid=this.core.map.liquidList.liquids[liquidIdx];
+        liquid=this.core.game.map.liquidList.liquids[liquidIdx];
         
             // draw tint
             

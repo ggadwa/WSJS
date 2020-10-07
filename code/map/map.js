@@ -110,8 +110,8 @@ export default class MapClass
     {
         let importGLTF;
         
-        importGLTF=new ImportGLTFClass(this.core,this.core.map.name);
-        if (!(await importGLTF.import(this.core.map,this.core.map.meshList,null))) return(false);
+        importGLTF=new ImportGLTFClass(this.core,this.name);
+        if (!(await importGLTF.import(this,this.meshList,null))) return(false);
        
             // paths json
             

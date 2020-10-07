@@ -159,7 +159,7 @@ export default class EntityPlatformMonsterClass extends EntityClass
         
     run()
     {
-        let player=this.core.map.entityList.getPlayer();
+        let player=this.core.game.map.entityList.getPlayer();
         
         super.run();
         

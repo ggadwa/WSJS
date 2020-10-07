@@ -149,6 +149,11 @@ export default class TitleClass
         window.requestAnimationFrame(titleMainLoop);
     }
     
+    endLoopToGame()
+    {
+        setTimeout(this.core.game.startLoop.bind(this.core.game),1);
+    }
+    
         //
         // running
         //
@@ -303,7 +308,7 @@ function titleMainLoop(timestamp)
     }
         
     if (title.runGame) {
-        setTimeout(window.main.core.game.startLoop.bind(window.main.core.game),1);
+        setTimeout(title.endLoopToGame.bind(title),1);
         return;
     }
     

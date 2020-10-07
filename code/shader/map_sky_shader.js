@@ -74,11 +74,11 @@ export default class MapSkyShaderClass extends ShaderClass
 
         gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,core.perspectiveMatrix.data);
         gl.uniformMatrix4fv(this.viewMatrixUniform,false,core.viewMatrix.data);
-        gl.uniformMatrix4fv(this.transformMatrixUniform,false,core.map.sky.transformMatrix.data);     // repositions/resizes/etc the sky globe
+        gl.uniformMatrix4fv(this.transformMatrixUniform,false,core.game.map.sky.transformMatrix.data);     // repositions/resizes/etc the sky globe
 
             // the color
             
-        gl.uniform3f(this.colorUniform,core.map.sky.color.r,core.map.sky.color.g,core.map.sky.color.b);
+        gl.uniform3f(this.colorUniform,core.game.map.sky.color.r,core.game.map.sky.color.g,core.game.map.sky.color.b);
         
             // enable the vertex attributes
 

@@ -412,11 +412,11 @@ export default class EffectClass
         if (this.json.sounds!==undefined) this.core.soundList.playJson(this.position,this.json.sounds.start);
         
         if (this.json.shake!==undefined) {
-            dist=this.position.distance(this.core.map.entityList.getPlayer().position);
+            dist=this.position.distance(this.core.game.map.entityList.getPlayer().position);
             if (dist<this.json.shake.distance) this.core.game.startCameraShake(this.json.shake.lifeTick,Math.trunc((this.json.shake.maxShift*dist)/this.json.shake.distance));
         }
         
-        if (this.json.damage!==undefined) this.core.map.entityList.damageForRadius(this.spawnedBy,this.position,this.json.damage.distance,this.json.damage.damage);
+        if (this.json.damage!==undefined) this.core.game.map.entityList.damageForRadius(this.spawnedBy,this.position,this.json.damage.distance,this.json.damage.damage);
        
         return(true);
     }

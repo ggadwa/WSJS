@@ -59,6 +59,7 @@ export default class DeveloperRayClass
         let collisionTrig,nCollisionTrig;
         let entity,nEntity,light,nLight,effect,nEffect,node,nNode;
         let dist,currentDist;
+        let map=this.core.game.map;
         
             // the rough collide boxes
             
@@ -76,8 +77,8 @@ export default class DeveloperRayClass
             // run through the meshes and
             // check against all trigs
 
-        for (n of this.core.map.meshList.collisionMeshIndexList) {
-            mesh=this.core.map.meshList.meshes[n];
+        for (n of map.meshList.collisionMeshIndexList) {
+            mesh=map.meshList.meshes[n];
 
                 // skip any mesh we don't collide with
 
@@ -143,10 +144,10 @@ export default class DeveloperRayClass
 
             // check entities
 
-        nEntity=this.core.map.entityList.entities.length;
+        nEntity=map.entityList.entities.length;
         
         for (n=0;n!==nEntity;n++) {
-            entity=this.core.map.entityList.entities[n];
+            entity=map.entityList.entities[n];
             if (!entity.mapSpawn) continue;
             
             if (this.collision.rayCylinderIntersection(pnt,vector,entity.originalPosition,entity.radius,entity.height,this.rayIntersectPnt)) {
@@ -162,10 +163,10 @@ export default class DeveloperRayClass
         
             // check lights
 
-        nLight=this.core.map.lightList.lights.length;
+        nLight=map.lightList.lights.length;
         
         for (n=0;n!==nLight;n++) {
-            light=this.core.map.lightList.lights[n];
+            light=map.lightList.lights[n];
             
             if (this.collision.rayCubeIntersection(pnt,vector,light.position,this.ICON_CLICK_SIZE,this.ICON_CLICK_SIZE,this.ICON_CLICK_SIZE,this.rayIntersectPnt)) {
                 dist=pnt.distance(this.rayIntersectPnt);
@@ -180,10 +181,10 @@ export default class DeveloperRayClass
         
             // check effects
 
-        nEffect=this.core.map.effectList.effects.length;
+        nEffect=map.effectList.effects.length;
         
         for (n=0;n!==nEffect;n++) {
-            effect=this.core.map.effectList.effects[n];
+            effect=map.effectList.effects[n];
             if (!effect.mapSpawn) continue;
             
             if (this.collision.rayCubeIntersection(pnt,vector,effect.position,this.ICON_CLICK_SIZE,this.ICON_CLICK_SIZE,this.ICON_CLICK_SIZE,this.rayIntersectPnt)) {
@@ -199,10 +200,10 @@ export default class DeveloperRayClass
         
             // check nodes
 
-        nNode=this.core.map.path.nodes.length;
+        nNode=map.path.nodes.length;
         
         for (n=0;n!==nNode;n++) {
-            node=this.core.map.path.nodes[n];
+            node=map.path.nodes[n];
             
             if (this.collision.rayCubeIntersection(pnt,vector,node.position,this.ICON_CLICK_SIZE,this.ICON_CLICK_SIZE,this.ICON_CLICK_SIZE,this.rayIntersectPnt)) {
                 dist=pnt.distance(this.rayIntersectPnt);

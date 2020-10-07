@@ -59,7 +59,7 @@ export default class EntityPickupClass extends EntityClass
     setRandomPosition()
     {
         let node;
-        let nodes=this.core.map.path.nodes;
+        let nodes=this.core.game.map.path.nodes;
         
         node=nodes[Math.trunc(nodes.length*Math.random())];
         

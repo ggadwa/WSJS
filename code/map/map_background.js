@@ -139,7 +139,7 @@ export default class MapBackgroundClass
     {
         let gl=this.core.gl;
         let shader=this.core.shaderList.interfaceShader;
-        let player=this.core.map.entityList.getPlayer();
+        let player=this.core.game.map.entityList.getPlayer();
         
         if (!this.on) return;
         

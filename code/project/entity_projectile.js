@@ -154,7 +154,7 @@ export default class EntityProjectileClass extends EntityClass
             // tracking
             
         if (this.trackList!==null) {
-            trackEntity=this.core.map.entityList.findClosest(this.position,this.trackList);
+            trackEntity=this.core.game.map.entityList.findClosest(this.position,this.trackList);
             if ((trackEntity!==null) && (trackEntity!==this.spawnedBy)) {
                 this.motion.x+=Math.sign(trackEntity.position.x-this.position.x)*this.trackSpeed;
                 this.motion.y+=Math.sign(trackEntity.position.y-this.position.y)*this.trackSpeed;

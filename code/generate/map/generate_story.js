@@ -58,7 +58,7 @@ export default class GenerateStoryClass
         moveMilliSec=this.core.randomInt(1000,3000);
         waitMilliSec=this.core.randomInt(1000,3000);
 
-        mesh=this.core.map.meshList.meshes[meshIdx];
+        mesh=this.core.game.map.meshList.meshes[meshIdx];
         mesh.movement=new MeshMovementClass(this.core,mesh,new PointClass(0,0,0));
 
         mesh.movement.addMove(new MeshMoveClass(waitMilliSec,new PointClass(0,0,0),new PointClass(0,0,0),movement.MOVEMENT_PAUSE_NONE,null,null,null));
@@ -339,7 +339,7 @@ export default class GenerateStoryClass
         uvArray=this.genMesh.buildUVs(vertexArray,normalArray,(1/this.segmentSize));
         tangentArray=this.genMesh.buildTangents(vertexArray,uvArray,indexArray);
         
-        this.core.map.meshList.add(new MeshClass(this.core,(this.name+'_story'),this.platformBitmap,-1,-1,new Float32Array(vertexArray),new Float32Array(normalArray),tangentArray,uvArray,null,null,new Uint16Array(indexArray)));
+        this.core.game.map.meshList.add(new MeshClass(this.core,(this.name+'_story'),this.platformBitmap,-1,-1,new Float32Array(vertexArray),new Float32Array(normalArray),tangentArray,uvArray,null,null,new Uint16Array(indexArray)));
     }
     
         //

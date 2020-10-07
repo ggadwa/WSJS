@@ -98,7 +98,7 @@ export default class SoundListClass
         let entity,jsonEntity,jsonEffect,jsonSequence;
         let success,promises;
         let game=this.core.game;
-        let map=this.core.map;
+        let map=game.map;
         
             // load all the necessary sounds
             // into a set
@@ -124,7 +124,7 @@ export default class SoundListClass
 
             // entity sounds
             
-        for (entity of this.core.map.entityList.entities) {
+        for (entity of map.entityList.entities) {
             jsonEntity=game.jsonEntityCache.get(entity.jsonName);
             if (jsonEntity!==null) game.addJsonObjectToLoadSet(soundSet,entity.data,"sounds",false,['name'],jsonEntity);
         }

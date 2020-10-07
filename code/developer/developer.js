@@ -103,7 +103,7 @@ export default class DeveloperClass
     {
         let n,d,dist;
         let nodeIdx;
-        let nodes=this.core.map.path.nodes;
+        let nodes=this.core.game.map.path.nodes;
         let nNode=nodes.length;
         
         nodeIdx=-1;
@@ -125,7 +125,7 @@ export default class DeveloperClass
         let n,k,nodeIdx,selNodeIdx;
         let node,links,rtn;
         let rayEndPoint=this.developerRay.lookEndPoint;
-        let path=this.core.map.path;
+        let path=this.core.game.map.path;
         let input=this.core.input;
         
             // o splits a path at two nodes,
@@ -286,23 +286,24 @@ export default class DeveloperClass
     {
         let entity;
         let position=new PointClass(0,0,0);
+        let map=this.core.game.map;
         
         switch (itemType) {
             case this.SELECT_ITEM_ENTITY:
-                entity=this.core.map.entityList.entities[itemIndex];
+                entity=map.entityList.entities[itemIndex];
                 position.setFromValues(entity.originalPosition.x,(entity.originalPosition.y-Math.trunc(entity.height*0.5)),entity.originalPosition.z);
                 break;
             case this.SELECT_ITEM_EFFECT:
-                position.setFromPoint(this.core.map.effectList.effects[itemIndex].position);
+                position.setFromPoint(map.effectList.effects[itemIndex].position);
                 break;
             case this.SELECT_ITEM_LIGHT:
-                position.setFromPoint(this.core.map.lightList.lights[itemIndex].position);
+                position.setFromPoint(map.lightList.lights[itemIndex].position);
                 break;
             case this.SELECT_ITEM_NODE:
-                position.setFromPoint(this.core.map.path.nodes[itemIndex].position);
+                position.setFromPoint(map.path.nodes[itemIndex].position);
                 break;
             case this.SELECT_ITEM_MESH:
-                position.setFromPoint(this.core.map.meshList.meshes[itemIndex].center);
+                position.setFromPoint(map.meshList.meshes[itemIndex].center);
                 break;
         }
         
@@ -311,17 +312,19 @@ export default class DeveloperClass
     
     getSelectLastIndex(itemType)
     {
+        let map=this.core.game.map;
+        
         switch (itemType) {
             case this.SELECT_ITEM_ENTITY:
-                return(this.core.map.entityList.entities.length);
+                return(map.entityList.entities.length);
             case this.SELECT_ITEM_EFFECT:
-                return(this.core.map.effectList.effects.length);
+                return(map.effectList.effects.length);
             case this.SELECT_ITEM_LIGHT:
-                return(this.core.map.lightList.lights.length);
+                return(map.lightList.lights.length);
             case this.SELECT_ITEM_NODE:
-                return(this.core.map.path.nodes.length);
+                return(map.path.nodes.length);
             case this.SELECT_ITEM_MESH:
-                return(this.core.map.meshList.meshes.length);
+                return(map.meshList.meshes.length);
         }
         
         return(0);
@@ -330,26 +333,27 @@ export default class DeveloperClass
     isSelectVisible(itemType,itemIndex)
     {
         if (itemType!==this.SELECT_ITEM_ENTITY) return(true);
-        return(this.core.map.entityList.entities[itemIndex].mapSpawn);
+        return(this.core.game.map.entityList.entities[itemIndex].mapSpawn);
     }
     
     getSelectName(itemType,itemIndex)
     {
         let key;
+        let map=this.core.game.map;
         
         switch (itemType) {
             case this.SELECT_ITEM_ENTITY:
-                return('[entity '+itemIndex+'] '+this.core.map.entityList.entities[itemIndex].name);
+                return('[entity '+itemIndex+'] '+map.entityList.entities[itemIndex].name);
             case this.SELECT_ITEM_EFFECT:
-                return('[effect '+itemIndex+'] '+this.core.map.effectList.effects[itemIndex].jsonName);
+                return('[effect '+itemIndex+'] '+map.effectList.effects[itemIndex].jsonName);
             case this.SELECT_ITEM_LIGHT:
                 return('[light '+itemIndex+']');
             case this.SELECT_ITEM_NODE:
-                key=this.core.map.path.nodes[itemIndex].key;
+                key=map.path.nodes[itemIndex].key;
                 if (key===null) key='';
                 return('[node '+itemIndex+'] '+key);
             case this.SELECT_ITEM_MESH:
-                return('[mesh '+this.core.map.meshList.meshes[itemIndex].name+']');
+                return('[mesh '+map.meshList.meshes[itemIndex].name+']');
         }
         
         return('');
@@ -528,7 +532,7 @@ export default class DeveloperClass
             // push selected node to path editor
             
         if (this.selectItemType===this.SELECT_ITEM_NODE) {
-            this.core.map.path.editorParentNodeIdx=this.selectItemIndex;
+            this.core.game.map.path.editorParentNodeIdx=this.selectItemIndex;
         }
     }
     
@@ -538,7 +542,7 @@ export default class DeveloperClass
     
     playerToDeveloper()
     {
-        let player=this.core.map.entityList.getPlayer();
+        let player=this.core.game.map.entityList.getPlayer();
         
         this.position.setFromPoint(player.position);
         this.position.y+=player.eyeOffset;
@@ -547,7 +551,7 @@ export default class DeveloperClass
     
     developerToPlayer()
     {
-        let player=this.core.map.entityList.getPlayer();
+        let player=this.core.game.map.entityList.getPlayer();
         
             // reset position to camera
             
@@ -582,6 +586,7 @@ export default class DeveloperClass
     setInterfaceOutput()
     {
         let n,str;
+        let map=this.core.game.map;
         
             // world info
             
@@ -594,10 +599,10 @@ export default class DeveloperClass
         
         str='';
 
-        for (n=0;n!==this.core.map.meshList.meshes.length;n++) {
-            if (this.core.map.meshList.meshes[n].boxBoundCollision(xBound,yBound,zBound)) {
+        for (n=0;n!==map.meshList.meshes.length;n++) {
+            if (map.meshList.meshes[n].boxBoundCollision(xBound,yBound,zBound)) {
                 if (str!=='') str+='|';
-                str+=this.core.map.meshList.meshes[n].name;
+                str+=map.meshList.meshes[n].name;
             }
         }
         
@@ -625,11 +630,11 @@ export default class DeveloperClass
         
             // highlight the map
             
-        this.lightMinBackup.setFromColor(this.core.map.lightList.lightMin);
-        this.lightMaxBackup.setFromColor(this.core.map.lightList.lightMax);
+        this.lightMinBackup.setFromColor(this.core.game.map.lightList.lightMin);
+        this.lightMaxBackup.setFromColor(this.core.game.map.lightList.lightMax);
         
-        this.core.map.lightList.lightMin.setFromValues(1,1,1);
-        this.core.map.lightList.lightMax.setFromValues(1,1,1);
+        this.core.game.map.lightList.lightMin.setFromValues(1,1,1);
+        this.core.game.map.lightList.lightMax.setFromValues(1,1,1);
         
             // suspect sound
             
@@ -650,8 +655,8 @@ export default class DeveloperClass
         
             // turn off highlight
             
-        this.core.map.lightList.lightMin.setFromColor(this.lightMinBackup);
-        this.core.map.lightList.lightMax.setFromColor(this.lightMaxBackup);
+        this.core.game.map.lightList.lightMin.setFromColor(this.lightMinBackup);
+        this.core.game.map.lightList.lightMax.setFromColor(this.lightMaxBackup);
         
             // resume sound
             
@@ -748,7 +753,7 @@ export default class DeveloperClass
             
         if (input.isKeyDownAndClear('PageDown')) {
             if (this.drawMode===this.DRAW_MODE_NORMAL) {
-                this.drawMode=(this.core.map.hasShadowmap)?this.DRAW_MODE_SHADOW:this.DRAW_MODE_COLLISION;
+                this.drawMode=(this.core.game.map.hasShadowmap)?this.DRAW_MODE_SHADOW:this.DRAW_MODE_COLLISION;
             }
             else {
                 this.drawMode=(this.drawMode===this.DRAW_MODE_SHADOW)?this.DRAW_MODE_COLLISION:this.DRAW_MODE_NORMAL;

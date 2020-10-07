@@ -87,10 +87,10 @@ export default class MeshMovementClass
                     paused=!this.core.game.checkTrigger(move.pauseData);
                     break;
                 case this.MOVEMENT_PAUSE_APPROACH:
-                    paused=(this.originalCenterPnt.distance(this.core.map.entityList.getPlayer().position)>move.pauseData);
+                    paused=(this.originalCenterPnt.distance(this.core.game.map.entityList.getPlayer().position)>move.pauseData);
                     break;
                 case this.MOVEMENT_PAUSE_LEAVE:
-                    paused=(this.originalCenterPnt.distance(this.core.map.entityList.getPlayer().position)<move.pauseData);
+                    paused=(this.originalCenterPnt.distance(this.core.game.map.entityList.getPlayer().position)<move.pauseData);
                     break;
                 case this.MOVEMENT_PAUSE_STOP:
                     paused=true;
@@ -164,6 +164,6 @@ export default class MeshMovementClass
             this.mesh.rotate(this.rotateAng,this.rotateOffset);
         }
 
-        if (needPush) this.core.map.entityList.meshPush(this.mesh,this.movePnt,this.rotateAng);
+        if (needPush) this.core.game.map.entityList.meshPush(this.mesh,this.movePnt,this.rotateAng);
     }
 }

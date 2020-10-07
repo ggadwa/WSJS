@@ -46,7 +46,7 @@ class EntityWeaponFireClass
     
     addAmmo(count)
     {
-        if ((this.interfaceAmmoIcon!==null) && (this.weapon.heldBy===this.core.map.entityList.getPlayer())) this.core.interface.pulseElement(this.interfaceAmmoIcon,500,10);
+        if ((this.interfaceAmmoIcon!==null) && (this.weapon.heldBy===this.core.game.map.entityList.getPlayer())) this.core.interface.pulseElement(this.interfaceAmmoIcon,500,10);
         
         this.ammo+=count;
         if (this.ammo>this.ammoMaxCount) this.ammo=this.ammoMaxCount;
@@ -409,7 +409,7 @@ export default class EntityWeaponClass extends EntityClass
         
             // update any UI if player
             
-        if (parentEntity===this.core.map.entityList.getPlayer()) {
+        if (parentEntity===this.core.game.map.entityList.getPlayer()) {
             if (this.interfaceCrosshair!==null) this.core.interface.showElement(this.interfaceCrosshair,((this.show)&&(this.core.game.camera.isFirstPerson())));
             if (this.primary!==null) this.primary.updateUI();
             if (this.secondary!==null) this.secondary.updateUI();

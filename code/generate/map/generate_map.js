@@ -223,7 +223,7 @@ export default class GenerateMapClass
         let x,z,nodeCount;
         let room,failCount,pathNode,offset;
         let roomCount=rooms.length;
-        let path=this.core.map.path;
+        let path=this.core.game.map.path;
         
         failCount=0;
         nodeCount=roomCount*3;

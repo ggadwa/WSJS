@@ -265,10 +265,10 @@ export default class EntityKartBaseClass extends EntityClass
         
             // get a random place
             
-        startIdx=Math.trunc(this.core.map.kartStartPositions.length*Math.random());
-        this.position.setFromPoint(this.core.map.kartStartPositions[startIdx]);
+        startIdx=Math.trunc(this.core.game.map.kartStartPositions.length*Math.random());
+        this.position.setFromPoint(this.core.game.map.kartStartPositions[startIdx]);
         
-        this.core.map.kartStartPositions.splice(startIdx,1);
+        this.core.game.map.kartStartPositions.splice(startIdx,1);
 
             // idle animation
             
@@ -477,7 +477,7 @@ export default class EntityKartBaseClass extends EntityClass
            
         if (jump) {
             if (this.isStandingOnFloor()) {
-                this.gravity=this.core.map.gravityMinValue;
+                this.gravity=this.core.game.map.gravityMinValue;
                 this.movement.y=this.jumpHeight;
             }
         }
@@ -695,7 +695,7 @@ export default class EntityKartBaseClass extends EntityClass
     {
         let n,nodeDist,prevNodeDist,nextNodeDist;
         let nodeIdx,prevNodeIdx,nextNodeIdx,spliceIdx,entity;
-        let entityList=this.core.map.entityList;
+        let entityList=this.core.game.map.entityList;
         let placeList=[];
 
             // this is a bit complicated -- the path of travel

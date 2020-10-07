@@ -373,7 +373,7 @@ export default class GenerateMeshClass
         uvArray=this.buildUVs(vertexArray,normalArray,(1/segmentSize));
         tangentArray=this.buildTangents(vertexArray,uvArray,indexArray);
         
-        return(this.core.map.meshList.add(new MeshClass(this.core,name,bitmap,-1,-1,new Float32Array(vertexArray),normalArray,tangentArray,uvArray,null,null,new Uint16Array(indexArray))));
+        return(this.core.game.map.meshList.add(new MeshClass(this.core,name,bitmap,-1,-1,new Float32Array(vertexArray),normalArray,tangentArray,uvArray,null,null,new Uint16Array(indexArray))));
     }
     
         //
@@ -399,7 +399,7 @@ export default class GenerateMeshClass
         uvArray=this.buildUVs(vertexArray,normalArray,(1/segmentSize));
         tangentArray=this.buildTangents(vertexArray,uvArray,indexArray);
         
-        this.core.map.meshList.add(new MeshClass(this.core,name,bitmap,-1,-1,new Float32Array(vertexArray),normalArray,tangentArray,uvArray,null,null,new Uint16Array(indexArray)));
+        this.core.game.map.meshList.add(new MeshClass(this.core,name,bitmap,-1,-1,new Float32Array(vertexArray),normalArray,tangentArray,uvArray,null,null,new Uint16Array(indexArray)));
     }
     
     buildRoomWalls(room,centerPnt,name,bitmap,segmentSize)
@@ -444,7 +444,7 @@ export default class GenerateMeshClass
         uvArray=this.buildUVs(vertexArray,normalArray,(1/segmentSize));
         tangentArray=this.buildTangents(vertexArray,uvArray,indexArray);
         
-        this.core.map.meshList.add(new MeshClass(this.core,name,bitmap,-1,-1,vertexArray,normalArray,tangentArray,uvArray,null,null,indexArray));
+        this.core.game.map.meshList.add(new MeshClass(this.core,name,bitmap,-1,-1,vertexArray,normalArray,tangentArray,uvArray,null,null,indexArray));
     }
     
         //
@@ -619,7 +619,7 @@ export default class GenerateMeshClass
         uvArray=this.buildUVs(vertexArray,normalArray,(1/segmentSize));
         tangentArray=this.buildTangents(vertexArray,uvArray,indexArray);
         
-        this.core.map.meshList.add(new MeshClass(this.core,name,stepBitmap,-1,-1,new Float32Array(vertexArray),normalArray,tangentArray,uvArray,null,null,new Uint16Array(indexArray)));
+        this.core.game.map.meshList.add(new MeshClass(this.core,name,stepBitmap,-1,-1,new Float32Array(vertexArray),normalArray,tangentArray,uvArray,null,null,new Uint16Array(indexArray)));
     }
     
     buildRoomStairs(room,name,stepBitmap,segmentSize)
@@ -804,7 +804,7 @@ export default class GenerateMeshClass
         tangentArray=this.buildTangents(vertexArray,uvArray,indexArray);
         
         mesh=new MeshClass(this.core,name,bitmap,-1,-1,new Float32Array(vertexArray),new Float32Array(normalArray),tangentArray,new Float32Array(uvArray),null,null,new Uint16Array(indexArray));
-        this.core.map.meshList.add(mesh);
+        this.core.game.map.meshList.add(mesh);
     }
     
     createCube(room,name,bitmap,xBound,yBound,zBound,left,right,front,back,top,bottom,normalsIn,uvMode,segmentSize)
@@ -1018,7 +1018,7 @@ export default class GenerateMeshClass
         tangentArray=this.buildTangents(vertexArray,uvArray,indexArray);
         
         mesh=new MeshClass(this.core,name,bitmap,-1,-1,new Float32Array(vertexArray),new Float32Array(normalArray),tangentArray,new Float32Array(uvArray),null,null,new Uint16Array(indexArray));
-        this.core.map.meshList.add(mesh);
+        this.core.game.map.meshList.add(mesh);
     }
     
     createMeshCylinderSimple(room,name,bitmap,centerPnt,yBound,radius,top,bot)

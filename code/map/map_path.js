@@ -47,7 +47,7 @@ export default class MapPathClass
     async loadPathJson()
     {
         let resp;
-        let url='../paths/'+this.core.map.name+'.json';
+        let url='../paths/'+this.core.game.map.name+'.json';
         
         try {
             resp=await fetch(url);
@@ -63,7 +63,7 @@ export default class MapPathClass
     {
         let n,paths;
         let pathDef,pathNode;
-        let map=this.core.map;
+        let map=this.core.game.map;
         
             // paths aren't required, so just
             // skip out if missing

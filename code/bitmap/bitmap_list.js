@@ -78,7 +78,7 @@ export default class BitmapListClass
         
         game.addJsonObjectToLoadSet(bitmapSet,null,null,false,['bitmap','interfaceHitBitmap','touchStickRingBitmap','touchStickThumbBitmap','touchMenuBitmap'],game.json);
         
-        for (entity of this.core.map.entityList.entities) {
+        for (entity of game.map.entityList.entities) {
             jsonEntity=game.jsonEntityCache.get(entity.jsonName);
             if (jsonEntity!==null) game.addJsonObjectToLoadSet(bitmapSet,entity.data,null,false,['bitmap'],jsonEntity);
         }

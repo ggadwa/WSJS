@@ -320,8 +320,8 @@ export default class CollisionClass
         let mesh,checkEntity;
         let collisionTrig,nCollisionTrig;             
         let dist,currentDist;
-        
-        let nEntity=this.core.map.entityList.count();
+        let map=this.core.game.map;
+        let nEntity=map.entityList.count();
         
             // keep a bump and push count
             
@@ -357,8 +357,8 @@ export default class CollisionClass
                 // run through the meshes and
                 // check against collision lines
 
-            for (n of this.core.map.meshList.collisionMeshIndexList) {
-                mesh=this.core.map.meshList.meshes[n];
+            for (n of map.meshList.collisionMeshIndexList) {
+                mesh=map.meshList.meshes[n];
                 
                     // skip any mesh we don't collide with
                     
@@ -392,7 +392,7 @@ export default class CollisionClass
                             
                         bumpY=-1;
 
-                        if ((collisionTrig.yBound.max-this.entityTestPnt.y)<=this.core.map.bumpHeight) {
+                        if ((collisionTrig.yBound.max-this.entityTestPnt.y)<=map.bumpHeight) {
                             bumpY=collisionTrig.yBound.max;
                             entity.collideWallMeshIdx=-1;
                         }
@@ -405,7 +405,7 @@ export default class CollisionClass
             pushedEntity=false;
             
             for (n=0;n!==nEntity;n++) {
-                checkEntity=this.core.map.entityList.entities[n];
+                checkEntity=map.entityList.entities[n];
                 if (checkEntity===entity) continue;
                 if ((!checkEntity.show) || (checkEntity.heldBy!==null)) continue;
                 
@@ -433,7 +433,7 @@ export default class CollisionClass
                         // can we bump?
                     
                     bumpY=-1;
-                    if ((entityTopY-this.entityTestPnt.y)<=this.core.map.bumpHeight) bumpY=entityTopY;
+                    if ((entityTopY-this.entityTestPnt.y)<=map.bumpHeight) bumpY=entityTopY;
                     
                         // can we push?
                         
@@ -496,10 +496,11 @@ export default class CollisionClass
     {
         let n,entityTopY;
         let checkEntity;
-        let nEntity=this.core.map.entityList.entities.length;
+        let map=this.core.game.map;
+        let nEntity=map.entityList.entities.length;
 
         for (n=0;n!==nEntity;n++) {
-            checkEntity=this.core.map.entityList.entities[n];
+            checkEntity=map.entityList.entities[n];
             if (checkEntity===entity) continue;
             if ((!checkEntity.show) || (checkEntity.heldBy!==null)) continue;
 
@@ -544,6 +545,7 @@ export default class CollisionClass
         let n,k,i,y,nCollisionTrig;
         let mesh,collisionTrig;
         let nEntity,checkEntity,entityTop,entityBot,checkEntityTop;
+        let map=this.core.game.map;
         
             // the rough collide boxes
             // floorRiseHeight is the farthest
@@ -575,8 +577,8 @@ export default class CollisionClass
         
             // run through colliding trigs
         
-        for (n of this.core.map.meshList.collisionMeshIndexList) {
-            mesh=this.core.map.meshList.meshes[n];
+        for (n of map.meshList.collisionMeshIndexList) {
+            mesh=map.meshList.meshes[n];
 
                 // skip any mesh we don't collide with
                 
@@ -611,13 +613,13 @@ export default class CollisionClass
             // unless we are currently in passthrough
     
         if (!entity.passThrough) {
-            nEntity=this.core.map.entityList.entities.length;
+            nEntity=map.entityList.entities.length;
 
             entityTop=(entity.position.y+entity.height)+fallY;
             entityBot=entity.position.y+fallY;
 
             for (n=0;n!==nEntity;n++) {
-                checkEntity=this.core.map.entityList.entities[n];
+                checkEntity=map.entityList.entities[n];
                 if (checkEntity===entity) continue;
                 if ((!checkEntity.show) || (checkEntity.passThrough) || (checkEntity.heldBy!==null)) continue;
 
@@ -659,6 +661,7 @@ export default class CollisionClass
         let n,k,i,y,nCollisionTrig;
         let mesh,collisionTrig;
         let nEntity,checkEntity,entityTop,entityBot,checkEntityTop;
+        let map=this.core.game.map;
         
             // the rough collide boxes
             // we check from the top of the entity past the rise
@@ -689,8 +692,8 @@ export default class CollisionClass
         
             // run through the meshes
         
-        for (n of this.core.map.meshList.collisionMeshIndexList) {
-            mesh=this.core.map.meshList.meshes[n];
+        for (n of map.meshList.collisionMeshIndexList) {
+            mesh=map.meshList.meshes[n];
 
                 // skip any mesh we don't collide with
 
@@ -723,13 +726,13 @@ export default class CollisionClass
             // unless we are currently in passthrough
             
         if (!entity.passThrough) {
-            nEntity=this.core.map.entityList.entities.length;
+            nEntity=map.entityList.entities.length;
         
             entityTop=(entity.position.y+entity.height)+riseY;
             entityBot=entity.position.y+riseY;
 
             for (n=0;n!==nEntity;n++) {
-                checkEntity=this.core.map.entityList.entities[n];
+                checkEntity=map.entityList.entities[n];
                 if (checkEntity===entity) continue;
                 if ((!checkEntity.show) || (checkEntity.passThrough) || (checkEntity.heldBy!==null)) continue;
 
@@ -772,8 +775,8 @@ export default class CollisionClass
         let mesh,checkEntity;
         let collisionTrig,nCollisionTrig;              
         let dist,currentDist;
-        
-        let nEntity=this.core.map.entityList.count();
+        let map=this.core.game.map;
+        let nEntity=map.entityList.count();
         
             // the rough collide boxes
             
@@ -789,8 +792,8 @@ export default class CollisionClass
             // run through the meshes and
             // check against all trigs
 
-        for (n of this.core.map.meshList.collisionMeshIndexList) {
-            mesh=this.core.map.meshList.meshes[n];
+        for (n of map.meshList.collisionMeshIndexList) {
+            mesh=map.meshList.meshes[n];
 
                 // skip any mesh we don't collide with
 
@@ -851,7 +854,7 @@ export default class CollisionClass
             // check entities
             
         for (n=0;n!==nEntity;n++) {
-            checkEntity=this.core.map.entityList.entities[n];
+            checkEntity=map.entityList.entities[n];
             if (checkEntity===entity) continue;
             if (checkEntity===entity.heldBy) continue;         // skip source entity and anything holding source entity
             if ((!checkEntity.show) || (checkEntity.passThrough) || (checkEntity.heldBy!==null)) continue;
@@ -883,6 +886,7 @@ export default class CollisionClass
         let mesh,checkEntity;
         let collisionTrig,nCollisionTrig;              
         let dist,currentDist;
+        let map=this.core.game.map;
         
             // the rough collide boxes
             
@@ -897,8 +901,8 @@ export default class CollisionClass
             // run through the meshes and
             // check against all trigs
 
-        for (n of this.core.map.meshList.collisionMeshIndexList) {
-            mesh=this.core.map.meshList.meshes[n];
+        for (n of map.meshList.collisionMeshIndexList) {
+            mesh=map.meshList.meshes[n];
 
                 // skip any mesh we don't collide with
 
@@ -959,10 +963,10 @@ export default class CollisionClass
             // check entities
             
         if (!skipEntities) {
-            let nEntity=this.core.map.entityList.count();
+            nEntity=map.entityList.count();
             
             for (n=0;n!==nEntity;n++) {
-                checkEntity=this.core.map.entityList.entities[n];
+                checkEntity=map.entityList.entities[n];
                 if (checkEntity===entity) continue;
                 if (checkEntity===entity.heldBy) continue;         // skip source entity and anything holding source entity
                 if ((!checkEntity.show) || (checkEntity.passThrough) || (checkEntity.heldBy!==null)) continue;
@@ -993,6 +997,7 @@ export default class CollisionClass
         let n,k,t,nCollisionTrig;
         let mesh,collisionTrig;
         let yHit=[0,0,0,0];
+        let map=this.core.game.map;
         
             // build the four rigid body points
             
@@ -1038,8 +1043,8 @@ export default class CollisionClass
             // run through colliding trigs
             // no entity checking as entities are always flat
         
-        for (n of this.core.map.meshList.collisionMeshIndexList) {
-            mesh=this.core.map.meshList.meshes[n];
+        for (n of map.meshList.collisionMeshIndexList) {
+            mesh=map.meshList.meshes[n];
 
                 // skip any mesh we don't collide with
 
@@ -1118,8 +1123,9 @@ export default class CollisionClass
         let n,k;
         let mesh,checkEntity,entityTopY;
         let collisionTrig,nCollisionTrig;
+        let map=this.core.game.map;
         
-        let nEntity=this.core.map.entityList.count();
+        let nEntity=map.entityList.count();
         
         entity.touchEntity=null;
         
@@ -1136,8 +1142,8 @@ export default class CollisionClass
             // run through the meshes and
             // rough check trig collision boxes
 
-        for (n of this.core.map.meshList.collisionMeshIndexList) {
-            mesh=this.core.map.meshList.meshes[n];
+        for (n of map.meshList.collisionMeshIndexList) {
+            mesh=map.meshList.meshes[n];
 
                 // skip any mesh we don't collide with
 
@@ -1170,7 +1176,7 @@ export default class CollisionClass
             // check other entities
 
         for (n=0;n!==nEntity;n++) {
-            checkEntity=this.core.map.entityList.entities[n];
+            checkEntity=map.entityList.entities[n];
             if (checkEntity===entity) continue;
             if ((!checkEntity.show) || (checkEntity.heldBy!==null)) continue;
 

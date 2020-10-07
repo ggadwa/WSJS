@@ -216,7 +216,7 @@ export default class NetworkClass
         entity.remoteId=remoteId;
         entity.initialize();        // errors here!
         
-        this.core.map.entityList.add(entity);       // need addRemote?
+        this.core.game.map.entityList.add(entity);       // need addRemote?
         
         this.core.game.remoteEntering(userName);
     }
@@ -227,7 +227,7 @@ export default class NetworkClass
         
         console.info('LEAVE>'+remoteId);
         
-        entity=this.core.map.entityList.findRemoteById(remoteId);
+        entity=this.core.game.map.entityList.findRemoteById(remoteId);
         if (entity!==null) entity.markDelete=true;
         
         this.core.game.remoteLeaving(entity.name);
@@ -237,7 +237,7 @@ export default class NetworkClass
     {
         let entity;
         
-        entity=this.core.map.entityList.findRemoteById(remoteId);
+        entity=this.core.game.map.entityList.findRemoteById(remoteId);
         if (entity!==null) {
             if (!entity.hadRemoteUpdate) entity.putUpdateNetworkData(dataView);     // only use the first (the latest) update, skip all others
         }
@@ -251,7 +251,7 @@ export default class NetworkClass
             // to only apply the latest update and check if
             // we didn't have an update so need to predict
             
-        this.core.map.entityList.clearEntityRemoteUpdateFlags();
+        this.core.game.map.entityList.clearEntityRemoteUpdateFlags();
         
             // run through the messages
             
@@ -320,7 +320,7 @@ export default class NetworkClass
     {
             // send my update to other players
             
-        this.sendEntityUpdate(this.core.map.entityList.getPlayer());
+        this.sendEntityUpdate(this.core.game.map.entityList.getPlayer());
         
             // do all the remote updates
             

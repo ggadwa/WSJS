@@ -69,7 +69,6 @@ export default class CoreClass
         this.title=null;
         this.dialog=null;
         this.game=null;
-        this.map=null;
         this.music=null;
         
             // input

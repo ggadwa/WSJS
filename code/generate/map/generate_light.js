@@ -67,7 +67,7 @@ export default class GenerateLightClass
             exponent=this.core.randomFloat(0.25,0.25);
             
             mapLight=new LightClass(new PointClass(x,(y-(lightSize*2)),z),color,intensity,exponent,false);
-            this.core.map.lightList.add(mapLight);
+            this.core.game.map.lightList.add(mapLight);
     //    }
     }
 }

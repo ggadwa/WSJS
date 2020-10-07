@@ -151,8 +151,8 @@ export default class ModelMeshShaderClass extends ShaderClass
             gl.uniform4f(light.colorExponentUniform,viewLight.color.r,viewLight.color.g,viewLight.color.b,viewLight.exponent);
         }
         
-        gl.uniform3f(this.lightMinUniform,this.core.map.lightList.lightMin.r,this.core.map.lightList.lightMin.g,this.core.map.lightList.lightMin.b);
-        gl.uniform3f(this.lightMaxUniform,this.core.map.lightList.lightMax.r,this.core.map.lightList.lightMax.g,this.core.map.lightList.lightMax.b);
+        gl.uniform3f(this.lightMinUniform,this.core.game.map.lightList.lightMin.r,this.core.game.map.lightList.lightMin.g,this.core.game.map.lightList.lightMin.b);
+        gl.uniform3f(this.lightMaxUniform,this.core.game.map.lightList.lightMax.r,this.core.game.map.lightList.lightMax.g,this.core.game.map.lightList.lightMax.b);
 
             // enable the vertex attributes
 

@@ -28,7 +28,7 @@ export default class SequenceEntityClass
     
     initialize()
     {
-        this.entity=this.core.map.entityList.find(this.entityName);
+        this.entity=this.core.game.map.entityList.find(this.entityName);
         if (this.entity===null) {
             console.log('unknown entity name: '+this.entityName+' in sequence '+sequence.jsonName);
             return(false);

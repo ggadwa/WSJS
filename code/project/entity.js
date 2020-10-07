@@ -55,7 +55,7 @@ export default class EntityClass
 
         this.remoteId=-1;       // the network ID
         
-        this.gravity=this.core.map.gravityMinValue;
+        this.gravity=this.core.game.map.gravityMinValue;
         
         this.passThrough=false;
         this.touchEntity=null;
@@ -170,12 +170,12 @@ export default class EntityClass
         
     getPlayerEntity()
     {
-        return(this.core.map.entityList.getPlayer());
+        return(this.core.game.map.entityList.getPlayer());
     }
     
     addEntity(jsonName,name,position,angle,data,spawnedBy,heldBy,show)
     {
-        return(this.core.map.entityList.addDynamic(jsonName,name,position,angle,data,spawnedBy,heldBy,show));
+        return(this.core.game.map.entityList.addDynamic(jsonName,name,position,angle,data,spawnedBy,heldBy,show));
     }
     
     removeEntity(entity)
@@ -202,7 +202,7 @@ export default class EntityClass
     {
         let entity,dist,damage;
 
-        for (entity of this.core.map.entityList.entities) {
+        for (entity of this.core.game.map.entityList.entities) {
             if (!entity.show) continue;
             
             dist=centerPosition.distance(entity.position);
@@ -224,7 +224,7 @@ export default class EntityClass
         effect=new EffectClass(this.core,spawnedByEntity,jsonName,position,data,false,show);
         if (!effect.initialize()) return(false);
         
-        this.core.map.effectList.add(effect);
+        this.core.game.map.effectList.add(effect);
         
         return(true);
     }
@@ -346,14 +346,14 @@ export default class EntityClass
         
     getPathNodeList()
     {
-        return(this.core.map.path.nodes);
+        return(this.core.game.map.path.nodes);
     }
     
     findNearestPathNode(maxDistance)
     {
         let n,d,dist;
         let nodeIdx;
-        let nodes=this.core.map.path.nodes;
+        let nodes=this.core.game.map.path.nodes;
         let nNode=nodes.length;
         
         nodeIdx=-1;
@@ -374,7 +374,7 @@ export default class EntityClass
     {
         let n,y,d,dist;
         let nodeIdx,pos;
-        let nodes=this.core.map.path.nodes;
+        let nodes=this.core.game.map.path.nodes;
         let nNode=nodes.length;
         
         nodeIdx=-1;
@@ -407,19 +407,19 @@ export default class EntityClass
     
     hitPathNode(nodeIdx,slopDistance)
     {
-        return(this.core.map.path.nodes[nodeIdx].position.distance(this.position)<slopDistance);
+        return(this.core.game.map.path.nodes[nodeIdx].position.distance(this.position)<slopDistance);
     }
     
     nextNodeInPath(fromNodeIdx,toNodeIdx)
     {
-        return(this.core.map.path.nodes[fromNodeIdx].pathHints[toNodeIdx]);
+        return(this.core.game.map.path.nodes[fromNodeIdx].pathHints[toNodeIdx]);
     }
     
     nextNodeTowardsEntity(fromNodeIdx,entity)
     {
         let n,linkNode,nextNodeIdx;
         let dist,currentDist;
-        let nodes=this.core.map.path.nodes;
+        let nodes=this.core.game.map.path.nodes;
         let node=nodes[fromNodeIdx];
         
         nextNodeIdx=-1;
@@ -440,13 +440,13 @@ export default class EntityClass
     
     moveToNode(nodeIdx)
     {
-        this.position.setFromPoint(this.core.map.path.nodes[nodeIdx].position);
+        this.position.setFromPoint(this.core.game.map.path.nodes[nodeIdx].position);
     }
     
     moveToRandomNode(avoidTelefrag)
     {
         let node;
-        let nodes=this.core.map.path.nodes;
+        let nodes=this.core.game.map.path.nodes;
         let idx,origIdx,hitEntity;
         
             // random node
@@ -490,17 +490,17 @@ export default class EntityClass
     
     getRandomKeyNodeIndex()
     {
-        let keyNodes=this.core.map.path.keyNodes;
+        let keyNodes=this.core.game.map.path.keyNodes;
         return(keyNodes[Math.trunc(keyNodes.length*Math.random())]);
     }
     
     findKeyNodeIndex(key)
     {
         let n;
-        let keyNodes=this.core.map.path.keyNodes;
+        let keyNodes=this.core.game.map.path.keyNodes;
         
         for (n=0;n!==keyNodes.length;n++) {
-            if (this.core.map.path.nodes[keyNodes[n]].key===key) return(keyNodes[n]);
+            if (this.core.game.map.path.nodes[keyNodes[n]].key===key) return(keyNodes[n]);
         }
         
         return(-1);
@@ -508,39 +508,39 @@ export default class EntityClass
     
     getNodeKey(nodeIdx)
     {
-        if (this.core.map.path.nodes[nodeIdx].key===undefined) return(null);
-        return(this.core.map.path.nodes[nodeIdx].key);
+        if (this.core.game.map.path.nodes[nodeIdx].key===undefined) return(null);
+        return(this.core.game.map.path.nodes[nodeIdx].key);
     }
     
     getNodeData(nodeIdx)
     {
-        if (this.core.map.path.nodes[nodeIdx].data===undefined) return(null);
-        return(this.core.map.path.nodes[nodeIdx].data);
+        if (this.core.game.map.path.nodes[nodeIdx].data===undefined) return(null);
+        return(this.core.game.map.path.nodes[nodeIdx].data);
     }
     
     getNodePosition(nodeIdx)
     {
-        return(this.core.map.path.nodes[nodeIdx].position);
+        return(this.core.game.map.path.nodes[nodeIdx].position);
     }
     
     turnYTowardsNode(nodeIdx,turnSpeed)
     {
-        return(this.angle.turnYTowards(this.position.angleYTo(this.core.map.path.nodes[nodeIdx].position),turnSpeed));
+        return(this.angle.turnYTowards(this.position.angleYTo(this.core.game.map.path.nodes[nodeIdx].position),turnSpeed));
     }
     
     getTurnYTowardsNode(nodeIdx)
     {
-        return(this.angle.getTurnYTowards(this.position.angleYTo(this.core.map.path.nodes[nodeIdx].position)));
+        return(this.angle.getTurnYTowards(this.position.angleYTo(this.core.game.map.path.nodes[nodeIdx].position)));
     }
     
     getVectorToNode(nodeIdx,pnt)
     {
-        pnt.setFromSubPoint(this.core.map.path.nodes[nodeIdx].position,this.position);
+        pnt.setFromSubPoint(this.core.game.map.path.nodes[nodeIdx].position,this.position);
     }
     
     getYAngleBetweenNodes(fromNodeIdx,toNodeIdx)
     {
-        let nodes=this.core.map.path.nodes;
+        let nodes=this.core.game.map.path.nodes;
         return(nodes[fromNodeIdx].position.angleYTo(nodes[toNodeIdx].position));
     }
     
@@ -550,7 +550,7 @@ export default class EntityClass
         
     findCubeContainingEntity()
     {
-        return(this.core.map.cubeList.findCubeContainingEntity(this));
+        return(this.core.game.map.cubeList.findCubeContainingEntity(this));
     }
     
         //
@@ -611,6 +611,7 @@ export default class EntityClass
     moveInMapY(movePnt,gravityFactor,noGravity)
     {
         let yAdd,fallY,riseY,maxValue;
+        let map=this.core.game.map;
         
             // clear collisions
             
@@ -624,20 +625,20 @@ export default class EntityClass
             // add in gravity
             
         if (noGravity) {
-            this.gravity=this.core.map.gravityMinValue;
+            this.gravity=map.gravityMinValue;
         }
         else {
                 // if there is upwards movement (usually a jump or push)
                 // then reduce it by the current gravity acceleration
   
             if (movePnt.y>0) {
-                movePnt.y-=((this.weight*this.core.map.gravityAcceleration)*gravityFactor);
+                movePnt.y-=((this.weight*map.gravityAcceleration)*gravityFactor);
                 if (movePnt.y<=0) {
                     this.gravity=-movePnt.y;
                     movePnt.y=0;
                 }
                 else {
-                    this.gravity=this.core.map.gravityMinValue;
+                    this.gravity=map.gravityMinValue;
                 }
             }
             
@@ -645,9 +646,9 @@ export default class EntityClass
                 // add it into the movement
 
             else {
-                this.gravity+=((this.weight*this.core.map.gravityAcceleration)*gravityFactor);
+                this.gravity+=((this.weight*map.gravityAcceleration)*gravityFactor);
                 
-                maxValue=this.core.map.gravityMaxValue*gravityFactor;
+                maxValue=map.gravityMaxValue*gravityFactor;
                 if (this.gravity>maxValue) this.gravity=maxValue;
             
                 yAdd-=this.gravity;
@@ -664,7 +665,7 @@ export default class EntityClass
             this.position.addValuesTrunc(0,fallY,0);
         
             if (fallY>=0) {
-                this.gravity=this.core.map.gravityMinValue;                  // if we are rising or stopped by a floor, restart gravity
+                this.gravity=map.gravityMinValue;                  // if we are rising or stopped by a floor, restart gravity
                 return(movePnt.y);
             }
         }
@@ -707,7 +708,7 @@ export default class EntityClass
             
         if (movePnt.y<0) {
             if (this.standOnMeshIdx!==-1) {
-                if (this.core.map.meshList.meshes[this.standOnMeshIdx]===mesh) {
+                if (this.core.game.map.meshList.meshes[this.standOnMeshIdx]===mesh) {
                     if (this.position.y<=mesh.yBound.min) {
                         this.position.y=Math.trunc(mesh.yBound.min)+1;
                     }
@@ -764,7 +765,7 @@ export default class EntityClass
     floorBounce(motion)
     {
         motion.y=-((motion.y+this.gravity)*this.bounceFactor);
-        this.gravity=this.core.map.gravityMinValue;
+        this.gravity=this.core.game.map.gravityMinValue;
         
         if (Math.abs(motion.y)<this.weight) motion.y=0;
     }
@@ -776,7 +777,7 @@ export default class EntityClass
         
             // get the normal
             
-        collisionTrig=this.core.map.meshList.meshes[this.collideWallMeshIdx].collisionWallTrigs[this.collideWallTrigIdx];
+        collisionTrig=this.core.game.map.meshList.meshes[this.collideWallMeshIdx].collisionWallTrigs[this.collideWallTrigIdx];
         normal=collisionTrig.normal;
         
             // get the angle between the normal and
@@ -824,12 +825,12 @@ export default class EntityClass
         
     getInLiquidIndex()
     {
-        return(this.core.map.liquidList.getLiquidForPoint(this.position));
+        return(this.core.game.map.liquidList.getLiquidForPoint(this.position));
     }
     
     getUnderLiquidIndex()
     {
-        return(this.core.map.liquidList.getLiquidForEyePoint(this.position,this.eyeOffset));
+        return(this.core.game.map.liquidList.getLiquidForEyePoint(this.position,this.eyeOffset));
     }
     
     isStandingOnFloor()

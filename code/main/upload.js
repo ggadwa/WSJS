@@ -21,7 +21,7 @@ export default class UploadClass
         
         url=window.location.protocol+'//'+window.location.host+path;
         if (!url.endsWith('/')) url+='/';
-        url+=encodeURIComponent(this.core.map.name)+'/'+uploadName+'/'+uploadIndex;
+        url+=encodeURIComponent(this.core.game.map.name)+'/'+uploadName+'/'+uploadIndex;
         
             // upload
             

@@ -53,7 +53,7 @@ export default class ModelListClass
         
         modelSet=new Set();
         
-        for (entity of this.core.map.entityList.entities) {
+        for (entity of this.core.game.map.entityList.entities) {
             jsonEntity=game.jsonEntityCache.get(entity.jsonName);
             if (jsonEntity!==null) game.addJsonObjectToLoadSet(modelSet,entity.data,null,false,['model'],jsonEntity);
         }

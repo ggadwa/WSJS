@@ -81,7 +81,7 @@ export default class DialogDeveloperClass extends DialogClass
         this.pathHintThread=new Worker('../../code/generate/path/path_thread.js',{type:"module"});
         this.pathHintThread.addEventListener('message',this.buildPathHintsThreadFinish.bind(this),false);
             
-        this.pathHintThread.postMessage({nodes:this.core.map.path.nodes});
+        this.pathHintThread.postMessage({nodes:this.core.game.map.path.nodes});
     }
     
     buildPathHintsThreadFinish(message)
@@ -129,7 +129,7 @@ export default class DialogDeveloperClass extends DialogClass
         let n,k,nMesh,data;
         let thread,perThreadMeshCount;
         let light,effect,lightIdx;
-        let map=this.core.map;
+        let map=this.core.game.map;
         
             // we need to make a parallel object of
             // all the data because our regular data has DOM

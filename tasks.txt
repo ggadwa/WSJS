@@ -4,7 +4,7 @@
 
 
 0. input pauses turns off keys too
-2. map to game
+1. fix start game -> end game -> start game problem
 
 4. title needs to work on iPad
 7. need game release

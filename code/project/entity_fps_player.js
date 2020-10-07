@@ -504,31 +504,31 @@ export default class EntityFPSPlayerClass extends EntityClass
         
             // liquid changes
             
-        liquidIdx=this.core.map.liquidList.getLiquidForEyePoint(this.position,this.eyeOffset);
+        liquidIdx=this.core.game.map.liquidList.getLiquidForEyePoint(this.position,this.eyeOffset);
         
         if (liquidIdx!==-1) {
             this.lastUnderLiquid=true;
         }
         else {
             if ((this.lastUnderLiquid) && (this.angle.x<0)) {
-                this.gravity=this.core.map.gravityMinValue;
+                this.gravity=this.core.game.map.gravityMinValue;
                 this.movement.y=this.jumpWaterHeight;
-                if (this.lastInLiquidIdx!==-1) this.core.map.liquidList.liquids[this.lastInLiquidIdx].playSoundOut(this.position);
+                if (this.lastInLiquidIdx!==-1) this.core.game.map.liquidList.liquids[this.lastInLiquidIdx].playSoundOut(this.position);
             }
             
             this.lastUnderLiquid=false;
         }
         
-        liquidIdx=this.core.map.liquidList.getLiquidForPoint(this.position);
+        liquidIdx=this.core.game.map.liquidList.getLiquidForPoint(this.position);
         
         if (liquidIdx!==-1) {
-            liquid=this.core.map.liquidList.liquids[liquidIdx];
+            liquid=this.core.game.map.liquidList.liquids[liquidIdx];
             if (this.lastInLiquidIdx===-1) liquid.playSoundIn(this.position);
             this.lastInLiquidIdx=liquidIdx;
             gravityFactor=liquid.gravityFactor;
         }
         else {
-            if (this.lastInLiquidIdx!==-1) this.core.map.liquidList.liquids[this.lastInLiquidIdx].playSoundOut(this.position);
+            if (this.lastInLiquidIdx!==-1) this.core.game.map.liquidList.liquids[this.lastInLiquidIdx].playSoundOut(this.position);
             this.lastInLiquidIdx=-1;
             gravityFactor=1.0;
         }
@@ -725,7 +725,7 @@ export default class EntityFPSPlayerClass extends EntityClass
            
         if (input.isKeyDown(' ')) {
             if ((this.standOnMeshIdx!==-1) && (!this.lastUnderLiquid)) {
-                this.gravity=this.core.map.gravityMinValue;
+                this.gravity=this.core.game.map.gravityMinValue;
                 this.movement.y=this.jumpHeight;
             }
         }
@@ -764,7 +764,7 @@ export default class EntityFPSPlayerClass extends EntityClass
         
             // any cube actions
             
-        cube=this.core.map.cubeList.findCubeContainingEntity(this);
+        cube=this.core.game.map.cubeList.findCubeContainingEntity(this);
         if (cube!==null) this.runActions(this,cube.actions);
     }
     

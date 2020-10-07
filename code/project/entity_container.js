@@ -80,7 +80,7 @@ export default class EntityContainerClass extends EntityClass
             if ((!this.core.input.isKeyDown('e')) && (!this.core.input.isTouchStickLeftClick())) return;
         }
         
-        player=this.core.map.entityList.getPlayer();
+        player=this.core.game.map.entityList.getPlayer();
         actionKeyDown=(this.position.distance(player.position)<this.openDistance);
         
         triggers=null;

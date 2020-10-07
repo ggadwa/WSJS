@@ -261,7 +261,7 @@ export default class EntityPlatformPlayerClass extends EntityClass
         
             // falling and bouncing
             
-        fallY=this.gravity-this.core.map.gravityMinValue;
+        fallY=this.gravity-this.core.game.map.gravityMinValue;
         if (fallY>0) {
             if (this.standOnEntity!==null) {
                 if (this.standOnEntity.stompable) this.standOnEntity.die();
@@ -339,7 +339,7 @@ export default class EntityPlatformPlayerClass extends EntityClass
         this.core.game.camera.setPlatformYOffset(this.currentCameraY-this.position.y);
         
         
-        let cube=this.core.map.cubeList.findCubeContainingEntity(this);
+        let cube=this.core.game.map.cubeList.findCubeContainingEntity(this);
         if (cube!==null) this.runActions(this,cube.actions);
     }
 

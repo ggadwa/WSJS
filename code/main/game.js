@@ -19,6 +19,7 @@ export default class GameClass
         this.core=core;
         this.data=data;
         
+        this.map=null;
         this.developer=new DeveloperClass(core);
         
         this.json=null;
@@ -239,6 +240,7 @@ export default class GameClass
     {
         if (this.json.developer) this.developer.release();
         this.camera.release();
+        this.map.release();
     }
  
         //
@@ -349,7 +351,7 @@ export default class GameClass
                 
             this.scores=new Map();
 
-            for (entity of this.core.map.entityList.entities) {
+            for (entity of this.map.entityList.entities) {
                 if ((entity instanceof EntityFPSPlayerClass) ||
                     (entity instanceof EntityFPSBotClass)) this.scores.set(entity.name,0);
             }
@@ -589,12 +591,14 @@ export default class GameClass
     {
         let startMap;
         
+        this.loadingScreenClear();
+        
           // initialize the map
           
         startMap=this.core.game.lookupValue(this.core.game.json.startMap,this.data);
         
-        this.core.map=new MapClass(this.core,startMap,this.core.game.autoGenerate);
-        if (!this.core.map.initialize()) return;
+        this.map=new MapClass(this.core,startMap,this.core.game.autoGenerate);
+        if (!this.map.initialize()) return;
 
             // next step
 
@@ -615,6 +619,14 @@ export default class GameClass
         }
 
              */
+    }
+    
+    endLoopToTitle()
+    {
+        this.map.release();
+        this.map=null;
+        
+        setTimeout(this.core.title.startLoop.bind(this.core.title),1);  // always force it to start on next go around
     }
     
         //
@@ -665,7 +677,7 @@ export default class GameClass
     */
     async initLoadMap()
     {
-        if (!(await this.core.map.loadMap())) return;
+        if (!(await this.map.loadMap())) return;
         
         this.loadingScreenUpdate();
         this.loadingScreenAddString('Building Collision Geometry');
@@ -676,7 +688,7 @@ export default class GameClass
     
     initCollisionGeometry()
     {
-        this.core.map.meshList.buildCollisionGeometry();
+        this.map.meshList.buildCollisionGeometry();
         
         this.loadingScreenUpdate();
 
@@ -737,15 +749,15 @@ export default class GameClass
     {
             // call the map ready
         
-        this.core.map.ready();
+        this.map.ready();
         
             // initialize any map effects
             
-        if (!this.core.map.effectList.initializeMapEffects()) return;        // halt on bad effect start
+        if (!this.map.effectList.initializeMapEffects()) return;        // halt on bad effect start
 
             // initialize any map entities
             
-        if (!this.core.map.entityList.initializeMapEntities()) return;    // halt on bad entity start
+        if (!this.map.entityList.initializeMapEntities()) return;    // halt on bad entity start
         
         this.loadingScreenUpdate();
         this.loadingScreenAddString('Finalizing');
@@ -763,19 +775,19 @@ export default class GameClass
         
             // setup draw buffers
 
-        this.core.map.setupBuffers();
+        this.map.setupBuffers();
         
             // set the listener to this entity
             
-        this.core.soundList.setListenerToEntity(this.core.map.entityList.getPlayer());
+        this.core.soundList.setListenerToEntity(this.map.entityList.getPlayer());
 
             // start the input
 
-        this.core.input.initialize(this.core.map.entityList.getPlayer());
+        this.core.input.initialize(this.map.entityList.getPlayer());
         
             // ready all the entities
             
-        this.core.map.entityList.ready();
+        this.map.entityList.ready();
         
             // start the music
             
@@ -1020,7 +1032,7 @@ export default class GameClass
     {
         let n;
         let light;
-        let player=this.core.map.entityList.getPlayer();
+        let player=this.map.entityList.getPlayer();
         let developerOn=this.developer.on;
         let gl=this.core.gl;
          
@@ -1095,7 +1107,7 @@ export default class GameClass
             // run the effect draw setups first
             // so lighting positions are set
             
-        this.core.map.effectList.drawSetup();
+        this.map.effectList.drawSetup();
         
             // convert view lights to shader lights
             // all lights need a eye coordinate, so calc
@@ -1103,9 +1115,9 @@ export default class GameClass
             
         this.lights=[];
 
-        this.core.map.lightList.addLightsToViewLights();
-        this.core.map.effectList.addLightsToViewLights();
-        this.core.map.lightList.addLightsToViewLightsAmbients();     // there is a special ambient flag, which always gets into the list
+        this.map.lightList.addLightsToViewLights();
+        this.map.effectList.addLightsToViewLights();
+        this.map.lightList.addLightsToViewLightsAmbients();     // there is a special ambient flag, which always gets into the list
         
             // fill in any missing lights with NULL
 
@@ -1123,37 +1135,37 @@ export default class GameClass
             // draw the map
             
         if (!developerOn) {
-            this.core.map.background.draw();
-            this.core.map.sky.draw();
-            this.core.map.meshList.drawMap();
-            if (this.core.map.hasShadowmap) this.core.map.meshList.drawMapShadow();
+            this.map.background.draw();
+            this.map.sky.draw();
+            this.map.meshList.drawMap();
+            if (this.map.hasShadowmap) this.map.meshList.drawMapShadow();
         }
         else {
             switch (this.developer.drawMode) {
                 case this.developer.DRAW_MODE_NORMAL:
-                    this.core.map.meshList.drawMap();
+                    this.map.meshList.drawMap();
                     break;
                 case this.developer.DRAW_MODE_SHADOW:
-                    this.core.map.meshList.drawMapShadow();
+                    this.map.meshList.drawMapShadow();
                     break;
                 case this.developer.DRAW_MODE_COLLISION:
-                    this.core.map.meshList.drawCollisionSurfaces();
+                    this.map.meshList.drawCollisionSurfaces();
                     break;
             }
         }
         
             // draw any non held entities
             
-        this.core.map.entityList.draw(null);
+        this.map.entityList.draw(null);
         
             // liquids
             
-        this.core.map.liquidList.draw();
+        this.map.liquidList.draw();
         
             // effects
             
-        this.core.map.effectList.draw();
-        if (developerOn) this.core.map.lightList.draw();
+        this.map.effectList.draw();
+        if (developerOn) this.map.lightList.draw();
         
             // and finally held entities,
             // clearing the z buffer first
@@ -1161,13 +1173,13 @@ export default class GameClass
             
         if (!developerOn) {
             gl.clear(gl.DEPTH_BUFFER_BIT);
-            this.core.map.entityList.draw(player);
+            this.map.entityList.draw(player);
         }
         
             // path and ray developer
             
         if (developerOn) {
-            this.core.map.path.drawPath();
+            this.map.path.drawPath();
             this.developer.developerRay.draw();
         }
         
@@ -1245,7 +1257,7 @@ function gameMainLoop(timestamp)
     let fpsTime,systemTick,isNetworkGame;
     let core=window.main.core;
     let game=core.game;
-    let map=core.map;
+    let map=game.map;
     
         // if paused, and not in a network
         // game than nothing to do
@@ -1307,7 +1319,7 @@ function gameMainLoop(timestamp)
         // time to exit loop?
         
     if (game.exitGame) {
-        setTimeout(window.main.core.title.startLoop.bind(window.main.core.title),1);  // always force it to start on next go around
+        setTimeout(game.endLoopToTitle.bind(game),1);  // always force it to start on next go around
         return;
     }
     

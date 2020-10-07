@@ -319,7 +319,7 @@ export default class MapEntityListClass
     {
         let entity,dist,damage;
 
-        for (entity of this.core.map.entityList.entities) {
+        for (entity of this.core.game.map.entityList.entities) {
             if (!entity.show) continue;
             
             dist=damagePosition.distance(entity.position);

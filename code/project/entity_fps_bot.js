@@ -514,16 +514,16 @@ export default class EntityFPSBotClass extends EntityClass
         
             // liquids
             
-        liquidIdx=this.core.map.liquidList.getLiquidForPoint(this.position);
+        liquidIdx=this.core.game.map.liquidList.getLiquidForPoint(this.position);
         
         if (liquidIdx!==-1) {
-            liquid=this.core.map.liquidList.liquids[liquidIdx];
+            liquid=this.core.game.map.liquidList.liquids[liquidIdx];
             if (this.lastInLiquidIdx===-1) liquid.playSoundIn(this.position);
             this.lastInLiquidIdx=liquidIdx;
             gravityFactor=liquid.gravityFactor;
         }
         else {
-            if (this.lastInLiquidIdx!==-1) this.core.map.liquidList.liquids[this.lastInLiquidIdx].playSoundOut(this.position);
+            if (this.lastInLiquidIdx!==-1) this.core.game.map.liquidList.liquids[this.lastInLiquidIdx].playSoundOut(this.position);
             this.lastInLiquidIdx=-1;
             gravityFactor=1.0;
         }
@@ -729,7 +729,7 @@ export default class EntityFPSBotClass extends EntityClass
         
             // any cube actions
             
-        cube=this.core.map.cubeList.findCubeContainingEntity(this);
+        cube=this.core.game.map.cubeList.findCubeContainingEntity(this);
         if (cube!==null) this.runActions(this,cube.actions);
     }
     
