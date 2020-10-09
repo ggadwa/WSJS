@@ -1185,7 +1185,7 @@ export default class GameClass
         
             // interface
             
-        if (!this.hideUI) this.core.interface.draw();
+        if (!this.hideUI) this.core.interface.drawGame();
         
             // sequences
             

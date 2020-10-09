@@ -1,4 +1,5 @@
 import SetupClass from '../main/setup.js';
+import DialogButtonClass from '../interface/interface_button.js';
 
 export default class DialogClass
 {
@@ -6,18 +7,9 @@ export default class DialogClass
     {
         this.core=core;
         
-        this.CURSOR_WIDTH=32;
-        this.CURSOR_HEIGHT=32;
+        this.MODE_OPTIONS=0;
         
         this.core=core;
-        
-        this.cursorBitmap=null;
-        
-        this.vertexArray=new Float32Array(2*4);     // 2D, only 2 vertex coordinates
-        
-        this.vertexBuffer=null;
-        this.uvBuffer=null;
-        this.indexBuffer=null;
         
         this.timestamp=0;
         this.lastSystemTimestamp=0;
@@ -26,8 +18,7 @@ export default class DialogClass
         this.lastRunTimestamp=0;
         this.lastDrawTimestamp=0;
         
-        this.cursorX=0;
-        this.cursorY=0;
+        this.runTitle=false;
     }
     
     
@@ -308,102 +299,22 @@ export default class DialogClass
     
     async initialize()
     {
-        /*
-        let uvArray,indexArray;
-        let lft,top,rgt,bot;
-        let gl=this.core.gl;
-        
-            // any bitmaps
-            
-        this.titleBitmap=new BitmapInterfaceClass(this.core,'textures/ui_title.png');
-        if (!(await this.titleBitmap.load())) return(false);
-        
-        this.cursorBitmap=new BitmapInterfaceClass(this.core,'textures/ui_cursor.png');
-        if (!(await this.cursorBitmap.load())) return(false);
-        
-            // buttons
-            
-        lft=Math.trunc(this.core.wid*0.79);
-        rgt=lft+Math.trunc(this.core.wid*0.2);
-        top=Math.trunc(this.core.high*0.75);
-        bot=top+Math.trunc(this.core.high*0.1);
-        
-        this.optionButton=new DialogButtonClass(this.core,lft,top,rgt,bot,'textures/ui_button_options.png','textures/ui_button_options_highlight.png');
-        if (!(await this.optionButton.initialize())) return(false);
-        
-        top+=Math.trunc(this.core.high*0.11);
-        bot=top+Math.trunc(this.core.high*0.1);
-        
-        this.playButton=new DialogButtonClass(this.core,lft,top,rgt,bot,'textures/ui_button_play.png','textures/ui_button_play_highlight.png');
-        if (!(await this.playButton.initialize())) return(false);
-        
-            // vertex array
-            
-        this.vertexBuffer=gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.vertexArray,gl.DYNAMIC_DRAW);
-        
-            // index array
-            
-        uvArray=new Float32Array(8);
-        
-        uvArray[0]=0;
-        uvArray[1]=0;
-        uvArray[2]=1;
-        uvArray[3]=0;
-        uvArray[4]=1;
-        uvArray[5]=1;
-        uvArray[6]=0;
-        uvArray[7]=1;
-
-        this.uvBuffer=gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.uvBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,uvArray,gl.STATIC_DRAW);
-        gl.bindBuffer(gl.ARRAY_BUFFER,null);
-        
-            // always drawing a single quad
-            
-        indexArray=new Uint16Array(6);
-        indexArray[0]=0;
-        indexArray[1]=1;
-        indexArray[2]=2;
-        indexArray[3]=0;
-        indexArray[4]=2;
-        indexArray[5]=3;
-        
-        this.indexBuffer=gl.createBuffer();
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,indexArray,gl.STATIC_DRAW);
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
-*/
         return(true);
     }
     
     release()
     {
-        /*
-        let gl=this.core.gl;
-        
-        gl.deleteBuffer(this.vertexBuffer);
-        gl.deleteBuffer(this.uvBuffer);
-        gl.deleteBuffer(this.indexBuffer);
-        
-        this.optionButton.release();
-        this.playButton.release();
-        
-        this.titleBitmap.release();
-        this.cursorBitmap.release();
-             * 
-         */
     }
     
         //
         // start and stop dialog loop
         //
         
-    startLoop()
+    startLoop(mode)
     {
         this.core.currentLoop=this.core.DIALOG_LOOP;
+        
+        this.mode=mode;
         
         this.timestamp=0;
         this.lastSystemTimestamp=Math.trunc(window.performance.now());
@@ -413,10 +324,14 @@ export default class DialogClass
         this.lastRunTimestamp=0;
         this.lastDrawTimestamp=0;
         
-        this.cursorX=Math.trunc(this.core.wid*0.5);
-        this.cursorY=Math.trunc(this.core.high*0.5);
+        this.runTitle=false;
         
         window.requestAnimationFrame(dialogMainLoop);
+    }
+    
+    endLoopToTitle()
+    {
+        setTimeout(this.core.title.startLoop.bind(this.core.title),1);
     }
     
         //
@@ -435,17 +350,15 @@ export default class DialogClass
         else {
             if (this.clickDown) {
                 this.clickDown=false;
-                /*
-                if (this.optionButton.cursorInButton(cursor.x,cursor.y)) {
-                    this.runSettings=true;
+
+                if (this.core.interface.cancelButton.cursorInButton(cursor.x,cursor.y)) {
+                    this.runTitle=true;
                     return;
                 }
-                if (this.playButton.cursorInButton(cursor.x,cursor.y)) {
-                    this.runGame=true;
+                if (this.core.interface.okButton.cursorInButton(cursor.x,cursor.y)) {
+                    this.runTitle=true;
                     return;
                 }
-                     * 
-                 */
             }
         }
     }
@@ -456,40 +369,8 @@ export default class DialogClass
         
     draw()
     {
-        let cursor=this.core.interface.cursor;
-        let gl=this.core.gl;
-        
-            // clear to black
-            
-        gl.clearColor(0,0,0,0);
-        gl.clear(gl.COLOR_BUFFER_BIT);
-        
-            // only need the othro matrix for this
-            
         this.core.orthoMatrix.setOrthoMatrix(this.core.wid,this.core.high,-1.0,1.0);
-        
-            // draw all the elements
-            
-        gl.disable(gl.DEPTH_TEST);
-
-        gl.enable(gl.BLEND);
-        gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);            
-        
-        this.core.shaderList.interfaceShader.drawStart();
-        
-        //this.drawBitmap(this.titleBitmap,0,0,this.core.wid,this.core.high);
-        //this.optionButton.draw(this.cursorX,this.cursorY);
-        //this.playButton.draw(this.cursorX,this.cursorY);
-        
-        if (!this.core.input.hasTouch) cursor.draw();
-        
-        this.core.shaderList.interfaceShader.drawEnd();
-        
-        gl.disable(gl.BLEND);
-        gl.enable(gl.DEPTH_TEST);
-        
-            // any paused text
-            
+        this.core.interface.drawUI(true);
         if (this.core.input.paused) this.core.interface.drawPauseMessage();
     }
     
@@ -537,10 +418,10 @@ function dialogMainLoop(timestamp)
         }
     }
     
-        // exiting to run game
+        // exiting to run title
         
-    if (dialog.runGame) {
-        setTimeout(window.main.core.game.startLoop.bind(window.main.core.game),1);  // always force it to start on next go around
+    if (dialog.runTitle) {
+        setTimeout(dialog.endLoopToTitle.bind(dialog),1);
         return;
     }
     

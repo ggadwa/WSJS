@@ -103,7 +103,6 @@ export default class DialogCursorClass
     
     run()
     {
-        let click;
         let input=this.core.input;
         
             // mouse move cursor

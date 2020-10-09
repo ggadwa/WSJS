@@ -1,13 +1,13 @@
 
 
+all interface hard coded, bitmap list should be game only
+new title for demo
 
 
-
-0. input pauses turns off keys too
 1. fix start game -> end game -> start game problem
+2. refresh can sometimes go nuts
 
 4. title needs to work on iPad
-7. need game release
 11. remove "main" leave only "core" (maybe?)
 12. iPad touchMenuTrigger (redo, search for it)
 

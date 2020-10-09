@@ -436,18 +436,18 @@ export default class EntityFPSPlayerClass extends EntityClass
                 // get hit spot
 
             if ((y<=-45) && (y>=-135)) {
-                this.core.interface.hitRight.flash(this.hitIndicatorFlashTick);
+                this.core.interface.hit.flash(this.core.interface.hit.SIDE_RIGHT,this.hitIndicatorFlashTick);
             }
             else {
                 if ((y>=45) && (y<=135)) {
-                    this.core.interface.hitLeft.flash(this.hitIndicatorFlashTick);
+                    this.core.interface.hit.flash(this.core.interface.hit.SIDE_LEFT,this.hitIndicatorFlashTick);
                 }
                 else {
                     if ((y>-45) && (y<45)) {
-                        this.core.interface.hitTop.flash(this.hitIndicatorFlashTick);
+                        this.core.interface.hit.flash(this.core.interface.hit.SIDE_TOP,this.hitIndicatorFlashTick);
                     }
                     else {
-                        this.core.interface.hitBottom.flash(this.hitIndicatorFlashTick);
+                        this.core.interface.hit.flash(this.core.interface.hit.SIDE_BOTTOM,this.hitIndicatorFlashTick);
                     }
                 }
             }

@@ -71,12 +71,12 @@ export default class BitmapListClass
             // we will already have bitmaps that
             // were added by importing glTF models,
             // so we only add the rest here
-
+            
             // game and entity interface bitmaps
             
         bitmapSet=new Set();
         
-        game.addJsonObjectToLoadSet(bitmapSet,null,null,false,['bitmap','interfaceHitBitmap','touchStickRingBitmap','touchStickThumbBitmap','touchMenuBitmap'],game.json);
+        game.addJsonObjectToLoadSet(bitmapSet,null,null,false,['bitmap'],game.json);
         
         for (entity of game.map.entityList.entities) {
             jsonEntity=game.jsonEntityCache.get(entity.jsonName);

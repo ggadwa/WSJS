@@ -54,6 +54,9 @@ export default class EntityPlatformPlayerClass extends EntityClass
         this.lastFall=false;
         
         this.collectItemCount=0;
+        
+        this.hitIndicator=false;
+        this.hitIndicatorFlashTick=0;
 
             // pre-allocates
             
@@ -85,6 +88,9 @@ export default class EntityPlatformPlayerClass extends EntityClass
         this.platformCameraJumpPause=this.core.game.lookupValue(this.json.config.platformCameraJumpPause,this.data,false);
         
         this.interfaceCollectItem=this.core.game.lookupValue(this.json.config.interfaceCollectItem,this.data,null);
+        
+        this.hitIndicator=this.core.game.lookupValue(this.json.config.hitIndicator,this.data,null);
+        this.hitIndicatorFlashTick=this.core.game.lookupValue(this.json.config.hitIndicatorFlashTick,this.data,0);
         
         this.idleAnimation=this.core.game.lookupAnimationValue(this.json.animations.idleAnimation);
         this.walkAnimation=this.core.game.lookupAnimationValue(this.json.animations.walkAnimation);
@@ -145,6 +151,10 @@ export default class EntityPlatformPlayerClass extends EntityClass
             // already dead?
             
         if (this.health<=0) return;
+        
+            // hit indicator
+            
+        if (this.hitIndicator) this.core.interface.hit.flash(this.core.interface.hit.SIDE_ALL,this.hitIndicatorFlashTick);
         
             // take damage
             

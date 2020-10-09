@@ -1,6 +1,8 @@
 import PointClass from '../utility/point.js';
 import ColorClass from '../utility/color.js';
 import RectClass from '../utility/rect.js';
+import InterfaceBackgroundClass from '../interface/interface_background.js';
+import InterfaceButtonClass from '../interface/interface_button.js';
 import InterfaceCursorClass from '../interface/interface_cursor.js';
 import InterfaceLiquidClass from '../interface/interface_liquid.js';
 import InterfaceHitClass from '../interface/interface_hit.js';
@@ -42,24 +44,23 @@ export default class InterfaceClass
         
         this.core=core;
         
+        this.background=null;
+        this.cursor=null;
         this.elements=new Map();
         this.counts=new Map();
         this.texts=new Map();
+        this.optionButton=null;
+        this.playButton=null;
+        this.cancelButton=null;
+        this.okButton=null;
             
         this.uiTextColor=new ColorClass(1,1,0);
         
         this.fontTexture=null;
         this.fontCharWidths=new Float32Array(128);
         
-        this.cursor=null;
-        
         this.liquid=null;
-        
-        this.hitLeft=null;
-        this.hitRight=null;
-        this.hitTop=null;
-        this.hitBottom=null;
-        
+        this.hit=null;
         this.touchStickLeft=null;
         this.touchStickRight=null;
         this.touchButtonMenu=null;
@@ -74,6 +75,7 @@ export default class InterfaceClass
     async initialize()
     {
         let hitSize,hitMargin;
+        let lft,top,rgt,bot;
         let game=this.core.game;
         
             // clear all current elements and texts
@@ -86,7 +88,10 @@ export default class InterfaceClass
             
         this.createFontTexture();
         
-            // shared cursor
+            // background and cursor
+            
+        this.background=new InterfaceBackgroundClass(this.core);
+        if (!(await this.background.initialize())) return(false);
             
         this.cursor=new InterfaceCursorClass(this.core);
         if (!(await this.cursor.initialize())) return(false);
@@ -101,55 +106,64 @@ export default class InterfaceClass
         hitSize=Math.trunc(this.core.canvas.width*0.08);
         hitMargin=Math.trunc(this.core.canvas.height*0.25);
         
-        if (game.json.config.interfaceHitBitmap!==null) {
-            this.hitLeft=new InterfaceHitClass(this.core,new RectClass(0,hitMargin,hitSize,this.core.canvas.height-hitMargin),[[1,0],[1,1],[0,1],[0,0]]);
-            if (!this.hitLeft.initialize()) return(false);
-
-            this.hitRight=new InterfaceHitClass(this.core,new RectClass((this.core.canvas.width-hitSize),hitMargin,this.core.canvas.width,(this.core.canvas.height-hitMargin)),[[1,1],[1,0],[0,0],[0,1]]);
-            if (!this.hitRight.initialize()) return(false);
-
-            hitSize=Math.trunc(this.core.canvas.height*0.08);
-            hitMargin=Math.trunc(this.core.canvas.width*0.25);
-
-            this.hitTop=new InterfaceHitClass(this.core,new RectClass(hitMargin,0,(this.core.canvas.width-hitMargin),hitSize),[[0,0],[1,0],[1,1],[0,1]]);
-            if (!this.hitTop.initialize()) return(false);
-
-            this.hitBottom=new InterfaceHitClass(this.core,new RectClass(hitMargin,(this.core.canvas.height-hitSize),(this.core.canvas.width-hitMargin),this.core.canvas.height),[[1,1],[0,1],[0,0],[1,0]]);
-            if (!this.hitBottom.initialize()) return(false);
-        }
+        this.hit=new InterfaceHitClass(this.core,'textures/ui_hit.png');
+        if (!this.hit.initialize()) return(false);
         
             // touch controls
             
-        this.touchStickLeft=new InterfaceTouchStickClass(this.core,game.json.config.touchStickRingBitmap,game.json.config.touchStickThumbBitmap,game.json.config.touchStickSize);
-        if (!this.touchStickLeft.initialize()) return(false);
+        this.touchStickLeft=new InterfaceTouchStickClass(this.core,'textures/ui_touch_stick_left_ring.png','textures/ui_touch_stick_left_thumb.png',game.json.config.touchStickSize);
+        if (!(await this.touchStickLeft.initialize())) return(false);
         
-        this.touchStickRight=new InterfaceTouchStickClass(this.core,game.json.config.touchStickRingBitmap,game.json.config.touchStickThumbBitmap,game.json.config.touchStickSize);
-        if (!this.touchStickRight.initialize()) return(false);
+        this.touchStickRight=new InterfaceTouchStickClass(this.core,'textures/ui_touch_stick_right_ring.png','textures/ui_touch_stick_right_thumb.png',game.json.config.touchStickSize);
+        if (!(await this.touchStickRight.initialize())) return(false);
         
-        this.touchButtonMenu=null;
-        if (this.core.game.json.config.touchMenuBitmap!==null) {
-            this.touchButtonMenu=new InterfaceTouchButtonClass(this.core,game.json.config.touchMenuBitmap,new PointClass(game.json.config.touchMenuPosition[0],game.json.config.touchMenuPosition[1],0),game.json.config.touchButtonSize);
-            if (!this.touchButtonMenu.initialize()) return(false);
-        }
+        this.touchButtonMenu=new InterfaceTouchButtonClass(this.core,'textures/ui_touch_menu.png',new PointClass(game.json.config.touchMenuPosition[0],game.json.config.touchMenuPosition[1],0),game.json.config.touchButtonSize);
+        if (!(await this.touchButtonMenu.initialize())) return(false);
+        
+            // buttons
+            
+        lft=Math.trunc(this.core.wid*0.79);
+        rgt=lft+Math.trunc(this.core.wid*0.2);
+        top=Math.trunc(this.core.high*0.77);
+        bot=top+Math.trunc(this.core.high*0.1);
+        
+        this.optionButton=new InterfaceButtonClass(this.core,lft,top,rgt,bot,'textures/ui_button_option_up.png','textures/ui_button_option_down.png');
+        if (!(await this.optionButton.initialize())) return(false);
+        
+        top+=Math.trunc(this.core.high*0.11);
+        bot=top+Math.trunc(this.core.high*0.1);
+        
+        this.playButton=new InterfaceButtonClass(this.core,lft,top,rgt,bot,'textures/ui_button_play_up.png','textures/ui_button_play_down.png');
+        if (!(await this.playButton.initialize())) return(false);
+
+        lft=Math.trunc(this.core.wid*0.78);
+        rgt=lft+Math.trunc(this.core.wid*0.1);
+        top=Math.trunc(this.core.high*0.93);
+        bot=top+Math.trunc(this.core.high*0.05);
+        
+        this.cancelButton=new InterfaceButtonClass(this.core,lft,top,rgt,bot,'textures/ui_button_cancel_up.png','textures/ui_button_cancel_down.png');
+        if (!(await this.cancelButton.initialize())) return(false);
+        
+        lft=Math.trunc(this.core.wid*0.89);
+        rgt=lft+Math.trunc(this.core.wid*0.1);
+        
+        this.okButton=new InterfaceButtonClass(this.core,lft,top,rgt,bot,'textures/ui_button_ok_up.png','textures/ui_button_ok_down.png');
+        if (!(await this.okButton.initialize())) return(false);
 
         return(true);
     }
 
     release()
     {
-        let element,count,text;
+        let element,count,text,button;
         
         this.liquid.release();
         
-        if (this.hitLeft!==null) this.hitLeft.release();
-        if (this.hitRight!==null) this.hitRight.release();
-        if (this.hitTop!==null) this.hitTop.release();
-        if (this.hitBottom!==null) this.hitBottom.release();
+        this.hit.release();
         
         this.touchStickLeft.release();
         this.touchStickRight.release();
-        
-        if (this.touchButtonMenu!==null) this.touchButtonMenu.release();
+        this.touchButtonMenu.release();
         
             // release all elements, counts, and texts
             
@@ -165,9 +179,17 @@ export default class InterfaceClass
             text.release();
         }
         
-            // the cursor
+            // buttons and controls
+            
+        this.optionButton.release();
+        this.playButton.release();
+        this.cancelButton.release();
+        this.okButton.release();
+        
+            // background and cursor
             
         this.cursor.release();
+        this.background.release();
         
             // and the font texture
             
@@ -414,7 +436,22 @@ export default class InterfaceClass
         text.show=true;
         text.hideTick=this.core.game.timestamp+tick;
     }
-    
+    /*
+    addButton(id,bitmapName,leftPercentage,topPercentage,widthPercentage,heightPercentage)
+    {
+        let lft,rgt,top,bot;
+        let button;
+        
+        lft=Math.trunc(this.core.wid*0.79);
+        rgt=lft+Math.trunc(this.core.wid*0.2);
+        top=Math.trunc(this.core.high*0.75);
+        bot=top+Math.trunc(this.core.high*0.1);
+        
+        button=new DialogButtonClass(this.core,lft,top,rgt,bot,'textures/ui_button_options.png','textures/ui_button_options_highlight.png');
+        if (!(await this.optionButton.initialize())) return(false);
+
+    }
+    */
         //
         // add from json
         // 
@@ -478,7 +515,7 @@ export default class InterfaceClass
         // drawing
         //
         
-    draw()
+    drawGame()
     {
         let key,element,count,text;
         let gl=this.core.gl;
@@ -489,11 +526,7 @@ export default class InterfaceClass
             // liquid and hits
         
         this.liquid.draw();
-        
-        if (this.hitLeft!==null) this.hitLeft.draw();
-        if (this.hitRight!==null) this.hitRight.draw();
-        if (this.hitTop!==null) this.hitTop.draw();
-        if (this.hitBottom!==null) this.hitBottom.draw();
+        this.hit.draw();
         
             // elements and counts
             
@@ -528,10 +561,46 @@ export default class InterfaceClass
             
             this.touchStickLeft.draw();
             this.touchStickRight.draw();
-            if (this.touchButtonMenu!==null) this.touchButtonMenu.draw();
+            this.touchButtonMenu.draw();
             
             this.core.shaderList.interfaceShader.drawEnd();
         }
+
+        gl.disable(gl.BLEND);
+        gl.enable(gl.DEPTH_TEST);
+    }
+    
+    drawUI(inDialog)
+    {
+        let gl=this.core.gl;
+        
+        this.core.shaderList.interfaceShader.drawStart();
+        
+        gl.disable(gl.DEPTH_TEST);
+        
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+        
+            // background
+            
+        this.background.draw(inDialog);
+                    
+            // buttons
+            
+        if (!inDialog) {
+            this.optionButton.draw(this.cursor.x,this.cursor.y);
+            this.playButton.draw(this.cursor.x,this.cursor.y);
+        }
+        else {
+            this.cancelButton.draw(this.cursor.x,this.cursor.y);
+            this.okButton.draw(this.cursor.x,this.cursor.y);
+        }
+        
+            // cursor
+        
+        if (!this.core.input.hasTouch) this.cursor.draw();
+        
+        this.core.shaderList.interfaceShader.drawEnd();
 
         gl.disable(gl.BLEND);
         gl.enable(gl.DEPTH_TEST);

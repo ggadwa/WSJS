@@ -83,7 +83,6 @@ export default class InputClass
     release()
     {
         if (this.eventsAttached) {
-            this.keyEnd();
             this.pointerLockEnd();
         }
     }
@@ -98,15 +97,13 @@ export default class InputClass
 
             // attach events
 
-        this.keyStart();
-        this.pointerLockStart();    // activates mouse and touch
+        this.pointerLockStart();    // activates mouse, keys, and touch
         this.eventsAttached=true;
     }
         
     stopInput()
     {
         if (this.eventsAttached) {
-            this.keyEnd();
             this.pointerLockEnd();
             this.eventsAttached=false;
         }
@@ -116,20 +113,6 @@ export default class InputClass
         // key events
         //
 
-    keyStart()
-    {
-        this.keyClear();
-            
-        document.addEventListener('keydown',this.keyDownListener,true);
-        document.addEventListener('keyup',this.keyUpListener.bind(this),true);
-    }
-    
-    keyEnd()
-    {
-        document.removeEventListener('keydown',this.keyDownListener,true);
-        document.removeEventListener('keyup',this.keyUpListener,true);
-    }
-   
     keyClear()
     {
         this.keyFlags.clear();
@@ -169,6 +152,7 @@ export default class InputClass
     {
         let rect;
 
+        this.keyClear();
         this.mouseButtonClear();
         this.touchClear();
         
@@ -224,6 +208,8 @@ export default class InputClass
             document.addEventListener('mouseup',this.mouseUpListener,false);
             document.addEventListener('wheel',this.mouseWheelListener,false);
             document.addEventListener('mousemove',this.mouseMovedListener,false);
+            document.addEventListener('keydown',this.keyDownListener,true);
+            document.addEventListener('keyup',this.keyUpListener.bind(this),true);
 
             this.core.canvas.onclick=null;
         }
@@ -234,6 +220,8 @@ export default class InputClass
             document.removeEventListener('mouseup',this.mouseUpListener,false);
             document.removeEventListener('wheel',this.mouseWheelListener,false);
             document.removeEventListener('mousemove',this.mouseMovedListener,false);
+            document.removeEventListener('keydown',this.keyDownListener,true);
+            document.removeEventListener('keyup',this.keyUpListener,true);
 
             this.core.canvas.onclick=this.pointerLockClickResume.bind(this);
         }
@@ -481,14 +469,12 @@ export default class InputClass
                 }
             }
             
-                // check buttons
+                // check menu button
                 
-            if (iface.touchButtonMenu!==null) {
-                if (iface.touchButtonMenu.isTouchInButton(x,y)) {
-                    if (iface.touchButtonMenu.id!==touch.identifier) {
-                        iface.touchButtonMenu.touchDown(touch.identifier);
-                        this.touchMenuTrigger=true;
-                    }
+            if (iface.touchButtonMenu.isTouchInButton(x,y)) {
+                if (iface.touchButtonMenu.id!==touch.identifier) {
+                    iface.touchButtonMenu.touchDown(touch.identifier);
+                    this.touchMenuTrigger=true;
                 }
             }
         }
@@ -556,13 +542,11 @@ export default class InputClass
                 break;
             }
             
-                // release on buttons
+                // release on menu button
                 
-            if (iface.touchButtonMenu!==null) {
-                if (iface.touchButtonMenu.id===touch.identifier) {
-                    iface.touchButtonMenu.touchUp();
-                    break;
-                }
+            if (iface.touchButtonMenu.id===touch.identifier) {
+                iface.touchButtonMenu.touchUp();
+                break;
             }
         }
     }

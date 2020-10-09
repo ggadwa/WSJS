@@ -1,12 +1,14 @@
+import BitmapInterfaceClass from '../bitmap/bitmap_interface.js';
+
 export default class InterfaceTouchStickClass
 {
-    constructor(core,ringBitmapName,thumbBitmapName,ringSize)
+    constructor(core,bitmapRingPath,bitmapThumbPath,ringSize)
     {
         this.TOUCH_CLICK_TICK=300;
         
         this.core=core;
-        this.ringBitmapName=ringBitmapName;
-        this.thumbBitmapName=thumbBitmapName;
+        this.bitmapRingPath=bitmapRingPath;
+        this.bitmapThumbPath=bitmapThumbPath;
         this.ringSize=ringSize;
         
         this.id=null;
@@ -22,6 +24,9 @@ export default class InterfaceTouchStickClass
         this.thumbSize=Math.trunc(this.ringSize*0.4);
         this.thumbRadius=Math.trunc(this.thumbSize*0.5);
         
+        this.bitmapRing=null;
+        this.bitmapThumb=null;
+        
         this.vertexArray=new Float32Array(2*8);     // 2D, only 2 vertex coordinates, 2 quads
         
         this.vertexBuffer=null;
@@ -29,10 +34,18 @@ export default class InterfaceTouchStickClass
         this.indexBuffer=null;
     }
     
-    initialize()
+    async initialize()
     {
         let uvArray,indexArray;
         let gl=this.core.gl;
+        
+            // any bitmaps
+            
+        this.bitmapRing=new BitmapInterfaceClass(this.core,this.bitmapRingPath);
+        if (!(await this.bitmapRing.load())) return(false);
+        
+        this.bitmapThumb=new BitmapInterfaceClass(this.core,this.bitmapThumbPath);
+        if (!(await this.bitmapThumb.load())) return(false);
         
             // vertex buffer
             
@@ -98,6 +111,9 @@ export default class InterfaceTouchStickClass
         gl.deleteBuffer(this.vertexBuffer);
         gl.deleteBuffer(this.uvBuffer);
         gl.deleteBuffer(this.indexBuffer);
+        
+        this.bitmapThumb.release();
+        this.bitmapRing.release();
     }
     
     touchDown(id,x,y)
@@ -145,12 +161,10 @@ export default class InterfaceTouchStickClass
     
     draw()
     {
-        let bitmap;
         let shader=this.core.shaderList.interfaceShader;
         let gl=this.core.gl;
         
         if (!this.show) return;
-        if ((this.ringBitmapName===null) || (this.thumbBitmapName===null)) return;
         
         gl.uniform4f(shader.colorUniform,1,1,1,1);
         
@@ -177,12 +191,10 @@ export default class InterfaceTouchStickClass
         
             // draw the outer ring
             
-        bitmap=this.core.bitmapList.get(this.ringBitmapName);
-        bitmap.attach();
+        this.bitmapRing.attach();
         gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_SHORT,0);
         
-        bitmap=this.core.bitmapList.get(this.thumbBitmapName);
-        bitmap.attach();
+        this.bitmapThumb.attach();
         gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_SHORT,(6*2));
 
             // remove the buffers

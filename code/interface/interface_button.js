@@ -1,22 +1,30 @@
 import BitmapInterfaceClass from '../bitmap/bitmap_interface.js';
 
-export default class InterfaceTouchButtonClass
+export default class InterfaceButtonClass
 {
-    constructor(core,bitmapPath,position,size)
+    constructor(core,lft,top,rgt,bot,bitmapUpPath,bitmapDownPath)
     {
         this.core=core;
-        this.bitmapPath=bitmapPath;
-        this.position=position;
-        this.size=size;
+        this.lft=lft;
+        this.top=top;
+        this.rgt=rgt;
+        this.bot=bot;
+        this.bitmapUpPath=bitmapUpPath;
+        this.bitmapDownPath=bitmapDownPath;
         
-        this.id=null;
-        
-        this.bitmap=null;
+        this.bitmapUp=null;
+        this.bitmapDown=null;
         
         this.vertexBuffer=null;
         this.uvBuffer=null;
         this.indexBuffer=null;
+        
+        Object.seal(this);
     }
+    
+        //
+        // initialize and release
+        //
     
     async initialize()
     {
@@ -25,22 +33,27 @@ export default class InterfaceTouchButtonClass
         
             // any bitmaps
             
-        this.bitmap=new BitmapInterfaceClass(this.core,this.bitmapPath);
-        if (!(await this.bitmap.load())) return(false);
+        this.bitmapUp=new BitmapInterfaceClass(this.core,this.bitmapUpPath);
+        if (!(await this.bitmapUp.load())) return(false);
         
-            // vertex buffer
+        this.bitmapDown=new BitmapInterfaceClass(this.core,this.bitmapDownPath);
+        if (!(await this.bitmapDown.load())) return(false);
+        
+            // vertex array
             
         vertexArray=new Float32Array(8);
         
-        vertexArray[0]=vertexArray[6]=this.position.x;
-        vertexArray[1]=vertexArray[3]=this.position.y;
-        vertexArray[2]=vertexArray[4]=this.position.x+this.size;
-        vertexArray[5]=vertexArray[7]=this.position.y+this.size;
-
+        vertexArray[0]=vertexArray[6]=this.lft;
+        vertexArray[1]=vertexArray[3]=this.top;
+        vertexArray[2]=vertexArray[4]=this.rgt;
+        vertexArray[5]=vertexArray[7]=this.bot;
+            
         this.vertexBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,vertexArray,gl.STATIC_DRAW);
         
+            // index array
+            
         uvArray=new Float32Array(8);
         
         uvArray[0]=0;
@@ -57,8 +70,9 @@ export default class InterfaceTouchButtonClass
         gl.bufferData(gl.ARRAY_BUFFER,uvArray,gl.STATIC_DRAW);
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
         
+            // always drawing a single quad
+            
         indexArray=new Uint16Array(6);
-        
         indexArray[0]=0;
         indexArray[1]=1;
         indexArray[2]=2;
@@ -70,10 +84,10 @@ export default class InterfaceTouchButtonClass
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,indexArray,gl.STATIC_DRAW);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
-        
+
         return(true);
     }
-
+    
     release()
     {
         let gl=this.core.gl;
@@ -82,26 +96,24 @@ export default class InterfaceTouchButtonClass
         gl.deleteBuffer(this.uvBuffer);
         gl.deleteBuffer(this.indexBuffer);
         
-        this.bitmap.release();
+        this.bitmapUp.release();
+        this.bitmapDown.release();
     }
     
-    isTouchInButton(x,y)
+        //
+        // clicking
+        //
+        
+    cursorInButton(cursorX,cursorY)
     {
-        if ((x<this.position.x) || (x>(this.position.x+this.size))) return(false);
-        return((y>=this.position.y) && (y<=(this.position.y+this.size)));
+        return((cursorX>=this.lft) && (cursorX<this.rgt) && (cursorY>=this.top) && (cursorY<this.bot));
     }
     
-    touchDown(id)
-    {
-        this.id=id;
-    }
-    
-    touchUp()
-    {
-        this.id=null;
-    }
-
-    draw()
+        //
+        // drawing
+        //
+        
+    draw(cursorX,cursorY)
     {
         let shader=this.core.shaderList.interfaceShader;
         let gl=this.core.gl;
@@ -120,7 +132,12 @@ export default class InterfaceTouchButtonClass
         
             // draw the button
             
-        this.bitmap.attach();
+        if (this.cursorInButton(cursorX,cursorY)) {
+            this.bitmapDown.attach();
+        }
+        else {
+            this.bitmapUp.attach();
+        }
         gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_SHORT,0);
 
             // remove the buffers
@@ -129,6 +146,4 @@ export default class InterfaceTouchButtonClass
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
     }
     
-    
 }
-

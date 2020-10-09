@@ -1,19 +1,16 @@
+import ColorClass from '../utility/color.js';
 import BitmapInterfaceClass from '../bitmap/bitmap_interface.js';
+import DialogButtonClass from '../interface/interface_button.js';
 
-export default class DialogButtonClass
+export default class InterfaceBackgroundClass
 {
-    constructor(core,lft,top,rgt,bot,bitmapPath,highlightBitmapPath)
+    constructor(core)
     {
         this.core=core;
-        this.lft=lft;
-        this.top=top;
-        this.rgt=rgt;
-        this.bot=bot;
-        this.bitmapPath=bitmapPath;
-        this.highlightBitmapPath=highlightBitmapPath;
         
-        this.bitmap=null;
-        this.highlightBitmap=null;
+        this.titleBitmap=null;
+        
+        this.vertexArray=new Float32Array(2*4);     // 2D, only 2 vertex coordinates
         
         this.vertexBuffer=null;
         this.uvBuffer=null;
@@ -31,26 +28,23 @@ export default class DialogButtonClass
         let vertexArray,uvArray,indexArray;
         let gl=this.core.gl;
         
-            // any bitmaps
+            // title bitmap
             
-        this.bitmap=new BitmapInterfaceClass(this.core,this.bitmapPath);
-        if (!(await this.bitmap.load())) return(false);
-        
-        this.highlightBitmap=new BitmapInterfaceClass(this.core,this.highlightBitmapPath);
-        if (!(await this.highlightBitmap.load())) return(false);
+        this.titleBitmap=new BitmapInterfaceClass(this.core,'textures/ui_title.png');
+        if (!(await this.titleBitmap.load())) return(false);
         
             // vertex array
             
         vertexArray=new Float32Array(8);
         
-        vertexArray[0]=vertexArray[6]=this.lft;
-        vertexArray[1]=vertexArray[3]=this.top;
-        vertexArray[2]=vertexArray[4]=this.rgt;
-        vertexArray[5]=vertexArray[7]=this.bot;
+        vertexArray[0]=vertexArray[6]=0;
+        vertexArray[1]=vertexArray[3]=0;
+        vertexArray[2]=vertexArray[4]=this.core.wid;
+        vertexArray[5]=vertexArray[7]=this.core.high;
             
         this.vertexBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,vertexArray,gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER,vertexArray,gl.DYNAMIC_DRAW);
         
             // index array
             
@@ -96,29 +90,24 @@ export default class DialogButtonClass
         gl.deleteBuffer(this.uvBuffer);
         gl.deleteBuffer(this.indexBuffer);
         
-        if (this.bitmap!==null) this.bitmap.release();
-        if (this.highlightBitmap!==null) this.highlightBitmap.release();
+        this.titleBitmap.release();
     }
-    
-        //
-        // clicking
-        //
         
-    cursorInButton(cursorX,cursorY)
-    {
-        return((cursorX>=this.lft) && (cursorX<this.rgt) && (cursorY>=this.top) && (cursorY<this.bot));
-    }
-    
         //
         // drawing
         //
         
-    draw(cursorX,cursorY)
+    draw(inDialog)
     {
         let shader=this.core.shaderList.interfaceShader;
         let gl=this.core.gl;
         
-        gl.uniform4f(shader.colorUniform,1,1,1,1);
+        if (!inDialog) {
+            gl.uniform4f(shader.colorUniform,1,1,1,1);
+        }
+        else {
+            gl.uniform4f(shader.colorUniform,0.2,0.2,0.2,1);
+        }
         
             // setup the drawing
             
@@ -130,14 +119,9 @@ export default class DialogButtonClass
         
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
         
-            // draw the button
+            // draw
             
-        if (this.cursorInButton(cursorX,cursorY)) {
-            this.highlightBitmap.attach();
-        }
-        else {
-            this.bitmap.attach();
-        }
+        this.titleBitmap.attach();
         gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_SHORT,0);
 
             // remove the buffers
@@ -145,5 +129,6 @@ export default class DialogButtonClass
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
     }
-    
+
 }
+
