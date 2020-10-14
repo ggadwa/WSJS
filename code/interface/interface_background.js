@@ -1,6 +1,5 @@
 import ColorClass from '../utility/color.js';
 import BitmapInterfaceClass from '../bitmap/bitmap_interface.js';
-import DialogButtonClass from '../interface/interface_button.js';
 
 export default class InterfaceBackgroundClass
 {
@@ -102,6 +101,8 @@ export default class InterfaceBackgroundClass
         let shader=this.core.shaderList.interfaceShader;
         let gl=this.core.gl;
         
+        shader.drawStart();       // we set these here instead of globally as UI interfaces have multiple shaders
+        
         if (!inDialog) {
             gl.uniform4f(shader.colorUniform,1,1,1,1);
         }
@@ -128,6 +129,8 @@ export default class InterfaceBackgroundClass
 
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
+        
+        shader.drawEnd();
     }
 
 }

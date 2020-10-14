@@ -7,6 +7,7 @@ import EffectShaderClass from '../shader/effect_shader.js';
 import InterfaceShaderClass from '../shader/interface_shader.js';
 import TintShaderClass from '../shader/tint_shader.js';
 import TextShaderClass from '../shader/text_shader.js';
+import ColorShaderClass from '../shader/color_shader.js';
 
 //
 // class to handle loading global shaders
@@ -27,6 +28,7 @@ export default class ShaderListClass
         this.interfaceShader=null;
         this.tintShader=null;
         this.textShader=null;
+        this.colorShader=null;
         
         Object.seal(this);
     }
@@ -46,6 +48,7 @@ export default class ShaderListClass
         this.interfaceShader=null;
         this.tintShader=null;
         this.textShader=null;
+        this.colorShader=null;
     }
     
     
@@ -60,6 +63,7 @@ export default class ShaderListClass
         if (this.interfaceShader!==null) this.interfaceShader.release();
         if (this.tintShader!==null) this.tintShader.release();
         if (this.textShader!==null) this.textShader.release();
+        if (this.colorShader!==null) this.colorShader.release();
     }
     
         //
@@ -102,7 +106,11 @@ export default class ShaderListClass
       
         this.textShader=new TextShaderClass(this.core);
         this.textShader.initialize();
-        return(await this.textShader.load());
+        if (!(await this.textShader.load())) return(false);
+        
+        this.colorShader=new ColorShaderClass(this.core);
+        this.colorShader.initialize();
+        return(await this.colorShader.load());
     }
 
 

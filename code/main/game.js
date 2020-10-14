@@ -705,7 +705,7 @@ export default class GameClass
         if (!(await shadowmapLoad.load())) return;
         
         this.loadingScreenUpdate();
-        this.loadingScreenAddString('Load Models');
+        this.loadingScreenAddString('Loading Models');
         this.loadingScreenDraw();
        
         setTimeout(this.initLoadModels.bind(this),1);    
@@ -716,7 +716,7 @@ export default class GameClass
         if (!(await this.core.modelList.loadAllModels())) return;
         
         this.loadingScreenUpdate();
-        this.loadingScreenAddString('Load Sounds');
+        this.loadingScreenAddString('Loading Sounds');
         this.loadingScreenDraw();
         
         setTimeout(this.initLoadSounds.bind(this),1);
@@ -728,7 +728,7 @@ export default class GameClass
         if (!(await this.core.music.load())) return;
     
         this.loadingScreenUpdate();
-        this.loadingScreenAddString('Load Images');
+        this.loadingScreenAddString('Loading Images');
         this.loadingScreenDraw();
 
         setTimeout(this.initLoadImages.bind(this),1);

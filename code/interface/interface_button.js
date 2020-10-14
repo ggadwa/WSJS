@@ -1,23 +1,25 @@
-import BitmapInterfaceClass from '../bitmap/bitmap_interface.js';
+import ColorClass from '../utility/color.js';
+import InterfaceTextClass from '../interface/interface_text.js';
 
 export default class InterfaceButtonClass
 {
-    constructor(core,lft,top,rgt,bot,bitmapUpPath,bitmapDownPath)
+    constructor(core,x,y,wid,high,title)
     {
         this.core=core;
-        this.lft=lft;
-        this.top=top;
-        this.rgt=rgt;
-        this.bot=bot;
-        this.bitmapUpPath=bitmapUpPath;
-        this.bitmapDownPath=bitmapDownPath;
+        this.title=title;
         
-        this.bitmapUp=null;
-        this.bitmapDown=null;
+        this.lft=Math.trunc(this.core.wid*x);
+        this.rgt=this.lft+Math.trunc(this.core.wid*wid);
+        this.top=Math.trunc(this.core.high*y);
+        this.bot=this.top+Math.trunc(this.core.high*high);
+        
+        this.colorArray=new Float32Array(4*4);
         
         this.vertexBuffer=null;
-        this.uvBuffer=null;
+        this.colorBuffer=null;
         this.indexBuffer=null;
+        
+        this.text=null;
         
         Object.seal(this);
     }
@@ -26,18 +28,11 @@ export default class InterfaceButtonClass
         // initialize and release
         //
     
-    async initialize()
+    initialize()
     {
-        let vertexArray,uvArray,indexArray;
+        let x,y,fontSize;
+        let vertexArray,indexArray;
         let gl=this.core.gl;
-        
-            // any bitmaps
-            
-        this.bitmapUp=new BitmapInterfaceClass(this.core,this.bitmapUpPath);
-        if (!(await this.bitmapUp.load())) return(false);
-        
-        this.bitmapDown=new BitmapInterfaceClass(this.core,this.bitmapDownPath);
-        if (!(await this.bitmapDown.load())) return(false);
         
             // vertex array
             
@@ -52,22 +47,11 @@ export default class InterfaceButtonClass
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,vertexArray,gl.STATIC_DRAW);
         
-            // index array
+            // color buffer
             
-        uvArray=new Float32Array(8);
-        
-        uvArray[0]=0;
-        uvArray[1]=0;
-        uvArray[2]=1;
-        uvArray[3]=0;
-        uvArray[4]=1;
-        uvArray[5]=1;
-        uvArray[6]=0;
-        uvArray[7]=1;
-
-        this.uvBuffer=gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.uvBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,uvArray,gl.STATIC_DRAW);
+        this.colorBuffer=gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.colorBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,this.colorArray,gl.DYNAMIC_DRAW);
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
         
             // always drawing a single quad
@@ -84,6 +68,15 @@ export default class InterfaceButtonClass
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,indexArray,gl.STATIC_DRAW);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
+        
+            // the title text
+            
+        x=Math.trunc((this.lft+this.rgt)*0.5);
+        fontSize=Math.trunc((this.bot-this.top)*0.6);
+        y=(this.bot-Math.trunc(((this.bot-this.top)-fontSize)*0.5))+Math.trunc(fontSize*0.1);
+        
+        this.text=new InterfaceTextClass(this.core,this.title,x,y,fontSize,this.core.interface.TEXT_ALIGN_CENTER,new ColorClass(1,1,1,1),1,false);
+        this.text.initialize();
 
         return(true);
     }
@@ -92,12 +85,10 @@ export default class InterfaceButtonClass
     {
         let gl=this.core.gl;
         
-        gl.deleteBuffer(this.vertexBuffer);
-        gl.deleteBuffer(this.uvBuffer);
-        gl.deleteBuffer(this.indexBuffer);
+        this.text.release();
         
-        this.bitmapUp.release();
-        this.bitmapDown.release();
+        gl.deleteBuffer(this.vertexBuffer);
+        gl.deleteBuffer(this.indexBuffer);
     }
     
         //
@@ -115,35 +106,72 @@ export default class InterfaceButtonClass
         
     draw(cursorX,cursorY)
     {
-        let shader=this.core.shaderList.interfaceShader;
+        let shader=this.core.shaderList.colorShader;
         let gl=this.core.gl;
         
-        gl.uniform4f(shader.colorUniform,1,1,1,1);
-        
-            // setup the drawing
+        shader.drawStart();
             
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
         gl.vertexAttribPointer(shader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
         
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.uvBuffer);
-        gl.vertexAttribPointer(shader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
+            // button fill
         
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
+        if (!this.cursorInButton(cursorX,cursorY)) {
+            this.colorArray[0]=this.colorArray[4]=0.7;
+            this.colorArray[1]=this.colorArray[5]=0.2;
+            this.colorArray[2]=this.colorArray[6]=1;
+            this.colorArray[3]=this.colorArray[7]=1;
         
-            // draw the button
-            
-        if (this.cursorInButton(cursorX,cursorY)) {
-            this.bitmapDown.attach();
+            this.colorArray[8]=this.colorArray[12]=0.4;
+            this.colorArray[9]=this.colorArray[13]=0.2;
+            this.colorArray[10]=this.colorArray[14]=0.8;
+            this.colorArray[11]=this.colorArray[15]=1;
         }
         else {
-            this.bitmapUp.attach();
+            this.colorArray[0]=this.colorArray[4]=1;
+            this.colorArray[1]=this.colorArray[5]=0;
+            this.colorArray[2]=this.colorArray[6]=1;
+            this.colorArray[3]=this.colorArray[7]=1;
+        
+            this.colorArray[8]=this.colorArray[12]=0.8;
+            this.colorArray[9]=this.colorArray[13]=0;
+            this.colorArray[10]=this.colorArray[14]=0.8;
+            this.colorArray[11]=this.colorArray[15]=1;
         }
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.colorBuffer);
+        gl.bufferSubData(gl.ARRAY_BUFFER,0,this.colorArray);
+        gl.vertexAttribPointer(shader.vertexColorAttribute,4,gl.FLOAT,false,0,0);
+        
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
+            
         gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_SHORT,0);
+        
+            // the outline
+            
+        this.colorArray[0]=this.colorArray[4]=this.colorArray[8]=this.colorArray[12]=0;
+        this.colorArray[1]=this.colorArray[5]=this.colorArray[9]=this.colorArray[13]=0;
+        this.colorArray[2]=this.colorArray[6]=this.colorArray[10]=this.colorArray[14]=0;
+        this.colorArray[3]=this.colorArray[7]=this.colorArray[11]=this.colorArray[15]=1;
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.colorBuffer);
+        gl.bufferSubData(gl.ARRAY_BUFFER,0,this.colorArray);
+        gl.vertexAttribPointer(shader.vertexColorAttribute,4,gl.FLOAT,false,0,0);
+        
+        gl.drawArrays(gl.LINE_LOOP,0,4);
 
             // remove the buffers
 
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
+        
+        shader.drawEnd();
+        
+            // the text
+            
+        this.core.shaderList.textShader.drawStart();
+        this.text.draw();
+        this.core.shaderList.textShader.drawStart();
     }
     
 }

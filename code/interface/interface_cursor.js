@@ -135,6 +135,8 @@ export default class DialogCursorClass
         let shader=this.core.shaderList.interfaceShader;
         let gl=this.core.gl;
         
+        shader.drawStart();       // we set these here instead of globally as UI interfaces have multiple shaders
+        
         gl.uniform4f(shader.colorUniform,1,1,1,1);
         
             // setup the drawing
@@ -162,6 +164,8 @@ export default class DialogCursorClass
 
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
+        
+        shader.drawEnd();
     }
     
 }

@@ -1,7 +1,15 @@
 
 
 all interface hard coded, bitmap list should be game only
-new title for demo
+get rid of ui_ bitmaps (cursor/title remain ???)
+
+
+Movement
+Sound
+Profile
+Multiplayer
+Developer
+Builders
 
 
 1. fix start game -> end game -> start game problem

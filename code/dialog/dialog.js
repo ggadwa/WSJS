@@ -1,5 +1,4 @@
 import SetupClass from '../main/setup.js';
-import DialogButtonClass from '../interface/interface_button.js';
 
 export default class DialogClass
 {
@@ -323,6 +322,8 @@ export default class DialogClass
         this.drawTick=0;
         this.lastRunTimestamp=0;
         this.lastDrawTimestamp=0;
+        
+        this.core.interface.cursor.center();
         
         this.runTitle=false;
         

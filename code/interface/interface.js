@@ -3,6 +3,7 @@ import ColorClass from '../utility/color.js';
 import RectClass from '../utility/rect.js';
 import InterfaceBackgroundClass from '../interface/interface_background.js';
 import InterfaceButtonClass from '../interface/interface_button.js';
+import InterfaceControlClass from '../interface/interface_control.js';
 import InterfaceCursorClass from '../interface/interface_cursor.js';
 import InterfaceLiquidClass from '../interface/interface_liquid.js';
 import InterfaceHitClass from '../interface/interface_hit.js';
@@ -42,6 +43,12 @@ export default class InterfaceClass
         
         this.POSITION_MODE_LIST=['topLeft','topRight','bottomLeft','bottomRight','middle'];
         
+        this.CONTROL_TYPE_HEADER=0;
+        this.CONTROL_TYPE_TEXT=1;
+        this.CONTROL_TYPE_CHECKBOX=2;
+        this.CONTROL_TYPE_RANGE=3;
+        this.CONTROL_TYPE_NUMBER=4;
+        
         this.core=core;
         
         this.background=null;
@@ -53,6 +60,7 @@ export default class InterfaceClass
         this.playButton=null;
         this.cancelButton=null;
         this.okButton=null;
+        this.controls=new Map();
             
         this.uiTextColor=new ColorClass(1,1,0);
         
@@ -65,6 +73,8 @@ export default class InterfaceClass
         this.touchStickRight=null;
         this.touchButtonMenu=null;
         
+        this.scrollTop=0;            // scrolling in dialog
+        
         Object.seal(this);
     }
     
@@ -74,8 +84,7 @@ export default class InterfaceClass
 
     async initialize()
     {
-        let hitSize,hitMargin;
-        let lft,top,rgt,bot;
+        let hitSize,hitMargin,control;
         let game=this.core.game;
         
             // clear all current elements and texts
@@ -122,40 +131,39 @@ export default class InterfaceClass
         
             // buttons
             
-        lft=Math.trunc(this.core.wid*0.79);
-        rgt=lft+Math.trunc(this.core.wid*0.2);
-        top=Math.trunc(this.core.high*0.77);
-        bot=top+Math.trunc(this.core.high*0.1);
+        this.optionButton=new InterfaceButtonClass(this.core,0.79,0.77,0.2,0.1,'SETUP');
+        if (!this.optionButton.initialize()) return(false);
         
-        this.optionButton=new InterfaceButtonClass(this.core,lft,top,rgt,bot,'textures/ui_button_option_up.png','textures/ui_button_option_down.png');
-        if (!(await this.optionButton.initialize())) return(false);
-        
-        top+=Math.trunc(this.core.high*0.11);
-        bot=top+Math.trunc(this.core.high*0.1);
-        
-        this.playButton=new InterfaceButtonClass(this.core,lft,top,rgt,bot,'textures/ui_button_play_up.png','textures/ui_button_play_down.png');
-        if (!(await this.playButton.initialize())) return(false);
+        this.playButton=new InterfaceButtonClass(this.core,0.79,0.88,0.2,0.1,'PLAY');
+        if (!this.playButton.initialize()) return(false);
 
-        lft=Math.trunc(this.core.wid*0.78);
-        rgt=lft+Math.trunc(this.core.wid*0.1);
-        top=Math.trunc(this.core.high*0.93);
-        bot=top+Math.trunc(this.core.high*0.05);
+        this.cancelButton=new InterfaceButtonClass(this.core,0.78,0.93,0.1,0.05,'CANCEL');
+        if (!this.cancelButton.initialize()) return(false);
         
-        this.cancelButton=new InterfaceButtonClass(this.core,lft,top,rgt,bot,'textures/ui_button_cancel_up.png','textures/ui_button_cancel_down.png');
-        if (!(await this.cancelButton.initialize())) return(false);
+        this.okButton=new InterfaceButtonClass(this.core,0.89,0.93,0.1,0.05,'OK');
+        if (!this.okButton.initialize()) return(false);
         
-        lft=Math.trunc(this.core.wid*0.89);
-        rgt=lft+Math.trunc(this.core.wid*0.1);
+            // controls
+            
+        this.controls.clear();
         
-        this.okButton=new InterfaceButtonClass(this.core,lft,top,rgt,bot,'textures/ui_button_ok_up.png','textures/ui_button_ok_down.png');
-        if (!(await this.okButton.initialize())) return(false);
+        if (!this.addDialogControl('head_movement',this.CONTROL_TYPE_HEADER,'Movement',0)) return(false);
+        if (!this.addDialogControl('a1',this.CONTROL_TYPE_TEXT,'Text Input:',0)) return(false);
+        if (!this.addDialogControl('a2',this.CONTROL_TYPE_CHECKBOX,'Checkbox:',0)) return(false);
+        if (!this.addDialogControl('a3',this.CONTROL_TYPE_RANGE,'Range:',0)) return(false);
+        if (!this.addDialogControl('a4',this.CONTROL_TYPE_NUMBER,'Number:',9)) return(false);
+        if (!this.addDialogControl('head_sound',this.CONTROL_TYPE_HEADER,'Sound',0)) return(false);
+        if (!this.addDialogControl('head_profile',this.CONTROL_TYPE_HEADER,'Profile',0)) return(false);
+        if (!this.addDialogControl('head_multiplayer',this.CONTROL_TYPE_HEADER,'Multiplayer',0)) return(false);
+        if (!this.addDialogControl('head_developer',this.CONTROL_TYPE_HEADER,'Developer',0)) return(false);
+        if (!this.addDialogControl('head_builder',this.CONTROL_TYPE_HEADER,'Builder',0)) return(false);
 
         return(true);
     }
 
     release()
     {
-        let element,count,text,button;
+        let element,count,text,control;
         
         this.liquid.release();
         
@@ -186,6 +194,10 @@ export default class InterfaceClass
         this.cancelButton.release();
         this.okButton.release();
         
+        for (control of this.controls) {
+            control.release();
+        }
+        
             // background and cursor
             
         this.cursor.release();
@@ -194,6 +206,21 @@ export default class InterfaceClass
             // and the font texture
             
         this.deleteFontTexture();
+    }
+    
+        //
+        // add dialog control
+        //
+        
+    addDialogControl(id,controlType,title,maxNumber)
+    {
+        let control;
+        
+        control=new InterfaceControlClass(this.core,controlType,title,maxNumber);
+        if (!control.initialize()) return(false);
+        this.controls.set(id,control);
+        
+        return(true);
     }
     
         //
@@ -436,22 +463,7 @@ export default class InterfaceClass
         text.show=true;
         text.hideTick=this.core.game.timestamp+tick;
     }
-    /*
-    addButton(id,bitmapName,leftPercentage,topPercentage,widthPercentage,heightPercentage)
-    {
-        let lft,rgt,top,bot;
-        let button;
-        
-        lft=Math.trunc(this.core.wid*0.79);
-        rgt=lft+Math.trunc(this.core.wid*0.2);
-        top=Math.trunc(this.core.high*0.75);
-        bot=top+Math.trunc(this.core.high*0.1);
-        
-        button=new DialogButtonClass(this.core,lft,top,rgt,bot,'textures/ui_button_options.png','textures/ui_button_options_highlight.png');
-        if (!(await this.optionButton.initialize())) return(false);
 
-    }
-    */
         //
         // add from json
         // 
@@ -512,7 +524,7 @@ export default class InterfaceClass
     }
         
         //
-        // drawing
+        // game drawing
         //
         
     drawGame()
@@ -570,28 +582,41 @@ export default class InterfaceClass
         gl.enable(gl.DEPTH_TEST);
     }
     
+        //
+        // title + dialog drawing
+        //
+    
     drawUI(inDialog)
     {
+        let y,key,control;
         let gl=this.core.gl;
-        
-        this.core.shaderList.interfaceShader.drawStart();
         
         gl.disable(gl.DEPTH_TEST);
         
         gl.enable(gl.BLEND);
         gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
         
+            // NOTE: These set shaders on each draw because
+            // we don't need the speed boost here and UI has
+            // multiple different shaders
+        
             // background
-            
+         
         this.background.draw(inDialog);
                     
-            // buttons
+            // pieces
             
         if (!inDialog) {
             this.optionButton.draw(this.cursor.x,this.cursor.y);
             this.playButton.draw(this.cursor.x,this.cursor.y);
         }
         else {
+            y=this.scrollTop+5;
+
+            for ([key,control] of this.controls) {
+                y=control.draw(y,this.cursor.x,this.cursor.y);
+            }
+
             this.cancelButton.draw(this.cursor.x,this.cursor.y);
             this.okButton.draw(this.cursor.x,this.cursor.y);
         }
@@ -599,8 +624,6 @@ export default class InterfaceClass
             // cursor
         
         if (!this.core.input.hasTouch) this.cursor.draw();
-        
-        this.core.shaderList.interfaceShader.drawEnd();
 
         gl.disable(gl.BLEND);
         gl.enable(gl.DEPTH_TEST);

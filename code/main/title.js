@@ -1,6 +1,5 @@
 import ColorClass from '../utility/color.js';
 import BitmapInterfaceClass from '../bitmap/bitmap_interface.js';
-import DialogButtonClass from '../interface/interface_button.js';
 
 export default class TitleClass
 {
