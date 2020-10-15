@@ -323,6 +323,7 @@ export default class DialogClass
         this.lastRunTimestamp=0;
         this.lastDrawTimestamp=0;
         
+        this.core.interface.resetOpenHeader();
         this.core.interface.cursor.center();
         
         this.runTitle=false;

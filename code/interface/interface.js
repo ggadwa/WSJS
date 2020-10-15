@@ -73,7 +73,8 @@ export default class InterfaceClass
         this.touchStickRight=null;
         this.touchButtonMenu=null;
         
-        this.scrollTop=0;            // scrolling in dialog
+        this.scrollTop=0;               // scrolling in dialog
+        this.currentOpenHeader=0;       // open header in dialog
         
         Object.seal(this);
     }
@@ -153,7 +154,11 @@ export default class InterfaceClass
         if (!this.addDialogControl('a3',this.CONTROL_TYPE_RANGE,'Range:',0)) return(false);
         if (!this.addDialogControl('a4',this.CONTROL_TYPE_NUMBER,'Number:',9)) return(false);
         if (!this.addDialogControl('head_sound',this.CONTROL_TYPE_HEADER,'Sound',0)) return(false);
+        if (!this.addDialogControl('a5',this.CONTROL_TYPE_TEXT,'Text Input Sound:',0)) return(false);
+        if (!this.addDialogControl('a6',this.CONTROL_TYPE_CHECKBOX,'Checkbox Sound:',0)) return(false);
         if (!this.addDialogControl('head_profile',this.CONTROL_TYPE_HEADER,'Profile',0)) return(false);
+        if (!this.addDialogControl('a7',this.CONTROL_TYPE_TEXT,'Text Input Profile:',0)) return(false);
+        if (!this.addDialogControl('a8',this.CONTROL_TYPE_CHECKBOX,'Checkbox Profile:',0)) return(false);
         if (!this.addDialogControl('head_multiplayer',this.CONTROL_TYPE_HEADER,'Multiplayer',0)) return(false);
         if (!this.addDialogControl('head_developer',this.CONTROL_TYPE_HEADER,'Developer',0)) return(false);
         if (!this.addDialogControl('head_builder',this.CONTROL_TYPE_HEADER,'Builder',0)) return(false);
@@ -209,7 +214,7 @@ export default class InterfaceClass
     }
     
         //
-        // add dialog control
+        // dialog controls
         //
         
     addDialogControl(id,controlType,title,maxNumber)
@@ -221,6 +226,11 @@ export default class InterfaceClass
         this.controls.set(id,control);
         
         return(true);
+    }
+    
+    resetOpenHeader()
+    {
+        this.currentOpenHeader=0;
     }
     
         //
@@ -588,7 +598,7 @@ export default class InterfaceClass
     
     drawUI(inDialog)
     {
-        let y,key,control;
+        let y,key,control,headerIdx,show;
         let gl=this.core.gl;
         
         gl.disable(gl.DEPTH_TEST);
@@ -612,9 +622,20 @@ export default class InterfaceClass
         }
         else {
             y=this.scrollTop+5;
+            
+            headerIdx=0;
+            show=false;
 
             for ([key,control] of this.controls) {
-                y=control.draw(y,this.cursor.x,this.cursor.y);
+                if (control.controlType===this.core.interface.CONTROL_TYPE_HEADER) {
+                    show=(this.currentOpenHeader===headerIdx);
+                    headerIdx++;
+                    
+                    y=control.draw(y,this.cursor.x,this.cursor.y);
+                }
+                else {
+                    if (show) y=control.draw(y,this.cursor.x,this.cursor.y);
+                }
             }
 
             this.cancelButton.draw(this.cursor.x,this.cursor.y);
