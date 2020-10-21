@@ -352,6 +352,8 @@ export default class DialogClass
         else {
             if (this.clickDown) {
                 this.clickDown=false;
+                
+                if (this.core.interface.clickUI()) return;
 
                 if (this.core.interface.cancelButton.cursorInButton(cursor.x,cursor.y)) {
                     this.runTitle=true;

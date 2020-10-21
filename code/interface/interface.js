@@ -73,8 +73,8 @@ export default class InterfaceClass
         this.touchStickRight=null;
         this.touchButtonMenu=null;
         
-        this.scrollTop=0;               // scrolling in dialog
-        this.currentOpenHeader=0;       // open header in dialog
+        this.scrollTop=0;                       // scrolling in dialog
+        this.currentOpenHeaderControl=null;     // open header in dialog
         
         Object.seal(this);
     }
@@ -230,7 +230,14 @@ export default class InterfaceClass
     
     resetOpenHeader()
     {
-        this.currentOpenHeader=0;
+        let key,control;
+        
+        for ([key,control] of this.controls) {
+            if (control.controlType===this.core.interface.CONTROL_TYPE_HEADER) {
+                this.currentOpenHeaderControl=control;
+                break;
+            }
+        }
     }
     
         //
@@ -593,12 +600,31 @@ export default class InterfaceClass
     }
     
         //
-        // title + dialog drawing
+        // title + dialog clicking and drawing
         //
+    
+    clickUI()
+    {
+        let key,control,show;
+        
+        show=false;
+
+        for ([key,control] of this.controls) {
+            if (control.controlType===this.core.interface.CONTROL_TYPE_HEADER) {
+                show=(this.currentOpenHeaderControl===control);
+                if (control.click(this.cursor.x,this.cursor.y)) return(true);
+            }
+            else {
+                if (control.click(this.cursor.x,this.cursor.y)) return(true);
+            }
+        }
+        
+        return(false);
+    }
     
     drawUI(inDialog)
     {
-        let y,key,control,headerIdx,show;
+        let y,key,control,show;
         let gl=this.core.gl;
         
         gl.disable(gl.DEPTH_TEST);
@@ -623,14 +649,11 @@ export default class InterfaceClass
         else {
             y=this.scrollTop+5;
             
-            headerIdx=0;
             show=false;
 
             for ([key,control] of this.controls) {
                 if (control.controlType===this.core.interface.CONTROL_TYPE_HEADER) {
-                    show=(this.currentOpenHeader===headerIdx);
-                    headerIdx++;
-                    
+                    show=(this.currentOpenHeaderControl===control);
                     y=control.draw(y,this.cursor.x,this.cursor.y);
                 }
                 else {
