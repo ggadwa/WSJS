@@ -1,7 +1,10 @@
 
+--> pause needs to stop all loops
+--> pause needs to stop all sounds
+--> resume loop by core.currentLoop (all need pauseLoopToPause/resumeLoopFromPause)
 
-all interface hard coded, bitmap list should be game only
 get rid of ui_ bitmaps (cursor/title remain ???)
+input pause turns off all music and sound
 
 
 Movement

@@ -75,6 +75,7 @@ export default class InterfaceClass
         
         this.scrollTop=0;                       // scrolling in dialog
         this.currentOpenHeaderControl=null;     // open header in dialog
+        this.currentTextInputControl=null;      // current text input in dialog
         
         Object.seal(this);
     }
@@ -148,17 +149,31 @@ export default class InterfaceClass
             
         this.controls.clear();
         
-        if (!this.addDialogControl('head_movement',this.CONTROL_TYPE_HEADER,'Movement',0)) return(false);
-        if (!this.addDialogControl('a1',this.CONTROL_TYPE_TEXT,'Text Input:',0)) return(false);
-        if (!this.addDialogControl('a2',this.CONTROL_TYPE_CHECKBOX,'Checkbox:',0)) return(false);
-        if (!this.addDialogControl('a3',this.CONTROL_TYPE_RANGE,'Range:',0)) return(false);
-        if (!this.addDialogControl('a4',this.CONTROL_TYPE_NUMBER,'Number:',9)) return(false);
-        if (!this.addDialogControl('head_sound',this.CONTROL_TYPE_HEADER,'Sound',0)) return(false);
-        if (!this.addDialogControl('a5',this.CONTROL_TYPE_TEXT,'Text Input Sound:',0)) return(false);
-        if (!this.addDialogControl('a6',this.CONTROL_TYPE_CHECKBOX,'Checkbox Sound:',0)) return(false);
+            // profile
+            
         if (!this.addDialogControl('head_profile',this.CONTROL_TYPE_HEADER,'Profile',0)) return(false);
-        if (!this.addDialogControl('a7',this.CONTROL_TYPE_TEXT,'Text Input Profile:',0)) return(false);
-        if (!this.addDialogControl('a8',this.CONTROL_TYPE_CHECKBOX,'Checkbox Profile:',0)) return(false);
+        if (!this.addDialogControl('name',this.CONTROL_TYPE_TEXT,'Name:',0)) return(false);
+        
+            // movement
+            
+        if (!this.addDialogControl('head_movement',this.CONTROL_TYPE_HEADER,'Movement',0)) return(false);
+        
+        if (!this.addDialogControl('mouseXSensitivity',this.CONTROL_TYPE_RANGE,'Mouse X Sensitivity:',0)) return(false);
+        if (!this.addDialogControl('mouseXAcceleration',this.CONTROL_TYPE_RANGE,'Mouse X Acceleration:',0)) return(false);
+        if (!this.addDialogControl('mouseXInvert',this.CONTROL_TYPE_CHECKBOX,'Invert Mouse X:',0)) return(false);
+        if (!this.addDialogControl('mouseYSensitivity',this.CONTROL_TYPE_RANGE,'Mouse Y Sensitivity:',0)) return(false);
+        if (!this.addDialogControl('mouseYAcceleration',this.CONTROL_TYPE_RANGE,'Mouse Y Acceleration:',0)) return(false);
+        if (!this.addDialogControl('mouseYInvert',this.CONTROL_TYPE_CHECKBOX,'Invert Mouse Y:',0)) return(false);
+        if (!this.addDialogControl('touchStickXSensitivity',this.CONTROL_TYPE_RANGE,'Touch Stick X Sensitivity:',0)) return(false);
+        if (!this.addDialogControl('touchStickYSensitivity',this.CONTROL_TYPE_RANGE,'Touch Stick Y Sensitivity:',0)) return(false);
+        
+            // sound
+            
+        if (!this.addDialogControl('head_sound',this.CONTROL_TYPE_HEADER,'Sound',0)) return(false);
+        if (!this.addDialogControl('soundVolume',this.CONTROL_TYPE_RANGE,'Sound Volume:',0)) return(false);
+        if (!this.addDialogControl('musicVolume',this.CONTROL_TYPE_RANGE,'Music Volume:',0)) return(false);
+        if (!this.addDialogControl('musicOn',this.CONTROL_TYPE_CHECKBOX,'Music:',0)) return(false);
+        
         if (!this.addDialogControl('head_multiplayer',this.CONTROL_TYPE_HEADER,'Multiplayer',0)) return(false);
         if (!this.addDialogControl('head_developer',this.CONTROL_TYPE_HEADER,'Developer',0)) return(false);
         if (!this.addDialogControl('head_builder',this.CONTROL_TYPE_HEADER,'Builder',0)) return(false);
@@ -228,16 +243,63 @@ export default class InterfaceClass
         return(true);
     }
     
-    resetOpenHeader()
+    setDialogControl(id,value)
+    {
+        this.controls.get(id).value=value;
+    }
+    
+    getDialogControl(id)
+    {
+        return(this.controls.get(id).value);
+    }
+    
+    loadDialogControls()
     {
         let key,control;
         
+            // reset to first open header
+            
         for ([key,control] of this.controls) {
             if (control.controlType===this.core.interface.CONTROL_TYPE_HEADER) {
                 this.currentOpenHeaderControl=control;
                 break;
             }
         }
+        
+            // no text input
+            
+        this.currentTextInputControl=null;
+        
+            // the values
+
+        this.setDialogControl('name',this.core.setup.name);
+        this.setDialogControl('mouseXSensitivity',Math.trunc(this.core.setup.mouseXSensitivity*100));
+        this.setDialogControl('mouseXAcceleration',Math.trunc(this.core.setup.mouseXAcceleration*100));
+        this.setDialogControl('mouseXInvert',this.core.setup.mouseXInvert);
+        this.setDialogControl('mouseYSensitivity',Math.trunc(this.core.setup.mouseYSensitivity*100));
+        this.setDialogControl('mouseYAcceleration',Math.trunc(this.core.setup.mouseYAcceleration*100));
+        this.setDialogControl('mouseYInvert',this.core.setup.mouseYInvert);
+        this.setDialogControl('touchStickXSensitivity',Math.trunc(this.core.setup.touchStickXSensitivity*100));
+        this.setDialogControl('touchStickYSensitivity',Math.trunc(this.core.setup.touchStickYSensitivity*100));
+        this.setDialogControl('soundVolume',Math.trunc(this.core.setup.soundVolume*100));
+        this.setDialogControl('musicVolume',Math.trunc(this.core.setup.musicVolume*100));
+        this.setDialogControl('musicOn',this.core.setup.musicOn);
+    }
+    
+    saveDialogControls()
+    {
+        this.core.setup.name=this.getDialogControl('name',);
+        this.core.setup.mouseXSensitivity=this.getDialogControl('mouseXSensitivity')/100;
+        this.core.setup.mouseXAcceleration=this.getDialogControl('mouseXAcceleration')/100;
+        this.core.setup.mouseXInvert=this.getDialogControl('mouseXInvert');
+        this.core.setup.mouseYSensitivity=this.getDialogControl('mouseYSensitivity')/100;
+        this.core.setup.mouseYAcceleration=this.getDialogControl('mouseYAcceleration')/100;
+        this.core.setup.mouseYInvert=this.getDialogControl('mouseYInvert');
+        this.core.setup.touchStickXSensitivity=this.getDialogControl('touchStickXSensitivity')/100;
+        this.core.setup.touchStickYSensitivity=this.getDialogControl('touchStickYSensitivity')/100;
+        this.core.setup.soundVolume=this.getDialogControl('soundVolume')/100;
+        this.core.setup.musicVolume=this.getDialogControl('musicVolume')/100;
+        this.core.setup.musicOn=this.getDialogControl('musicOn');
     }
     
         //
@@ -620,6 +682,27 @@ export default class InterfaceClass
         }
         
         return(false);
+    }
+    
+    keyUI()
+    {
+        let key;
+        
+        if (this.currentTextInputControl===null) return;
+        
+        key=this.core.input.keyGetLastRaw();
+        if (key===null) return;
+        
+        if (key.toLowerCase()==='backspace') {
+            if (this.currentTextInputControl.value.length>0) {
+                this.currentTextInputControl.value=this.currentTextInputControl.value.substring(0,(this.currentTextInputControl.value.length-1));
+            }
+            return;
+        }
+        
+        if (((key>='a') && (key<='z')) || ((key>='A') && (key<='Z')) || ((key>='0') && (key<='9'))) {
+            this.currentTextInputControl.value+=key;
+        }
     }
     
     drawUI(inDialog)

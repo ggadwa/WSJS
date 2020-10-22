@@ -629,6 +629,28 @@ export default class GameClass
         setTimeout(this.core.title.startLoop.bind(this.core.title),1);  // always force it to start on next go around
     }
     
+    pauseLoopToDialog()
+    {
+        setTimeout(this.core.dialog.startLoop.bind(this.core.dialog,this.core.dialog.MODE_OPTIONS,true),1);  // always force it to start on next go around
+    }
+    
+    resumeLoopFromDialog()
+    {
+        this.core.currentLoop=this.core.GAME_LOOP;
+        
+        this.timestamp=0;
+        this.lastSystemTimestamp=Math.trunc(window.performance.now());
+        
+        this.physicsTick=0;
+        this.drawTick=0;
+        this.lastPhysicTimestamp=0;
+        this.lastDrawTimestamp=0;
+        
+        this.exitGame=false;
+
+        window.requestAnimationFrame(gameMainLoop);
+    }
+    
         //
         // game startup
         //
@@ -1317,6 +1339,11 @@ function gameMainLoop(timestamp)
     map.effectList.cleanUpMarkedAsDeleted();
     
         // time to exit loop?
+        
+    if (core.input.isKeyDown('backspace')) {
+        setTimeout(game.pauseLoopToDialog.bind(game),1);  // always force it to start on next go around
+        return;
+    }
         
     if (game.exitGame) {
         setTimeout(game.endLoopToTitle.bind(game),1);  // always force it to start on next go around

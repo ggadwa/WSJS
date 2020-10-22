@@ -189,10 +189,12 @@ export default class InterfaceControlClass
         
     clickTextInput(y,cursorX,cursorY)
     {
-    //    if ((cursorX<this.TITLE_MARGIN) || (cursorX>(this.core.wid-this.TITLE_MARGIN)) || (cursorY<y) || (cursorY>(y+this.CONTROL_HEIGHT))) return(false);
+        let x=Math.trunc(this.core.wid*0.5);
         
-    //    this.core.interface.currentOpenHeaderControl=this;
-        return(false);
+        if ((cursorX<x) || (cursorX>((x+(this.TITLE_MARGIN*2))+this.TEXT_INPUT_WIDTH)) || (cursorY<y) || (cursorY>(y+this.CONTROL_HEIGHT))) return(false);
+        
+        this.core.interface.currentTextInputControl=this;
+        return(true);
     }
         
     drawTextInput(y)
@@ -255,6 +257,15 @@ export default class InterfaceControlClass
         
         this.valueText.x=x+(this.TITLE_MARGIN*2);
         this.valueText.y=this.titleText.y;
+        
+        if (this.value===null) this.value='';
+        
+        if ((this.core.interface.currentTextInputControl===this) && (!this.core.input.paused) && ((Math.trunc(window.performance.now())&0x200)!=0)) {
+            this.valueText.str=this.value+'_';
+        }
+        else {
+            this.valueText.str=this.value;
+        }
             
         this.core.shaderList.textShader.drawStart();
         this.titleText.draw();
@@ -275,6 +286,8 @@ export default class InterfaceControlClass
         if ((cursorX<(x+this.TITLE_MARGIN)) || (cursorX>((x+this.TITLE_MARGIN)+this.CONTROL_HEIGHT)) || (cursorY<y) || (cursorY>(y+this.CONTROL_HEIGHT))) return(false);
         
         this.value=!this.value;
+        
+        this.core.interface.currentTextInputControl=null;
         return(true);
     }
         
@@ -381,6 +394,7 @@ export default class InterfaceControlClass
         
         this.value=hx;
         
+        this.core.interface.currentTextInputControl=null;
         return(false);
     }
         
@@ -508,6 +522,8 @@ export default class InterfaceControlClass
         if ((cursorX>=(x+(this.TITLE_MARGIN*2))) && (cursorX<((x+(this.TITLE_MARGIN*2))+this.NUMBER_CONTROL_WIDTH)) && (cursorY>=y) && (cursorY<(y+this.CONTROL_HEIGHT))) {
             this.value--;
             if (this.value<0) this.value=0;
+            
+            this.core.interface.currentTextInputControl=null;
             return(true);
         }
         
@@ -516,6 +532,8 @@ export default class InterfaceControlClass
         if ((cursorX>=((x+this.NUMBER_INPUT_WIDTH)-this.NUMBER_CONTROL_WIDTH)) && (cursorX<(x+this.NUMBER_INPUT_WIDTH)) && (cursorY>=y) && (cursorY<(y+this.CONTROL_HEIGHT))) {
             this.value++;
             if (this.value>this.maxNumber) this.value=this.maxNumber;
+            
+            this.core.interface.currentTextInputControl=null;
             return(true);
         }
        

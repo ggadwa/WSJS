@@ -18,6 +18,8 @@ export default class InputClass
         this.eventsAttached=false;
         
         this.keyFlags=new Map();
+        this.keyLastRawDown=null;
+        this.keyLastRaw=null;
         
         this.mouseChangeX=0;
         this.mouseChangeY=0;
@@ -116,15 +118,24 @@ export default class InputClass
     keyClear()
     {
         this.keyFlags.clear();
+        
+        this.keyLastRawDown=null;
+        this.keyLastRaw=null;
     }
 
     keyDownEvent(event)
     {
+        this.keyLastRawDown=event.key;
+        this.keyLastRaw=null;
+        
         this.keyFlags.set(event.key.toLowerCase(),true);
     }
      
     keyUpEvent(event)
     {
+        this.keyLastRaw=this.keyLastRawDown;
+        this.keyLastRawDown=null;
+        
         this.keyFlags.set(event.key.toLowerCase(),false);
     }
     
@@ -142,6 +153,14 @@ export default class InputClass
         
         this.keyFlags.set(key.toLowerCase(),false);
         return(true);
+    }
+    
+    keyGetLastRaw()
+    {
+        let key=this.keyLastRaw;
+        
+        this.keyLastRaw=null;
+        return(key);            // for input like dialog controls
     }
     
         //

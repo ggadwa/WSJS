@@ -64,7 +64,7 @@ export default class TitleClass
     
     endLoopToDialog()
     {
-        setTimeout(this.core.dialog.startLoop.bind(this.core.dialog,this.core.dialog.MODE_OPTIONS),1);
+        setTimeout(this.core.dialog.startLoop.bind(this.core.dialog,this.core.dialog.MODE_OPTIONS,false),1);
     }
     
     endLoopToGame()
