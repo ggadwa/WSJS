@@ -31,6 +31,10 @@ export default class CoreClass
         this.MAX_LIGHT_COUNT=24;        // max lights in scene, needs to be the same as lights[x] in shaders
         this.MAX_SKELETON_JOINT=64;    // max joints in a skeleton, needs to be the same as jointMatrix[x] in shaders
         
+        this.LOOP_TITLE=0;
+        this.LOOP_DIALOG=1;
+        this.LOOP_GAME=2;
+        
         this.GL_OPTIONS={
             alpha:false,
             depth:true,
@@ -44,7 +48,9 @@ export default class CoreClass
         
             // current loop
             
-        this.currentLoop=this.NO_LOOP;
+        this.currentLoop=this.LOOP_TITLE;
+        this.previousLoop=this.LOOP_TITLE;
+        this.paused=true;
 
             // the opengl context
 
@@ -221,10 +227,6 @@ export default class CoreClass
         this.connectDialog=new DialogConnectClass(this);
         this.developerDialog=new DialogDeveloperClass(this);
         
-            // finally start the input
-            
-        this.input.startInput();
-        
         return(true);
     }
 
@@ -321,4 +323,109 @@ export default class CoreClass
         return((this.random()*2.0)-1.0);
     }
     
+        //
+        // main loop
+        //
+        
+    startLoop()
+    {
+        this.currentLoop=this.LOOP_TITLE;
+        
+            // always start the game paused
+            
+        this.paused=true;
+        
+            // start the title loop
+            
+        this.title.startLoop();
+                
+            // finally start the input
+            // this starts a pointerlock which
+            // unpauses the game and starts the loop
+            
+        this.input.startInput();
+    }
+    
+    switchLoop(gotoLoop)
+    {
+        this.previousLoop=this.currentLoop;
+        this.currentLoop=gotoLoop;
+        
+        switch (this.currentLoop) {
+            case this.LOOP_TITLE:
+                this.title.startLoop();
+                break;
+            case this.LOOP_DIALOG:
+                this.dialog.startLoop();
+                break;
+            case this.LOOP_GAME:
+                if (this.previousLoop!==this.LOOP_DIALOG) {         // if this is coming from dialog to game, then it's a resume instead of a start
+                    this.game.startLoop();
+                }
+                else {
+                    this.game.resumeLoop();
+                }
+                break;
+        }
+    }
+    
+    pauseLoop()
+    {
+        this.paused=true;
+        
+        // sound, music, etc
+    }
+    
+    resumeLoop()
+    {
+        this.paused=false;
+        
+        switch (this.currentLoop) {
+            case this.LOOP_TITLE:
+                this.title.resumeLoop();
+                break;
+            case this.LOOP_DIALOG:
+                this.dialog.resumeLoop();
+                break;
+            case this.LOOP_GAME:
+                this.game.resumeLoop();
+                break;
+        }
+        
+        window.requestAnimationFrame(mainLoop);
+    }
+
 }
+
+//
+// main game loop
+//
+
+function mainLoop(timestamp)
+{
+    let core=window.main.core;
+    
+        // skip right out if paused
+        // so we no longer have any callbacks
+        
+    if (core.paused) return;
+    
+        // run the current loop
+        
+    switch (core.currentLoop) {
+        case core.LOOP_TITLE:
+            core.title.loop();
+            break;
+        case core.LOOP_DIALOG:
+            core.dialog.loop();
+            break;
+        case core.LOOP_GAME:
+            if (!core.game.inLoading) core.game.loop();
+            break;
+    }
+    
+        // next animation request
+        
+    window.requestAnimationFrame(mainLoop);
+}
+

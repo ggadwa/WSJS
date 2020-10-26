@@ -33,8 +33,6 @@ export default class InputClass
         this.canvasMidX=0;
         this.canvasMidY=0;
         
-        this.paused=false;
-        
             // listeners
             // need to set them to a variables so remove
             // can find them later
@@ -221,8 +219,6 @@ export default class InputClass
     pointerLockChange(event)
     {
         if (document.pointerLockElement===this.core.canvas) {
-            this.paused=false;
-            
             document.addEventListener('mousedown',this.mouseDownListener,false);
             document.addEventListener('mouseup',this.mouseUpListener,false);
             document.addEventListener('wheel',this.mouseWheelListener,false);
@@ -231,10 +227,10 @@ export default class InputClass
             document.addEventListener('keyup',this.keyUpListener.bind(this),true);
 
             this.core.canvas.onclick=null;
+            
+            this.core.resumeLoop();
         }
         else {
-            this.paused=true;
-            
             document.removeEventListener('mousedown',this.mouseDownListener,false);
             document.removeEventListener('mouseup',this.mouseUpListener,false);
             document.removeEventListener('wheel',this.mouseWheelListener,false);
@@ -243,6 +239,8 @@ export default class InputClass
             document.removeEventListener('keyup',this.keyUpListener,true);
 
             this.core.canvas.onclick=this.pointerLockClickResume.bind(this);
+            
+            this.core.pauseLoop();
         }
     }
     

@@ -6,17 +6,11 @@ export default class DialogClass
     {
         this.core=core;
         
-        this.MODE_OPTIONS=0;
-        
         this.timestamp=0;
         this.lastSystemTimestamp=0;
-        this.runTick=0;
-        this.drawTick=0;
         this.lastRunTimestamp=0;
         this.lastDrawTimestamp=0;
         
-        this.mode=0;
-        this.inGame=false;
         this.exitDialog=false;
         
         //Object.seal(this);
@@ -39,18 +33,11 @@ export default class DialogClass
         // start and stop dialog loop
         //
         
-    startLoop(mode,inGame)
+    startLoop()
     {
-        this.core.currentLoop=this.core.DIALOG_LOOP;
-        
-        this.mode=mode;
-        this.inGame=inGame;
-        
         this.timestamp=0;
         this.lastSystemTimestamp=Math.trunc(window.performance.now());
         
-        this.runTick=0;
-        this.drawTick=0;
         this.lastRunTimestamp=0;
         this.lastDrawTimestamp=0;
         
@@ -58,18 +45,16 @@ export default class DialogClass
         this.core.interface.cursor.center();
         
         this.exitDialog=false;
+    }
+    
+    resumeLoop()
+    {
+        this.lastSystemTimestamp=Math.trunc(window.performance.now());
         
-        window.requestAnimationFrame(dialogMainLoop);
-    }
-    
-    endLoopToTitle()
-    {
-        setTimeout(this.core.title.startLoop.bind(this.core.title),1);
-    }
-    
-    endLoopToGame()
-    {
-        setTimeout(this.core.game.resumeLoopFromDialog.bind(this.core.game),1);
+        this.lastRunTimestamp=this.timestamp;
+        this.lastDrawTimestamp=this.timestamp;
+        
+        this.exitDialog=false;
     }
     
         //
@@ -119,74 +104,60 @@ export default class DialogClass
         if (this.core.input.paused) this.core.interface.drawPauseMessage();
     }
     
-}
-
-//
-// dialog main loop
-//
-
-const RUN_MILLISECONDS=32;
-const DRAW_MILLISECONDS=32;
-const BAIL_MILLISECONDS=5000;
-
-function dialogMainLoop(timestamp)
-{
-    let systemTick;
-    let core=window.main.core;
-    let dialog=core.dialog;
-    
-        // loop uses it's own tick (so it
-        // can be paused, etc) and calculates
-        // it from the system tick
+        //
+        // loop
+        //
         
-    systemTick=Math.trunc(window.performance.now());
-    dialog.timestamp+=(systemTick-dialog.lastSystemTimestamp);
-    dialog.lastSystemTimestamp=systemTick;
-    
-        // cursor movement
-    
-    dialog.runTick=dialog.timestamp-dialog.lastRunTimestamp;
+    loop()
+    {
+        const RUN_MILLISECONDS=32;
+        const DRAW_MILLISECONDS=32;
+        const BAIL_MILLISECONDS=5000;
 
-    if (dialog.runTick>RUN_MILLISECONDS) {
+        let systemTick,runTick;
 
-        if (dialog.runTick<BAIL_MILLISECONDS) {       // this is a temporary bail measure in case something held the browser up for a long time
+            // loop uses it's own tick (so it
+            // can be paused, etc) and calculates
+            // it from the system tick
 
-            while (dialog.runTick>RUN_MILLISECONDS) {
-                dialog.runTick-=RUN_MILLISECONDS;
-                dialog.lastRunTimestamp+=RUN_MILLISECONDS;
+        systemTick=Math.trunc(window.performance.now());
+        this.timestamp+=(systemTick-this.lastSystemTimestamp);
+        this.lastSystemTimestamp=systemTick;
 
-                dialog.run();
+            // cursor movement
+
+        runTick=this.timestamp-this.lastRunTimestamp;
+
+        if (runTick>RUN_MILLISECONDS) {
+
+            if (runTick<BAIL_MILLISECONDS) {       // this is a temporary bail measure in case something held the browser up for a long time
+
+                while (runTick>RUN_MILLISECONDS) {
+                    runTick-=RUN_MILLISECONDS;
+                    this.lastRunTimestamp+=RUN_MILLISECONDS;
+
+                    this.run();
+                }
+            }
+            else {
+                this.lastRunTimestamp=this.timestamp;
             }
         }
-        else {
-            dialog.lastRunTimestamp=dialog.timestamp;
-        }
-    }
-    
-        // exiting dialog
-        
-    if (dialog.exitDialog) {
-        if (dialog.inGame) {
-            setTimeout(dialog.endLoopToGame.bind(dialog),1);
-        }
-        else {
-            setTimeout(dialog.endLoopToTitle.bind(dialog),1);
-        }
-        return;
-    }
-    
-        // drawing
-        
-    dialog.drawTick=dialog.timestamp-dialog.lastDrawTimestamp;
-    
-    if (dialog.drawTick>DRAW_MILLISECONDS) {
-        dialog.lastDrawTimestamp=dialog.timestamp; 
 
-        dialog.draw();
+            // exiting dialog
+
+        if (this.exitDialog) {
+            window.main.core.switchLoop(window.main.core.previousLoop);
+            return;
+        }
+
+            // drawing
+
+        if ((this.timestamp-this.lastDrawTimestamp)>DRAW_MILLISECONDS) {
+            this.lastDrawTimestamp=this.timestamp; 
+            this.draw();
+        }
     }
+
     
-        // next frame
-        
-    window.requestAnimationFrame(dialogMainLoop);
 }
-

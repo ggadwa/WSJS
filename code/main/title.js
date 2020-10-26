@@ -10,8 +10,6 @@ export default class TitleClass
         
         this.timestamp=0;
         this.lastSystemTimestamp=0;
-        this.runTick=0;
-        this.drawTick=0;
         this.lastRunTimestamp=0;
         this.lastDrawTimestamp=0;
         
@@ -34,42 +32,6 @@ export default class TitleClass
     
     release()
     {
-    }
-    
-        //
-        // start and stop title loop
-        //
-        
-    startLoop()
-    {
-        this.core.currentLoop=this.core.TITLE_LOOP;
-        
-        this.timestamp=0;
-        this.lastSystemTimestamp=Math.trunc(window.performance.now());
-        
-        this.runTick=0;
-        this.drawTick=0;
-        this.lastRunTimestamp=0;
-        this.lastDrawTimestamp=0;
-        
-        this.core.interface.cursor.center();
-        
-        this.clickDown=false;
-        
-        this.runDialog=false;
-        this.runGame=false;
-        
-        window.requestAnimationFrame(titleMainLoop);
-    }
-    
-    endLoopToDialog()
-    {
-        setTimeout(this.core.dialog.startLoop.bind(this.core.dialog,this.core.dialog.MODE_OPTIONS,false),1);
-    }
-    
-    endLoopToGame()
-    {
-        setTimeout(this.core.game.startLoop.bind(this.core.game),1);
     }
     
         //
@@ -112,74 +74,95 @@ export default class TitleClass
         if (this.core.input.paused) this.core.interface.drawPauseMessage();
     }
     
-}
-
-//
-// title main loop
-//
-
-const RUN_MILLISECONDS=32;
-const DRAW_MILLISECONDS=32;
-const BAIL_MILLISECONDS=5000;
-
-function titleMainLoop(timestamp)
-{
-    let systemTick;
-    let core=window.main.core;
-    let title=core.title;
-    
-        // loop uses it's own tick (so it
-        // can be paused, etc) and calculates
-        // it from the system tick
+        //
+        // title loop
+        //
         
-    systemTick=Math.trunc(window.performance.now());
-    title.timestamp+=(systemTick-title.lastSystemTimestamp);
-    title.lastSystemTimestamp=systemTick;
+    startLoop()
+    {
+        this.timestamp=0;
+        this.lastSystemTimestamp=Math.trunc(window.performance.now());
+        
+        this.lastRunTimestamp=0;
+        this.lastDrawTimestamp=0;
+        
+        this.core.interface.cursor.center();
+        
+        this.clickDown=false;
+        
+        this.runDialog=false;
+        this.runGame=false;
+    }
     
-        // cursor movement
-    
-    title.runTick=title.timestamp-title.lastRunTimestamp;
+    resumeLoop()
+    {
+        this.lastSystemTimestamp=Math.trunc(window.performance.now());
+        
+        this.lastRunTimestamp=this.timestamp;
+        this.lastDrawTimestamp=this.timestamp;
+        
+        this.clickDown=false;
+        
+        this.runDialog=false;
+        this.runGame=false;
+    }
+        
+    loop()
+    {
+        const RUN_MILLISECONDS=32;
+        const DRAW_MILLISECONDS=32;
+        const BAIL_MILLISECONDS=5000;
 
-    if (title.runTick>RUN_MILLISECONDS) {
+        let systemTick;
+        let runTick;
 
-        if (title.runTick<BAIL_MILLISECONDS) {       // this is a temporary bail measure in case something held the browser up for a long time
+            // loop uses it's own tick (so it
+            // can be paused, etc) and calculates
+            // it from the system tick
 
-            while (title.runTick>RUN_MILLISECONDS) {
-                title.runTick-=RUN_MILLISECONDS;
-                title.lastRunTimestamp+=RUN_MILLISECONDS;
+        systemTick=Math.trunc(window.performance.now());
+        this.timestamp+=(systemTick-this.lastSystemTimestamp);
+        this.lastSystemTimestamp=systemTick;
 
-                title.run();
+            // cursor movement
+
+        runTick=this.timestamp-this.lastRunTimestamp;
+
+        if (runTick>RUN_MILLISECONDS) {
+
+            if (runTick<BAIL_MILLISECONDS) {       // this is a temporary bail measure in case something held the browser up for a long time
+
+                while (runTick>RUN_MILLISECONDS) {
+                    runTick-=RUN_MILLISECONDS;
+                    this.lastRunTimestamp+=RUN_MILLISECONDS;
+
+                    this.run();
+                }
+            }
+            else {
+                this.lastRunTimestamp=this.timestamp;
             }
         }
-        else {
-            title.lastRunTimestamp=title.timestamp;
+
+            // exiting this loop
+
+        if (this.runDialog) {
+            window.main.core.switchLoop(window.main.core.LOOP_DIALOG);
+            return;
+        }
+
+        if (this.runGame) {
+            window.main.core.switchLoop(window.main.core.LOOP_GAME);
+            return;
+        }
+
+            // drawing
+
+        if ((this.timestamp-this.lastDrawTimestamp)>DRAW_MILLISECONDS) {
+            this.lastDrawTimestamp=this.timestamp; 
+
+            this.draw();
         }
     }
     
-        // exiting this loop
-        // always force it to start on next go around
-        
-    if (title.runDialog) {
-        setTimeout(title.endLoopToDialog.bind(title),1);
-        return;
-    }
-        
-    if (title.runGame) {
-        setTimeout(title.endLoopToGame.bind(title),1);
-        return;
-    }
-    
-        // drawing
-        
-    title.drawTick=title.timestamp-title.lastDrawTimestamp;
-    
-    if (title.drawTick>DRAW_MILLISECONDS) {
-        title.lastDrawTimestamp=title.timestamp; 
-
-        title.draw();
-    }
-    
-        // next frame
-        
-    window.requestAnimationFrame(titleMainLoop);
 }

@@ -68,11 +68,10 @@ export default class GameClass
             
         this.timestamp=0;
         this.lastSystemTimestamp=0;
-        this.physicsTick=0;
-        this.drawTick=0;
-        this.lastPhysicTimestamp=0;
+        this.lastRunTimestamp=0;
         this.lastDrawTimestamp=0;
         
+        this.inLoading=false;
         this.exitGame=false;
         
             // eye
@@ -591,6 +590,10 @@ export default class GameClass
     {
         let startMap;
         
+            // need to pause loop if in loading
+            
+        this.inLoading=true;
+        
         this.loadingScreenClear();
         
           // initialize the map
@@ -621,34 +624,14 @@ export default class GameClass
              */
     }
     
-    endLoopToTitle()
+    resumeLoop()
     {
-        this.map.release();
-        this.map=null;
-        
-        setTimeout(this.core.title.startLoop.bind(this.core.title),1);  // always force it to start on next go around
-    }
-    
-    pauseLoopToDialog()
-    {
-        setTimeout(this.core.dialog.startLoop.bind(this.core.dialog,this.core.dialog.MODE_OPTIONS,true),1);  // always force it to start on next go around
-    }
-    
-    resumeLoopFromDialog()
-    {
-        this.core.currentLoop=this.core.GAME_LOOP;
-        
-        this.timestamp=0;
         this.lastSystemTimestamp=Math.trunc(window.performance.now());
         
-        this.physicsTick=0;
-        this.drawTick=0;
-        this.lastPhysicTimestamp=0;
-        this.lastDrawTimestamp=0;
+        this.lastRunTimestamp=this.timestamp;
+        this.lastDrawTimestamp=this.timestamp;
         
         this.exitGame=false;
-
-        window.requestAnimationFrame(gameMainLoop);
     }
     
         //
@@ -835,19 +818,16 @@ export default class GameClass
        
             // start the main loop
             
-        this.core.currentLoop=this.core.GAME_LOOP;
+        this.core.currentLoop=this.core.LOOP_GAME;
         
         this.timestamp=0;
         this.lastSystemTimestamp=Math.trunc(window.performance.now());
         
-        this.physicsTick=0;
-        this.drawTick=0;
-        this.lastPhysicTimestamp=0;
+        this.lastRunTimestamp=0;
         this.lastDrawTimestamp=0;
         
+        this.inLoading=false;
         this.exitGame=false;
-
-        window.requestAnimationFrame(gameMainLoop);
     }
     
     runMultiplayerSyncOK()
@@ -1264,127 +1244,123 @@ export default class GameClass
             
         this.core.interface.drawDebugConsole(this.loadingStrings);
     }
-}
-
-//
-// game main loop
-//
-
-const PHYSICS_MILLISECONDS=16;
-const DRAW_MILLISECONDS=16;
-const BAIL_MILLISECONDS=5000;
-
-function gameMainLoop(timestamp)
-{
-    let fpsTime,systemTick,isNetworkGame;
-    let core=window.main.core;
-    let game=core.game;
-    let map=game.map;
     
-        // if paused, and not in a network
-        // game than nothing to do
+        //
+        // loop
+        //
         
-    isNetworkGame=(core.isMultiplayer) && (!core.setup.localGame);
-    //if ((core.paused) && (!isNetworkGame)) return;
-    
-        // loop uses it's own tick (so it
-        // can be paused, etc) and calculates
-        // it from the system tick
-        
-    systemTick=Math.trunc(window.performance.now());
-    game.timestamp+=(systemTick-game.lastSystemTimestamp);
-    game.lastSystemTimestamp=systemTick;
-    
-        // map movement, entities, and
-        // other physics, we only do this if we've
-        // moved unto another physics tick
-        
-        // this timing needs to be precise so
-        // physics remains constants
-        
-    game.physicsTick=game.timestamp-game.lastPhysicTimestamp;
+    loop()
+    {
+        const PHYSICS_MILLISECONDS=16;
+        const DRAW_MILLISECONDS=16;
+        const BAIL_MILLISECONDS=5000;
 
-    if (game.physicsTick>PHYSICS_MILLISECONDS) {
+        let systemTick,runTick,drawTick;
+        let fpsTime,isNetworkGame;
 
-        if (game.physicsTick<BAIL_MILLISECONDS) {       // this is a temporary bail measure in case something held the browser up for a long time
+            // if paused, and not in a network
+            // game than nothing to do
 
-            while (game.physicsTick>PHYSICS_MILLISECONDS) {
-                game.physicsTick-=PHYSICS_MILLISECONDS;
-                game.lastPhysicTimestamp+=PHYSICS_MILLISECONDS;
+        isNetworkGame=(this.core.isMultiplayer) && (!this.core.setup.localGame);
+        //if ((this.core.paused) && (!isNetworkGame)) return;
 
-                map.meshList.run();
-                game.run();
-                map.entityList.run();
+            // loop uses it's own tick (so it
+            // can be paused, etc) and calculates
+            // it from the system tick
+
+        systemTick=Math.trunc(window.performance.now());
+        this.timestamp+=(systemTick-this.lastSystemTimestamp);
+        this.lastSystemTimestamp=systemTick;
+
+            // map movement, entities, and
+            // other physics, we only do this if we've
+            // moved unto another physics tick
+
+            // this timing needs to be precise so
+            // physics remains constants
+
+        runTick=this.timestamp-this.lastRunTimestamp;
+
+        if (runTick>PHYSICS_MILLISECONDS) {
+
+            if (runTick<BAIL_MILLISECONDS) {       // this is a temporary bail measure in case something held the browser up for a long time
+
+                while (runTick>PHYSICS_MILLISECONDS) {
+                    runTick-=PHYSICS_MILLISECONDS;
+                    this.lastRunTimestamp+=PHYSICS_MILLISECONDS;
+
+                    this.map.meshList.run();
+                    this.run();
+                    this.map.entityList.run();
+                }
             }
+            else {
+                this.lastRunTimestamp=this.timestamp;
+            }
+
+                // update the listener and all current
+                // playing sound positions
+
+            this.core.soundList.updateListener();
+
+                // if multiplayer, handle all
+                // the network updates and messages
+
+            if (isNetworkGame) this.core.network.run();
         }
-        else {
-            game.lastPhysicTimestamp=game.timestamp;
+
+            // clean up deleted entities
+            // and effects
+
+        this.map.entityList.cleanUpMarkedAsDeleted();
+        this.map.effectList.cleanUpMarkedAsDeleted();
+
+            // time to exit loop?
+
+        if (this.core.input.isKeyDown('backspace')) {
+            window.main.core.switchLoop(window.main.core.LOOP_DIALOG);
+            return;
         }
 
-            // update the listener and all current
-            // playing sound positions
+        if (this.exitGame) {
+            window.main.core.switchLoop(window.main.core.LOOP_TITLE);
+            return;
+        }
 
-        core.soundList.updateListener();
-    
-            // if multiplayer, handle all
-            // the network updates and messages
-        
-        if (isNetworkGame) core.network.run();
-    }
-    
-        // clean up deleted entities
-        // and effects
-        
-    map.entityList.cleanUpMarkedAsDeleted();
-    map.effectList.cleanUpMarkedAsDeleted();
-    
-        // time to exit loop?
-        
-    if (core.input.isKeyDown('backspace')) {
-        setTimeout(game.pauseLoopToDialog.bind(game),1);  // always force it to start on next go around
-        return;
-    }
-        
-    if (game.exitGame) {
-        setTimeout(game.endLoopToTitle.bind(game),1);  // always force it to start on next go around
-        return;
-    }
-    
-        // drawing
-        
-        // this timing is loose, as it's only there to
-        // draw frames
-        
-    game.drawTick=game.timestamp-game.lastDrawTimestamp;
-    
-    if (game.drawTick>DRAW_MILLISECONDS) {
-        game.lastDrawTimestamp=game.timestamp; 
+            // drawing
 
-        game.draw();
-        
-        game.fpsTotal+=game.drawTick;
-        game.fpsCount++;
-    }
-    
-        // the fps
-        
-    if (game.fpsStartTimestamp===-1) game.fpsStartTimestamp=game.timestamp; // a reset from paused state
-    
-    fpsTime=game.timestamp-game.fpsStartTimestamp;
-    if (fpsTime>=1000) {
-        game.fps=(game.fpsCount*1000.0)/game.fpsTotal;
-        game.fpsStartTimestamp=game.timestamp;
+            // this timing is loose, as it's only there to
+            // draw frames
 
-        game.fpsTotal=0;
-        game.fpsCount=0;
-    }
-    
-        // special check for touch controls
-        // pausing the game
-
-    //if (core.input.touchMenuTrigger) core.setPauseState(true,false);
-    
-        // next frame
+        drawTick=this.timestamp-this.lastDrawTimestamp;
         
-    window.requestAnimationFrame(gameMainLoop);
+        if (drawTick>DRAW_MILLISECONDS) {
+            this.lastDrawTimestamp=this.timestamp; 
+
+            this.draw();
+
+            this.fpsTotal+=drawTick;
+            this.fpsCount++;
+        }
+
+            // the fps
+
+        if (this.fpsStartTimestamp===-1) this.fpsStartTimestamp=this.timestamp; // a reset from paused state
+
+        fpsTime=this.timestamp-this.fpsStartTimestamp;
+        if (fpsTime>=1000) {
+            this.fps=(this.fpsCount*1000.0)/this.fpsTotal;
+            this.fpsStartTimestamp=this.timestamp;
+
+            this.fpsTotal=0;
+            this.fpsCount=0;
+        }
+
+            // special check for touch controls
+            // pausing the game
+
+        //if (this.core.input.touchMenuTrigger) this.core.setPauseState(true,false);
+    }
+
 }
+
