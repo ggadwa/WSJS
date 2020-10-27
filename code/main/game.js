@@ -1192,10 +1192,6 @@ export default class GameClass
             // sequences
             
         if (this.currentSequence!==null) this.currentSequence.draw();
-        
-            // any paused text
-            
-        if (this.core.input.paused) this.core.interface.drawPauseMessage();
     }
     
         //

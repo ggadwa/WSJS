@@ -1,11 +1,8 @@
 
---> loading needs own loop type
---> pause/resume work properly
+
 --> move dialog to main
 --> remove main (leave only core) -- maybe?
-
-get rid of ui_ bitmaps (cursor/title remain ???)
-input pause turns off all music and sound
+--> move all the indexes to the root of the project
 
 
 Movement
@@ -17,7 +14,6 @@ Builders
 
 
 1. fix start game -> end game -> start game problem
-2. refresh can sometimes go nuts
 
 4. title needs to work on iPad
 12. iPad touchMenuTrigger (redo, search for it)

@@ -371,15 +371,54 @@ export default class CoreClass
     
     pauseLoop()
     {
+        let div,y;
+        
         this.paused=true;
         
-        // sound, music, etc
+            // suspend the sound
+            
+        this.soundList.suspend();
+        
+            // the pause click
+
+        y=parseInt(this.canvas.style.top)+Math.trunc(this.canvas.height*0.5);
+        
+        div=document.createElement('div');
+        div.id='pauseDiv';
+        div.style.position='absolute';
+        div.style.left=(parseInt(this.canvas.style.left)+50)+'px';
+        div.style.top=(y-25)+'px';
+        div.style.width=(this.canvas.width-100)+'px';
+        div.style.height='50px';
+        div.style.border='2px solid black';
+        div.style.backgroundColor='#EEEE00';
+        div.style.boxShadow='2px 2px 2px #AAAAAA';
+        div.style.fontFamily='Arial';
+        div.style.fontSize='36pt';
+        div.style.textAlign='center';
+        div.style.cursor='pointer';
+        div.appendChild(document.createTextNode("Paused - Click To Continue"));
+        
+        div.addEventListener('mouseover',function(){this.style.backgroundColor='#FFFF00'});
+        div.addEventListener('mouseout',function(){this.style.backgroundColor='#EEEE00'});
+        div.addEventListener("click",this.input.pointerLockClickResume.bind(this.input));
+        
+        document.body.appendChild(div);
     }
     
     resumeLoop()
     {
+        let div;
+        
         this.paused=false;
         
+            // remove the pause click
+            
+        div=document.getElementById('pauseDiv');
+        if (div!==null) document.body.removeChild(div);
+        
+            // resume the proper loop
+            
         switch (this.currentLoop) {
             case this.LOOP_TITLE:
                 this.title.resumeLoop();
@@ -391,6 +430,12 @@ export default class CoreClass
                 this.game.resumeLoop();
                 break;
         }
+        
+            // resume the sound
+            
+        this.soundList.resume();
+        
+            // and restart the loop
         
         window.requestAnimationFrame(mainLoop);
     }

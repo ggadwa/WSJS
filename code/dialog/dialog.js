@@ -101,7 +101,6 @@ export default class DialogClass
     {
         this.core.orthoMatrix.setOrthoMatrix(this.core.wid,this.core.high,-1.0,1.0);
         this.core.interface.drawUI(true);
-        if (this.core.input.paused) this.core.interface.drawPauseMessage();
     }
     
         //

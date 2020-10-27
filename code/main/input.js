@@ -93,8 +93,6 @@ export default class InputClass
         
     startInput()
     {
-        this.core.canvas.onclick=null;
-
             // attach events
 
         this.pointerLockStart();    // activates mouse, keys, and touch
@@ -225,8 +223,6 @@ export default class InputClass
             document.addEventListener('mousemove',this.mouseMovedListener,false);
             document.addEventListener('keydown',this.keyDownListener,true);
             document.addEventListener('keyup',this.keyUpListener.bind(this),true);
-
-            this.core.canvas.onclick=null;
             
             this.core.resumeLoop();
         }
@@ -237,8 +233,6 @@ export default class InputClass
             document.removeEventListener('mousemove',this.mouseMovedListener,false);
             document.removeEventListener('keydown',this.keyDownListener,true);
             document.removeEventListener('keyup',this.keyUpListener,true);
-
-            this.core.canvas.onclick=this.pointerLockClickResume.bind(this);
             
             this.core.pauseLoop();
         }

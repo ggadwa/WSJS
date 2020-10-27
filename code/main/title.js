@@ -71,7 +71,6 @@ export default class TitleClass
     {
         this.core.orthoMatrix.setOrthoMatrix(this.core.wid,this.core.high,-1.0,1.0);
         this.core.interface.drawUI(false);
-        if (this.core.input.paused) this.core.interface.drawPauseMessage();
     }
     
         //
