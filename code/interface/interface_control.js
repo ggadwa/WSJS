@@ -3,12 +3,12 @@ import InterfaceTextClass from '../interface/interface_text.js';
 
 export default class InterfaceControlClass
 {
-    constructor(core,controlType,title,maxNumber)
+    constructor(core,controlType,title,list)
     {
         this.core=core;
         this.controlType=controlType;
         this.title=title;
-        this.maxNumber=maxNumber;
+        this.list=list;
         
         this.value=null;
         
@@ -18,9 +18,9 @@ export default class InterfaceControlClass
         this.HEIGHT_MARGIN=5;
         this.FONT_MARGIN=4;
         this.CHECKBOX_MARGIN=5;
-        this.CONTROL_RAIL_HEIGHT=10;
-        this.NUMBER_INPUT_WIDTH=100;
-        this.NUMBER_CONTROL_WIDTH=20;
+        this.CONTROL_RAIL_HEIGHT=5;
+        this.LIST_INPUT_WIDTH=200;
+        this.LIST_CONTROL_WIDTH=20;
         
         this.vertexArray=new Float32Array(4*2);
         this.colorArray=new Float32Array(4*4);
@@ -29,10 +29,11 @@ export default class InterfaceControlClass
         this.colorBuffer=null;
         this.indexBuffer=null;
         
-        this.blueTopColor=new ColorClass(0.7,0.7,1.0);
-        this.blueBottomColor=new ColorClass(0.5,0.5,1.0);
-        this.outlineColor=new ColorClass(0.5,0.5,0.5);
+        this.widgetTopColor=new ColorClass(0.7,0.7,1.0);
+        this.widgetBottomColor=new ColorClass(0.5,0.5,1.0);
+        this.widgetOutlineColor=new ColorClass(0.0,0.0,0.6);
         this.fillColor=new ColorClass(0.9,0.9,0.9);
+        this.outlineColor=new ColorClass(0.5,0.5,0.5);
         
         this.titleText=null;
         this.valueText=null;
@@ -88,10 +89,10 @@ export default class InterfaceControlClass
         this.titleText=new InterfaceTextClass(this.core,this.title,0,0,fontSize,align,new ColorClass(1,1,1,1),1,false);
         this.titleText.initialize();
         
-        if ((this.controlType===this.core.interface.CONTROL_TYPE_TEXT) || (this.controlType===this.core.interface.CONTROL_TYPE_NUMBER)) {
+        if ((this.controlType===this.core.interface.CONTROL_TYPE_TEXT) || (this.controlType===this.core.interface.CONTROL_TYPE_LIST)) {
             align=(this.controlType===this.core.interface.CONTROL_TYPE_TEXT)?this.core.interface.TEXT_ALIGN_LEFT:this.core.interface.TEXT_ALIGN_CENTER;
             
-            this.valueText=new InterfaceTextClass(this.core,'',0,0,fontSize,align,this.blueTopColor,1,false);
+            this.valueText=new InterfaceTextClass(this.core,'',0,0,fontSize,align,this.widgetTopColor,1,false);
             this.valueText.initialize();
         }
         else {
@@ -146,14 +147,14 @@ export default class InterfaceControlClass
 
             // the fill
             
-        this.colorArray[0]=this.colorArray[4]=this.blueTopColor.r;
-        this.colorArray[1]=this.colorArray[5]=this.blueTopColor.g;
-        this.colorArray[2]=this.colorArray[6]=this.blueTopColor.b;
+        this.colorArray[0]=this.colorArray[4]=this.widgetTopColor.r;
+        this.colorArray[1]=this.colorArray[5]=this.widgetTopColor.g;
+        this.colorArray[2]=this.colorArray[6]=this.widgetTopColor.b;
         this.colorArray[3]=this.colorArray[7]=1;
 
-        this.colorArray[8]=this.colorArray[12]=this.blueBottomColor.r;
-        this.colorArray[9]=this.colorArray[13]=this.blueBottomColor.g
-        this.colorArray[10]=this.colorArray[14]=this.blueBottomColor.b;
+        this.colorArray[8]=this.colorArray[12]=this.widgetBottomColor.r;
+        this.colorArray[9]=this.colorArray[13]=this.widgetBottomColor.g
+        this.colorArray[10]=this.colorArray[14]=this.widgetBottomColor.b;
         this.colorArray[11]=this.colorArray[15]=1;
         
         gl.bindBuffer(gl.ARRAY_BUFFER,this.colorBuffer);
@@ -347,15 +348,29 @@ export default class InterfaceControlClass
             gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
             gl.bufferSubData(gl.ARRAY_BUFFER,0,this.vertexArray);
 
-            this.colorArray[0]=this.colorArray[4]=this.colorArray[8]=this.colorArray[12]=this.blueBottomColor.r;
-            this.colorArray[1]=this.colorArray[5]=this.colorArray[9]=this.colorArray[13]=this.blueBottomColor.g;
-            this.colorArray[2]=this.colorArray[6]=this.colorArray[10]=this.colorArray[14]=this.blueBottomColor.b;
-            this.colorArray[3]=this.colorArray[7]=this.colorArray[11]=this.colorArray[15]=1;
+            this.colorArray[0]=this.colorArray[4]=this.widgetBottomColor.r;
+            this.colorArray[1]=this.colorArray[5]=this.widgetBottomColor.g;
+            this.colorArray[2]=this.colorArray[6]=this.widgetBottomColor.b;
+            this.colorArray[3]=this.colorArray[7]=1;
+
+            this.colorArray[8]=this.colorArray[12]=this.widgetTopColor.r;
+            this.colorArray[9]=this.colorArray[13]=this.widgetTopColor.g
+            this.colorArray[10]=this.colorArray[14]=this.widgetTopColor.b;
+            this.colorArray[11]=this.colorArray[15]=1;
 
             gl.bindBuffer(gl.ARRAY_BUFFER,this.colorBuffer);
             gl.bufferSubData(gl.ARRAY_BUFFER,0,this.colorArray);
 
             gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_SHORT,0);
+            
+            this.colorArray[0]=this.colorArray[4]=this.colorArray[8]=this.colorArray[12]=this.widgetOutlineColor.r;
+            this.colorArray[1]=this.colorArray[5]=this.colorArray[9]=this.colorArray[13]=this.widgetOutlineColor.g;
+            this.colorArray[2]=this.colorArray[6]=this.colorArray[10]=this.colorArray[14]=this.widgetOutlineColor.b;
+            this.colorArray[3]=this.colorArray[7]=this.colorArray[11]=this.colorArray[15]=1;
+            
+            gl.bufferSubData(gl.ARRAY_BUFFER,0,this.colorArray);
+            
+            gl.drawArrays(gl.LINE_LOOP,0,4);
         }
         
             // remove the buffers
@@ -465,10 +480,15 @@ export default class InterfaceControlClass
         
             // the handle fill
             
-        this.colorArray[0]=this.colorArray[4]=this.colorArray[8]=this.colorArray[12]=this.blueBottomColor.r;
-        this.colorArray[1]=this.colorArray[5]=this.colorArray[9]=this.colorArray[13]=this.blueBottomColor.g;
-        this.colorArray[2]=this.colorArray[6]=this.colorArray[10]=this.colorArray[14]=this.blueBottomColor.b;
-        this.colorArray[3]=this.colorArray[7]=this.colorArray[11]=this.colorArray[15]=1;
+            this.colorArray[0]=this.colorArray[4]=this.widgetBottomColor.r;
+            this.colorArray[1]=this.colorArray[5]=this.widgetBottomColor.g;
+            this.colorArray[2]=this.colorArray[6]=this.widgetBottomColor.b;
+            this.colorArray[3]=this.colorArray[7]=1;
+
+            this.colorArray[8]=this.colorArray[12]=this.widgetTopColor.r;
+            this.colorArray[9]=this.colorArray[13]=this.widgetTopColor.g
+            this.colorArray[10]=this.colorArray[14]=this.widgetTopColor.b;
+            this.colorArray[11]=this.colorArray[15]=1;
         
         gl.bindBuffer(gl.ARRAY_BUFFER,this.colorBuffer);
         gl.bufferSubData(gl.ARRAY_BUFFER,0,this.colorArray);
@@ -480,9 +500,9 @@ export default class InterfaceControlClass
         
             // the handle outline
             
-        this.colorArray[0]=this.colorArray[4]=this.colorArray[8]=this.colorArray[12]=this.outlineColor.r;
-        this.colorArray[1]=this.colorArray[5]=this.colorArray[9]=this.colorArray[13]=this.outlineColor.g;
-        this.colorArray[2]=this.colorArray[6]=this.colorArray[10]=this.colorArray[14]=this.outlineColor.b;
+        this.colorArray[0]=this.colorArray[4]=this.colorArray[8]=this.colorArray[12]=this.widgetOutlineColor.r;
+        this.colorArray[1]=this.colorArray[5]=this.colorArray[9]=this.colorArray[13]=this.widgetOutlineColor.g;
+        this.colorArray[2]=this.colorArray[6]=this.colorArray[10]=this.colorArray[14]=this.widgetOutlineColor.b;
         this.colorArray[3]=this.colorArray[7]=this.colorArray[11]=this.colorArray[15]=1;
         
         gl.bindBuffer(gl.ARRAY_BUFFER,this.colorBuffer);
@@ -510,16 +530,16 @@ export default class InterfaceControlClass
     }
     
         //
-        // number
+        // list
         //
         
-    clickNumber(y,cursorX,cursorY)
+    clickList(y,cursorX,cursorY)
     {
         let x=Math.trunc(this.core.wid*0.5);
         
             // down
             
-        if ((cursorX>=(x+(this.TITLE_MARGIN*2))) && (cursorX<((x+(this.TITLE_MARGIN*2))+this.NUMBER_CONTROL_WIDTH)) && (cursorY>=y) && (cursorY<(y+this.CONTROL_HEIGHT))) {
+        if ((cursorX>=(x+(this.TITLE_MARGIN*2))) && (cursorX<((x+(this.TITLE_MARGIN*2))+this.LIST_CONTROL_WIDTH)) && (cursorY>=y) && (cursorY<(y+this.CONTROL_HEIGHT))) {
             this.value--;
             if (this.value<0) this.value=0;
             
@@ -529,9 +549,9 @@ export default class InterfaceControlClass
         
              // up
             
-        if ((cursorX>=((x+this.NUMBER_INPUT_WIDTH)-this.NUMBER_CONTROL_WIDTH)) && (cursorX<(x+this.NUMBER_INPUT_WIDTH)) && (cursorY>=y) && (cursorY<(y+this.CONTROL_HEIGHT))) {
+        if ((cursorX>=((x+this.LIST_INPUT_WIDTH)-this.LIST_CONTROL_WIDTH)) && (cursorX<(x+this.LIST_INPUT_WIDTH)) && (cursorY>=y) && (cursorY<(y+this.CONTROL_HEIGHT))) {
             this.value++;
-            if (this.value>this.maxNumber) this.value=this.maxNumber;
+            if (this.value>=this.list.length) this.value=this.list.length-1;
             
             this.core.interface.currentTextInputControl=null;
             return(true);
@@ -540,7 +560,7 @@ export default class InterfaceControlClass
         return(false);
     }
 
-    drawNumber(y)
+    drawList(y)
     {
         let x;
         let shader=this.core.shaderList.colorShader;
@@ -552,7 +572,7 @@ export default class InterfaceControlClass
         
         this.vertexArray[0]=this.vertexArray[6]=x+this.TITLE_MARGIN;
         this.vertexArray[1]=this.vertexArray[3]=y;
-        this.vertexArray[2]=this.vertexArray[4]=(x+this.TITLE_MARGIN)+this.NUMBER_INPUT_WIDTH;
+        this.vertexArray[2]=this.vertexArray[4]=(x+this.TITLE_MARGIN)+this.LIST_INPUT_WIDTH;
         this.vertexArray[5]=this.vertexArray[7]=y+this.CONTROL_HEIGHT;
             
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
@@ -590,16 +610,16 @@ export default class InterfaceControlClass
             
         this.vertexArray[0]=x+(this.TITLE_MARGIN*2);
         this.vertexArray[1]=y+Math.trunc(this.CONTROL_HEIGHT*0.5);
-        this.vertexArray[2]=this.vertexArray[4]=(x+(this.TITLE_MARGIN*2))+this.NUMBER_CONTROL_WIDTH;
+        this.vertexArray[2]=this.vertexArray[4]=(x+(this.TITLE_MARGIN*2))+this.LIST_CONTROL_WIDTH;
         this.vertexArray[3]=y+this.FONT_MARGIN;
         this.vertexArray[5]=(y+this.CONTROL_HEIGHT)-this.FONT_MARGIN;
         
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
         gl.bufferSubData(gl.ARRAY_BUFFER,0,this.vertexArray);
         
-        this.colorArray[0]=this.colorArray[4]=this.colorArray[8]=this.blueBottomColor.r;
-        this.colorArray[1]=this.colorArray[5]=this.colorArray[9]=this.blueBottomColor.g;
-        this.colorArray[2]=this.colorArray[6]=this.colorArray[10]=this.blueBottomColor.b;
+        this.colorArray[0]=this.colorArray[4]=this.colorArray[8]=this.widgetBottomColor.r;
+        this.colorArray[1]=this.colorArray[5]=this.colorArray[9]=this.widgetBottomColor.g;
+        this.colorArray[2]=this.colorArray[6]=this.colorArray[10]=this.widgetBottomColor.b;
         this.colorArray[3]=this.colorArray[7]=this.colorArray[11]=1;
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.colorBuffer);
@@ -607,18 +627,44 @@ export default class InterfaceControlClass
         
         gl.drawElements(gl.TRIANGLES,3,gl.UNSIGNED_SHORT,0);
         
+        this.colorArray[0]=this.colorArray[4]=this.colorArray[8]=this.widgetOutlineColor.r;
+        this.colorArray[1]=this.colorArray[5]=this.colorArray[9]=this.widgetOutlineColor.g;
+        this.colorArray[2]=this.colorArray[6]=this.colorArray[10]=this.widgetOutlineColor.b;
+        this.colorArray[3]=this.colorArray[7]=this.colorArray[11]=1;
+        
+        gl.bufferSubData(gl.ARRAY_BUFFER,0,this.colorArray);
+        
+        gl.drawArrays(gl.LINE_LOOP,0,3);
+        
             // up
             
-        this.vertexArray[0]=x+this.NUMBER_INPUT_WIDTH;
+        this.vertexArray[0]=x+this.LIST_INPUT_WIDTH;
         this.vertexArray[1]=y+Math.trunc(this.CONTROL_HEIGHT*0.5);
-        this.vertexArray[2]=this.vertexArray[4]=(x+this.NUMBER_INPUT_WIDTH)-this.NUMBER_CONTROL_WIDTH;
+        this.vertexArray[2]=this.vertexArray[4]=(x+this.LIST_INPUT_WIDTH)-this.LIST_CONTROL_WIDTH;
         this.vertexArray[3]=y+this.FONT_MARGIN;
         this.vertexArray[5]=(y+this.CONTROL_HEIGHT)-this.FONT_MARGIN;
         
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
         gl.bufferSubData(gl.ARRAY_BUFFER,0,this.vertexArray);
         
+        this.colorArray[0]=this.colorArray[4]=this.colorArray[8]=this.widgetBottomColor.r;
+        this.colorArray[1]=this.colorArray[5]=this.colorArray[9]=this.widgetBottomColor.g;
+        this.colorArray[2]=this.colorArray[6]=this.colorArray[10]=this.widgetBottomColor.b;
+        this.colorArray[3]=this.colorArray[7]=this.colorArray[11]=1;
+
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.colorBuffer);
+        gl.bufferSubData(gl.ARRAY_BUFFER,0,this.colorArray);
+        
         gl.drawElements(gl.TRIANGLES,3,gl.UNSIGNED_SHORT,0);
+        
+        this.colorArray[0]=this.colorArray[4]=this.colorArray[8]=this.widgetOutlineColor.r;
+        this.colorArray[1]=this.colorArray[5]=this.colorArray[9]=this.widgetOutlineColor.g;
+        this.colorArray[2]=this.colorArray[6]=this.colorArray[10]=this.widgetOutlineColor.b;
+        this.colorArray[3]=this.colorArray[7]=this.colorArray[11]=1;
+        
+        gl.bufferSubData(gl.ARRAY_BUFFER,0,this.colorArray);
+        
+        gl.drawArrays(gl.LINE_LOOP,0,3);
         
             // remove the buffers
 
@@ -632,11 +678,9 @@ export default class InterfaceControlClass
         this.titleText.x=x-this.TITLE_MARGIN;
         this.titleText.y=(y+this.CONTROL_HEIGHT)-this.FONT_MARGIN;
         
-        if (!Number.isInteger(this.value)) this.value=0;
-        
-        this.valueText.x=(x+this.TITLE_MARGIN)+Math.trunc(this.NUMBER_INPUT_WIDTH*0.5);
+        this.valueText.x=(x+this.TITLE_MARGIN)+Math.trunc(this.LIST_INPUT_WIDTH*0.5);
         this.valueText.y=this.titleText.y;
-        this.valueText.str=''+this.value;
+        this.valueText.str=''+this.list[this.value];
             
         this.core.shaderList.textShader.drawStart();
         this.titleText.draw();
@@ -661,8 +705,8 @@ export default class InterfaceControlClass
                 return(this.clickCheckbox(this.lastDrawY,cursorX,cursorY));
             case this.core.interface.CONTROL_TYPE_RANGE:
                 return(this.clickRange(this.lastDrawY,cursorX,cursorY));
-            case this.core.interface.CONTROL_TYPE_NUMBER:
-                return(this.clickNumber(this.lastDrawY,cursorX,cursorY));
+            case this.core.interface.CONTROL_TYPE_LIST:
+                return(this.clickList(this.lastDrawY,cursorX,cursorY));
         }
         
         return(false);
@@ -685,8 +729,8 @@ export default class InterfaceControlClass
                 return(this.drawCheckbox(y));
             case this.core.interface.CONTROL_TYPE_RANGE:
                 return(this.drawRange(y));
-            case this.core.interface.CONTROL_TYPE_NUMBER:
-                return(this.drawNumber(y));
+            case this.core.interface.CONTROL_TYPE_LIST:
+                return(this.drawList(y));
         }
         
         return(y);

@@ -1,8 +1,10 @@
 
 
+--> need dialog for node text entry
+--> dialog modes
+--> figure out why dialogs break during develop
 --> move dialog to main
 --> remove main (leave only core) -- maybe?
---> move all the indexes to the root of the project
 
 
 Movement
