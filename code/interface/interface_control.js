@@ -17,13 +17,13 @@ export default class InterfaceControlClass
         this.CONTROL_HEIGHT=30;
         this.HEIGHT_MARGIN=5;
         this.FONT_MARGIN=4;
-        this.CHECKBOX_MARGIN=5;
+        this.CHECKBOX_MARGIN=2;
         this.CONTROL_RAIL_HEIGHT=5;
         this.LIST_INPUT_WIDTH=200;
         this.LIST_CONTROL_WIDTH=20;
         
-        this.vertexArray=new Float32Array(4*2);
-        this.colorArray=new Float32Array(4*4);
+        this.vertexArray=new Float32Array(5*2);
+        this.colorArray=new Float32Array(5*4);  // there's an extra to work around the missing pixel problem
         
         this.vertexBuffer=null;
         this.colorBuffer=null;

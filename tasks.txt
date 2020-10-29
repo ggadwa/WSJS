@@ -1,6 +1,6 @@
 
 
---> need dialog for node text entry
+--> don't restart sound coming out of pause if in developer mode
 --> dialog modes
 --> figure out why dialogs break during develop
 --> move dialog to main

@@ -220,7 +220,7 @@ export default class InterfaceTextClass
     
     draw()
     {
-        if ((!this.show) || (this.core.game.developer.on!==this.developer)) return;
+        if (!this.show) return;
         
             // check for temporary time out
          
