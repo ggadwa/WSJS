@@ -33,7 +33,7 @@ export default class DialogClass
         // start and stop dialog loop
         //
         
-    startLoop()
+    startLoop(mode)
     {
         this.timestamp=0;
         this.lastSystemTimestamp=Math.trunc(window.performance.now());
@@ -41,7 +41,7 @@ export default class DialogClass
         this.lastRunTimestamp=0;
         this.lastDrawTimestamp=0;
         
-        this.core.interface.loadDialogControls();
+        this.core.interface.loadDialogControls(mode);
         this.core.interface.cursor.center();
         
         this.exitDialog=false;
@@ -146,7 +146,7 @@ export default class DialogClass
             // exiting dialog
 
         if (this.exitDialog) {
-            window.main.core.switchLoop(window.main.core.previousLoop);
+            window.main.core.switchLoop(window.main.core.previousLoop,0);
             return;
         }
 

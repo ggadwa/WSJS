@@ -346,18 +346,22 @@ export default class CoreClass
         this.input.startInput();
     }
     
-    switchLoop(gotoLoop)
+    switchLoop(gotoLoop,mode)
     {
         this.previousLoop=this.currentLoop;
         this.currentLoop=gotoLoop;
         
         switch (this.currentLoop) {
+            
             case this.LOOP_TITLE:
                 this.title.startLoop();
                 break;
+                
             case this.LOOP_DIALOG:
-                this.dialog.startLoop();
+                this.dialog.startLoop(mode);
+                
                 break;
+                
             case this.LOOP_GAME:
                 if (this.previousLoop!==this.LOOP_DIALOG) {         // if this is coming from dialog to game, then it's a resume instead of a start
                     this.game.startLoop();
@@ -431,9 +435,9 @@ export default class CoreClass
                 break;
         }
         
-            // resume the sound
+            // resume the sound (if not in developer)
             
-        this.soundList.resume();
+        if (!this.game.developer.on) this.soundList.resume();
         
             // and restart the loop
         

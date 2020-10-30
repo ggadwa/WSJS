@@ -235,11 +235,11 @@ export default class DeveloperRayClass
         this.lookVector.rotateY(null,angle.y);
         
         if (this.rayCollision(this.lookPoint,this.lookVector,this.lookEndPoint)) {
-            this.core.interface.updateText('wsTarget',('target:'+this.core.game.developer.getSelectName(this.targetItemType,this.targetItemIndex)));
+            this.core.game.developer.targetText.str='target:'+this.core.game.developer.getSelectName(this.targetItemType,this.targetItemIndex);
         }
         else {
             this.lookEndPoint.setFromAddPoint(this.lookPoint,this.lookVector);
-            this.core.interface.updateText('wsTarget','target:');
+            this.core.game.developer.targetText.str='target:';
         }
         
         this.lookEndPoint.trunc();      // this can be used to position things so make sure it's an integer

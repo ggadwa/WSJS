@@ -12,6 +12,8 @@ export default class InterfaceControlClass
         
         this.value=null;
         
+        this.show=true;
+        
         this.TITLE_MARGIN=5;
         this.TEXT_INPUT_WIDTH=300;
         this.CONTROL_HEIGHT=30;

@@ -10,6 +10,7 @@ export default class SetupClass
         
         this.name='Player';
 
+        this.showFPS=false;
         this.localGame=true;
 
         this.serverURL='127.0.0.1';

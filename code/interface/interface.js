@@ -49,6 +49,10 @@ export default class InterfaceClass
         this.CONTROL_TYPE_RANGE=3;
         this.CONTROL_TYPE_LIST=4;
         
+        this.DIALOG_MODE_SETTINGS=0;
+        this.DIALOG_MODE_MULTIPLAYER=1;
+        this.DIALOG_MODE_DEVELOPER=2;
+        
         this.core=core;
         
         this.background=null;
@@ -56,6 +60,7 @@ export default class InterfaceClass
         this.elements=new Map();
         this.counts=new Map();
         this.texts=new Map();
+        this.fpsText=null;
         this.playButton=null;
         this.multiplayerButton=null;
         this.optionButton=null;
@@ -163,6 +168,11 @@ export default class InterfaceClass
         this.developBuildShadowMapsButton=new InterfaceButtonClass(this.core,0.22,0.93,0.2,0.05,'Build Shadow Maps');
         if (!this.developBuildShadowMapsButton.initialize()) return(false);
         
+            // fps
+            
+        this.fpsText=new InterfaceTextClass(this.core,'',(this.core.wid-5),23,20,this.core.interface.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1,true);
+        this.fpsText.initialize();
+        
             // controls
             
         this.controls.clear();
@@ -171,6 +181,7 @@ export default class InterfaceClass
             
         if (!this.addDialogControl('head_profile',this.CONTROL_TYPE_HEADER,'Profile',null)) return(false);
         if (!this.addDialogControl('name',this.CONTROL_TYPE_TEXT,'Name:',null)) return(false);
+        if (!this.addDialogControl('showFPS',this.CONTROL_TYPE_CHECKBOX,'Show FPS:',null)) return(false);
         
             // movement
             
@@ -249,6 +260,8 @@ export default class InterfaceClass
             control.release();
         }
         
+        this.fpsText.release();
+        
             // background and cursor
             
         this.cursor.release();
@@ -284,19 +297,40 @@ export default class InterfaceClass
         return(this.controls.get(id).value);
     }
     
-    loadDialogControls()
+    loadDialogControls(mode)
     {
-        let key,control;
-        
-            // reset to first open header
+            // dialog modes
             
-        for ([key,control] of this.controls) {
-            if (control.controlType===this.core.interface.CONTROL_TYPE_HEADER) {
-                this.currentOpenHeaderControl=control;
+        switch (mode) {
+            
+            case this.DIALOG_MODE_SETTINGS:
+                this.currentOpenHeaderControl=this.controls.get('head_profile');
+                this.controls.get('head_profile').show=true;
+                this.controls.get('head_movement').show=true;
+                this.controls.get('head_sound').show=true;
+                this.controls.get('head_multiplayer').show=false;
+                this.controls.get('head_developer').show=false;
                 break;
-            }
+                
+            case this.DIALOG_MODE_MULTIPLAYER:
+                this.currentOpenHeaderControl=this.controls.get('head_multiplayer');
+                this.controls.get('head_profile').show=false;
+                this.controls.get('head_movement').show=false;
+                this.controls.get('head_sound').show=false;
+                this.controls.get('head_multiplayer').show=true;
+                this.controls.get('head_developer').show=false;
+                break;
+                
+            case this.DIALOG_MODE_DEVELOPER:
+                this.currentOpenHeaderControl=this.controls.get('head_developer');
+                this.controls.get('head_profile').show=false;
+                this.controls.get('head_movement').show=false;
+                this.controls.get('head_sound').show=false;
+                this.controls.get('head_multiplayer').show=false;
+                this.controls.get('head_developer').show=true;
+                break;
         }
-        
+
             // no text input
             
         this.currentTextInputControl=null;
@@ -304,6 +338,7 @@ export default class InterfaceClass
             // the values
 
         this.setDialogControl('name',this.core.setup.name);
+        this.setDialogControl('showFPS',this.core.setup.showFPS);
         
         this.setDialogControl('mouseXSensitivity',Math.trunc(this.core.setup.mouseXSensitivity*100));
         this.setDialogControl('mouseXAcceleration',Math.trunc(this.core.setup.mouseXAcceleration*100));
@@ -326,7 +361,8 @@ export default class InterfaceClass
     
     saveDialogControls()
     {
-        this.core.setup.name=this.getDialogControl('name',);
+        this.core.setup.name=this.getDialogControl('name');
+        this.core.setup.showFPS=this.getDialogControl('showFPS');
         
         this.core.setup.mouseXSensitivity=this.getDialogControl('mouseXSensitivity')/100;
         this.core.setup.mouseXAcceleration=this.getDialogControl('mouseXAcceleration')/100;
@@ -345,6 +381,8 @@ export default class InterfaceClass
         this.core.setup.botCount=this.getDialogControl('botCount');
         this.core.setup.botSkill=this.getDialogControl('botSkill');
         this.core.setup.serverURL=this.getDialogControl('serverURL');
+        
+        this.core.setup.save(this.core);
     }
     
         //
@@ -654,6 +692,7 @@ export default class InterfaceClass
     drawGame()
     {
         let key,element,count,text;
+        let fpsStr,idx;
         let gl=this.core.gl;
         
         gl.disable(gl.DEPTH_TEST);
@@ -688,6 +727,21 @@ export default class InterfaceClass
             text.draw();
         }
         
+        if (this.core.setup.showFPS) {
+            fpsStr=this.core.game.fps.toString();
+        
+            idx=fpsStr.indexOf('.');
+            if (idx===-1) {
+                fpsStr+='.0';
+            }
+            else {
+                fpsStr=fpsStr.substring(0,(idx+3));
+            }
+
+            this.fpsText.str=fpsStr;
+            this.fpsText.draw();
+        }
+        
         this.core.shaderList.textShader.drawEnd();
         
             // touch controls
@@ -718,8 +772,13 @@ export default class InterfaceClass
 
         for ([key,control] of this.controls) {
             if (control.controlType===this.core.interface.CONTROL_TYPE_HEADER) {
-                show=(this.currentOpenHeaderControl===control);
-                if (control.click(this.cursor.x,this.cursor.y)) return(true);
+                if (!control.show) {
+                    show=false;
+                }
+                else {
+                    show=(this.currentOpenHeaderControl===control);
+                    if (control.click(this.cursor.x,this.cursor.y)) return(true);
+                }
             }
             else {
                 if (show) {
@@ -784,17 +843,24 @@ export default class InterfaceClass
 
             for ([key,control] of this.controls) {
                 if (control.controlType===this.core.interface.CONTROL_TYPE_HEADER) {
-                    show=(this.currentOpenHeaderControl===control);
-                    y=control.draw(y,this.cursor.x,this.cursor.y);
+                    if (!control.show) {
+                        show=false;
+                    }
+                    else {
+                        show=(this.currentOpenHeaderControl===control);
+                        y=control.draw(y,this.cursor.x,this.cursor.y);
+                    }
                 }
                 else {
                     if (show) y=control.draw(y,this.cursor.x,this.cursor.y);
                 }
             }
             
-            this.developBuildPathHintsButton.draw(this.cursor.x,this.cursor.y);
-            this.developBuildShadowMapsButton.draw(this.cursor.x,this.cursor.y);
-
+            if (this.core.game.developer.on) {
+                this.developBuildPathHintsButton.draw(this.cursor.x,this.cursor.y);
+                this.developBuildShadowMapsButton.draw(this.cursor.x,this.cursor.y);
+            }
+            
             this.cancelButton.draw(this.cursor.x,this.cursor.y);
             this.okButton.draw(this.cursor.x,this.cursor.y);
         }

@@ -2,6 +2,7 @@ import PointClass from '../utility/point.js';
 import ColorClass from '../utility/color.js';
 import BoundClass from '../utility/bound.js';
 import QuaternionClass from '../utility/quaternion.js';
+import InterfaceTextClass from '../interface/interface_text.js';
 import DeveloperSpriteClass from '../developer/developer_sprite.js';
 import DeveloperRayClass from '../developer/developer_ray.js';
 import MapPathNodeClass from '../map/map_path_node.js';
@@ -47,6 +48,12 @@ export default class DeveloperClass
         
             // misc drawing class
             
+        this.positionText=null;
+        this.angleText=null;
+        this.meshText=null;
+        this.targetText=null;
+        this.selectText=null;
+            
         this.developerSprite=new DeveloperSpriteClass(core);
         this.developerRay=new DeveloperRayClass(core);
         
@@ -65,13 +72,20 @@ export default class DeveloperClass
     
     initialize()
     {
-        this.core.interface.addText('wsFPS','',this.core.interface.POSITION_MODE_TOP_RIGHT,{"x":-5,"y":23},20,this.core.interface.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1,false);
+        this.positionText=new InterfaceTextClass(this.core,'',5,(this.core.high-95),20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
+        this.positionText.initialize();
         
-        this.core.interface.addText('wsPosition','',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-95},20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
-        this.core.interface.addText('wsAngle','',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-72},20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
-        this.core.interface.addText('wsMesh','',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-49},20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
-        this.core.interface.addText('wsTarget','target:',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-26},20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
-        this.core.interface.addText('wsSelect','select:',this.core.interface.POSITION_MODE_BOTTOM_LEFT,{"x":5,"y":-3},20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
+        this.angleText=new InterfaceTextClass(this.core,'',5,(this.core.high-72),20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
+        this.angleText.initialize();
+
+        this.meshText=new InterfaceTextClass(this.core,'',5,(this.core.high-49),20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
+        this.meshText.initialize();
+
+        this.targetText=new InterfaceTextClass(this.core,'',5,(this.core.high-26),20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
+        this.targetText.initialize();
+
+        this.selectText=new InterfaceTextClass(this.core,'',5,(this.core.high-3),20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
+        this.selectText.initialize();
         
         if (!this.developerSprite.initialize()) return(false);
         if (!this.developerRay.initialize()) return(false);
@@ -81,6 +95,12 @@ export default class DeveloperClass
     
     release()
     {
+        this.positionText.release();
+        this.angleText.release();
+        this.meshText.release();
+        this.targetText.release();
+        this.selectText.release();
+        
         this.developerRay.release();
         this.developerSprite.release();
     }
@@ -498,7 +518,7 @@ export default class DeveloperClass
             if (this.developerRay.targetItemType!==this.SELECT_ITEM_NONE) {
                 this.selectItemType=this.developerRay.targetItemType;
                 this.selectItemIndex=this.developerRay.targetItemIndex;
-                this.core.interface.updateText('wsSelect',('select:'+this.getSelectName(this.selectItemType,this.selectItemIndex)));
+                this.selectText.str='select:'+this.getSelectName(this.selectItemType,this.selectItemIndex);
             }
         }
         
@@ -526,7 +546,7 @@ export default class DeveloperClass
             }
 
             this.position.setFromAddPoint(this.getSelectPosition(this.selectItemType,this.selectItemIndex),this.selectVector);
-            this.core.interface.updateText('wsSelect',('select:'+this.getSelectName(this.selectItemType,this.selectItemIndex)));
+            this.selectText.str='select:'+this.getSelectName(this.selectItemType,this.selectItemIndex);
         }
         
             // push selected node to path editor
@@ -576,11 +596,11 @@ export default class DeveloperClass
         
     clearInterfaceOutput()
     {
-        this.core.interface.updateText('wsPosition','');
-        this.core.interface.updateText('wsAngle','');
-        this.core.interface.updateText('wsMesh','');
-        this.core.interface.updateText('wsTarget','target:');
-        this.core.interface.updateText('wsSelect','select:');
+        this.positionText.str='';
+        this.angleText.str='';
+        this.meshText.str='';
+        this.targetText.str='target:';
+        this.selectText.str='select:';
     }
     
     setInterfaceOutput()
@@ -590,8 +610,8 @@ export default class DeveloperClass
         
             // world info
             
-        this.core.interface.updateText('wsPosition',('pos:'+this.position.toDisplayString()));
-        this.core.interface.updateText('wsAngle',('ang:'+this.angle.toDisplayString()));
+        this.positionText.str='pos:'+this.position.toDisplayString();
+        this.angleText.str='ang:'+this.angle.toDisplayString();
         
         let xBound=new BoundClass((this.position.x-this.CONTACT_MESH_RADIUS),(this.position.x+this.CONTACT_MESH_RADIUS));
         let yBound=new BoundClass((this.position.y-this.CONTACT_MESH_RADIUS),(this.position.y+this.CONTACT_MESH_RADIUS));
@@ -607,10 +627,10 @@ export default class DeveloperClass
         }
         
         if (str==='') {
-            this.core.interface.updateText('wsMesh','mesh:');
+            this.meshText.str='mesh:';
         }
         else {
-            this.core.interface.updateText('wsMesh',('mesh:'+str));
+            this.meshText.str='mesh:'+str;
         }
     }
     
@@ -691,27 +711,15 @@ export default class DeveloperClass
     }
 
         //
-        // mainline
+        // developer run
         //
         
     run()
     {
-        let idx;
-        let fpsStr=this.core.game.fps.toString();
         let input=this.core.input;
         
             // developer output
-            // always do fps, only others if in developer mode
-            
-        idx=fpsStr.indexOf('.');
-        if (idx===-1) {
-            fpsStr+='.0';
-        }
-        else {
-            fpsStr=fpsStr.substring(0,(idx+3));
-        }
         
-        this.core.interface.updateText('wsFPS',fpsStr);
         if (this.on) this.setInterfaceOutput();
         
             // can run any developer mode is network game
@@ -763,6 +771,41 @@ export default class DeveloperClass
             // run the targetting
             
         this.developerRay.run(this.position,this.angle);
-
     }
+    
+        //
+        // developer draw
+        //
+        
+            
+    draw()
+    {
+        let gl=this.core.gl;
+        
+            // paths and rays
+            
+        this.core.game.map.path.drawPath();
+        this.developerRay.draw();
+        
+            // text
+            
+        gl.disable(gl.DEPTH_TEST);
+        
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+            
+        this.core.shaderList.textShader.drawStart();
+        
+        this.positionText.draw();
+        this.angleText.draw();
+        this.meshText.draw();
+        this.targetText.draw();
+        this.selectText.draw();
+                
+        this.core.shaderList.textShader.drawEnd();
+        
+        gl.disable(gl.BLEND);
+        gl.enable(gl.DEPTH_TEST);
+    }
+
 }

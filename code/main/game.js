@@ -1178,20 +1178,17 @@ export default class GameClass
             this.map.entityList.draw(player);
         }
         
-            // path and ray developer
-            
-        if (developerOn) {
-            this.map.path.drawPath();
-            this.developer.developerRay.draw();
-        }
-        
             // interface
             
-        if (!this.hideUI) this.core.interface.drawGame();
+        if ((!developerOn) && (!this.hideUI)) this.core.interface.drawGame();
         
             // sequences
             
         if (this.currentSequence!==null) this.currentSequence.draw();
+        
+            // developer drawing
+            
+        if (developerOn) this.developer.draw();
     }
     
         //
@@ -1314,12 +1311,12 @@ export default class GameClass
             // time to exit loop?
 
         if (this.core.input.isKeyDown('backspace')) {
-            window.main.core.switchLoop(window.main.core.LOOP_DIALOG);
+            window.main.core.switchLoop(this.core.LOOP_DIALOG,(this.developer.on?this.core.interface.DIALOG_MODE_DEVELOPER:this.core.interface.DIALOG_MODE_SETTINGS));
             return;
         }
 
         if (this.exitGame) {
-            window.main.core.switchLoop(window.main.core.LOOP_TITLE);
+            window.main.core.switchLoop(this.core.LOOP_TITLE,0);
             return;
         }
 

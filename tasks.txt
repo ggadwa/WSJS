@@ -1,18 +1,9 @@
 
 
---> don't restart sound coming out of pause if in developer mode
---> dialog modes
---> figure out why dialogs break during develop
+--> developer should be on core, not game ???
 --> move dialog to main
 --> remove main (leave only core) -- maybe?
 
-
-Movement
-Sound
-Profile
-Multiplayer
-Developer
-Builders
 
 
 1. fix start game -> end game -> start game problem

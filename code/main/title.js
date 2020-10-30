@@ -146,12 +146,12 @@ export default class TitleClass
             // exiting this loop
 
         if (this.runDialog) {
-            window.main.core.switchLoop(window.main.core.LOOP_DIALOG);
+            window.main.core.switchLoop(this.core.LOOP_DIALOG,this.core.interface.DIALOG_MODE_SETTINGS);
             return;
         }
 
         if (this.runGame) {
-            window.main.core.switchLoop(window.main.core.LOOP_GAME);
+            window.main.core.switchLoop(this.core.LOOP_GAME,0);
             return;
         }
 
