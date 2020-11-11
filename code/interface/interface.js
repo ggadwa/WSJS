@@ -357,6 +357,8 @@ export default class InterfaceClass
         this.setDialogControl('botCount',this.core.setup.botCount);
         this.setDialogControl('botSkill',this.core.setup.botSkill);
         this.setDialogControl('serverURL',this.core.setup.serverURL);
+        
+        this.setDialogControl('skipShadowMapNormals',this.core.setup.skipShadowMapNormals);
     }
     
     saveDialogControls()
@@ -381,6 +383,8 @@ export default class InterfaceClass
         this.core.setup.botCount=this.getDialogControl('botCount');
         this.core.setup.botSkill=this.getDialogControl('botSkill');
         this.core.setup.serverURL=this.getDialogControl('serverURL');
+        
+        this.core.setup.skipShadowMapNormals=this.getDialogControl('skipShadowMapNormals');
         
         this.core.setup.save(this.core);
     }
@@ -793,11 +797,15 @@ export default class InterfaceClass
     keyUI()
     {
         let key;
+        console.info('here='+this.currentTextInputControl);
+        
         
         if (this.currentTextInputControl===null) return;
         
         key=this.core.input.keyGetLastRaw();
         if (key===null) return;
+        
+        console.info('got key='+key);
         
         if (key.toLowerCase()==='backspace') {
             if (this.currentTextInputControl.value.length>0) {

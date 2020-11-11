@@ -159,6 +159,11 @@ export default class InputClass
         return(key);            // for input like dialog controls
     }
     
+    keyClearLastRaw()
+    {
+        this.keyLastRaw=null;
+    }
+    
         //
         // pointer lock
         //

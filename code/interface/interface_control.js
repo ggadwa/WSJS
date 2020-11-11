@@ -197,6 +197,8 @@ export default class InterfaceControlClass
         if ((cursorX<x) || (cursorX>((x+(this.TITLE_MARGIN*2))+this.TEXT_INPUT_WIDTH)) || (cursorY<y) || (cursorY>(y+this.CONTROL_HEIGHT))) return(false);
         
         this.core.interface.currentTextInputControl=this;
+        this.core.input.keyClearLastRaw();
+        
         return(true);
     }
         

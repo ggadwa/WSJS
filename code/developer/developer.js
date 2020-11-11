@@ -3,6 +3,7 @@ import ColorClass from '../utility/color.js';
 import BoundClass from '../utility/bound.js';
 import QuaternionClass from '../utility/quaternion.js';
 import InterfaceTextClass from '../interface/interface_text.js';
+import DeveloperBuildersClass from '../developer/developer_builders.js';
 import DeveloperSpriteClass from '../developer/developer_sprite.js';
 import DeveloperRayClass from '../developer/developer_ray.js';
 import MapPathNodeClass from '../map/map_path_node.js';
@@ -54,6 +55,7 @@ export default class DeveloperClass
         this.targetText=null;
         this.selectText=null;
             
+        this.developerBuilders=new DeveloperBuildersClass(core);
         this.developerSprite=new DeveloperSpriteClass(core);
         this.developerRay=new DeveloperRayClass(core);
         

@@ -84,10 +84,27 @@ export default class DialogClass
                     this.exitDialog=true;
                     return;
                 }
+                
                 if (this.core.interface.okButton.cursorInButton(cursor.x,cursor.y)) {
                     this.core.interface.saveDialogControls();
                     this.exitDialog=true;
                     return;
+                }
+                
+                if (this.core.game.developer.on) {
+                    if (this.core.interface.developBuildPathHintsButton.cursorInButton(cursor.x,cursor.y)) {
+                        this.core.interface.saveDialogControls();
+                        this.core.game.developer.developerBuilders.buildPathHints();
+                        this.exitDialog=true;
+                        return;
+                    }
+                    
+                    if (this.core.interface.developBuildShadowMapsButton.cursorInButton(cursor.x,cursor.y)) {
+                        this.core.interface.saveDialogControls();
+                        this.core.game.developer.developerBuilders.buildShadowmap(this.core.setup.skipShadowMapNormals);
+                        this.exitDialog=true;
+                        return;
+                    }
                 }
             }
         }

@@ -1014,7 +1014,7 @@ export default class GameClass
 
             // sequences
             
-        if (this.currentSequence!==null) {
+        if ((!this.developer.on) && (this.currentSequence!==null)) {
             if (this.currentSequence.isFinished()) {
                 this.currentSequence.release();
                 this.currentSequence=null;
@@ -1184,7 +1184,7 @@ export default class GameClass
         
             // sequences
             
-        if (this.currentSequence!==null) this.currentSequence.draw();
+        if ((!developerOn) && (this.currentSequence!==null)) this.currentSequence.draw();
         
             // developer drawing
             

@@ -44,6 +44,8 @@ export default class SetupClass
         this.soundVolume=0.3;
         this.musicVolume=0.5;
         this.musicOn=true;
+        
+        this.skipShadowMapNormals=false;
     }
     
     load(core)  // core has to be passed in other JSON is circular

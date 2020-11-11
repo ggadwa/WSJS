@@ -1,8 +1,11 @@
 
-
---> developer should be on core, not game ???
+--> development needs only loop
+--> X for checkboxes
+--> no multiplayer button for non-multiplayer
+--> key nodes editing
 --> move dialog to main
 --> remove main (leave only core) -- maybe?
+--> remove dialog_connect,_developer,_setting
 
 
 
