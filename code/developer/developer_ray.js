@@ -71,7 +71,7 @@ export default class DeveloperRayClass
 
         currentDist=-1;
         
-        this.targetItemType=this.core.game.developer.SELECT_ITEM_NONE;
+        this.targetItemType=this.core.developer.SELECT_ITEM_NONE;
         this.targetItemIndex=0;
 
             // run through the meshes and
@@ -95,7 +95,7 @@ export default class DeveloperRayClass
                 if (collisionTrig.rayTrace(pnt,vector,this.rayIntersectPnt)) {
                     dist=pnt.distance(this.rayIntersectPnt);
                     if ((dist<currentDist) || (currentDist===-1)) {
-                        this.targetItemType=this.core.game.developer.SELECT_ITEM_MESH;
+                        this.targetItemType=this.core.developer.SELECT_ITEM_MESH;
                         this.targetItemIndex=n;
                         hitPnt.setFromPoint(this.rayIntersectPnt);
                         currentDist=dist;
@@ -114,7 +114,7 @@ export default class DeveloperRayClass
                 if (collisionTrig.rayTrace(pnt,vector,this.rayIntersectPnt)) {
                     dist=pnt.distance(this.rayIntersectPnt);
                     if ((dist<currentDist) || (currentDist===-1)) {
-                        this.targetItemType=this.core.game.developer.SELECT_ITEM_MESH;
+                        this.targetItemType=this.core.developer.SELECT_ITEM_MESH;
                         this.targetItemIndex=n;
                         hitPnt.setFromPoint(this.rayIntersectPnt);
                         currentDist=dist;
@@ -133,7 +133,7 @@ export default class DeveloperRayClass
                 if (collisionTrig.rayTrace(pnt,vector,this.rayIntersectPnt)) {
                     dist=pnt.distance(this.rayIntersectPnt);
                     if ((dist<currentDist) || (currentDist===-1)) {
-                        this.targetItemType=this.core.game.developer.SELECT_ITEM_MESH;
+                        this.targetItemType=this.core.developer.SELECT_ITEM_MESH;
                         this.targetItemIndex=n;
                         hitPnt.setFromPoint(this.rayIntersectPnt);
                         currentDist=dist;
@@ -152,8 +152,8 @@ export default class DeveloperRayClass
             
             if (this.collision.rayCylinderIntersection(pnt,vector,entity.originalPosition,entity.radius,entity.height,this.rayIntersectPnt)) {
                 dist=pnt.distance(this.rayIntersectPnt);
-                if ((dist<currentDist) || (currentDist===-1) || (this.targetItemType===this.core.game.developer.SELECT_ITEM_MESH)) {
-                    this.targetItemType=this.core.game.developer.SELECT_ITEM_ENTITY;
+                if ((dist<currentDist) || (currentDist===-1) || (this.targetItemType===this.core.developer.SELECT_ITEM_MESH)) {
+                    this.targetItemType=this.core.developer.SELECT_ITEM_ENTITY;
                     this.targetItemIndex=n;
                     hitPnt.setFromPoint(this.rayIntersectPnt);
                     currentDist=dist;
@@ -170,8 +170,8 @@ export default class DeveloperRayClass
             
             if (this.collision.rayCubeIntersection(pnt,vector,light.position,this.ICON_CLICK_SIZE,this.ICON_CLICK_SIZE,this.ICON_CLICK_SIZE,this.rayIntersectPnt)) {
                 dist=pnt.distance(this.rayIntersectPnt);
-                if ((dist<currentDist) || (currentDist===-1) || (this.targetItemType===this.core.game.developer.SELECT_ITEM_MESH)) {
-                    this.targetItemType=this.core.game.developer.SELECT_ITEM_LIGHT;
+                if ((dist<currentDist) || (currentDist===-1) || (this.targetItemType===this.core.developer.SELECT_ITEM_MESH)) {
+                    this.targetItemType=this.core.developer.SELECT_ITEM_LIGHT;
                     this.targetItemIndex=n;
                     hitPnt.setFromPoint(this.rayIntersectPnt);
                     currentDist=dist;
@@ -189,8 +189,8 @@ export default class DeveloperRayClass
             
             if (this.collision.rayCubeIntersection(pnt,vector,effect.position,this.ICON_CLICK_SIZE,this.ICON_CLICK_SIZE,this.ICON_CLICK_SIZE,this.rayIntersectPnt)) {
                 dist=pnt.distance(this.rayIntersectPnt);
-                if ((dist<currentDist) || (currentDist===-1) || (this.targetItemType===this.core.game.developer.SELECT_ITEM_MESH)) {
-                    this.targetItemType=this.core.game.developer.SELECT_ITEM_EFFECT;
+                if ((dist<currentDist) || (currentDist===-1) || (this.targetItemType===this.core.developer.SELECT_ITEM_MESH)) {
+                    this.targetItemType=this.core.developer.SELECT_ITEM_EFFECT;
                     this.targetItemIndex=n;
                     hitPnt.setFromPoint(this.rayIntersectPnt);
                     currentDist=dist;
@@ -207,9 +207,9 @@ export default class DeveloperRayClass
             
             if (this.collision.rayCubeIntersection(pnt,vector,node.position,this.ICON_CLICK_SIZE,this.ICON_CLICK_SIZE,this.ICON_CLICK_SIZE,this.rayIntersectPnt)) {
                 dist=pnt.distance(this.rayIntersectPnt);
-                if ((dist<currentDist) || (currentDist===-1) || (this.targetItemType===this.core.game.developer.SELECT_ITEM_MESH)) {
+                if ((dist<currentDist) || (currentDist===-1) || (this.targetItemType===this.core.developer.SELECT_ITEM_MESH)) {
                     
-                    this.targetItemType=this.core.game.developer.SELECT_ITEM_NODE;
+                    this.targetItemType=this.core.developer.SELECT_ITEM_NODE;
                     this.targetItemIndex=n;
                     hitPnt.setFromPoint(this.rayIntersectPnt);
                     currentDist=dist;
@@ -235,11 +235,11 @@ export default class DeveloperRayClass
         this.lookVector.rotateY(null,angle.y);
         
         if (this.rayCollision(this.lookPoint,this.lookVector,this.lookEndPoint)) {
-            this.core.game.developer.targetText.str='target:'+this.core.game.developer.getSelectName(this.targetItemType,this.targetItemIndex);
+            this.core.developer.targetText.str='target:'+this.core.developer.getSelectName(this.targetItemType,this.targetItemIndex);
         }
         else {
             this.lookEndPoint.setFromAddPoint(this.lookPoint,this.lookVector);
-            this.core.game.developer.targetText.str='target:';
+            this.core.developer.targetText.str='target:';
         }
         
         this.lookEndPoint.trunc();      // this can be used to position things so make sure it's an integer
@@ -258,7 +258,7 @@ export default class DeveloperRayClass
         gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
         
         bitmap=this.core.bitmapList.get('../developer/sprites/target.png');
-        this.core.game.developer.developerSprite.drawBillboardSprite(bitmap,this.lookEndPoint,false);
+        this.core.developer.developerSprite.drawBillboardSprite(bitmap,this.lookEndPoint,false);
         
         gl.disable(gl.BLEND);
         

@@ -232,7 +232,7 @@ export default class CameraClass
     
     setupDeveloper()
     {
-        this.position.setFromPoint(this.core.game.developer.position);
-        this.angle.setFromPoint(this.core.game.developer.angle);
+        this.position.setFromPoint(this.core.developer.position);
+        this.angle.setFromPoint(this.core.developer.angle);
     }
 }

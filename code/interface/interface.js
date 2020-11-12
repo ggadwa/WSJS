@@ -195,6 +195,7 @@ export default class InterfaceClass
         if (!this.addDialogControl('mouseYInvert',this.CONTROL_TYPE_CHECKBOX,'Invert Mouse Y:',null)) return(false);
         if (!this.addDialogControl('touchStickXSensitivity',this.CONTROL_TYPE_RANGE,'Touch Stick X Sensitivity:',null)) return(false);
         if (!this.addDialogControl('touchStickYSensitivity',this.CONTROL_TYPE_RANGE,'Touch Stick Y Sensitivity:',null)) return(false);
+        if (!this.addDialogControl('snapLook',this.CONTROL_TYPE_CHECKBOX,'Snap Look:',null)) return(false);
         
             // sound
             
@@ -349,6 +350,8 @@ export default class InterfaceClass
         this.setDialogControl('touchStickXSensitivity',Math.trunc(this.core.setup.touchStickXSensitivity*100));
         this.setDialogControl('touchStickYSensitivity',Math.trunc(this.core.setup.touchStickYSensitivity*100));
         
+        this.setDialogControl('snapLook',this.core.setup.snapLook);
+        
         this.setDialogControl('soundVolume',Math.trunc(this.core.setup.soundVolume*100));
         this.setDialogControl('musicVolume',Math.trunc(this.core.setup.musicVolume*100));
         this.setDialogControl('musicOn',this.core.setup.musicOn);
@@ -374,6 +377,8 @@ export default class InterfaceClass
         this.core.setup.mouseYInvert=this.getDialogControl('mouseYInvert');
         this.core.setup.touchStickXSensitivity=this.getDialogControl('touchStickXSensitivity')/100;
         this.core.setup.touchStickYSensitivity=this.getDialogControl('touchStickYSensitivity')/100;
+        
+        this.core.setup.snapLook=this.getDialogControl('snapLook');
         
         this.core.setup.soundVolume=this.getDialogControl('soundVolume')/100;
         this.core.setup.musicVolume=this.getDialogControl('musicVolume')/100;
@@ -797,8 +802,6 @@ export default class InterfaceClass
     keyUI()
     {
         let key;
-        console.info('here='+this.currentTextInputControl);
-        
         
         if (this.currentTextInputControl===null) return;
         
@@ -864,7 +867,7 @@ export default class InterfaceClass
                 }
             }
             
-            if (this.core.game.developer.on) {
+            if (this.core.developer.on) {
                 this.developBuildPathHintsButton.draw(this.cursor.x,this.cursor.y);
                 this.developBuildShadowMapsButton.draw(this.cursor.x,this.cursor.y);
             }

@@ -104,7 +104,7 @@ export default class ModelClass
             // developer bounds drawing
             // note this can't draw held stuff
             
-        if ((this.core.game.developer.on) && (entity.heldBy===null)) {
+        if ((this.core.developer.on) && (entity.heldBy===null)) {
             modelEntityAlter.setupModelMatrix(false);
             modelEntityAlter.drawBounds(selected);
         }

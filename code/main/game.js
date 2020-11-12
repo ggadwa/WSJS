@@ -8,7 +8,6 @@ import ShadowmapLoadClass from '../light/shadowmap_load.js';
 import SequenceClass from '../sequence/sequence.js';
 import EntityFPSPlayerClass from '../project/entity_fps_player.js';
 import EntityFPSBotClass from '../project/entity_fps_bot.js';
-import DeveloperClass from '../developer/developer.js';
 
 export default class GameClass
 {
@@ -20,7 +19,6 @@ export default class GameClass
         this.data=data;
         
         this.map=null;
-        this.developer=new DeveloperClass(core);
         
         this.json=null;
         this.jsonEntityCache=new Map();
@@ -237,7 +235,6 @@ export default class GameClass
     
     release()
     {
-        if (this.json.developer) this.developer.release();
         this.camera.release();
         this.map.release();
     }
@@ -378,12 +375,6 @@ export default class GameClass
         this.freezePlayer=false;
         this.freezeAI=false;
         this.hideUI=false;
-                
-            // developer mode initialization
-        
-        if (this.json.developer) {
-            if (!this.developer.initialize()) return(false);
-        }
         
         return(true);
     }
@@ -997,71 +988,11 @@ export default class GameClass
     }
     
         //
-        // game run
+        // 3d setup
         //
         
-    run()
+    calc3dSetup()
     {
-            // score functions
-
-        if (this.core.isMultiplayer) {
-            if (this.core.input.isKeyDownAndClear('`')) this.showScoreDisplay(!this.scoreShow);
-        }
-        
-            // developer functions
-            
-        if (this.json.developer) this.developer.run();
-
-            // sequences
-            
-        if ((!this.developer.on) && (this.currentSequence!==null)) {
-            if (this.currentSequence.isFinished()) {
-                this.currentSequence.release();
-                this.currentSequence=null;
-            }
-            else {  
-                this.currentSequence.run();
-            }
-        }
-        
-    }
-    
-        //
-        // draw view
-        //
-
-    draw()
-    {
-        let n;
-        let light;
-        let player=this.map.entityList.getPlayer();
-        let developerOn=this.developer.on;
-        let gl=this.core.gl;
-         
-            // everything overdraws except
-            // clear the depth buffer
-            
-        gl.clear(gl.DEPTH_BUFFER_BIT);
-        
-            // if in developer, clear the background
-            // because we can float outside maps without
-            // skies
-          
-        if (developerOn) {
-            gl.clearColor(0.5,0.5,1,0);
-            gl.clear(gl.COLOR_BUFFER_BIT);
-        }
-        
-            // setup the view camera based on
-            // the camera settings and the camera entity
-            
-        if (!developerOn) {
-            this.camera.setup(player);
-        }
-        else {
-            this.camera.setupDeveloper();
-        }
-        
             // create the perspective matrix
             // note this function has a translate in it for NEAR_Z
 
@@ -1105,6 +1036,55 @@ export default class GameClass
             // build the culling frustum
 
         this.buildCullingFrustum();
+    }
+    
+        //
+        // game run
+        //
+        
+    run()
+    {
+            // score functions
+
+        if (this.core.isMultiplayer) {
+            if (this.core.input.isKeyDownAndClear('`')) this.showScoreDisplay(!this.scoreShow);
+        }
+
+            // sequences
+            
+        if (this.currentSequence!==null) {
+            if (this.currentSequence.isFinished()) {
+                this.currentSequence.release();
+                this.currentSequence=null;
+            }
+            else {  
+                this.currentSequence.run();
+            }
+        }
+        
+    }
+    
+        //
+        // draw view
+        //
+
+    draw()
+    {
+        let n;
+        let light;
+        let player=this.map.entityList.getPlayer();
+        let gl=this.core.gl;
+         
+            // everything overdraws except
+            // clear the depth buffer
+            
+        gl.clear(gl.DEPTH_BUFFER_BIT);
+        
+            // setup the view camera based on
+            // the camera settings and the camera entity
+            
+        this.camera.setup(player);
+        this.calc3dSetup();
         
             // run the effect draw setups first
             // so lighting positions are set
@@ -1136,25 +1116,10 @@ export default class GameClass
         
             // draw the map
             
-        if (!developerOn) {
-            this.map.background.draw();
-            this.map.sky.draw();
-            this.map.meshList.drawMap();
-            if (this.map.hasShadowmap) this.map.meshList.drawMapShadow();
-        }
-        else {
-            switch (this.developer.drawMode) {
-                case this.developer.DRAW_MODE_NORMAL:
-                    this.map.meshList.drawMap();
-                    break;
-                case this.developer.DRAW_MODE_SHADOW:
-                    this.map.meshList.drawMapShadow();
-                    break;
-                case this.developer.DRAW_MODE_COLLISION:
-                    this.map.meshList.drawCollisionSurfaces();
-                    break;
-            }
-        }
+        this.map.background.draw();
+        this.map.sky.draw();
+        this.map.meshList.drawMap();
+        if (this.map.hasShadowmap) this.map.meshList.drawMapShadow();
         
             // draw any non held entities
             
@@ -1167,28 +1132,20 @@ export default class GameClass
             // effects
             
         this.map.effectList.draw();
-        if (developerOn) this.map.lightList.draw();
         
             // and finally held entities,
             // clearing the z buffer first
-            // (skip this if in developer)
             
-        if (!developerOn) {
-            gl.clear(gl.DEPTH_BUFFER_BIT);
-            this.map.entityList.draw(player);
-        }
+        gl.clear(gl.DEPTH_BUFFER_BIT);
+        this.map.entityList.draw(player);
         
             // interface
             
-        if ((!developerOn) && (!this.hideUI)) this.core.interface.drawGame();
+        if (!this.hideUI) this.core.interface.drawGame();
         
             // sequences
             
-        if ((!developerOn) && (this.currentSequence!==null)) this.currentSequence.draw();
-        
-            // developer drawing
-            
-        if (developerOn) this.developer.draw();
+        if (this.currentSequence!==null) this.currentSequence.draw();
     }
     
         //
@@ -1309,9 +1266,14 @@ export default class GameClass
         this.map.effectList.cleanUpMarkedAsDeleted();
 
             // time to exit loop?
+            
+        if (this.core.input.isKeyDownAndClear('pageup')) {
+            window.main.core.switchLoop(this.core.LOOP_DEVELOPER,0);
+            return;
+        }
 
-        if (this.core.input.isKeyDown('backspace')) {
-            window.main.core.switchLoop(this.core.LOOP_DIALOG,(this.developer.on?this.core.interface.DIALOG_MODE_DEVELOPER:this.core.interface.DIALOG_MODE_SETTINGS));
+        if (this.core.input.isKeyDownAndClear('backspace')) {
+            window.main.core.switchLoop(this.core.LOOP_DIALOG,this.core.interface.DIALOG_MODE_SETTINGS);
             return;
         }
 

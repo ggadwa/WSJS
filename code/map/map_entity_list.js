@@ -353,11 +353,6 @@ export default class MapEntityListClass
     {
         let entity;
         
-            // entities are stalled
-            // when developer is on
-            
-        if (this.core.game.developer.on) return;
-        
             // run the entities
             
         for (entity of this.entities) {
@@ -383,7 +378,7 @@ export default class MapEntityListClass
                 if (entity.heldBy!==null) continue;
             }
             
-            entity.draw(this.core.game.developer.isEntitySelected(n));
+            entity.draw(this.core.developer.isEntitySelected(n));
         }
     }
 

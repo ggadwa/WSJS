@@ -85,7 +85,7 @@ export default class InterfaceElementClass
         
             // skip if not shown
             
-        if ((!this.show) || (this.core.game.developer.on!==this.developer)) return;
+        if ((!this.show) || (this.core.developer.on!==this.developer)) return;
         
             // handle any pulses
             

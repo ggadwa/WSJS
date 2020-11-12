@@ -150,19 +150,16 @@ export default class MapEffectListClass
         
     draw()
     {
-        let n,effect,bitmap;
+        let effect;
         
-            // regular effect drawing
-            // if the effects are shown, then draw them
-            
-        if (!this.core.game.developer.on) {
-        
-            for (effect of this.effects) {
-                if ((effect.show) && (effect.setupOK)) effect.draw();
-            }
-            
-            return;
+        for (effect of this.effects) {
+            if ((effect.show) && (effect.setupOK)) effect.draw();
         }
+    }
+    
+    drawDeveloper()
+    {
+        let n,effect,bitmap;
         
             // developer draw, just draw icons
             // for where effects are (only draw for
@@ -173,7 +170,7 @@ export default class MapEffectListClass
             
         for (n=0;n!==this.effects.length;n++) {
             effect=this.effects[n];
-            if (effect.mapSpawn) this.core.game.developer.developerSprite.drawBillboardSprite(bitmap,effect.position,this.core.game.developer.isEffectSelected(n));
+            if (effect.mapSpawn) this.core.developer.developerSprite.drawBillboardSprite(bitmap,effect.position,this.core.developer.isEffectSelected(n));
         }
     }
 

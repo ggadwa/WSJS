@@ -1,5 +1,5 @@
 import TitleClass from '../main/title.js';
-import DialogClass from '../dialog/dialog.js';
+import DialogClass from '../main/dialog.js';
 import MapClass from '../map/map.js';
 import BitmapListClass from '../bitmap/bitmap_list.js';
 import SoundListClass from '../sound/sound_list.js';
@@ -12,13 +12,11 @@ import PlaneClass from '../utility/plane.js';
 import ColorClass from '../utility/color.js';
 import Matrix4Class from '../utility/matrix4.js';
 import GameClass from '../main/game.js';
+import DeveloperClass from '../developer/developer.js';
 import InterfaceClass from '../interface/interface.js';
 import InputClass from '../main/input.js';
 import NetworkClass from '../main/network.js';
 import SetupClass from '../main/setup.js';
-import DialogSettingsClass from '../dialog/dialog_settings.js';
-import DialogConnectClass from '../dialog/dialog_connect.js';
-import DialogDeveloperClass from '../dialog/dialog_developer.js';
 
 //
 // core class
@@ -34,6 +32,7 @@ export default class CoreClass
         this.LOOP_TITLE=0;
         this.LOOP_DIALOG=1;
         this.LOOP_GAME=2;
+        this.LOOP_DEVELOPER=3;
         
         this.GL_OPTIONS={
             alpha:false,
@@ -70,11 +69,13 @@ export default class CoreClass
         this.shaderList=null;
         this.modelList=null;
         
-            // the game and map
+            // loops
             
         this.title=null;
         this.dialog=null;
         this.game=null;
+        this.developer=null;
+        
         this.music=null;
         
             // input
@@ -105,9 +106,6 @@ export default class CoreClass
         this.interface=null;
 
         this.setup=null;
-        this.settingsDialog=null;
-        this.connectDialog=null;
-        this.developerDialog=null;
         
             // random numbers
             
@@ -218,20 +216,22 @@ export default class CoreClass
         this.music=new MusicClass(this);
         if (!this.music.initialize()) return;
         
+            // developer
+            
+        this.developer=new DeveloperClass(this);
+        if (!this.developer.initialize()) return(false);
+        
             // create misc objects
             
         this.setup=new SetupClass();
         this.setup.load(this);      // requires game to be initialized, so we do this later
-        
-        this.settingsDialog=new DialogSettingsClass(this);
-        this.connectDialog=new DialogConnectClass(this);
-        this.developerDialog=new DialogDeveloperClass(this);
         
         return(true);
     }
 
     release()
     {
+        this.developer.release();
         this.music.release();
         this.interface.release();
         this.game.release();
@@ -363,11 +363,20 @@ export default class CoreClass
                 break;
                 
             case this.LOOP_GAME:
-                if (this.previousLoop!==this.LOOP_DIALOG) {         // if this is coming from dialog to game, then it's a resume instead of a start
-                    this.game.startLoop();
+                if ((this.previousLoop===this.LOOP_DIALOG) || (this.previousLoop===this.LOOP_DEVELOPER)) {         // if this is coming from dialog or developer to game, then it's a resume instead of a start
+                    this.game.resumeLoop();
                 }
                 else {
-                    this.game.resumeLoop();
+                    this.game.startLoop();
+                }
+                break;
+                
+            case this.LOOP_DEVELOPER:
+                if (this.previousLoop===this.LOOP_DIALOG) {         // if this is coming from dialog to developer, then it's a resume instead of a start
+                    this.developer.resumeLoop();
+                }
+                else {
+                    this.developer.startLoop();
                 }
                 break;
         }
@@ -433,11 +442,14 @@ export default class CoreClass
             case this.LOOP_GAME:
                 this.game.resumeLoop();
                 break;
+            case this.LOOP_DEVELOPER:
+                this.developer.resumeLoop();
+                break;
         }
         
             // resume the sound (if not in developer)
             
-        if (!this.game.developer.on) this.soundList.resume();
+        if (this.currentLoop!==this.LOOP_DEVELOPER) this.soundList.resume();
         
             // and restart the loop
         
@@ -470,6 +482,9 @@ function mainLoop(timestamp)
             break;
         case core.LOOP_GAME:
             if (!core.game.inLoading) core.game.loop();
+            break;
+        case core.LOOP_DEVELOPER:
+            core.developer.loop();
             break;
     }
     

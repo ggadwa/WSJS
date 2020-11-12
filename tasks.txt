@@ -1,13 +1,23 @@
 
 --> development needs only loop
+     * development on core
+     * developerModeExit/Enter
+     * pull apart the loops (instead of developer.on stuff)
+     - replace developer.on with loop check (or just remove after new loop)
+     * get rid of developerDialogs in core
+     - maybe don't need developer flags in interface?
+     - going into dialog stops music
+     - map.entityList.draw(null); needs separate draw for developer
+     - figure out lookdown lock
 --> X for checkboxes
 --> no multiplayer button for non-multiplayer
 --> key nodes editing
---> move dialog to main
 --> remove main (leave only core) -- maybe?
---> remove dialog_connect,_developer,_setting
 
-
+developer keys
+ pageup = enter/exit
+ pagedown = change view type
+ lookdown???
 
 1. fix start game -> end game -> start game problem
 

@@ -247,7 +247,7 @@ export default class MapPathClass
         }
             // and overdraw for selected nodes
             
-        selNodeIdx=this.core.game.developer.getSelectNode();
+        selNodeIdx=this.core.developer.getSelectNode();
         
         if (selNodeIdx!==-1) {
             gl.uniform3f(shader.colorUniform,1.0,1.0,0.0);

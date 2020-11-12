@@ -1041,7 +1041,7 @@ export default class EntityClass
             // entities (as we only edit the map entities,
             // now dynamically spawned ones)
         
-        if (!this.core.game.developer.on) {
+        if (!this.core.developer.on) {
             if (!this.show) return;
             
             if (!this.drawSetup()) return;

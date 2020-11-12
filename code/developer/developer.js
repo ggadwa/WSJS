@@ -47,6 +47,15 @@ export default class DeveloperClass
         this.selectItemIndex=0;
         this.selectVector=new PointClass(0,0,0);
         
+            // loop
+            
+        this.timestamp=0;
+        this.lastSystemTimestamp=0;
+        this.lastRunTimestamp=0;
+        this.lastDrawTimestamp=0;
+        
+        this.exitGame=false;
+        
             // misc drawing class
             
         this.positionText=null;
@@ -637,57 +646,6 @@ export default class DeveloperClass
     }
     
         //
-        // enter/exit developer mode
-        //
-        
-    developerModeEnter()
-    {
-        this.on=true;
-        
-            // attach developer camera to play location
-            
-        this.playerToDeveloper();
-        
-        this.lookDownLock=false;
-        
-            // highlight the map
-            
-        this.lightMinBackup.setFromColor(this.core.game.map.lightList.lightMin);
-        this.lightMaxBackup.setFromColor(this.core.game.map.lightList.lightMax);
-        
-        this.core.game.map.lightList.lightMin.setFromValues(1,1,1);
-        this.core.game.map.lightList.lightMax.setFromValues(1,1,1);
-        
-            // suspect sound
-            
-        this.core.soundList.suspend();
-        
-        console.info('developer mode: on');
-    }
-    
-    developerModeExit()
-    {
-        this.on=false;
-        
-            // reset the player to camera location
-            // and clear input
-            
-        this.developerToPlayer();
-        this.clearInterfaceOutput();
-        
-            // turn off highlight
-            
-        this.core.game.map.lightList.lightMin.setFromColor(this.lightMinBackup);
-        this.core.game.map.lightList.lightMax.setFromColor(this.lightMaxBackup);
-        
-            // resume sound
-            
-        this.core.soundList.resume();
-        
-        console.info('developer mode: off');
-    }
-    
-        //
         // selections
         //
         
@@ -711,7 +669,70 @@ export default class DeveloperClass
         if (this.selectItemType!==this.SELECT_ITEM_NODE) return(-1);
         return(this.selectItemIndex);
     }
+    
+        //
+        // developer loop
+        //
+        
+    startLoop()
+    {
+        this.on=true;
+        
+            // attach developer camera to play location
+            
+        this.playerToDeveloper();
+        
+        this.lookDownLock=false;
+        
+            // highlight the map
+            
+        this.lightMinBackup.setFromColor(this.core.game.map.lightList.lightMin);
+        this.lightMaxBackup.setFromColor(this.core.game.map.lightList.lightMax);
+        
+        this.core.game.map.lightList.lightMin.setFromValues(1,1,1);
+        this.core.game.map.lightList.lightMax.setFromValues(1,1,1);
+        
+            // suspect sound
+            
+        this.core.soundList.suspend();
 
+            // timing setup
+            
+        this.timestamp=0;
+        this.lastSystemTimestamp=Math.trunc(window.performance.now());
+        
+        this.lastRunTimestamp=this.timestamp;
+        this.lastDrawTimestamp=this.timestamp;
+    }
+    
+    resumeLoop()
+    {
+        this.lastSystemTimestamp=Math.trunc(window.performance.now());
+        
+        this.lastRunTimestamp=this.timestamp;
+        this.lastDrawTimestamp=this.timestamp;
+    }
+    
+    resetForGame()
+    {
+        this.on=false;
+        
+            // reset the player to camera location
+            // and clear input
+            
+        this.developerToPlayer();
+        this.clearInterfaceOutput();
+        
+            // turn off highlight
+            
+        this.core.game.map.lightList.lightMin.setFromColor(this.lightMinBackup);
+        this.core.game.map.lightList.lightMax.setFromColor(this.lightMaxBackup);
+        
+            // resume sound
+            
+        this.core.soundList.resume();
+    }
+    
         //
         // developer run
         //
@@ -722,30 +743,7 @@ export default class DeveloperClass
         
             // developer output
         
-        if (this.on) this.setInterfaceOutput();
-        
-            // can run any developer mode is network game
-            
-        if ((this.core.isMultiplayer) && (!this.core.setup.localGame)) return;
-        
-            // turn on/off developer mode
-            
-            // if going into developer mode, put developer
-            // mode position at player, and vice-versa, and
-            // reset all the entities
-            
-        if (input.isKeyDownAndClear('PageUp')) {
-            if (this.on) {
-                this.developerModeExit();
-            }
-            else {
-                this.developerModeEnter();
-            }
-        }
-        
-            // exit if not in developer mode
-            
-        if (!this.on) return;
+        this.setInterfaceOutput();
         
             // move and select
             
@@ -778,15 +776,64 @@ export default class DeveloperClass
         //
         // developer draw
         //
-        
             
     draw()
     {
+        let game=this.core.game;
+        let map=game.map;
         let gl=this.core.gl;
         
+            // developer has clear background
+            
+        gl.clear(gl.DEPTH_BUFFER_BIT);
+        
+        gl.clearColor(0.5,0.5,1,0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+         
+            // developer has static background
+            
+        gl.clear(gl.DEPTH_BUFFER_BIT);
+        gl.clearColor(0.5,0.5,1,0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        
+            // setup the view camera based on
+            // the camera settings and the camera entity
+            
+        game.camera.setupDeveloper();
+        game.calc3dSetup();
+        
+            // no game shader lights
+            
+        game.lights=[];
+
+        while (game.lights.length<this.core.MAX_LIGHT_COUNT) {
+            game.lights.push(null);
+        }
+        
+            // draw the map
+            
+        switch (this.drawMode) {
+            case this.DRAW_MODE_NORMAL:
+                map.meshList.drawMap();
+                break;
+            case this.DRAW_MODE_SHADOW:
+                map.meshList.drawMapShadow();
+                break;
+            case this.DRAW_MODE_COLLISION:
+                map.meshList.drawCollisionSurfaces();
+                break;
+        }
+        
+            // draw any entities and objects
+            
+        map.entityList.draw(null);
+        map.liquidList.draw();
+        map.effectList.drawDeveloper();
+        map.lightList.drawDeveloper();
+    
             // paths and rays
             
-        this.core.game.map.path.drawPath();
+        game.map.path.drawPath();
         this.developerRay.draw();
         
             // text
@@ -809,5 +856,79 @@ export default class DeveloperClass
         gl.disable(gl.BLEND);
         gl.enable(gl.DEPTH_TEST);
     }
+    
+        //
+        // loop
+        //
+        
+    loop()
+    {
+        const PHYSICS_MILLISECONDS=16;
+        const DRAW_MILLISECONDS=16;
+        const BAIL_MILLISECONDS=5000;
+
+        let systemTick,runTick,drawTick;
+
+            // loop uses it's own tick (so it
+            // can be paused, etc) and calculates
+            // it from the system tick
+
+        systemTick=Math.trunc(window.performance.now());
+        this.timestamp+=(systemTick-this.lastSystemTimestamp);
+        this.lastSystemTimestamp=systemTick;
+
+            // map movement, entities, and
+            // other physics, we only do this if we've
+            // moved unto another physics tick
+
+            // this timing needs to be precise so
+            // physics remains constants
+
+        runTick=this.timestamp-this.lastRunTimestamp;
+
+        if (runTick>PHYSICS_MILLISECONDS) {
+
+            if (runTick<BAIL_MILLISECONDS) {       // this is a temporary bail measure in case something held the browser up for a long time
+
+                while (runTick>PHYSICS_MILLISECONDS) {
+                    runTick-=PHYSICS_MILLISECONDS;
+                    this.lastRunTimestamp+=PHYSICS_MILLISECONDS;
+
+                    //this.map.meshList.run();
+                    this.run();
+                    //this.map.entityList.run();
+                }
+            }
+            else {
+                this.lastRunTimestamp=this.timestamp;
+            }
+        }
+
+            // time to exit loop?
+            
+        if (this.core.input.isKeyDownAndClear('pageup')) {
+            this.resetForGame();
+            window.main.core.switchLoop(this.core.LOOP_GAME,0);
+            return;
+        }
+            
+        if (this.core.input.isKeyDownAndClear('backspace')) {
+            window.main.core.switchLoop(this.core.LOOP_DIALOG,this.core.interface.DIALOG_MODE_DEVELOPER);
+            return;
+        }
+
+            // drawing
+
+            // this timing is loose, as it's only there to
+            // draw frames
+
+        drawTick=this.timestamp-this.lastDrawTimestamp;
+        
+        if (drawTick>DRAW_MILLISECONDS) {
+            this.lastDrawTimestamp=this.timestamp; 
+            this.draw();
+        }
+    }
+
 
 }

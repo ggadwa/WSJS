@@ -91,17 +91,17 @@ export default class DialogClass
                     return;
                 }
                 
-                if (this.core.game.developer.on) {
+                if (this.core.currentLoop===this.core.LOOP_DEVELOPER) {
                     if (this.core.interface.developBuildPathHintsButton.cursorInButton(cursor.x,cursor.y)) {
                         this.core.interface.saveDialogControls();
-                        this.core.game.developer.developerBuilders.buildPathHints();
+                        this.core.developer.developerBuilders.buildPathHints();
                         this.exitDialog=true;
                         return;
                     }
                     
                     if (this.core.interface.developBuildShadowMapsButton.cursorInButton(cursor.x,cursor.y)) {
                         this.core.interface.saveDialogControls();
-                        this.core.game.developer.developerBuilders.buildShadowmap(this.core.setup.skipShadowMapNormals);
+                        this.core.developer.developerBuilders.buildShadowmap(this.core.setup.skipShadowMapNormals);
                         this.exitDialog=true;
                         return;
                     }
