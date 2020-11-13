@@ -378,7 +378,19 @@ export default class MapEntityListClass
                 if (entity.heldBy!==null) continue;
             }
             
-            entity.draw(this.core.developer.isEntitySelected(n));
+            entity.draw();
+        }
+    }
+    
+    drawDeveloper(drawSkeletons)
+    {
+        let n,entity;
+        
+        for (n=0;n!==this.entities.length;n++) {
+            entity=this.entities[n];
+            if (entity.heldBy!==null) continue;
+            
+            entity.drawDeveloper(this.core.developer.isEntitySelected(n),drawSkeletons);
         }
     }
 

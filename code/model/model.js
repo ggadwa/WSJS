@@ -81,7 +81,23 @@ export default class ModelClass
         // draw model
         //
 
-    draw(entity,selected)
+    draw(entity)
+    {
+        let modelEntityAlter=entity.modelEntityAlter;
+        
+        modelEntityAlter.setupModelMatrix(true);
+        
+            // models cull on entire model
+            // instead of per mesh
+            
+        if (!modelEntityAlter.boundBoxInFrustum()) return;
+        
+            // draw the meshlist
+        
+        this.meshList.drawModel(modelEntityAlter);
+    }
+    
+    drawDeveloper(entity,selected,drawSkeleton)
     {
         let modelEntityAlter=entity.modelEntityAlter;
         
@@ -98,15 +114,11 @@ export default class ModelClass
         
             // debugging for skeletons
             
-        //modelEntityAlter.setupModelMatrix(false);
-        //modelEntityAlter.drawSkeleton();
+        modelEntityAlter.setupModelMatrix(false);
+        if (drawSkeleton) modelEntityAlter.drawSkeleton();
         
             // developer bounds drawing
-            // note this can't draw held stuff
             
-        if ((this.core.developer.on) && (entity.heldBy===null)) {
-            modelEntityAlter.setupModelMatrix(false);
-            modelEntityAlter.drawBounds(selected);
-        }
+        modelEntityAlter.drawBounds(selected);
     }
 }

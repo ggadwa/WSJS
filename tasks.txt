@@ -1,23 +1,8 @@
 
---> development needs only loop
-     * development on core
-     * developerModeExit/Enter
-     * pull apart the loops (instead of developer.on stuff)
-     - replace developer.on with loop check (or just remove after new loop)
-     * get rid of developerDialogs in core
-     - maybe don't need developer flags in interface?
-     - going into dialog stops music
-     - map.entityList.draw(null); needs separate draw for developer
-     - figure out lookdown lock
---> X for checkboxes
+--> going into dialog stops music
 --> no multiplayer button for non-multiplayer
 --> key nodes editing
 --> remove main (leave only core) -- maybe?
-
-developer keys
- pageup = enter/exit
- pagedown = change view type
- lookdown???
 
 1. fix start game -> end game -> start game problem
 
@@ -25,9 +10,6 @@ developer keys
 12. iPad touchMenuTrigger (redo, search for it)
 
 - multiplayer complete redo
-
-- fix developer breaking with music/keys
-- need float over window for developer UI (do div upper right hand first, draggable later)
 
 - won/lost songs (kart/platformer)
 
@@ -40,7 +22,6 @@ developer keys
 
 DEVELOPER
   - work on developer path split
-  - stop all movements / liquids
 
 PHYSICS
   - fix wacky bumping (if you bump but can't move fully, than completely stop motion -- check stairs)

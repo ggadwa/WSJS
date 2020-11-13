@@ -35,9 +35,9 @@ export default class DeveloperClass
         this.DRAW_MODE_SHADOW=1;
         this.DRAW_MODE_COLLISION=2;
         
-        this.on=false;
-        this.lookDownLock=false;
         this.drawMode=this.DRAW_MODE_NORMAL;
+        this.lookDownLock=false;
+        this.drawSkeletons=false;
         
         this.position=new PointClass(0,0,0);
         this.angle=new PointClass(0,0,0);
@@ -500,24 +500,6 @@ export default class DeveloperClass
         this.position.addPoint(this.movement);
     }
     
-    moveSwitch()
-    {
-        let input=this.core.input;
-        
-        if (input.isKeyDownAndClear('home')) {
-            this.fpsAngle.setFromPoint(this.angle);
-            this.angle.setFromValues(89,0,0);
-            this.lookDownLock=true;
-            return;
-        }
-        
-        if (input.isKeyDownAndClear('delete')) {
-            this.angle.setFromPoint(this.fpsAngle);
-            this.lookDownLock=false;
-            return;
-        }        
-    }
-    
     select()
     {
         let prev,next;
@@ -676,8 +658,6 @@ export default class DeveloperClass
         
     startLoop()
     {
-        this.on=true;
-        
             // attach developer camera to play location
             
         this.playerToDeveloper();
@@ -715,8 +695,6 @@ export default class DeveloperClass
     
     resetForGame()
     {
-        this.on=false;
-        
             // reset the player to camera location
             // and clear input
             
@@ -745,20 +723,25 @@ export default class DeveloperClass
         
         this.setInterfaceOutput();
         
-            // move and select
+            // keys
             
-        this.moveSwitch();
-        if (!this.lookDownLock) {
-            this.fpsMove();
+        if (input.isKeyDownAndClear('delete')) {
+            if (this.lookDownLock) {
+                this.angle.setFromPoint(this.fpsAngle);
+                this.lookDownLock=false;
+            }
+            else {
+                this.fpsAngle.setFromPoint(this.angle);
+                this.angle.setFromValues(89,0,0);
+                this.lookDownLock=true;
+            }
         }
-        else {
-            this.lookDownMove();
-        }
-        this.select();
-        this.pathEditor();
         
-            // draw modes
-            
+        if (input.isKeyDownAndClear('end')) {
+            this.drawSkeletons=!this.drawSkeletons;
+            return;
+        }        
+
         if (input.isKeyDownAndClear('PageDown')) {
             if (this.drawMode===this.DRAW_MODE_NORMAL) {
                 this.drawMode=(this.core.game.map.hasShadowmap)?this.DRAW_MODE_SHADOW:this.DRAW_MODE_COLLISION;
@@ -767,6 +750,17 @@ export default class DeveloperClass
                 this.drawMode=(this.drawMode===this.DRAW_MODE_SHADOW)?this.DRAW_MODE_COLLISION:this.DRAW_MODE_NORMAL;
             }
         }
+        
+            // move and select
+            
+        if (!this.lookDownLock) {
+            this.fpsMove();
+        }
+        else {
+            this.lookDownMove();
+        }
+        this.select();
+        this.pathEditor();
         
             // run the targetting
             
@@ -826,7 +820,7 @@ export default class DeveloperClass
         
             // draw any entities and objects
             
-        map.entityList.draw(null);
+        map.entityList.drawDeveloper(this.drawSkeletons);
         map.liquidList.draw();
         map.effectList.drawDeveloper();
         map.lightList.drawDeveloper();

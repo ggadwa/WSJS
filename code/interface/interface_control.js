@@ -23,6 +23,8 @@ export default class InterfaceControlClass
         this.CONTROL_RAIL_HEIGHT=5;
         this.LIST_INPUT_WIDTH=200;
         this.LIST_CONTROL_WIDTH=20;
+        this.CHECKBOX_HORIZONTAL_MARGIN=4;
+        this.CHECKBOX_VERTICAL_MARGIN=-2;
         
         this.vertexArray=new Float32Array(5*2);
         this.colorArray=new Float32Array(5*4);  // there's an extra to work around the missing pixel problem
@@ -33,6 +35,8 @@ export default class InterfaceControlClass
         
         this.widgetTopColor=new ColorClass(0.7,0.7,1.0);
         this.widgetBottomColor=new ColorClass(0.5,0.5,1.0);
+        this.widgetTopHighlightColor=new ColorClass(0.9,0.75,1.0);
+        this.widgetBottomHighlightColor=new ColorClass(0.8,0.55,1.0);
         this.widgetOutlineColor=new ColorClass(0.0,0.0,0.6);
         this.fillColor=new ColorClass(0.9,0.9,0.9);
         this.outlineColor=new ColorClass(0.5,0.5,0.5);
@@ -91,14 +95,22 @@ export default class InterfaceControlClass
         this.titleText=new InterfaceTextClass(this.core,this.title,0,0,fontSize,align,new ColorClass(1,1,1,1),1,false);
         this.titleText.initialize();
         
-        if ((this.controlType===this.core.interface.CONTROL_TYPE_TEXT) || (this.controlType===this.core.interface.CONTROL_TYPE_LIST)) {
-            align=(this.controlType===this.core.interface.CONTROL_TYPE_TEXT)?this.core.interface.TEXT_ALIGN_LEFT:this.core.interface.TEXT_ALIGN_CENTER;
-            
-            this.valueText=new InterfaceTextClass(this.core,'',0,0,fontSize,align,this.widgetTopColor,1,false);
-            this.valueText.initialize();
-        }
-        else {
-            this.valueText=null;
+        this.valueText=null;
+        
+        switch (this.controlType) {
+            case this.core.interface.CONTROL_TYPE_TEXT:
+                this.valueText=new InterfaceTextClass(this.core,'',0,0,fontSize,this.core.interface.TEXT_ALIGN_LEFT,this.widgetTopColor,1,false);
+                this.valueText.initialize();
+                break;
+            case this.core.interface.CONTROL_TYPE_CHECKBOX:
+                fontSize=Math.trunc(this.CONTROL_HEIGHT*0.98);
+                this.valueText=new InterfaceTextClass(this.core,'',0,0,fontSize,this.core.interface.TEXT_ALIGN_CENTER,this.widgetTopColor,1,false);
+                this.valueText.initialize();
+                break;
+            case this.core.interface.CONTROL_TYPE_LIST:
+                this.valueText=new InterfaceTextClass(this.core,'',0,0,fontSize,this.core.interface.TEXT_ALIGN_CENTER,this.widgetTopColor,1,false);
+                this.valueText.initialize();
+                break;
         }
 
         return(true);
@@ -128,7 +140,7 @@ export default class InterfaceControlClass
         return(true);
     }
     
-    drawHeader(y)
+    drawHeader(y,cursorX,cursorY)
     {
         let x;
         let shader=this.core.shaderList.colorShader;
@@ -149,15 +161,28 @@ export default class InterfaceControlClass
 
             // the fill
             
-        this.colorArray[0]=this.colorArray[4]=this.widgetTopColor.r;
-        this.colorArray[1]=this.colorArray[5]=this.widgetTopColor.g;
-        this.colorArray[2]=this.colorArray[6]=this.widgetTopColor.b;
-        this.colorArray[3]=this.colorArray[7]=1;
+        if ((cursorX<this.TITLE_MARGIN) || (cursorX>(this.core.wid-this.TITLE_MARGIN)) || (cursorY<y) || (cursorY>(y+this.CONTROL_HEIGHT))) { 
+            this.colorArray[0]=this.colorArray[4]=this.widgetTopColor.r;
+            this.colorArray[1]=this.colorArray[5]=this.widgetTopColor.g;
+            this.colorArray[2]=this.colorArray[6]=this.widgetTopColor.b;
+            this.colorArray[3]=this.colorArray[7]=1;
 
-        this.colorArray[8]=this.colorArray[12]=this.widgetBottomColor.r;
-        this.colorArray[9]=this.colorArray[13]=this.widgetBottomColor.g
-        this.colorArray[10]=this.colorArray[14]=this.widgetBottomColor.b;
-        this.colorArray[11]=this.colorArray[15]=1;
+            this.colorArray[8]=this.colorArray[12]=this.widgetBottomColor.r;
+            this.colorArray[9]=this.colorArray[13]=this.widgetBottomColor.g
+            this.colorArray[10]=this.colorArray[14]=this.widgetBottomColor.b;
+            this.colorArray[11]=this.colorArray[15]=1;
+        }
+        else {
+            this.colorArray[0]=this.colorArray[4]=this.widgetTopHighlightColor.r;
+            this.colorArray[1]=this.colorArray[5]=this.widgetTopHighlightColor.g;
+            this.colorArray[2]=this.colorArray[6]=this.widgetTopHighlightColor.b;
+            this.colorArray[3]=this.colorArray[7]=1;
+
+            this.colorArray[8]=this.colorArray[12]=this.widgetBottomHighlightColor.r;
+            this.colorArray[9]=this.colorArray[13]=this.widgetBottomHighlightColor.g
+            this.colorArray[10]=this.colorArray[14]=this.widgetBottomHighlightColor.b;
+            this.colorArray[11]=this.colorArray[15]=1;
+        }
         
         gl.bindBuffer(gl.ARRAY_BUFFER,this.colorBuffer);
         gl.bufferSubData(gl.ARRAY_BUFFER,0,this.colorArray);
@@ -340,43 +365,7 @@ export default class InterfaceControlClass
         gl.bufferSubData(gl.ARRAY_BUFFER,0,this.colorArray);
         
         gl.drawArrays(gl.LINE_LOOP,0,4);
-        
-            // the check
-          
-        if (this.value) {
-            this.vertexArray[0]=this.vertexArray[6]=(x+this.TITLE_MARGIN)+this.CHECKBOX_MARGIN;
-            this.vertexArray[1]=this.vertexArray[3]=y+this.CHECKBOX_MARGIN;
-            this.vertexArray[2]=this.vertexArray[4]=((x+this.TITLE_MARGIN)+this.CONTROL_HEIGHT)-this.CHECKBOX_MARGIN;
-            this.vertexArray[5]=this.vertexArray[7]=(y+this.CONTROL_HEIGHT)-this.CHECKBOX_MARGIN;
 
-            gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
-            gl.bufferSubData(gl.ARRAY_BUFFER,0,this.vertexArray);
-
-            this.colorArray[0]=this.colorArray[4]=this.widgetBottomColor.r;
-            this.colorArray[1]=this.colorArray[5]=this.widgetBottomColor.g;
-            this.colorArray[2]=this.colorArray[6]=this.widgetBottomColor.b;
-            this.colorArray[3]=this.colorArray[7]=1;
-
-            this.colorArray[8]=this.colorArray[12]=this.widgetTopColor.r;
-            this.colorArray[9]=this.colorArray[13]=this.widgetTopColor.g
-            this.colorArray[10]=this.colorArray[14]=this.widgetTopColor.b;
-            this.colorArray[11]=this.colorArray[15]=1;
-
-            gl.bindBuffer(gl.ARRAY_BUFFER,this.colorBuffer);
-            gl.bufferSubData(gl.ARRAY_BUFFER,0,this.colorArray);
-
-            gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_SHORT,0);
-            
-            this.colorArray[0]=this.colorArray[4]=this.colorArray[8]=this.colorArray[12]=this.widgetOutlineColor.r;
-            this.colorArray[1]=this.colorArray[5]=this.colorArray[9]=this.colorArray[13]=this.widgetOutlineColor.g;
-            this.colorArray[2]=this.colorArray[6]=this.colorArray[10]=this.colorArray[14]=this.widgetOutlineColor.b;
-            this.colorArray[3]=this.colorArray[7]=this.colorArray[11]=this.colorArray[15]=1;
-            
-            gl.bufferSubData(gl.ARRAY_BUFFER,0,this.colorArray);
-            
-            gl.drawArrays(gl.LINE_LOOP,0,4);
-        }
-        
             // remove the buffers
 
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
@@ -388,9 +377,14 @@ export default class InterfaceControlClass
             
         this.titleText.x=x-this.TITLE_MARGIN;
         this.titleText.y=(y+this.CONTROL_HEIGHT)-this.FONT_MARGIN;
+        
+        this.valueText.x=(x+Math.trunc(this.CONTROL_HEIGHT*0.5))+this.CHECKBOX_HORIZONTAL_MARGIN;
+        this.valueText.y=(y+this.CONTROL_HEIGHT)-this.CHECKBOX_VERTICAL_MARGIN;
+        this.valueText.str='X';
             
         this.core.shaderList.textShader.drawStart();
         this.titleText.draw();
+        if (this.value) this.valueText.draw();
         this.core.shaderList.textShader.drawStart();
         
         return((y+this.CONTROL_HEIGHT)+this.HEIGHT_MARGIN);
@@ -726,7 +720,7 @@ export default class InterfaceControlClass
         
         switch (this.controlType) {
             case this.core.interface.CONTROL_TYPE_HEADER:
-                return(this.drawHeader(y));
+                return(this.drawHeader(y,cursorX,cursorY));
             case this.core.interface.CONTROL_TYPE_TEXT:
                 return(this.drawTextInput(y));
             case this.core.interface.CONTROL_TYPE_CHECKBOX:

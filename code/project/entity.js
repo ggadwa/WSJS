@@ -1028,34 +1028,38 @@ export default class EntityClass
         // draw entity
         //
     
-    draw(selected)
+    draw()
     {
         if (this.model===null) return;
         
-            // if regular drawing, skip if we aren't
-            // showing, or the draw setup returns false
+            // skip if we aren't showing, or the draw setup returns false
             // otherwise calc the animation and draw
-            //
-            // if in development mode, always draw at
-            // starting position and skip any non-map spawn
-            // entities (as we only edit the map entities,
-            // now dynamically spawned ones)
         
-        if (!this.core.developer.on) {
-            if (!this.show) return;
-            
-            if (!this.drawSetup()) return;
-            this.modelEntityAlter.runAnimation();
-        }
-        else {
-            if (!this.mapSpawn) return;
-            
-            this.drawSetupDeveloper();
-            this.modelEntityAlter.runAninimationDeveloper();
-        }
+        if (!this.show) return;
+
+        if (!this.drawSetup()) return;
+        this.modelEntityAlter.runAnimation();
         
             // draw the model
             
-        this.model.draw(this,selected);
+        this.model.draw(this);
+    }
+    
+    drawDeveloper(selected,drawSkeleton)
+    {
+        if (this.model===null) return;
+        
+            // always draw at starting position and skip any non-map spawn
+            // entities (as we only edit the map entities, now dynamically
+            // spawned ones)
+        
+        if (!this.mapSpawn) return;
+
+        this.drawSetupDeveloper();
+        this.modelEntityAlter.runAninimationDeveloper();
+        
+            // draw the model
+            
+        this.model.drawDeveloper(this,selected,drawSkeleton);
     }
 }

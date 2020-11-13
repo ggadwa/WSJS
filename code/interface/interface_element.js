@@ -85,7 +85,8 @@ export default class InterfaceElementClass
         
             // skip if not shown
             
-        if ((!this.show) || (this.core.developer.on!==this.developer)) return;
+        if (!this.show) return;
+        if ((this.developer) && (this.core.currentLoop!==this.core.LOOP_DEVELOPER)) return;
         
             // handle any pulses
             

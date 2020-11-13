@@ -867,7 +867,7 @@ export default class InterfaceClass
                 }
             }
             
-            if (this.core.developer.on) {
+            if (this.core.currentLoop===this.core.LOOP_DEVELOPER) {
                 this.developBuildPathHintsButton.draw(this.cursor.x,this.cursor.y);
                 this.developBuildShadowMapsButton.draw(this.cursor.x,this.cursor.y);
             }

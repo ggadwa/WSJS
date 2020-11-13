@@ -1,0 +1,11 @@
+--------------
+Developer Keys
+--------------
+
+PgUp = enter/exit developer mode
+PgDn = switch map view type (normal, shadow map, collision surfaces)
+Delete = switch fps/look down view
+End = switch drawing skeletons
+Backspace = developer dialog
+
+
