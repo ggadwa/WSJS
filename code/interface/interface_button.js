@@ -95,16 +95,16 @@ export default class InterfaceButtonClass
         // clicking
         //
         
-    cursorInButton(cursorX,cursorY)
+    cursorInButton()
     {
-        return((cursorX>=this.lft) && (cursorX<this.rgt) && (cursorY>=this.top) && (cursorY<this.bot));
+        return((this.core.interface.cursor.x>=this.lft) && (this.core.interface.cursor.x<this.rgt) && (this.core.interface.cursor.y>=this.top) && (this.core.interface.cursor.y<this.bot));
     }
     
         //
         // drawing
         //
         
-    draw(cursorX,cursorY)
+    draw()
     {
         let shader=this.core.shaderList.colorShader;
         let gl=this.core.gl;
@@ -116,7 +116,7 @@ export default class InterfaceButtonClass
         
             // button fill
         
-        if (!this.cursorInButton(cursorX,cursorY)) {
+        if (!this.cursorInButton()) {
             this.colorArray[0]=this.colorArray[4]=0.7;
             this.colorArray[1]=this.colorArray[5]=0.2;
             this.colorArray[2]=this.colorArray[6]=1;

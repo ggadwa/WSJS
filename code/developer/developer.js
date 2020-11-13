@@ -239,29 +239,6 @@ export default class DeveloperClass
             return;
         }
         
-            // u key adds a key to selected node
-            // leave blank to delete
-            
-        if (input.isKeyDownAndClear('u')) {
-            selNodeIdx=this.getSelectNode();
-            if (selNodeIdx===-1) return;
-            
-            node=path.nodes[selNodeIdx];
-            
-            rtn=prompt('Enter the key name',((node.key===null)?'':node.key));
-            if (rtn===null) return;
-            
-            if (rtn==='') {
-                node.key=null;
-                console.info('Removed key from '+selNodeIdx);
-                return;
-            }
-
-            node.key=rtn;
-            console.info('Added key '+node.key+' to '+selNodeIdx);
-            return;
-        }
-        
             // \ key deletes selected node
             
         if (input.isKeyDownAndClear('\\')) {
@@ -307,6 +284,23 @@ export default class DeveloperClass
            
            return;
         }
+    }
+    
+    getSelectedNodeKey()
+    {
+        let key;
+        let selNodeIdx=this.getSelectNode();
+        
+        if (selNodeIdx===-1) return('');
+
+        key=this.core.game.map.path.nodes[selNodeIdx].key;
+        return((key===null)?'':key);
+    }
+    
+    setSelectedNodeKey(key)
+    {
+        let selNodeIdx=this.getSelectNode();
+        if (selNodeIdx!==-1) this.core.game.map.path.nodes[selNodeIdx].key=(key==='')?null:key;
     }
     
         //
@@ -725,6 +719,17 @@ export default class DeveloperClass
         
             // keys
             
+        if (this.core.input.isKeyDownAndClear('pageup')) {
+            this.resetForGame();
+            window.main.core.switchLoop(this.core.LOOP_GAME,0,false);
+            return(false);
+        }
+            
+        if (this.core.input.isKeyDownAndClear('backspace')) {
+            window.main.core.switchLoop(this.core.LOOP_DIALOG,this.core.dialog.DIALOG_MODE_DEVELOPER,false);
+            return(false);
+        }
+
         if (input.isKeyDownAndClear('delete')) {
             if (this.lookDownLock) {
                 this.angle.setFromPoint(this.fpsAngle);
@@ -739,7 +744,6 @@ export default class DeveloperClass
         
         if (input.isKeyDownAndClear('end')) {
             this.drawSkeletons=!this.drawSkeletons;
-            return;
         }        
 
         if (input.isKeyDownAndClear('PageDown')) {
@@ -765,6 +769,8 @@ export default class DeveloperClass
             // run the targetting
             
         this.developerRay.run(this.position,this.angle);
+        
+        return(true);
     }
     
         //
@@ -888,27 +894,12 @@ export default class DeveloperClass
                     runTick-=PHYSICS_MILLISECONDS;
                     this.lastRunTimestamp+=PHYSICS_MILLISECONDS;
 
-                    //this.map.meshList.run();
-                    this.run();
-                    //this.map.entityList.run();
+                    if (!this.run()) return;        // returns false if we are changing loop
                 }
             }
             else {
                 this.lastRunTimestamp=this.timestamp;
             }
-        }
-
-            // time to exit loop?
-            
-        if (this.core.input.isKeyDownAndClear('pageup')) {
-            this.resetForGame();
-            window.main.core.switchLoop(this.core.LOOP_GAME,0);
-            return;
-        }
-            
-        if (this.core.input.isKeyDownAndClear('backspace')) {
-            window.main.core.switchLoop(this.core.LOOP_DIALOG,this.core.interface.DIALOG_MODE_DEVELOPER);
-            return;
         }
 
             // drawing

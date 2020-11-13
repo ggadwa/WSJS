@@ -1,15 +1,18 @@
 
---> going into dialog stops music
---> no multiplayer button for non-multiplayer
---> key nodes editing
+
+--> add join server / local game dialog buttons (put local on left)
+    --> get rid of local checkbox
+--> redo the multiplayer (local) part
 --> remove main (leave only core) -- maybe?
+--> going into dialog stops music
+--> runMultiplayerSyncError redo all this
+--> network class to game class (instead of core)
 
 1. fix start game -> end game -> start game problem
 
 4. title needs to work on iPad
 12. iPad touchMenuTrigger (redo, search for it)
 
-- multiplayer complete redo
 
 - won/lost songs (kart/platformer)
 

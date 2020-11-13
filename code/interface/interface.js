@@ -43,16 +43,6 @@ export default class InterfaceClass
         
         this.POSITION_MODE_LIST=['topLeft','topRight','bottomLeft','bottomRight','middle'];
         
-        this.CONTROL_TYPE_HEADER=0;
-        this.CONTROL_TYPE_TEXT=1;
-        this.CONTROL_TYPE_CHECKBOX=2;
-        this.CONTROL_TYPE_RANGE=3;
-        this.CONTROL_TYPE_LIST=4;
-        
-        this.DIALOG_MODE_SETTINGS=0;
-        this.DIALOG_MODE_MULTIPLAYER=1;
-        this.DIALOG_MODE_DEVELOPER=2;
-        
         this.core=core;
         
         this.background=null;
@@ -61,14 +51,6 @@ export default class InterfaceClass
         this.counts=new Map();
         this.texts=new Map();
         this.fpsText=null;
-        this.playButton=null;
-        this.multiplayerButton=null;
-        this.optionButton=null;
-        this.cancelButton=null;
-        this.okButton=null;
-        this.developBuildPathHintsButton=null;
-        this.developBuildShadowMapsButton=null;
-        this.controls=new Map();
             
         this.uiTextColor=new ColorClass(1,1,0);
         
@@ -81,10 +63,6 @@ export default class InterfaceClass
         this.touchStickRight=null;
         this.touchButtonMenu=null;
         
-        this.scrollTop=0;                       // scrolling in dialog
-        this.currentOpenHeaderControl=null;     // open header in dialog
-        this.currentTextInputControl=null;      // current text input in dialog
-        
         Object.seal(this);
     }
     
@@ -94,7 +72,7 @@ export default class InterfaceClass
 
     async initialize()
     {
-        let hitSize,hitMargin,y;
+        let hitSize,hitMargin;
         let game=this.core.game;
         
             // clear all current elements and texts
@@ -139,91 +117,17 @@ export default class InterfaceClass
         this.touchButtonMenu=new InterfaceTouchButtonClass(this.core,'textures/ui_touch_menu.png',new PointClass(game.json.config.touchMenuPosition[0],game.json.config.touchMenuPosition[1],0),game.json.config.touchButtonSize);
         if (!(await this.touchButtonMenu.initialize())) return(false);
         
-            // buttons
-            
-        y=0.66;
-        
-        this.playButton=new InterfaceButtonClass(this.core,0.75,y,0.24,0.1,'Play');
-        if (!this.playButton.initialize()) return(false);
-        
-        y+=0.11;
-        
-        this.multiplayerButton=new InterfaceButtonClass(this.core,0.75,y,0.24,0.1,'Multiplayer');
-        if (!this.multiplayerButton.initialize()) return(false);
-            
-        y+=0.11;
-        
-        this.optionButton=new InterfaceButtonClass(this.core,0.75,y,0.24,0.1,'Setup');
-        if (!this.optionButton.initialize()) return(false);
-
-        this.cancelButton=new InterfaceButtonClass(this.core,0.78,0.93,0.1,0.05,'Cancel');
-        if (!this.cancelButton.initialize()) return(false);
-        
-        this.okButton=new InterfaceButtonClass(this.core,0.89,0.93,0.1,0.05,'Ok');
-        if (!this.okButton.initialize()) return(false);
-        
-        this.developBuildPathHintsButton=new InterfaceButtonClass(this.core,0.01,0.93,0.2,0.05,'Build Path Hints');
-        if (!this.developBuildPathHintsButton.initialize()) return(false);
-        
-        this.developBuildShadowMapsButton=new InterfaceButtonClass(this.core,0.22,0.93,0.2,0.05,'Build Shadow Maps');
-        if (!this.developBuildShadowMapsButton.initialize()) return(false);
-        
             // fps
             
         this.fpsText=new InterfaceTextClass(this.core,'',(this.core.wid-5),23,20,this.core.interface.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1,true);
         this.fpsText.initialize();
-        
-            // controls
-            
-        this.controls.clear();
-        
-            // profile
-            
-        if (!this.addDialogControl('head_profile',this.CONTROL_TYPE_HEADER,'Profile',null)) return(false);
-        if (!this.addDialogControl('name',this.CONTROL_TYPE_TEXT,'Name:',null)) return(false);
-        if (!this.addDialogControl('showFPS',this.CONTROL_TYPE_CHECKBOX,'Show FPS:',null)) return(false);
-        
-            // movement
-            
-        if (!this.addDialogControl('head_movement',this.CONTROL_TYPE_HEADER,'Movement',null)) return(false);
-        
-        if (!this.addDialogControl('mouseXSensitivity',this.CONTROL_TYPE_RANGE,'Mouse X Sensitivity:',null)) return(false);
-        if (!this.addDialogControl('mouseXAcceleration',this.CONTROL_TYPE_RANGE,'Mouse X Acceleration:',null)) return(false);
-        if (!this.addDialogControl('mouseXInvert',this.CONTROL_TYPE_CHECKBOX,'Invert Mouse X:',null)) return(false);
-        if (!this.addDialogControl('mouseYSensitivity',this.CONTROL_TYPE_RANGE,'Mouse Y Sensitivity:',null)) return(false);
-        if (!this.addDialogControl('mouseYAcceleration',this.CONTROL_TYPE_RANGE,'Mouse Y Acceleration:',null)) return(false);
-        if (!this.addDialogControl('mouseYInvert',this.CONTROL_TYPE_CHECKBOX,'Invert Mouse Y:',null)) return(false);
-        if (!this.addDialogControl('touchStickXSensitivity',this.CONTROL_TYPE_RANGE,'Touch Stick X Sensitivity:',null)) return(false);
-        if (!this.addDialogControl('touchStickYSensitivity',this.CONTROL_TYPE_RANGE,'Touch Stick Y Sensitivity:',null)) return(false);
-        if (!this.addDialogControl('snapLook',this.CONTROL_TYPE_CHECKBOX,'Snap Look:',null)) return(false);
-        
-            // sound
-            
-        if (!this.addDialogControl('head_sound',this.CONTROL_TYPE_HEADER,'Sound',null)) return(false);
-        if (!this.addDialogControl('soundVolume',this.CONTROL_TYPE_RANGE,'Sound Volume:',null)) return(false);
-        if (!this.addDialogControl('musicVolume',this.CONTROL_TYPE_RANGE,'Music Volume:',null)) return(false);
-        if (!this.addDialogControl('musicOn',this.CONTROL_TYPE_CHECKBOX,'Music:',null)) return(false);
-        
-            // multiplayer
-            
-        if (!this.addDialogControl('head_multiplayer',this.CONTROL_TYPE_HEADER,'Multiplayer',null)) return(false);
-        if (!this.addDialogControl('localGame',this.CONTROL_TYPE_CHECKBOX,'Local Game:',null)) return(false);
-        if (!this.addDialogControl('botCount',this.CONTROL_TYPE_LIST,'Bot Count:',[0,1,2,3,4,5,6,7,8,9])) return(false);
-        if (!this.addDialogControl('botSkill',this.CONTROL_TYPE_LIST,'Bot Skill:',['Easy','Moderate','Normal','Skilled','Hard'])) return(false);
-        if (!this.addDialogControl('serverURL',this.CONTROL_TYPE_TEXT,'Server URL:',null)) return(false);
-        
-            // developer
-            
-        if (!this.addDialogControl('head_developer',this.CONTROL_TYPE_HEADER,'Developer',null)) return(false);
-        if (!this.addDialogControl('nodeKey',this.CONTROL_TYPE_TEXT,'Current Node Key:',null)) return(false);
-        if (!this.addDialogControl('skipShadowMapNormals',this.CONTROL_TYPE_CHECKBOX,'Skip Normals on Shadowmap Build:',null)) return(false);
 
         return(true);
     }
 
     release()
     {
-        let element,count,text,control;
+        let element,count,text;
         
         this.liquid.release();
         
@@ -247,20 +151,6 @@ export default class InterfaceClass
             text.release();
         }
         
-            // buttons and controls
-            
-        this.optionButton.release();
-        this.playButton.release();
-        this.multiplayerButton.release();
-        this.cancelButton.release();
-        this.okButton.release();
-        this.developBuildPathHintsButton.release();
-        this.developBuildShadowMapsButton.release();
-        
-        for (control of this.controls) {
-            control.release();
-        }
-        
         this.fpsText.release();
         
             // background and cursor
@@ -272,128 +162,7 @@ export default class InterfaceClass
             
         this.deleteFontTexture();
     }
-    
-        //
-        // dialog controls
-        //
         
-    addDialogControl(id,controlType,title,list)
-    {
-        let control;
-        
-        control=new InterfaceControlClass(this.core,controlType,title,list);
-        if (!control.initialize()) return(false);
-        this.controls.set(id,control);
-        
-        return(true);
-    }
-    
-    setDialogControl(id,value)
-    {
-        this.controls.get(id).value=value;
-    }
-    
-    getDialogControl(id)
-    {
-        return(this.controls.get(id).value);
-    }
-    
-    loadDialogControls(mode)
-    {
-            // dialog modes
-            
-        switch (mode) {
-            
-            case this.DIALOG_MODE_SETTINGS:
-                this.currentOpenHeaderControl=this.controls.get('head_profile');
-                this.controls.get('head_profile').show=true;
-                this.controls.get('head_movement').show=true;
-                this.controls.get('head_sound').show=true;
-                this.controls.get('head_multiplayer').show=false;
-                this.controls.get('head_developer').show=false;
-                break;
-                
-            case this.DIALOG_MODE_MULTIPLAYER:
-                this.currentOpenHeaderControl=this.controls.get('head_multiplayer');
-                this.controls.get('head_profile').show=false;
-                this.controls.get('head_movement').show=false;
-                this.controls.get('head_sound').show=false;
-                this.controls.get('head_multiplayer').show=true;
-                this.controls.get('head_developer').show=false;
-                break;
-                
-            case this.DIALOG_MODE_DEVELOPER:
-                this.currentOpenHeaderControl=this.controls.get('head_developer');
-                this.controls.get('head_profile').show=false;
-                this.controls.get('head_movement').show=false;
-                this.controls.get('head_sound').show=false;
-                this.controls.get('head_multiplayer').show=false;
-                this.controls.get('head_developer').show=true;
-                break;
-        }
-
-            // no text input
-            
-        this.currentTextInputControl=null;
-        
-            // the values
-
-        this.setDialogControl('name',this.core.setup.name);
-        this.setDialogControl('showFPS',this.core.setup.showFPS);
-        
-        this.setDialogControl('mouseXSensitivity',Math.trunc(this.core.setup.mouseXSensitivity*100));
-        this.setDialogControl('mouseXAcceleration',Math.trunc(this.core.setup.mouseXAcceleration*100));
-        this.setDialogControl('mouseXInvert',this.core.setup.mouseXInvert);
-        this.setDialogControl('mouseYSensitivity',Math.trunc(this.core.setup.mouseYSensitivity*100));
-        this.setDialogControl('mouseYAcceleration',Math.trunc(this.core.setup.mouseYAcceleration*100));
-        this.setDialogControl('mouseYInvert',this.core.setup.mouseYInvert);
-        this.setDialogControl('touchStickXSensitivity',Math.trunc(this.core.setup.touchStickXSensitivity*100));
-        this.setDialogControl('touchStickYSensitivity',Math.trunc(this.core.setup.touchStickYSensitivity*100));
-        
-        this.setDialogControl('snapLook',this.core.setup.snapLook);
-        
-        this.setDialogControl('soundVolume',Math.trunc(this.core.setup.soundVolume*100));
-        this.setDialogControl('musicVolume',Math.trunc(this.core.setup.musicVolume*100));
-        this.setDialogControl('musicOn',this.core.setup.musicOn);
-        
-        this.setDialogControl('localGame',this.core.setup.localGame);
-        this.setDialogControl('botCount',this.core.setup.botCount);
-        this.setDialogControl('botSkill',this.core.setup.botSkill);
-        this.setDialogControl('serverURL',this.core.setup.serverURL);
-        
-        this.setDialogControl('skipShadowMapNormals',this.core.setup.skipShadowMapNormals);
-    }
-    
-    saveDialogControls()
-    {
-        this.core.setup.name=this.getDialogControl('name');
-        this.core.setup.showFPS=this.getDialogControl('showFPS');
-        
-        this.core.setup.mouseXSensitivity=this.getDialogControl('mouseXSensitivity')/100;
-        this.core.setup.mouseXAcceleration=this.getDialogControl('mouseXAcceleration')/100;
-        this.core.setup.mouseXInvert=this.getDialogControl('mouseXInvert');
-        this.core.setup.mouseYSensitivity=this.getDialogControl('mouseYSensitivity')/100;
-        this.core.setup.mouseYAcceleration=this.getDialogControl('mouseYAcceleration')/100;
-        this.core.setup.mouseYInvert=this.getDialogControl('mouseYInvert');
-        this.core.setup.touchStickXSensitivity=this.getDialogControl('touchStickXSensitivity')/100;
-        this.core.setup.touchStickYSensitivity=this.getDialogControl('touchStickYSensitivity')/100;
-        
-        this.core.setup.snapLook=this.getDialogControl('snapLook');
-        
-        this.core.setup.soundVolume=this.getDialogControl('soundVolume')/100;
-        this.core.setup.musicVolume=this.getDialogControl('musicVolume')/100;
-        this.core.setup.musicOn=this.getDialogControl('musicOn');
-        
-        this.core.setup.localGame=this.getDialogControl('localGame');
-        this.core.setup.botCount=this.getDialogControl('botCount');
-        this.core.setup.botSkill=this.getDialogControl('botSkill');
-        this.core.setup.serverURL=this.getDialogControl('serverURL');
-        
-        this.core.setup.skipShadowMapNormals=this.getDialogControl('skipShadowMapNormals');
-        
-        this.core.setup.save(this.core);
-    }
-    
         //
         // build font bitmap
         //
@@ -764,121 +533,6 @@ export default class InterfaceClass
             
             this.core.shaderList.interfaceShader.drawEnd();
         }
-
-        gl.disable(gl.BLEND);
-        gl.enable(gl.DEPTH_TEST);
-    }
-    
-        //
-        // title + dialog clicking and drawing
-        //
-    
-    clickUI()
-    {
-        let key,control,show;
-        
-        show=false;
-
-        for ([key,control] of this.controls) {
-            if (control.controlType===this.core.interface.CONTROL_TYPE_HEADER) {
-                if (!control.show) {
-                    show=false;
-                }
-                else {
-                    show=(this.currentOpenHeaderControl===control);
-                    if (control.click(this.cursor.x,this.cursor.y)) return(true);
-                }
-            }
-            else {
-                if (show) {
-                    if (control.click(this.cursor.x,this.cursor.y)) return(true);
-                }
-            }
-        }
-        
-        return(false);
-    }
-    
-    keyUI()
-    {
-        let key;
-        
-        if (this.currentTextInputControl===null) return;
-        
-        key=this.core.input.keyGetLastRaw();
-        if (key===null) return;
-        
-        console.info('got key='+key);
-        
-        if (key.toLowerCase()==='backspace') {
-            if (this.currentTextInputControl.value.length>0) {
-                this.currentTextInputControl.value=this.currentTextInputControl.value.substring(0,(this.currentTextInputControl.value.length-1));
-            }
-            return;
-        }
-        
-        if (((key>='a') && (key<='z')) || ((key>='A') && (key<='Z')) || ((key>='0') && (key<='9'))) {
-            this.currentTextInputControl.value+=key;
-        }
-    }
-    
-    drawUI(inDialog)
-    {
-        let y,key,control,show;
-        let gl=this.core.gl;
-        
-        gl.disable(gl.DEPTH_TEST);
-        
-        gl.enable(gl.BLEND);
-        gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
-        
-            // NOTE: These set shaders on each draw because
-            // we don't need the speed boost here and UI has
-            // multiple different shaders
-        
-            // background
-         
-        this.background.draw(inDialog);
-                    
-            // pieces
-            
-        if (!inDialog) {
-            this.playButton.draw(this.cursor.x,this.cursor.y);
-            this.multiplayerButton.draw(this.cursor.x,this.cursor.y);
-            this.optionButton.draw(this.cursor.x,this.cursor.y);
-        }
-        else {
-            y=this.scrollTop+5;
-            
-            show=false;
-
-            for ([key,control] of this.controls) {
-                if (control.controlType===this.core.interface.CONTROL_TYPE_HEADER) {
-                    if (!control.show) {
-                        show=false;
-                    }
-                    else {
-                        show=(this.currentOpenHeaderControl===control);
-                        y=control.draw(y,this.cursor.x,this.cursor.y);
-                    }
-                }
-                else {
-                    if (show) y=control.draw(y,this.cursor.x,this.cursor.y);
-                }
-            }
-            
-            if (this.core.currentLoop===this.core.LOOP_DEVELOPER) {
-                this.developBuildPathHintsButton.draw(this.cursor.x,this.cursor.y);
-                this.developBuildShadowMapsButton.draw(this.cursor.x,this.cursor.y);
-            }
-            
-            this.cancelButton.draw(this.cursor.x,this.cursor.y);
-            this.okButton.draw(this.cursor.x,this.cursor.y);
-        }
-        
-            // cursor
-        
-        if (!this.core.input.hasTouch) this.cursor.draw();
 
         gl.disable(gl.BLEND);
         gl.enable(gl.DEPTH_TEST);

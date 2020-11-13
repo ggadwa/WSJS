@@ -314,7 +314,7 @@ export default class EntityFPSPlayerClass extends EntityClass
             
         this.telefragTriggerEntity=null;
             
-        if (this.core.isMultiplayer) this.moveToRandomNode(false);
+        if (this.core.game.multiplayer) this.moveToRandomNode(false);
         
             // turn off any score display
             
@@ -549,7 +549,7 @@ export default class EntityFPSPlayerClass extends EntityClass
             
                 // only recover in multiplayer
                 
-            if (this.isMultiplayer()) {
+            if (this.core.game.multiplayer) {
                 if (this.core.game.timestamp>this.respawnTick)  this.ready();
             }
             

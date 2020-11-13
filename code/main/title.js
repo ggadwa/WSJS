@@ -1,5 +1,6 @@
 import ColorClass from '../utility/color.js';
 import BitmapInterfaceClass from '../bitmap/bitmap_interface.js';
+import InterfaceButtonClass from '../interface/interface_button.js';
 
 export default class TitleClass
 {
@@ -15,8 +16,9 @@ export default class TitleClass
         
         this.clickDown=false;
         
-        this.runDialog=false;
-        this.runGame=false;
+        this.playButton=null;
+        this.multiplayerButton=null;
+        this.setupButton=null;
         
         Object.seal(this);
     }
@@ -27,11 +29,33 @@ export default class TitleClass
     
     async initialize()
     {
+        this.playButton=new InterfaceButtonClass(this.core,this.core.game.json.title.playButton.x,this.core.game.json.title.playButton.y,this.core.game.json.title.playButton.width,this.core.game.json.title.playButton.height,this.core.game.json.title.playButton.title);
+        if (!this.playButton.initialize()) return(false);
+        
+        if (this.core,this.core.game.json.title.multiplayerButton.show) {
+            this.multiplayerButton=new InterfaceButtonClass(this.core,this.core.game.json.title.multiplayerButton.x,this.core.game.json.title.multiplayerButton.y,this.core.game.json.title.multiplayerButton.width,this.core.game.json.title.multiplayerButton.height,this.core.game.json.title.multiplayerButton.title);
+            if (!this.multiplayerButton.initialize()) return(false);
+        }
+        else {
+            this.multiplayerButton=null;
+        }
+        
+        if (this.core,this.core.game.json.title.setupButton.show) {
+            this.setupButton=new InterfaceButtonClass(this.core,this.core.game.json.title.setupButton.x,this.core.game.json.title.setupButton.y,this.core.game.json.title.setupButton.width,this.core.game.json.title.setupButton.height,this.core.game.json.title.setupButton.title);
+            if (!this.setupButton.initialize()) return(false);
+        }
+        else {
+            this.setupButton=null;
+        }
+        
         return(true);
     }
     
     release()
     {
+        this.playButton.release();
+        if (this.mulmultiplayerButton!==null) this.multiplayerButton.release();
+        if (this.setupButton!==null) this.setupButton.release();
     }
     
         //
@@ -51,16 +75,28 @@ export default class TitleClass
             if (this.clickDown) {
                 this.clickDown=false;
                 
-                if (this.core.interface.optionButton.cursorInButton(cursor.x,cursor.y)) {
-                    this.runDialog=true;
-                    return;
+                if (this.playButton.cursorInButton()) {
+                    window.main.core.switchLoop(this.core.LOOP_GAME,0,false);
+                    return(false);
                 }
-                if (this.core.interface.playButton.cursorInButton(cursor.x,cursor.y)) {
-                    this.runGame=true;
-                    return;
+                
+                if (this.multiplayerButton!==null) {
+                    if (this.multiplayerButton.cursorInButton()) {
+                        window.main.core.switchLoop(this.core.LOOP_DIALOG,this.core.dialog.DIALOG_MODE_MULTIPLAYER,false);
+                        return(false);
+                    }
+                }
+                
+                if (this.setupButton!==null) {
+                    if (this.setupButton.cursorInButton()) {
+                        window.main.core.switchLoop(this.core.LOOP_DIALOG,this.core.dialog.DIALOG_MODE_SETTINGS,false);
+                        return(false);
+                    }
                 }
             }
         }
+        
+        return(true);
     }
     
         //
@@ -69,8 +105,35 @@ export default class TitleClass
         
     draw()
     {
+        let gl=this.core.gl;
+        
         this.core.orthoMatrix.setOrthoMatrix(this.core.wid,this.core.high,-1.0,1.0);
-        this.core.interface.drawUI(false);
+        
+        gl.disable(gl.DEPTH_TEST);
+        
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+        
+            // NOTE: These set shaders on each draw because
+            // we don't need the speed boost here and UI has
+            // multiple different shaders
+        
+            // background
+         
+        this.core.interface.background.draw(false);
+                    
+            // buttons
+            
+        this.playButton.draw();
+        if (this.multiplayerButton!==null) this.multiplayerButton.draw();
+        if (this.setupButton!==null) this.setupButton.draw();
+        
+            // cursor
+        
+        if (!this.core.input.hasTouch) this.core.interface.cursor.draw();
+
+        gl.disable(gl.BLEND);
+        gl.enable(gl.DEPTH_TEST);
     }
     
         //
@@ -88,9 +151,6 @@ export default class TitleClass
         this.core.interface.cursor.center();
         
         this.clickDown=false;
-        
-        this.runDialog=false;
-        this.runGame=false;
     }
     
     resumeLoop()
@@ -101,9 +161,6 @@ export default class TitleClass
         this.lastDrawTimestamp=this.timestamp;
         
         this.clickDown=false;
-        
-        this.runDialog=false;
-        this.runGame=false;
     }
         
     loop()
@@ -135,24 +192,12 @@ export default class TitleClass
                     runTick-=RUN_MILLISECONDS;
                     this.lastRunTimestamp+=RUN_MILLISECONDS;
 
-                    this.run();
+                    if (!this.run()) return;        // returns false if we are changing loop
                 }
             }
             else {
                 this.lastRunTimestamp=this.timestamp;
             }
-        }
-
-            // exiting this loop
-
-        if (this.runDialog) {
-            window.main.core.switchLoop(this.core.LOOP_DIALOG,this.core.interface.DIALOG_MODE_SETTINGS);
-            return;
-        }
-
-        if (this.runGame) {
-            window.main.core.switchLoop(this.core.LOOP_GAME,0);
-            return;
         }
 
             // drawing

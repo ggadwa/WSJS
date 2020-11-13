@@ -202,7 +202,7 @@ export default class MapEntityListClass
             
             // add any bots if it's a local multiplayer game
             
-        if ((this.core.isMultiplayer) && (this.core.setup.localGame)) {
+        if ((this.core.game.multiplayer) && (this.core.setup.localGame)) {
             for (n=0;n!==this.core.setup.botCount;n++) {
                 nameIdx=n%this.core.game.json.bot.names.length;
                 

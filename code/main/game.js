@@ -19,6 +19,7 @@ export default class GameClass
         this.data=data;
         
         this.map=null;
+        this.multiplayer=false;
         
         this.json=null;
         this.jsonEntityCache=new Map();
@@ -341,7 +342,7 @@ export default class GameClass
         
             // multiplayer scores
             
-        if (this.core.isMultiplayer) {
+        if (this.multiplayer) {
             
                 // current scores
                 
@@ -457,7 +458,7 @@ export default class GameClass
         let iter,rtn,name,insertIdx;
         let sortedNames=[];
         
-        if (!this.core.isMultiplayer) return;
+        if (!this.multiplayer) return;
         
             // any messages
             
@@ -541,7 +542,7 @@ export default class GameClass
     {
         let n;
         
-        if (!this.core.isMultiplayer) return;
+        if (!this.multiplayer) return;
         
         this.scoreShow=show;
         
@@ -577,26 +578,32 @@ export default class GameClass
         // game loop
         //
         
-    startLoop()
+    startLoop(multiplayer)
     {
         let startMap;
         
             // need to pause loop if in loading
             
         this.inLoading=true;
+        this.multiplayer=multiplayer;
         
         this.loadingScreenClear();
         
           // initialize the map
           
-        startMap=this.core.game.lookupValue(this.core.game.json.startMap,this.data);
+        if (!multiplayer) {
+            startMap=this.core.game.lookupValue(this.core.game.json.startMap,this.data);
+        }
+        else {
+            startMap=this.core.game.json.multiplayerMaps[this.core.setup.localMap];
+        }
         
         this.map=new MapClass(this.core,startMap,this.core.game.autoGenerate);
         if (!this.map.initialize()) return;
 
             // next step
 
-        //if (!this.core.isMultiplayer) {
+        //if (!this.multiplayer) {
             this.loadingScreenUpdate();
             this.loadingScreenAddString('Loading Map');
             this.loadingScreenDraw();
@@ -793,11 +800,11 @@ export default class GameClass
             
         this.runStartSequence();
         
-            // if we are in a networked game, last thing to
+            // if we are in a non-local networked game, last thing to
             // do is request a map_sync to get the map in the right time
             
             /*
-        if (this.core.isMultiplayer) {
+        if (this.multiplayer) {
             this.loadingScreenUpdate();
             this.loadingScreenAddString('Connecting to Server');
             this.loadingScreenDraw();
@@ -807,6 +814,24 @@ export default class GameClass
         }
         */
        
+            // start the main loop
+            
+        this.initDone();
+    }
+    
+    runMultiplayerSyncOK()
+    {
+        initDone();
+    }
+    
+    runMultiplayerSyncError()
+    {
+        alert(this.core.network.lastErrorMessage);  // this all needs to be redone
+        this.network.disconnect();
+    }
+       
+    initDone()
+    {
             // start the main loop
             
         this.core.currentLoop=this.core.LOOP_GAME;
@@ -819,17 +844,6 @@ export default class GameClass
         
         this.inLoading=false;
         this.exitGame=false;
-    }
-    
-    runMultiplayerSyncOK()
-    {
-        this.core.game.startLoop();
-    }
-    
-    runMultiplayerSyncError()
-    {
-        alert(this.core.network.lastErrorMessage);
-        this.network.disconnect();
     }
     
         //
@@ -1044,9 +1058,21 @@ export default class GameClass
         
     run()
     {
+            // special keys
+            
+        if (this.core.input.isKeyDownAndClear('pageup')) {
+            window.main.core.switchLoop(this.core.LOOP_DEVELOPER,0,false);
+            return(false);
+        }
+
+        if (this.core.input.isKeyDownAndClear('backspace')) {
+            window.main.core.switchLoop(this.core.LOOP_DIALOG,this.core.dialog.DIALOG_MODE_SETTINGS,false);
+            return(false);
+        }
+
             // score functions
 
-        if (this.core.isMultiplayer) {
+        if (this.multiplayer) {
             if (this.core.input.isKeyDownAndClear('`')) this.showScoreDisplay(!this.scoreShow);
         }
 
@@ -1062,6 +1088,7 @@ export default class GameClass
             }
         }
         
+        return(true);
     }
     
         //
@@ -1211,7 +1238,7 @@ export default class GameClass
             // if paused, and not in a network
             // game than nothing to do
 
-        isNetworkGame=(this.core.isMultiplayer) && (!this.core.setup.localGame);
+        isNetworkGame=(this.multiplayer) && (!this.core.setup.localGame);
         //if ((this.core.paused) && (!isNetworkGame)) return;
 
             // loop uses it's own tick (so it
@@ -1240,7 +1267,7 @@ export default class GameClass
                     this.lastRunTimestamp+=PHYSICS_MILLISECONDS;
 
                     this.map.meshList.run();
-                    this.run();
+                    if (!this.run()) return;            // returns false if loop is changing
                     this.map.entityList.run();
                 }
             }
@@ -1265,20 +1292,10 @@ export default class GameClass
         this.map.entityList.cleanUpMarkedAsDeleted();
         this.map.effectList.cleanUpMarkedAsDeleted();
 
-            // time to exit loop?
+            // exit game trigger
             
-        if (this.core.input.isKeyDownAndClear('pageup')) {
-            window.main.core.switchLoop(this.core.LOOP_DEVELOPER,0);
-            return;
-        }
-
-        if (this.core.input.isKeyDownAndClear('backspace')) {
-            window.main.core.switchLoop(this.core.LOOP_DIALOG,this.core.interface.DIALOG_MODE_SETTINGS);
-            return;
-        }
-
         if (this.exitGame) {
-            window.main.core.switchLoop(this.core.LOOP_TITLE,0);
+            window.main.core.switchLoop(this.core.LOOP_TITLE,0,false);
             return;
         }
 

@@ -85,7 +85,6 @@ export default class CoreClass
         
             // networking
             
-        this.isMultiplayer=false;
         this.network=new NetworkClass(this);
         
             // the core setup
@@ -197,14 +196,6 @@ export default class CoreClass
         this.modelList=new ModelListClass(this);
         this.modelList.initialize();
         
-            // title/dialogs (non game interface)
-            
-        this.title=new TitleClass(this,data);
-        if (!(await this.title.initialize())) return;
-        
-        this.dialog=new DialogClass(this,data);
-        if (!(await this.dialog.initialize())) return;
-        
             // game and interface
             
         this.game=new GameClass(this,data);
@@ -215,6 +206,14 @@ export default class CoreClass
         
         this.music=new MusicClass(this);
         if (!this.music.initialize()) return;
+        
+            // title/dialogs (non game interface)
+            
+        this.title=new TitleClass(this,data);
+        if (!(await this.title.initialize())) return;
+        
+        this.dialog=new DialogClass(this,data);
+        if (!(await this.dialog.initialize())) return;
         
             // developer
             
@@ -346,7 +345,7 @@ export default class CoreClass
         this.input.startInput();
     }
     
-    switchLoop(gotoLoop,mode)
+    switchLoop(gotoLoop,dialogMode,multiplayer)
     {
         this.previousLoop=this.currentLoop;
         this.currentLoop=gotoLoop;
@@ -358,7 +357,7 @@ export default class CoreClass
                 break;
                 
             case this.LOOP_DIALOG:
-                this.dialog.startLoop(mode);
+                this.dialog.startLoop(dialogMode);
                 
                 break;
                 
@@ -367,7 +366,7 @@ export default class CoreClass
                     this.game.resumeLoop();
                 }
                 else {
-                    this.game.startLoop();
+                    this.game.startLoop(multiplayer);
                 }
                 break;
                 

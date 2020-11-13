@@ -12,6 +12,7 @@ export default class SetupClass
 
         this.showFPS=false;
         this.localGame=true;
+        this.localMap=0;
 
         this.serverURL='127.0.0.1';
         this.savedServerURLList=['127.0.0.1'];
