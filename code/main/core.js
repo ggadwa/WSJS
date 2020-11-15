@@ -345,7 +345,7 @@ export default class CoreClass
         this.input.startInput();
     }
     
-    switchLoop(gotoLoop,dialogMode,multiplayer)
+    switchLoop(gotoLoop)
     {
         this.previousLoop=this.currentLoop;
         this.currentLoop=gotoLoop;
@@ -357,16 +357,16 @@ export default class CoreClass
                 break;
                 
             case this.LOOP_DIALOG:
-                this.dialog.startLoop(dialogMode);
+                this.dialog.startLoop();
                 
                 break;
                 
             case this.LOOP_GAME:
-                if ((this.previousLoop===this.LOOP_DIALOG) || (this.previousLoop===this.LOOP_DEVELOPER)) {         // if this is coming from dialog or developer to game, then it's a resume instead of a start
+                if (((this.previousLoop===this.LOOP_DIALOG) && (this.dialog.dialogMode!==this.dialog.DIALOG_MODE_MULTIPLAYER)) || (this.previousLoop===this.LOOP_DEVELOPER)) {         // if this is coming from dialog or developer to game, then it's a resume instead of a start
                     this.game.resumeLoop();
                 }
                 else {
-                    this.game.startLoop(multiplayer);
+                    this.game.startLoop();
                 }
                 break;
                 

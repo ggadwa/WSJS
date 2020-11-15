@@ -721,12 +721,13 @@ export default class DeveloperClass
             
         if (this.core.input.isKeyDownAndClear('pageup')) {
             this.resetForGame();
-            window.main.core.switchLoop(this.core.LOOP_GAME,0,false);
+            this.core.switchLoop(this.core.LOOP_GAME);
             return(false);
         }
             
         if (this.core.input.isKeyDownAndClear('backspace')) {
-            window.main.core.switchLoop(this.core.LOOP_DIALOG,this.core.dialog.DIALOG_MODE_DEVELOPER,false);
+            this.core.dialog.setDialogMode(this.core.dialog.DIALOG_MODE_DEVELOPER);
+            this.core.switchLoop(this.core.LOOP_DIALOG);
             return(false);
         }
 

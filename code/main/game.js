@@ -19,7 +19,12 @@ export default class GameClass
         this.data=data;
         
         this.map=null;
-        this.multiplayer=false;
+        
+        this.MULTIPLAYER_MODE_NONE=0;
+        this.MULTIPLAYER_MODE_LOCAL=1;
+        this.MULTIPLAYER_MODE_JOIN=2;
+        
+        this.multiplayerMode=this.MULTIPLAYER_MODE_NONE;
         
         this.json=null;
         this.jsonEntityCache=new Map();
@@ -342,7 +347,7 @@ export default class GameClass
         
             // multiplayer scores
             
-        if (this.multiplayer) {
+        if (this.multiplayerMode!==this.MULTIPLAYER_MODE_NONE) {
             
                 // current scores
                 
@@ -458,7 +463,7 @@ export default class GameClass
         let iter,rtn,name,insertIdx;
         let sortedNames=[];
         
-        if (!this.multiplayer) return;
+        if (this.multiplayerMode===this.MULTIPLAYER_MODE_NONE) return;
         
             // any messages
             
@@ -542,7 +547,7 @@ export default class GameClass
     {
         let n;
         
-        if (!this.multiplayer) return;
+        if (this.multiplayerMode===this.MULTIPLAYER_MODE_NONE) return;
         
         this.scoreShow=show;
         
@@ -578,20 +583,19 @@ export default class GameClass
         // game loop
         //
         
-    startLoop(multiplayer)
+    startLoop()
     {
         let startMap;
         
             // need to pause loop if in loading
             
         this.inLoading=true;
-        this.multiplayer=multiplayer;
         
         this.loadingScreenClear();
         
           // initialize the map
           
-        if (!multiplayer) {
+        if (this.multiplayerMode===this.MULTIPLAYER_MODE_NONE) {
             startMap=this.core.game.lookupValue(this.core.game.json.startMap,this.data);
         }
         else {
@@ -630,6 +634,11 @@ export default class GameClass
         this.lastDrawTimestamp=this.timestamp;
         
         this.exitGame=false;
+    }
+    
+    setMultiplayerMode(multiplayerMode)
+    {
+        this.multiplayerMode=multiplayerMode;
     }
     
         //
@@ -1061,18 +1070,19 @@ export default class GameClass
             // special keys
             
         if (this.core.input.isKeyDownAndClear('pageup')) {
-            window.main.core.switchLoop(this.core.LOOP_DEVELOPER,0,false);
+            this.core.switchLoop(this.core.LOOP_DEVELOPER);
             return(false);
         }
 
         if (this.core.input.isKeyDownAndClear('backspace')) {
-            window.main.core.switchLoop(this.core.LOOP_DIALOG,this.core.dialog.DIALOG_MODE_SETTINGS,false);
+            this.core.dialog.setDialogMode(this.core.dialog.DIALOG_MODE_SETTINGS);
+            this.core.switchLoop(this.core.LOOP_DIALOG);
             return(false);
         }
 
             // score functions
 
-        if (this.multiplayer) {
+        if (this.multiplayerMode!==this.MULTIPLAYER_MODE_NONE) {
             if (this.core.input.isKeyDownAndClear('`')) this.showScoreDisplay(!this.scoreShow);
         }
 
@@ -1233,13 +1243,7 @@ export default class GameClass
         const BAIL_MILLISECONDS=5000;
 
         let systemTick,runTick,drawTick;
-        let fpsTime,isNetworkGame;
-
-            // if paused, and not in a network
-            // game than nothing to do
-
-        isNetworkGame=(this.multiplayer) && (!this.core.setup.localGame);
-        //if ((this.core.paused) && (!isNetworkGame)) return;
+        let fpsTime;
 
             // loop uses it's own tick (so it
             // can be paused, etc) and calculates
@@ -1283,7 +1287,7 @@ export default class GameClass
                 // if multiplayer, handle all
                 // the network updates and messages
 
-            if (isNetworkGame) this.core.network.run();
+            if (this.multiplayerMode===this.MULTIPLAYER_MODE_JOIN) this.core.network.run();
         }
 
             // clean up deleted entities
@@ -1295,7 +1299,7 @@ export default class GameClass
             // exit game trigger
             
         if (this.exitGame) {
-            window.main.core.switchLoop(this.core.LOOP_TITLE,0,false);
+            this.core.switchLoop(this.core.LOOP_TITLE);
             return;
         }
 

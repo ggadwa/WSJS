@@ -11,14 +11,13 @@ export default class SetupClass
         this.name='Player';
 
         this.showFPS=false;
-        this.localGame=true;
+
         this.localMap=0;
+        this.botCount=5;
+        this.botSkill=this.BOT_SKILL_NORMAL;
 
         this.serverURL='127.0.0.1';
         this.savedServerURLList=['127.0.0.1'];
-
-        this.botCount=5;
-        this.botSkill=this.BOT_SKILL_NORMAL;
 
         this.mouseXSensitivity=0.3;
         this.mouseXAcceleration=0.4;

@@ -1,8 +1,5 @@
 
-
---> add join server / local game dialog buttons (put local on left)
-    --> get rid of local checkbox
---> redo the multiplayer (local) part
+--> make dialog_setting, dialog_developer, dialog_multiplayer, etc separate loops
 --> remove main (leave only core) -- maybe?
 --> going into dialog stops music
 --> runMultiplayerSyncError redo all this

@@ -76,20 +76,23 @@ export default class TitleClass
                 this.clickDown=false;
                 
                 if (this.playButton.cursorInButton()) {
-                    window.main.core.switchLoop(this.core.LOOP_GAME,0,false);
+                    this.core.game.setMultiplayerMode(this.core.game.MULTIPLAYER_MODE_NONE);
+                    this.core.switchLoop(this.core.LOOP_GAME);
                     return(false);
                 }
                 
                 if (this.multiplayerButton!==null) {
                     if (this.multiplayerButton.cursorInButton()) {
-                        window.main.core.switchLoop(this.core.LOOP_DIALOG,this.core.dialog.DIALOG_MODE_MULTIPLAYER,false);
+                        this.core.dialog.setDialogMode(this.core.dialog.DIALOG_MODE_MULTIPLAYER);
+                        this.core.switchLoop(this.core.LOOP_DIALOG);
                         return(false);
                     }
                 }
                 
                 if (this.setupButton!==null) {
                     if (this.setupButton.cursorInButton()) {
-                        window.main.core.switchLoop(this.core.LOOP_DIALOG,this.core.dialog.DIALOG_MODE_SETTINGS,false);
+                        this.core.dialog.setDialogMode(this.core.dialog.DIALOG_MODE_SETTINGS);
+                        this.core.switchLoop(this.core.LOOP_DIALOG);
                         return(false);
                     }
                 }

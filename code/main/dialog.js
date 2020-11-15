@@ -25,7 +25,7 @@ export default class DialogClass
         
         this.controls=new Map();
         
-        this.currentDialogMode=0;
+        this.dialogMode=0;
         this.clickDown=false;
         this.currentOpenHeaderControl=null;     // current open header in dialog
         this.currentTextInputControl=null;      // current text input in dialog
@@ -100,7 +100,6 @@ export default class DialogClass
             // multiplayer
             
         if (!this.addDialogControl('head_multiplayer',this.CONTROL_TYPE_HEADER,'Multiplayer',null)) return(false);
-        if (!this.addDialogControl('localGame',this.CONTROL_TYPE_CHECKBOX,'Local Game:',null)) return(false);
         if (!this.addDialogControl('localMap',this.CONTROL_TYPE_LIST,'Local Map:',this.core.game.json.multiplayerMaps)) return(false);
         if (!this.addDialogControl('botCount',this.CONTROL_TYPE_LIST,'Bot Count:',[0,1,2,3,4,5,6,7,8,9])) return(false);
         if (!this.addDialogControl('botSkill',this.CONTROL_TYPE_LIST,'Bot Skill:',['Easy','Moderate','Normal','Skilled','Hard'])) return(false);
@@ -164,7 +163,7 @@ export default class DialogClass
     {
             // dialog modes
             
-        switch (this.currentDialogMode) {
+        switch (this.dialogMode) {
             
             case this.core.dialog.DIALOG_MODE_SETTINGS:
                 this.currentOpenHeaderControl=this.controls.get('head_profile');
@@ -218,7 +217,6 @@ export default class DialogClass
         this.setDialogControl('musicVolume',Math.trunc(this.core.setup.musicVolume*100));
         this.setDialogControl('musicOn',this.core.setup.musicOn);
         
-        this.setDialogControl('localGame',this.core.setup.localGame);
         this.setDialogControl('localMap',this.core.setup.localMap);
         this.setDialogControl('botCount',this.core.setup.botCount);
         this.setDialogControl('botSkill',this.core.setup.botSkill);
@@ -228,7 +226,7 @@ export default class DialogClass
         
             // special developer node keys
             
-        if (this.currentDialogMode===this.core.dialog.DIALOG_MODE_DEVELOPER) {
+        if (this.dialogMode===this.core.dialog.DIALOG_MODE_DEVELOPER) {
             this.setDialogControl('nodeKey',this.core.developer.getSelectedNodeKey());
         }
         else {
@@ -256,7 +254,6 @@ export default class DialogClass
         this.core.setup.musicVolume=this.getDialogControl('musicVolume')/100;
         this.core.setup.musicOn=this.getDialogControl('musicOn');
         
-        this.core.setup.localGame=this.getDialogControl('localGame');
         this.core.setup.localMap=this.getDialogControl('localMap');
         this.core.setup.botCount=this.getDialogControl('botCount');
         this.core.setup.botSkill=this.getDialogControl('botSkill');
@@ -268,7 +265,7 @@ export default class DialogClass
         
             // special developer node keys
 
-        if (this.currentDialogMode===this.core.dialog.DIALOG_MODE_DEVELOPER) {
+        if (this.dialogMode===this.core.dialog.DIALOG_MODE_DEVELOPER) {
             this.core.developer.setSelectedNodeKey(this.getDialogControl('nodeKey'));
         }
     }
@@ -277,10 +274,8 @@ export default class DialogClass
         // start and stop dialog loop
         //
         
-    startLoop(mode)
+    startLoop()
     {
-        this.currentDialogMode=mode;
-        
         this.timestamp=0;
         this.lastSystemTimestamp=Math.trunc(window.performance.now());
         
@@ -303,6 +298,11 @@ export default class DialogClass
         this.clickDown=false;
     }
     
+    setDialogMode(dialogMode)
+    {
+        this.dialogMode=dialogMode;
+    }
+    
         //
         // running
         //
@@ -319,7 +319,13 @@ export default class DialogClass
 
                 if (key.toLowerCase()==='enter') {              // enter key can exit dialog
                     this.saveDialogControls();
-                    window.main.core.switchLoop(window.main.core.previousLoop,0,(this.currentDialogMode===this.DIALOG_MODE_MULTIPLAYER));
+                    if (this.dialogMode!==this.DIALOG_MODE_MULTIPLAYER) {
+                        this.core.switchLoop(this.core.previousLoop);
+                    }
+                    else {
+                        this.core.game.setMultiplayerMode(this.core.game.MULTIPLAYER_MODE_JOIN);
+                        this.core.switchLoop(this.core.LOOP_GAME);
+                    }
                     return(false);
                 }
                 
@@ -373,33 +379,42 @@ export default class DialogClass
             // buttons
 
         if (this.cancelButton.cursorInButton()) {
-            window.main.core.switchLoop(window.main.core.previousLoop,0,false);
+            this.core.switchLoop(this.core.previousLoop);
             return(false);
         }
 
         if (this.okButton.cursorInButton()) {
             this.saveDialogControls();
-            if (this.currentDialogMode!==this.DIALOG_MODE_MULTIPLAYER) {
-                window.main.core.switchLoop(window.main.core.previousLoop,0,false);
-            }
-            else {
-                window.main.core.switchLoop(window.main.core.LOOP_GAME,0,true);
-            }
+            this.core.switchLoop(this.core.previousLoop);
+            return(false);
+        }
+        
+        if (this.localGameButton.cursorInButton()) {
+            this.saveDialogControls();
+            this.core.game.setMultiplayerMode(this.core.game.MULTIPLAYER_MODE_LOCAL);
+            this.core.switchLoop(this.core.LOOP_GAME);
+            return(false);
+        }
+        
+        if (this.joinGameButton.cursorInButton()) {
+            this.saveDialogControls();
+            this.core.game.setMultiplayerMode(this.core.game.MULTIPLAYER_MODE_JOIN);
+            this.core.switchLoop(this.core.LOOP_GAME);
             return(false);
         }
 
-        if (this.currentDialogMode===this.DIALOG_MODE_DEVELOPER) {
+        if (this.dialogMode===this.DIALOG_MODE_DEVELOPER) {
             if (this.developBuildPathHintsButton.cursorInButton()) {
                 this.saveDialogControls();
                 this.core.developer.developerBuilders.buildPathHints();
-                window.main.core.switchLoop(window.main.core.previousLoop,0,false);
+                this.core.switchLoop(this.core.previousLoop);
                 return(false);
             }
 
             if (this.developBuildShadowMapsButton.cursorInButton()) {
                 this.saveDialogControls();
                 this.core.developer.developerBuilders.buildShadowmap(this.core.setup.skipShadowMapNormals);
-                window.main.core.switchLoop(window.main.core.previousLoop,0,false);
+                this.core.switchLoop(this.core.previousLoop);
                 return(false);
             }
         }
@@ -452,14 +467,14 @@ export default class DialogClass
             }
         }
 
-        if (this.currentDialogMode===this.DIALOG_MODE_DEVELOPER) {
+        if (this.dialogMode===this.DIALOG_MODE_DEVELOPER) {
             this.developBuildPathHintsButton.draw();
             this.developBuildShadowMapsButton.draw();
         }
 
         this.cancelButton.draw();
 
-        if (this.currentDialogMode!==this.DIALOG_MODE_MULTIPLAYER) {
+        if (this.dialogMode!==this.DIALOG_MODE_MULTIPLAYER) {
             this.okButton.draw();
         }
         else {
