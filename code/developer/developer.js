@@ -726,8 +726,7 @@ export default class DeveloperClass
         }
             
         if (this.core.input.isKeyDownAndClear('backspace')) {
-            this.core.dialog.setDialogMode(this.core.dialog.DIALOG_MODE_DEVELOPER);
-            this.core.switchLoop(this.core.LOOP_DIALOG);
+            this.core.switchLoop(this.core.LOOP_DIALOG_DEVELOPER);
             return(false);
         }
 

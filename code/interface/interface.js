@@ -43,6 +43,12 @@ export default class InterfaceClass
         
         this.POSITION_MODE_LIST=['topLeft','topRight','bottomLeft','bottomRight','middle'];
         
+        this.CONTROL_TYPE_HEADER=0;
+        this.CONTROL_TYPE_TEXT=1;
+        this.CONTROL_TYPE_CHECKBOX=2;
+        this.CONTROL_TYPE_RANGE=3;
+        this.CONTROL_TYPE_LIST=4;
+        
         this.core=core;
         
         this.background=null;
@@ -62,6 +68,9 @@ export default class InterfaceClass
         this.touchStickLeft=null;
         this.touchStickRight=null;
         this.touchButtonMenu=null;
+        
+        this.currentOpenHeaderControl=null;     // current open header in dialog
+        this.currentTextInputControl=null;      // current text input in dialog
         
         Object.seal(this);
     }

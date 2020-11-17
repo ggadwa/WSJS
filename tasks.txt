@@ -1,6 +1,4 @@
 
---> make dialog_setting, dialog_developer, dialog_multiplayer, etc separate loops
---> remove main (leave only core) -- maybe?
 --> going into dialog stops music
 --> runMultiplayerSyncError redo all this
 --> network class to game class (instead of core)

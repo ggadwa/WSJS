@@ -1,5 +1,7 @@
 import TitleClass from '../main/title.js';
-import DialogClass from '../main/dialog.js';
+import DialogSettingClass from '../main/dialog_setting.js';
+import DialogMultiplayerClass from '../main/dialog_multiplayer.js';
+import DialogDeveloperClass from '../main/dialog_developer.js';
 import MapClass from '../map/map.js';
 import BitmapListClass from '../bitmap/bitmap_list.js';
 import SoundListClass from '../sound/sound_list.js';
@@ -30,9 +32,11 @@ export default class CoreClass
         this.MAX_SKELETON_JOINT=64;    // max joints in a skeleton, needs to be the same as jointMatrix[x] in shaders
         
         this.LOOP_TITLE=0;
-        this.LOOP_DIALOG=1;
-        this.LOOP_GAME=2;
-        this.LOOP_DEVELOPER=3;
+        this.LOOP_DIALOG_SETTING=1;
+        this.LOOP_DIALOG_MULTIPLAYER=2;
+        this.LOOP_DIALOG_DEVELOPER=3;
+        this.LOOP_GAME=4;
+        this.LOOP_DEVELOPER=5;
         
         this.GL_OPTIONS={
             alpha:false,
@@ -72,7 +76,9 @@ export default class CoreClass
             // loops
             
         this.title=null;
-        this.dialog=null;
+        this.dialogSetting=null;
+        this.dialogMultiplayer=null;
+        this.dialogDeveloper=null;
         this.game=null;
         this.developer=null;
         
@@ -212,8 +218,14 @@ export default class CoreClass
         this.title=new TitleClass(this,data);
         if (!(await this.title.initialize())) return;
         
-        this.dialog=new DialogClass(this,data);
-        if (!(await this.dialog.initialize())) return;
+        this.dialogSetting=new DialogSettingClass(this,data);
+        if (!this.dialogSetting.initialize()) return;
+        
+        this.dialogMultiplayer=new DialogMultiplayerClass(this,data);
+        if (!this.dialogMultiplayer.initialize()) return;
+        
+        this.dialogDeveloper=new DialogDeveloperClass(this,data);
+        if (!this.dialogDeveloper.initialize()) return;
         
             // developer
             
@@ -235,7 +247,9 @@ export default class CoreClass
         this.interface.release();
         this.game.release();
         this.title.release();
-        this.dialog.release();
+        this.dialogSetting.release();
+        this.dialogMultiplayer.release();
+        this.dialogDeveloper.release();
         this.modelList.release();
         this.shaderList.release();
         this.soundList.release();
@@ -356,13 +370,19 @@ export default class CoreClass
                 this.title.startLoop();
                 break;
                 
-            case this.LOOP_DIALOG:
-                this.dialog.startLoop();
+            case this.LOOP_DIALOG_SETTING:
+                this.dialogSetting.startLoop();
+                break;
                 
+            case this.LOOP_DIALOG_MULTIPLAYER:
+                this.dialogMultiplayer.startLoop();
+                break;
+            case this.LOOP_DIALOG_DEVELOPER:
+                this.dialogDeveloper.startLoop();
                 break;
                 
             case this.LOOP_GAME:
-                if (((this.previousLoop===this.LOOP_DIALOG) && (this.dialog.dialogMode!==this.dialog.DIALOG_MODE_MULTIPLAYER)) || (this.previousLoop===this.LOOP_DEVELOPER)) {         // if this is coming from dialog or developer to game, then it's a resume instead of a start
+                if ((this.previousLoop===this.LOOP_DIALOG_SETTING) || (this.previousLoop===this.LOOP_DEVELOPER)) {         // if this is coming from setting dialog or developer to game, then it's a resume instead of a start
                     this.game.resumeLoop();
                 }
                 else {
@@ -371,7 +391,7 @@ export default class CoreClass
                 break;
                 
             case this.LOOP_DEVELOPER:
-                if (this.previousLoop===this.LOOP_DIALOG) {         // if this is coming from dialog to developer, then it's a resume instead of a start
+                if (this.previousLoop===this.LOOP_DIALOG_DEVELOPER) {         // if this is coming from developer dialog to developer, then it's a resume instead of a start
                     this.developer.resumeLoop();
                 }
                 else {
@@ -435,8 +455,14 @@ export default class CoreClass
             case this.LOOP_TITLE:
                 this.title.resumeLoop();
                 break;
-            case this.LOOP_DIALOG:
-                this.dialog.resumeLoop();
+            case this.LOOP_DIALOG_SETTING:
+                this.dialogSetting.resumeLoop();
+                break;
+            case this.LOOP_DIALOG_MULTIPLAYER:
+                this.dialogMultiplayer.resumeLoop();
+                break;
+            case this.LOOP_DIALOG_DEVELOPER:
+                this.dialogDeveloper.resumeLoop();
                 break;
             case this.LOOP_GAME:
                 this.game.resumeLoop();
@@ -476,8 +502,14 @@ function mainLoop(timestamp)
         case core.LOOP_TITLE:
             core.title.loop();
             break;
-        case core.LOOP_DIALOG:
-            core.dialog.loop();
+        case core.LOOP_DIALOG_SETTING:
+            core.dialogSetting.loop();
+            break;
+        case core.LOOP_DIALOG_MULTIPLAYER:
+            core.dialogMultiplayer.loop();
+            break;
+        case core.LOOP_DIALOG_DEVELOPER:
+            core.dialogDeveloper.loop();
             break;
         case core.LOOP_GAME:
             if (!core.game.inLoading) core.game.loop();

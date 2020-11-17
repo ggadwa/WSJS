@@ -83,16 +83,14 @@ export default class TitleClass
                 
                 if (this.multiplayerButton!==null) {
                     if (this.multiplayerButton.cursorInButton()) {
-                        this.core.dialog.setDialogMode(this.core.dialog.DIALOG_MODE_MULTIPLAYER);
-                        this.core.switchLoop(this.core.LOOP_DIALOG);
+                        this.core.switchLoop(this.core.LOOP_DIALOG_MULTIPLAYER);
                         return(false);
                     }
                 }
                 
                 if (this.setupButton!==null) {
                     if (this.setupButton.cursorInButton()) {
-                        this.core.dialog.setDialogMode(this.core.dialog.DIALOG_MODE_SETTINGS);
-                        this.core.switchLoop(this.core.LOOP_DIALOG);
+                        this.core.switchLoop(this.core.LOOP_DIALOG_SETTING);
                         return(false);
                     }
                 }

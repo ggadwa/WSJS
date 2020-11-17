@@ -12,8 +12,6 @@ export default class InterfaceControlClass
         
         this.value=null;
         
-        this.show=true;
-        
         this.TITLE_MARGIN=5;
         this.TEXT_INPUT_WIDTH=300;
         this.CONTROL_HEIGHT=30;
@@ -91,7 +89,7 @@ export default class InterfaceControlClass
             // the title text
             
         fontSize=Math.trunc(this.CONTROL_HEIGHT*0.6);
-        align=(this.controlType===this.core.dialog.CONTROL_TYPE_HEADER)?this.core.interface.TEXT_ALIGN_LEFT:this.core.interface.TEXT_ALIGN_RIGHT;
+        align=(this.controlType===this.core.interface.CONTROL_TYPE_HEADER)?this.core.interface.TEXT_ALIGN_LEFT:this.core.interface.TEXT_ALIGN_RIGHT;
         
         this.titleText=new InterfaceTextClass(this.core,this.title,0,0,fontSize,align,new ColorClass(1,1,1,1),1,false);
         this.titleText.initialize();
@@ -99,11 +97,11 @@ export default class InterfaceControlClass
         this.valueText=null;
         
         switch (this.controlType) {
-            case this.core.dialog.CONTROL_TYPE_TEXT:
+            case this.core.interface.CONTROL_TYPE_TEXT:
                 this.valueText=new InterfaceTextClass(this.core,'',0,0,fontSize,this.core.interface.TEXT_ALIGN_LEFT,this.widgetTopColor,1,false);
                 this.valueText.initialize();
                 break;
-            case this.core.dialog.CONTROL_TYPE_LIST:
+            case this.core.interface.CONTROL_TYPE_LIST:
                 this.valueText=new InterfaceTextClass(this.core,'',0,0,fontSize,this.core.interface.TEXT_ALIGN_CENTER,this.widgetTopColor,1,false);
                 this.valueText.initialize();
                 break;
@@ -132,7 +130,7 @@ export default class InterfaceControlClass
     {
         if ((this.core.interface.cursor.x<this.TITLE_MARGIN) || (this.core.interface.cursor.x>(this.core.wid-this.TITLE_MARGIN)) || (this.core.interface.cursor.y<y) || (this.core.interface.cursor.y>(y+this.CONTROL_HEIGHT))) return(false);
         
-        this.core.dialog.currentOpenHeaderControl=this;
+        this.core.interface.currentOpenHeaderControl=this;
         return(true);
     }
     
@@ -217,7 +215,7 @@ export default class InterfaceControlClass
         
         if ((this.core.interface.cursor.x<x) || (this.core.interface.cursor.x>((x+(this.TITLE_MARGIN*2))+this.TEXT_INPUT_WIDTH)) || (this.core.interface.cursor.y<y) || (this.core.interface.cursor.y>(y+this.CONTROL_HEIGHT))) return(false);
         
-        this.core.dialog.currentTextInputControl=this;
+        this.core.interface.currentTextInputControl=this;
         this.core.input.keyClearLastRaw();
         
         return(true);
@@ -286,7 +284,7 @@ export default class InterfaceControlClass
         
         if (this.value===null) this.value='';
         
-        if ((this.core.dialog.currentTextInputControl===this) && (!this.core.input.paused) && ((Math.trunc(window.performance.now())&0x200)!=0)) {
+        if ((this.core.interface.currentTextInputControl===this) && (!this.core.input.paused) && ((Math.trunc(window.performance.now())&0x200)!=0)) {
             this.valueText.str=this.value+'_';
         }
         else {
@@ -313,7 +311,7 @@ export default class InterfaceControlClass
         
         this.value=!this.value;
         
-        this.core.dialog.currentTextInputControl=null;
+        this.core.interface.currentTextInputControl=null;
         return(true);
     }
         
@@ -460,7 +458,7 @@ export default class InterfaceControlClass
         
         this.value=hx;
         
-        this.core.dialog.currentTextInputControl=null;
+        this.core.interface.currentTextInputControl=null;
         return(false);
     }
         
@@ -594,7 +592,7 @@ export default class InterfaceControlClass
             this.value--;
             if (this.value<0) this.value=0;
             
-            this.core.dialog.currentTextInputControl=null;
+            this.core.interface.currentTextInputControl=null;
             return(true);
         }
         
@@ -604,7 +602,7 @@ export default class InterfaceControlClass
             this.value++;
             if (this.value>=this.list.length) this.value=this.list.length-1;
             
-            this.core.dialog.currentTextInputControl=null;
+            this.core.interface.currentTextInputControl=null;
             return(true);
         }
        
@@ -748,15 +746,15 @@ export default class InterfaceControlClass
     click()
     {
         switch (this.controlType) {
-            case this.core.dialog.CONTROL_TYPE_HEADER:
+            case this.core.interface.CONTROL_TYPE_HEADER:
                 return(this.clickHeader(this.lastDrawY));
-            case this.core.dialog.CONTROL_TYPE_TEXT:
+            case this.core.interface.CONTROL_TYPE_TEXT:
                 return(this.clickTextInput(this.lastDrawY));
-            case this.core.dialog.CONTROL_TYPE_CHECKBOX:
+            case this.core.interface.CONTROL_TYPE_CHECKBOX:
                 return(this.clickCheckbox(this.lastDrawY));
-            case this.core.dialog.CONTROL_TYPE_RANGE:
+            case this.core.interface.CONTROL_TYPE_RANGE:
                 return(this.clickRange(this.lastDrawY));
-            case this.core.dialog.CONTROL_TYPE_LIST:
+            case this.core.interface.CONTROL_TYPE_LIST:
                 return(this.clickList(this.lastDrawY));
         }
         
@@ -772,15 +770,15 @@ export default class InterfaceControlClass
         this.lastDrawY=y;
         
         switch (this.controlType) {
-            case this.core.dialog.CONTROL_TYPE_HEADER:
+            case this.core.interface.CONTROL_TYPE_HEADER:
                 return(this.drawHeader(y));
-            case this.core.dialog.CONTROL_TYPE_TEXT:
+            case this.core.interface.CONTROL_TYPE_TEXT:
                 return(this.drawTextInput(y));
-            case this.core.dialog.CONTROL_TYPE_CHECKBOX:
+            case this.core.interface.CONTROL_TYPE_CHECKBOX:
                 return(this.drawCheckbox(y));
-            case this.core.dialog.CONTROL_TYPE_RANGE:
+            case this.core.interface.CONTROL_TYPE_RANGE:
                 return(this.drawRange(y));
-            case this.core.dialog.CONTROL_TYPE_LIST:
+            case this.core.interface.CONTROL_TYPE_LIST:
                 return(this.drawList(y));
         }
         
