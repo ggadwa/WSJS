@@ -59,7 +59,7 @@ export default class SequenceClass
         
             // stop any music
             
-        this.core.music.stop();
+        this.core.audio.musicStop();
         
             // setup the bitmaps
             
@@ -151,7 +151,7 @@ export default class SequenceClass
         
             // restart any music
             
-        this.core.music.start();
+        this.core.audio.musicStart(this.core.game.map.music);
     }
     
         //

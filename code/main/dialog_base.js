@@ -115,8 +115,15 @@ export default class DialogBaseClass
         
         this.clickDown=false;
         
+            // stop music
+            
+        this.core.audio.musicStop();
+        
+            // prepare the dialog
+            
         this.loadDialogControls();
         this.core.interface.cursor.center();
+        this.core.input.keyClear();
     }
     
     resumeLoop()

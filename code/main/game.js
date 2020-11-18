@@ -634,6 +634,8 @@ export default class GameClass
         this.lastDrawTimestamp=this.timestamp;
         
         this.exitGame=false;
+        
+        this.core.audio.musicStart(this.map.music);
     }
     
     setMultiplayerMode(multiplayerMode)
@@ -737,7 +739,7 @@ export default class GameClass
     async initLoadSounds()
     {
         if (!(await this.core.soundList.loadAllSounds())) return;
-        if (!(await this.core.music.load())) return;
+        if (!(await this.map.music.load())) return;
     
         this.loadingScreenUpdate();
         this.loadingScreenAddString('Loading Images');
@@ -801,14 +803,6 @@ export default class GameClass
             
         this.map.entityList.ready();
         
-            // start the music
-            
-        this.core.music.start();
-        
-            // start any sequence
-            
-        this.runStartSequence();
-        
             // if we are in a non-local networked game, last thing to
             // do is request a map_sync to get the map in the right time
             
@@ -853,6 +847,14 @@ export default class GameClass
         
         this.inLoading=false;
         this.exitGame=false;
+        
+            // start any music
+            
+        this.core.audio.musicStart(this.map.music);
+        
+            // start any sequence
+            
+        this.runStartSequence();
     }
     
         //
@@ -1298,6 +1300,7 @@ export default class GameClass
             // exit game trigger
             
         if (this.exitGame) {
+            this.release();
             this.core.switchLoop(this.core.LOOP_TITLE);
             return;
         }

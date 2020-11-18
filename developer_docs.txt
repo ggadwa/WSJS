@@ -15,6 +15,7 @@ p = add a new path node, or connect to path node if close to another node
 \ = deletes selected node
 i = select new node
 o = splits path, hit o on first node, then o on second node, and then o to create a new node between them
+k = edit key for node (leave blank for none)
 
 Use dialog (backspace) to change keys for currently selected node
 

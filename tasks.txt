@@ -1,10 +1,25 @@
 
---> going into dialog stops music
+--> audio
+     * need independent audio object on core
+     - map sound list
+     - sound play independent on list
+     * pause stops all audio
+     * dialogs stop music
+     - disconnect nodes on sound plays
+
+--> models
+     - model_list into map
+     - init/release with map
+
+--> game json -> core json, at root, put index at root, too, load in core
+
+
+
+--> eventually test full screen
 --> runMultiplayerSyncError redo all this
 --> network class to game class (instead of core)
 
 1. fix start game -> end game -> start game problem
-
 4. title needs to work on iPad
 12. iPad touchMenuTrigger (redo, search for it)
 

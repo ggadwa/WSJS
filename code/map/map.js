@@ -9,6 +9,7 @@ import MapCubeListClass from '../map/map_cube_list.js';
 import MapPathClass from '../map/map_path.js';
 import MapSkyClass from '../map/map_sky.js';
 import MapBackgroundClass from '../map/map_background.js';
+import MusicClass from '../sound/music.js';
 
 //
 // map class
@@ -38,10 +39,7 @@ export default class MapClass
         this.path=new MapPathClass(core);
         this.sky=new MapSkyClass(core);
         this.background=new MapBackgroundClass(core);
-        
-        this.musicName=null;
-        this.musicLoopStart=0;
-        this.musicLoopEnd=0;
+        this.music=new MusicClass(core);
         
         this.hasShadowmap=false;
         

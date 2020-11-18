@@ -15,9 +15,6 @@ export default class MusicClass
         this.buffer=null;
         this.loaded=false;
         
-        this.sourceNode=null;
-        this.gainNode=null;
-        
         Object.seal(this);
     }
     
@@ -40,7 +37,7 @@ export default class MusicClass
     }
     
         //
-        // music api
+        // set the music
         //
         
     setMusic(name,loopStart,loopEnd)
@@ -48,37 +45,6 @@ export default class MusicClass
         this.name=name;
         this.loopStart=loopStart;
         this.loopEnd=loopEnd;
-    }
-    
-    start()
-    {
-            // any music to play?
-        
-        if ((this.name===null) || (!this.core.setup.musicOn)) return;
-        
-            // set the audio nodes
-        
-        this.sourceNode=this.core.audioCTX.createBufferSource();
-        this.sourceNode.buffer=this.buffer;
-        this.sourceNode.playbackRate.value=1.0;
-        this.sourceNode.loopStart=this.loopStart;
-        this.sourceNode.loopEnd=this.loopEnd;
-        this.sourceNode.loop=true;
-        
-        this.gainNode=this.core.audioCTX.createGain();
-        this.gainNode.gain.value=this.core.setup.musicVolume;
-
-        this.sourceNode.connect(this.gainNode);
-        this.gainNode.connect(this.core.audioCTX.destination);
-        
-            // finally play the music
-            
-        this.sourceNode.start();
-    }
-    
-    stop()
-    {
-        if (this.sourceNode!==null) this.sourceNode.stop();
     }
     
         //
@@ -107,7 +73,7 @@ export default class MusicClass
         return(
                 new Promise((resolve,reject) =>
                     {
-                        this.core.audioCTX.decodeAudioData(data,resolve,reject);
+                        this.core.audio.audioCTX.decodeAudioData(data,resolve,reject);
                     }
                 )
            );
@@ -146,7 +112,7 @@ export default class MusicClass
         this.buffer=null;
         
         await this.decodeAudioPromise(data)
-        //await this.core.audioCTX.decodeAudioData(data)      // safari doesn't have the promise version of this
+        //await this.core.audio.audioCTX.decodeAudioData(data)      // safari doesn't have the promise version of this
             .then
                 (
                         // resolved

@@ -27,13 +27,13 @@ export default class DialogSettingClass extends DialogBaseClass
         
             // profile controls
             
-        if (!this.addDialogControl('head_profile',this.core.interface.CONTROL_TYPE_HEADER,'Profile',null)) return(false);
+        if (!this.addDialogControl('headProfile',this.core.interface.CONTROL_TYPE_HEADER,'Profile',null)) return(false);
         if (!this.addDialogControl('name',this.core.interface.CONTROL_TYPE_TEXT,'Name:',null)) return(false);
         if (!this.addDialogControl('showFPS',this.core.interface.CONTROL_TYPE_CHECKBOX,'Show FPS:',null)) return(false);
         
             // movement controls
             
-        if (!this.addDialogControl('head_movement',this.core.interface.CONTROL_TYPE_HEADER,'Movement',null)) return(false);
+        if (!this.addDialogControl('headMovement',this.core.interface.CONTROL_TYPE_HEADER,'Movement',null)) return(false);
         
         if (!this.addDialogControl('mouseXSensitivity',this.core.interface.CONTROL_TYPE_RANGE,'Mouse X Sensitivity:',null)) return(false);
         if (!this.addDialogControl('mouseXAcceleration',this.core.interface.CONTROL_TYPE_RANGE,'Mouse X Acceleration:',null)) return(false);
@@ -47,7 +47,7 @@ export default class DialogSettingClass extends DialogBaseClass
         
             // sound controls
             
-        if (!this.addDialogControl('head_sound',this.core.interface.CONTROL_TYPE_HEADER,'Sound',null)) return(false);
+        if (!this.addDialogControl('headSound',this.core.interface.CONTROL_TYPE_HEADER,'Sound',null)) return(false);
         if (!this.addDialogControl('soundVolume',this.core.interface.CONTROL_TYPE_RANGE,'Sound Volume:',null)) return(false);
         if (!this.addDialogControl('musicVolume',this.core.interface.CONTROL_TYPE_RANGE,'Music Volume:',null)) return(false);
         if (!this.addDialogControl('musicOn',this.core.interface.CONTROL_TYPE_CHECKBOX,'Music:',null)) return(false);
@@ -63,7 +63,7 @@ export default class DialogSettingClass extends DialogBaseClass
     {
             // open header and no selected text
             
-        this.core.interface.currentOpenHeaderControl=this.controls.get('head_profile');
+        this.core.interface.currentOpenHeaderControl=this.controls.get('headProfile');
         this.core.interface.currentTextInputControl=null;
         
             // the values

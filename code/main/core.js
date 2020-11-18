@@ -2,12 +2,13 @@ import TitleClass from '../main/title.js';
 import DialogSettingClass from '../main/dialog_setting.js';
 import DialogMultiplayerClass from '../main/dialog_multiplayer.js';
 import DialogDeveloperClass from '../main/dialog_developer.js';
+import DialogPromptClass from '../main/dialog_prompt.js';
 import MapClass from '../map/map.js';
 import BitmapListClass from '../bitmap/bitmap_list.js';
 import SoundListClass from '../sound/sound_list.js';
 import ShaderListClass from '../shader/shader_list.js';
 import ModelListClass from '../model/model_list.js';
-import MusicClass from '../sound/music.js';
+import AudioClass from '../sound/audio.js';
 import PointClass from '../utility/point.js';
 import RectClass from '../utility/rect.js';
 import PlaneClass from '../utility/plane.js';
@@ -35,8 +36,9 @@ export default class CoreClass
         this.LOOP_DIALOG_SETTING=1;
         this.LOOP_DIALOG_MULTIPLAYER=2;
         this.LOOP_DIALOG_DEVELOPER=3;
-        this.LOOP_GAME=4;
-        this.LOOP_DEVELOPER=5;
+        this.LOOP_DIALOG_PROMPT=4;
+        this.LOOP_GAME=5;
+        this.LOOP_DEVELOPER=6;
         
         this.GL_OPTIONS={
             alpha:false,
@@ -60,9 +62,9 @@ export default class CoreClass
         this.gl=null;
         this.canvas=null;
         
-            // the audio context
+            // the audio
             
-        this.audioCTX=null;
+        this.audio=new AudioClass(this);
         
             // the cached objects
             // list, these are usually created by
@@ -79,10 +81,9 @@ export default class CoreClass
         this.dialogSetting=null;
         this.dialogMultiplayer=null;
         this.dialogDeveloper=null;
+        this.dialogPrompt=null;
         this.game=null;
         this.developer=null;
-        
-        this.music=null;
         
             // input
             
@@ -127,7 +128,6 @@ export default class CoreClass
     async initialize(data)
     {
         let lft,top,wid,high;
-        let initAudioContext=window.AudioContext||window.webkitAudioContext;
         
             // canvas position
             
@@ -179,12 +179,7 @@ export default class CoreClass
         
             // the audio context
             
-        this.audioCTX=new initAudioContext();
-        
-        if (this.audioCTX===null) {
-            alert('Could not initialize audio context');
-            return(false);
-        }
+        if (!this.audio.initialize()) return(false);
         
             // bitmap, sound, shader, and model list
             // a lot of these are deffered load or
@@ -210,9 +205,6 @@ export default class CoreClass
         this.interface=new InterfaceClass(this);
         if (!(await this.interface.initialize())) return;
         
-        this.music=new MusicClass(this);
-        if (!this.music.initialize()) return;
-        
             // title/dialogs (non game interface)
             
         this.title=new TitleClass(this,data);
@@ -226,6 +218,9 @@ export default class CoreClass
         
         this.dialogDeveloper=new DialogDeveloperClass(this,data);
         if (!this.dialogDeveloper.initialize()) return;
+        
+        this.dialogPrompt=new DialogPromptClass(this,data);
+        if (!this.dialogPrompt.initialize()) return;
         
             // developer
             
@@ -243,17 +238,18 @@ export default class CoreClass
     release()
     {
         this.developer.release();
-        this.music.release();
         this.interface.release();
         this.game.release();
         this.title.release();
         this.dialogSetting.release();
         this.dialogMultiplayer.release();
         this.dialogDeveloper.release();
+        this.dialogPrompt.release();
         this.modelList.release();
         this.shaderList.release();
         this.soundList.release();
         this.bitmapList.release();
+        this.audio.release();
     }
     
         //
@@ -377,8 +373,13 @@ export default class CoreClass
             case this.LOOP_DIALOG_MULTIPLAYER:
                 this.dialogMultiplayer.startLoop();
                 break;
+                
             case this.LOOP_DIALOG_DEVELOPER:
                 this.dialogDeveloper.startLoop();
+                break;
+                
+            case this.LOOP_DIALOG_PROMPT:
+                this.dialogPrompt.startLoop();
                 break;
                 
             case this.LOOP_GAME:
@@ -391,7 +392,7 @@ export default class CoreClass
                 break;
                 
             case this.LOOP_DEVELOPER:
-                if (this.previousLoop===this.LOOP_DIALOG_DEVELOPER) {         // if this is coming from developer dialog to developer, then it's a resume instead of a start
+                if ((this.previousLoop===this.LOOP_DIALOG_DEVELOPER) || (this.previousLoop===this.LOOP_DIALOG_PROMPT)) {    // if this is coming from developer dialog to developer, then it's a resume instead of a start
                     this.developer.resumeLoop();
                 }
                 else {
@@ -409,7 +410,7 @@ export default class CoreClass
         
             // suspend the sound
             
-        this.soundList.suspend();
+        this.audio.suspend();
         
             // the pause click
 
@@ -464,6 +465,9 @@ export default class CoreClass
             case this.LOOP_DIALOG_DEVELOPER:
                 this.dialogDeveloper.resumeLoop();
                 break;
+            case this.LOOP_DIALOG_PROMPT:
+                this.dialogPrompt.resumeLoop();
+                break;
             case this.LOOP_GAME:
                 this.game.resumeLoop();
                 break;
@@ -474,7 +478,7 @@ export default class CoreClass
         
             // resume the sound (if not in developer)
             
-        if (this.currentLoop!==this.LOOP_DEVELOPER) this.soundList.resume();
+        if (this.currentLoop!==this.LOOP_DEVELOPER) this.audio.resume();
         
             // and restart the loop
         
@@ -510,6 +514,9 @@ function mainLoop(timestamp)
             break;
         case core.LOOP_DIALOG_DEVELOPER:
             core.dialogDeveloper.loop();
+            break;
+        case core.LOOP_DIALOG_PROMPT:
+            core.dialogPrompt.loop();
             break;
         case core.LOOP_GAME:
             if (!core.game.inLoading) core.game.loop();

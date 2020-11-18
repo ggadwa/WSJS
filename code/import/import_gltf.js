@@ -776,7 +776,7 @@ export default class ImportGLTFClass
             obj=this.decideMapMeshInformationalParseJSON(meshNode,value);
             if (obj===null) return(this.MESH_INFORMATIONAL_ERROR);
             
-            this.core.music.setMusic(obj.name,((obj.loopStart===undefined)?0:obj.loopStart),((obj.loopEnd===undefined)?0:obj.loopEnd));
+            map.music.setMusic(obj.name,((obj.loopStart===undefined)?0:obj.loopStart),((obj.loopEnd===undefined)?0:obj.loopEnd));
             return(this.MESH_INFORMATIONAL_REMOVE);
         }
         

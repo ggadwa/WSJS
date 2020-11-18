@@ -21,11 +21,20 @@ export default class ModelListClass
 
     initialize()
     {
+        this.models.clear();
+        
         return(true);
     }
 
     release()
     {
+        let model;
+        
+        for (model of this.models.values()) {
+            model.release();
+        }
+        
+        this.models.clear();
     }
     
         //

@@ -38,6 +38,8 @@ export default class SoundListClass
     {
         let n;
         
+        this.sounds.clear();
+        
             // list of playing sounds
         
         this.soundPlays=[];
@@ -48,34 +50,30 @@ export default class SoundListClass
        
             // get a reference to the listener
             
-        this.listener=this.core.audioCTX.listener;
+        this.listener=this.core.audio.audioCTX.listener;
         
         return(true);
     }
 
     release()
     {
-        let n;
+        let n,sound;
         
+            // playing sounds
+            
         for (n=0;n!==this.MAX_CONCURRENT_SOUNDS;n++) {
             this.soundPlays[n].close();
         }
       
         this.soundPlays=[];
-    }
-    
-        //
-        // suspend and resume all sound context
-        //
         
-    suspend()
-    {
-        this.core.audioCTX.suspend();
-    }
-    
-    resume()
-    {
-        this.core.audioCTX.resume();
+            // buffers
+            
+        for (sound of this.sounds.values()) {
+            sound.release();
+        }
+        
+        this.sounds.clear();
     }
     
         //
@@ -273,7 +271,7 @@ export default class SoundListClass
         
             // set it to entity
             
-        if (!soundPlay.play(this.core.audioCTX,this.currentListenerEntity,position,sound,rate,distance,loopStart,loopEnd,loop)) return(-1);
+        if (!soundPlay.play(this.core.audio.audioCTX,this.currentListenerEntity,position,sound,rate,distance,loopStart,loopEnd,loop)) return(-1);
         
         return(idx);
     }

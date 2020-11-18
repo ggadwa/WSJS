@@ -164,18 +164,18 @@ export default class DeveloperClass
             
         if (input.isKeyDownAndClear('o')) {
             selNodeIdx=this.getSelectNode();
-            if (selNodeIdx===-1) return;
+            if (selNodeIdx===-1) return(true);
             
             if (path.editorSplitStartNodeIdx===-1) {
                 path.editorSplitStartNodeIdx=selNodeIdx;
                 console.info('starting split at '+selNodeIdx+' > now select second node');
-                return;
+                return(true);
             }
             
             if (path.editorSplitEndNodeIdx===-1) {
                 path.editorSplitEndNodeIdx=selNodeIdx;
                 console.info('second node selected '+selNodeIdx+' > now add split node');
-                return;
+                return(true);
             }
             
             nodeIdx=path.nodes.length;
@@ -193,7 +193,7 @@ export default class DeveloperClass
             path.editorSplitStartNodeIdx=-1;
             path.editorSplitEndNodeIdx=-1;
 
-            return;
+            return(true);
         }
         
             // p key adds to path
@@ -213,13 +213,13 @@ export default class DeveloperClass
                     console.info('Connected node '+this.developerRay.targetItemIndex);
                 }
                 
-                return;
+                return(true);
             }
             
                 // otherwise create a new node
                 // if the ray has hit something
                 
-            if (this.developerRay.targetItemType===this.SELECT_ITEM_NONE) return;
+            if (this.developerRay.targetItemType===this.SELECT_ITEM_NONE) return(true);
                 
             nodeIdx=path.nodes.length;
             
@@ -236,14 +236,14 @@ export default class DeveloperClass
             this.selectItemIndex=nodeIdx;
             
             console.info('Added node '+nodeIdx);
-            return;
+            return(true);
         }
         
             // \ key deletes selected node
             
         if (input.isKeyDownAndClear('\\')) {
             selNodeIdx=this.getSelectNode();
-            if (selNodeIdx===-1) return;
+            if (selNodeIdx===-1) return(true);
                 
                 // fix any links
 
@@ -270,37 +270,34 @@ export default class DeveloperClass
 
             this.selectItemType=this.SELECT_ITEM_NONE;
             
-            return;
+            return(true);
         }
         
             // i key moves selected node to ray end
 
         if (input.isKeyDownAndClear('i')) {
             selNodeIdx=this.getSelectNode();
-            if (selNodeIdx===-1) return;
+            if (selNodeIdx===-1) return(true);
             
             path.nodes[selNodeIdx].position.setFromPoint(rayEndPoint);
             console.info('Moved node '+selNodeIdx);
            
-           return;
+           return(true);
         }
-    }
-    
-    getSelectedNodeKey()
-    {
-        let key;
-        let selNodeIdx=this.getSelectNode();
         
-        if (selNodeIdx===-1) return('');
+            // k key edits current node key
 
-        key=this.core.game.map.path.nodes[selNodeIdx].key;
-        return((key===null)?'':key);
-    }
-    
-    setSelectedNodeKey(key)
-    {
-        let selNodeIdx=this.getSelectNode();
-        if (selNodeIdx!==-1) this.core.game.map.path.nodes[selNodeIdx].key=(key==='')?null:key;
+        if (input.isKeyDownAndClear('k')) {
+            selNodeIdx=this.getSelectNode();
+            if (selNodeIdx===-1) return(true);
+            
+            this.core.dialogPrompt.setup('Node Key','Node Key (blank for none)',path.nodes[selNodeIdx],'key');
+            this.core.switchLoop(this.core.LOOP_DIALOG_PROMPT);
+           
+           return(false);       // going into dialog, exit out of loop
+        }
+        
+        return(true);
     }
     
         //
@@ -666,9 +663,9 @@ export default class DeveloperClass
         this.core.game.map.lightList.lightMin.setFromValues(1,1,1);
         this.core.game.map.lightList.lightMax.setFromValues(1,1,1);
         
-            // suspect sound
+            // stop music
             
-        this.core.soundList.suspend();
+        this.core.audio.musicStop();
 
             // timing setup
             
@@ -702,7 +699,7 @@ export default class DeveloperClass
         
             // resume sound
             
-        this.core.soundList.resume();
+        this.core.audio.musicStart(this.core.game.map.music);
     }
     
         //
@@ -763,8 +760,9 @@ export default class DeveloperClass
         else {
             this.lookDownMove();
         }
+        
         this.select();
-        this.pathEditor();
+        if (!this.pathEditor()) return(false);
         
             // run the targetting
             
