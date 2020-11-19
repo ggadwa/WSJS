@@ -1,6 +1,6 @@
 import ColorClass from '../utility/color.js';
 import BitmapInterfaceClass from '../bitmap/bitmap_interface.js';
-import InterfaceButtonClass from '../interface/interface_button.js';
+import DialogButtonClass from '../dialog/dialog_button.js';
 
 export default class TitleClass
 {
@@ -29,11 +29,11 @@ export default class TitleClass
     
     async initialize()
     {
-        this.playButton=new InterfaceButtonClass(this.core,this.core.json.title.playButton.x,this.core.json.title.playButton.y,this.core.json.title.playButton.width,this.core.json.title.playButton.height,this.core.json.title.playButton.title);
+        this.playButton=new DialogButtonClass(this.core,this.core.json.title.playButton.x,this.core.json.title.playButton.y,this.core.json.title.playButton.width,this.core.json.title.playButton.height,this.core.json.title.playButton.title);
         if (!this.playButton.initialize()) return(false);
         
         if (this.core,this.core.json.title.multiplayerButton.show) {
-            this.multiplayerButton=new InterfaceButtonClass(this.core,this.core.json.title.multiplayerButton.x,this.core.json.title.multiplayerButton.y,this.core.json.title.multiplayerButton.width,this.core.json.title.multiplayerButton.height,this.core.json.title.multiplayerButton.title);
+            this.multiplayerButton=new DialogButtonClass(this.core,this.core.json.title.multiplayerButton.x,this.core.json.title.multiplayerButton.y,this.core.json.title.multiplayerButton.width,this.core.json.title.multiplayerButton.height,this.core.json.title.multiplayerButton.title);
             if (!this.multiplayerButton.initialize()) return(false);
         }
         else {
@@ -41,7 +41,7 @@ export default class TitleClass
         }
         
         if (this.core,this.core.json.title.setupButton.show) {
-            this.setupButton=new InterfaceButtonClass(this.core,this.core.json.title.setupButton.x,this.core.json.title.setupButton.y,this.core.json.title.setupButton.width,this.core.json.title.setupButton.height,this.core.json.title.setupButton.title);
+            this.setupButton=new DialogButtonClass(this.core,this.core.json.title.setupButton.x,this.core.json.title.setupButton.y,this.core.json.title.setupButton.width,this.core.json.title.setupButton.height,this.core.json.title.setupButton.title);
             if (!this.setupButton.initialize()) return(false);
         }
         else {
@@ -64,11 +64,9 @@ export default class TitleClass
         
     run()
     {
-        let cursor=this.core.interface.cursor;
-        
             // mouse move cursor
             
-        if (cursor.run()) {
+        if (this.core.cursor.run()) {
             this.clickDown=true;
         }
         else {
@@ -121,7 +119,7 @@ export default class TitleClass
         
             // background
          
-        this.core.interface.background.draw(false);
+        this.core.background.draw(false);
                     
             // buttons
             
@@ -131,7 +129,7 @@ export default class TitleClass
         
             // cursor
         
-        if (!this.core.input.hasTouch) this.core.interface.cursor.draw();
+        if (!this.core.input.hasTouch) this.core.cursor.draw();
 
         gl.disable(gl.BLEND);
         gl.enable(gl.DEPTH_TEST);
@@ -149,7 +147,7 @@ export default class TitleClass
         this.lastRunTimestamp=0;
         this.lastDrawTimestamp=0;
         
-        this.core.interface.cursor.center();
+        this.core.cursor.center();
         
         this.clickDown=false;
     }

@@ -1,6 +1,6 @@
 import BitmapInterfaceClass from '../bitmap/bitmap_interface.js';
 
-export default class InterfaceHitClass
+export default class HitOverlayClass
 {
     constructor(core,bitmapPath)
     {
@@ -217,6 +217,9 @@ export default class InterfaceHitClass
             // draw
         
         shader.drawStart();
+        
+        gl.disable(gl.DEPTH_TEST);
+        gl.enable(gl.BLEND);
         gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
                 
         this.bitmap.attach();
@@ -246,6 +249,9 @@ export default class InterfaceHitClass
             // remove the buffers
 
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
+
+        gl.disable(gl.BLEND);
+        gl.enable(gl.DEPTH_TEST);
         
         shader.drawEnd();
     }

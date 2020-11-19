@@ -1,8 +1,10 @@
+import BackgroundClass from '../main/background.js';
+import CursorClass from '../main/cursor.js';
 import TitleClass from '../main/title.js';
-import DialogSettingClass from '../main/dialog_setting.js';
-import DialogMultiplayerClass from '../main/dialog_multiplayer.js';
-import DialogDeveloperClass from '../main/dialog_developer.js';
-import DialogPromptClass from '../main/dialog_prompt.js';
+import DialogSettingClass from '../dialog/dialog_setting.js';
+import DialogMultiplayerClass from '../dialog/dialog_multiplayer.js';
+import DialogDeveloperClass from '../dialog/dialog_developer.js';
+import DialogPromptClass from '../dialog/dialog_prompt.js';
 import MapClass from '../map/map.js';
 import BitmapListClass from '../bitmap/bitmap_list.js';
 import ShaderListClass from '../shader/shader_list.js';
@@ -12,11 +14,10 @@ import RectClass from '../utility/rect.js';
 import PlaneClass from '../utility/plane.js';
 import ColorClass from '../utility/color.js';
 import Matrix4Class from '../utility/matrix4.js';
-import GameClass from '../main/game.js';
+import GameClass from '../game/game.js';
 import DeveloperClass from '../developer/developer.js';
 import InterfaceClass from '../interface/interface.js';
 import InputClass from '../main/input.js';
-import NetworkClass from '../main/network.js';
 import SetupClass from '../main/setup.js';
 
 //
@@ -27,9 +28,8 @@ export default class CoreClass
 {
     constructor()
     {
-        this.MAX_LIGHT_COUNT=24;        // max lights in scene, needs to be the same as lights[x] in shaders
-        this.MAX_SKELETON_JOINT=64;    // max joints in a skeleton, needs to be the same as jointMatrix[x] in shaders
-        
+            // loop types
+            
         this.LOOP_TITLE=0;
         this.LOOP_DIALOG_SETTING=1;
         this.LOOP_DIALOG_MULTIPLAYER=2;
@@ -38,6 +38,8 @@ export default class CoreClass
         this.LOOP_GAME=5;
         this.LOOP_DEVELOPER=6;
         
+            // gl options
+            
         this.GL_OPTIONS={
             alpha:false,
             depth:true,
@@ -48,6 +50,21 @@ export default class CoreClass
             preserveDrawingBuffer:true,
             failIfMajorPerformanceCaveat:false
         };
+        
+            // text statics
+            
+        this.TEXT_TEXTURE_WIDTH=512;
+        this.TEXT_TEXTURE_HEIGHT=512;
+        this.TEXT_CHAR_PER_ROW=10;
+        this.TEXT_CHAR_WIDTH=50;
+        this.TEXT_CHAR_HEIGHT=50;
+        this.TEXT_FONT_NAME='Arial';
+        this.TEXT_FONT_SIZE=48;
+        
+            // misc statics
+            
+        this.MAX_LIGHT_COUNT=24;        // max lights in scene, needs to be the same as lights[x] in shaders
+        this.MAX_SKELETON_JOINT=64;    // max joints in a skeleton, needs to be the same as jointMatrix[x] in shaders
         
             // current loop
             
@@ -64,9 +81,19 @@ export default class CoreClass
             
         this.audio=new AudioClass(this);
         
+            // fonts
+            
+        this.fontTexture=null;
+        this.fontCharWidths=new Float32Array(128);
+        
             // the core.json
             
         this.json=null;
+        
+            // title/dialog common interfaces
+            
+        this.background=null;
+        this.cursor=null;
         
             // the cached objects
             // list, these are usually created by
@@ -90,10 +117,6 @@ export default class CoreClass
         this.input=new InputClass(this);
         this.input.initialize();
         
-            // networking
-            
-        this.network=new NetworkClass(this);
-        
             // the core setup
 
         this.wid=0;
@@ -108,7 +131,6 @@ export default class CoreClass
         
             // additional core classes
 
-        this.text=null;
         this.interface=null;
 
         this.setup=null;
@@ -198,6 +220,18 @@ export default class CoreClass
             
         if (!this.audio.initialize()) return(false);
         
+            // the font texture
+            
+        this.createFontTexture();
+        
+            // title/dialog common interfaces
+            
+        this.background=new BackgroundClass(this);
+        if (!(await this.background.initialize())) return(false);
+            
+        this.cursor=new CursorClass(this);
+        if (!(await this.cursor.initialize())) return(false);
+        
             // bitmap, shader list
             // a lot of these are deffered load or
             // versions that cache objects
@@ -259,7 +293,73 @@ export default class CoreClass
         this.shaderList.release();
         this.bitmapList.release();
         this.audio.release();
+        this.cursor.release();
+        this.background.release();
+        this.deleteFontTexture();
     }
+    
+        //
+        // fonts
+        //
+        
+    createFontTexture()
+    {
+        let x,y,yAdd,cIdx,charStr,ch;
+        let fontCanvas,ctx;
+        let gl=this.gl;
+        
+            // create the text bitmap
+
+        fontCanvas=document.createElement('canvas');
+        fontCanvas.width=this.TEXT_TEXTURE_WIDTH;
+        fontCanvas.height=this.TEXT_TEXTURE_HEIGHT;
+        ctx=fontCanvas.getContext('2d');
+        
+            // background is black, text is white
+            // so it can be colored
+            
+        ctx.fillStyle='#000000';
+        ctx.fillRect(0,0,this.TEXT_TEXTURE_WIDTH,this.TEXT_TEXTURE_HEIGHT);
+
+            // draw the text
+
+        ctx.font=(this.TEXT_FONT_SIZE+'px ')+this.TEXT_FONT_NAME;
+        ctx.textAlign='left';
+        ctx.textBaseline='middle';
+        ctx.fillStyle='#FFFFFF';
+
+        yAdd=Math.trunc(this.TEXT_CHAR_HEIGHT/2);
+
+        for (ch=32;ch!==127;ch++) {
+            cIdx=ch-32;
+            x=(cIdx%this.TEXT_CHAR_PER_ROW)*this.TEXT_CHAR_WIDTH;
+            y=Math.trunc(cIdx/this.TEXT_CHAR_PER_ROW)*this.TEXT_CHAR_HEIGHT;
+            y+=yAdd;
+
+            charStr=String.fromCharCode(ch);
+            this.fontCharWidths[cIdx]=((ctx.measureText(charStr).width+4)/this.TEXT_CHAR_WIDTH);
+            if (this.fontCharWidths[cIdx]>1.0) this.fontCharWidths[cIdx]=1.0;
+
+            ctx.fillText(charStr,(x+2),(y-1));
+
+            x+=this.TEXT_CHAR_WIDTH;
+        }
+
+            // finally load into webGL
+            
+        this.fontTexture=gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D,this.fontTexture);
+        gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,fontCanvas);
+        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_NEAREST);
+        gl.generateMipmap(gl.TEXTURE_2D);
+        gl.bindTexture(gl.TEXTURE_2D,null);
+    }
+    
+    deleteFontTexture()
+    {
+        this.gl.deleteTexture(this.fontTexture);
+    }        
     
         //
         // canvas right click, always disabled

@@ -1,8 +1,4 @@
-import PointClass from '../utility/point.js';
 import CoreClass from '../main/core.js';
-import GameClass from '../main/game.js';
-import MapClass from '../map/map.js';
-import ShadowmapLoadClass from '../light/shadowmap_load.js';
 
 //
 // main class

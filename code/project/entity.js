@@ -7,7 +7,6 @@ import ModelClass from '../model/model.js';
 import ModelEntityAlterClass from '../model/model_entity_alter.js';
 import EffectClass from '../project/effect.js';
 import CollisionClass from '../collision/collisions.js';
-import NetworkClass from '../main/network.js';
 
 export default class EntityClass
 {
@@ -859,7 +858,7 @@ export default class EntityClass
     
     sendCustomNetworkMessage(intParam0,intParam1,intParam2,floatParam0,floatParam1,floatParam2,stringParam0,stringParam1,stringParam2)
     {
-        this.core.network.sendCustomMessage(this,intParam0,intParam1,intParam2,floatParam0,floatParam1,floatParam2,stringParam0,stringParam1,stringParam2);
+        this.core.game.network.sendCustomMessage(this,intParam0,intParam1,intParam2,floatParam0,floatParam1,floatParam2,stringParam0,stringParam1,stringParam2);
     }
     
     getUpdateNetworkData(msgType,remoteId)

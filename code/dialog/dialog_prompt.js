@@ -1,7 +1,5 @@
-import DialogBaseClass from '../main/dialog_base.js';
+import DialogBaseClass from '../dialog/dialog_base.js';
 import SetupClass from '../main/setup.js';
-import InterfaceButtonClass from '../interface/interface_button.js';
-import InterfaceControlClass from '../interface/interface_control.js';
 
 export default class DialogPromptClass extends DialogBaseClass
 {
@@ -30,8 +28,8 @@ export default class DialogPromptClass extends DialogBaseClass
         
             // prompt controls
             
-        if (!this.addDialogControl('headPrompt',this.core.interface.CONTROL_TYPE_HEADER,'',null)) return(false);
-        if (!this.addDialogControl('promptValue',this.core.interface.CONTROL_TYPE_TEXT,'',null)) return(false);
+        if (!this.addDialogControl(this,'headPrompt',this.core.interface.CONTROL_TYPE_HEADER,'',null)) return(false);
+        if (!this.addDialogControl(this,'promptValue',this.core.interface.CONTROL_TYPE_TEXT,'',null)) return(false);
         
         return(true);
     }
@@ -42,12 +40,12 @@ export default class DialogPromptClass extends DialogBaseClass
         
     loadDialogControls()
     {
-        this.core.interface.currentOpenHeaderControl=this.controls.get('headPrompt');
+        this.currentOpenHeaderControl=this.controls.get('headPrompt');
         
             // only a single text value, which is always selected
 
         this.setDialogControl('promptValue',this.valueObj[this.valuePropName]);
-        this.core.interface.currentTextInputControl=this.controls.get('promptValue');
+        this.currentTextInputControl=this.controls.get('promptValue');
     }
     
     saveDialogControls()

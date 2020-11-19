@@ -1,7 +1,5 @@
-import DialogBaseClass from '../main/dialog_base.js';
+import DialogBaseClass from '../dialog/dialog_base.js';
 import SetupClass from '../main/setup.js';
-import InterfaceButtonClass from '../interface/interface_button.js';
-import InterfaceControlClass from '../interface/interface_control.js';
 
 export default class DialogSettingClass extends DialogBaseClass
 {
@@ -27,30 +25,30 @@ export default class DialogSettingClass extends DialogBaseClass
         
             // profile controls
             
-        if (!this.addDialogControl('headProfile',this.core.interface.CONTROL_TYPE_HEADER,'Profile',null)) return(false);
-        if (!this.addDialogControl('name',this.core.interface.CONTROL_TYPE_TEXT,'Name:',null)) return(false);
-        if (!this.addDialogControl('showFPS',this.core.interface.CONTROL_TYPE_CHECKBOX,'Show FPS:',null)) return(false);
+        if (!this.addDialogControl(this,'headProfile',this.core.interface.CONTROL_TYPE_HEADER,'Profile',null)) return(false);
+        if (!this.addDialogControl(this,'name',this.core.interface.CONTROL_TYPE_TEXT,'Name:',null)) return(false);
+        if (!this.addDialogControl(this,'showFPS',this.core.interface.CONTROL_TYPE_CHECKBOX,'Show FPS:',null)) return(false);
         
             // movement controls
             
-        if (!this.addDialogControl('headMovement',this.core.interface.CONTROL_TYPE_HEADER,'Movement',null)) return(false);
+        if (!this.addDialogControl(this,'headMovement',this.core.interface.CONTROL_TYPE_HEADER,'Movement',null)) return(false);
         
-        if (!this.addDialogControl('mouseXSensitivity',this.core.interface.CONTROL_TYPE_RANGE,'Mouse X Sensitivity:',null)) return(false);
-        if (!this.addDialogControl('mouseXAcceleration',this.core.interface.CONTROL_TYPE_RANGE,'Mouse X Acceleration:',null)) return(false);
-        if (!this.addDialogControl('mouseXInvert',this.core.interface.CONTROL_TYPE_CHECKBOX,'Invert Mouse X:',null)) return(false);
-        if (!this.addDialogControl('mouseYSensitivity',this.core.interface.CONTROL_TYPE_RANGE,'Mouse Y Sensitivity:',null)) return(false);
-        if (!this.addDialogControl('mouseYAcceleration',this.core.interface.CONTROL_TYPE_RANGE,'Mouse Y Acceleration:',null)) return(false);
-        if (!this.addDialogControl('mouseYInvert',this.core.interface.CONTROL_TYPE_CHECKBOX,'Invert Mouse Y:',null)) return(false);
-        if (!this.addDialogControl('touchStickXSensitivity',this.core.interface.CONTROL_TYPE_RANGE,'Touch Stick X Sensitivity:',null)) return(false);
-        if (!this.addDialogControl('touchStickYSensitivity',this.core.interface.CONTROL_TYPE_RANGE,'Touch Stick Y Sensitivity:',null)) return(false);
-        if (!this.addDialogControl('snapLook',this.core.interface.CONTROL_TYPE_CHECKBOX,'Snap Look:',null)) return(false);
+        if (!this.addDialogControl(this,'mouseXSensitivity',this.core.interface.CONTROL_TYPE_RANGE,'Mouse X Sensitivity:',null)) return(false);
+        if (!this.addDialogControl(this,'mouseXAcceleration',this.core.interface.CONTROL_TYPE_RANGE,'Mouse X Acceleration:',null)) return(false);
+        if (!this.addDialogControl(this,'mouseXInvert',this.core.interface.CONTROL_TYPE_CHECKBOX,'Invert Mouse X:',null)) return(false);
+        if (!this.addDialogControl(this,'mouseYSensitivity',this.core.interface.CONTROL_TYPE_RANGE,'Mouse Y Sensitivity:',null)) return(false);
+        if (!this.addDialogControl(this,'mouseYAcceleration',this.core.interface.CONTROL_TYPE_RANGE,'Mouse Y Acceleration:',null)) return(false);
+        if (!this.addDialogControl(this,'mouseYInvert',this.core.interface.CONTROL_TYPE_CHECKBOX,'Invert Mouse Y:',null)) return(false);
+        if (!this.addDialogControl(this,'touchStickXSensitivity',this.core.interface.CONTROL_TYPE_RANGE,'Touch Stick X Sensitivity:',null)) return(false);
+        if (!this.addDialogControl(this,'touchStickYSensitivity',this.core.interface.CONTROL_TYPE_RANGE,'Touch Stick Y Sensitivity:',null)) return(false);
+        if (!this.addDialogControl(this,'snapLook',this.core.interface.CONTROL_TYPE_CHECKBOX,'Snap Look:',null)) return(false);
         
             // sound controls
             
-        if (!this.addDialogControl('headSound',this.core.interface.CONTROL_TYPE_HEADER,'Sound',null)) return(false);
-        if (!this.addDialogControl('soundVolume',this.core.interface.CONTROL_TYPE_RANGE,'Sound Volume:',null)) return(false);
-        if (!this.addDialogControl('musicVolume',this.core.interface.CONTROL_TYPE_RANGE,'Music Volume:',null)) return(false);
-        if (!this.addDialogControl('musicOn',this.core.interface.CONTROL_TYPE_CHECKBOX,'Music:',null)) return(false);
+        if (!this.addDialogControl(this,'headSound',this.core.interface.CONTROL_TYPE_HEADER,'Sound',null)) return(false);
+        if (!this.addDialogControl(this,'soundVolume',this.core.interface.CONTROL_TYPE_RANGE,'Sound Volume:',null)) return(false);
+        if (!this.addDialogControl(this,'musicVolume',this.core.interface.CONTROL_TYPE_RANGE,'Music Volume:',null)) return(false);
+        if (!this.addDialogControl(this,'musicOn',this.core.interface.CONTROL_TYPE_CHECKBOX,'Music:',null)) return(false);
         
         return(true);
     }
@@ -63,8 +61,8 @@ export default class DialogSettingClass extends DialogBaseClass
     {
             // open header and no selected text
             
-        this.core.interface.currentOpenHeaderControl=this.controls.get('headProfile');
-        this.core.interface.currentTextInputControl=null;
+        this.currentOpenHeaderControl=this.controls.get('headProfile');
+        this.currentTextInputControl=null;
         
             // the values
 

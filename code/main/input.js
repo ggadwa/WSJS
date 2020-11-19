@@ -343,54 +343,73 @@ export default class InputClass
     
     isTouchStickLeftClick()
     {
+        /*
         let click=this.touchStickLeftClick;
         this.touchStickLeftClick=false;
         
         return(click);
+            */
+        return(false);
     }
     
     getTouchStickLeftX(deadZone,acceleration)
     {
+        /*
         let x=this.core.interface.touchStickLeft.getX();
         
         if (Math.abs(x)<deadZone) return(0);
         return(x*acceleration);
+            */
+        return(0);
     }
     
     getTouchStickLeftY(deadZone,acceleration)
     {
+        /*
         let y=this.core.interface.touchStickLeft.getY();
         
         if (Math.abs(y)<deadZone) return(0);
         return(y*acceleration);
+            */
+        return(0);
     }
     
     isTouchStickRightClick()
     {
+        /*
         let click=this.touchStickRightClick;
         this.touchStickRightClick=false;
         
         return(click);
+            */
+        return(false);
     }
     
     getTouchStickRightX(deadZone,acceleration)
     {
+        /*
         let x=this.core.interface.touchStickRight.getX();
         
         if (Math.abs(x)<deadZone) return(0);
         return(x*acceleration);
+            */
+        return(0);
     }
     
     getTouchStickRightY(deadZone,acceleration)
     {
+        /*
         let y=this.core.interface.touchStickRight.getY();
         
         if (Math.abs(y)<deadZone) return(0);
         return(y*acceleration);
+            */
+        return(0);
     }
     
     getTouchSwipeLeftX()
     {
+        /*
         let x;
         
         if (this.touchLeftSwipeMovement.x===0) return(0);
@@ -398,10 +417,13 @@ export default class InputClass
         x=this.touchLeftSwipeMovement.x;
         this.touchLeftSwipeMovement.x=0;
         return(x);
+            */
+        return(0);
     }
     
     getTouchSwipeLeftY()
     {
+        /*
         let y;
         
         if (this.touchLeftSwipeMovement.y===0) return(0);
@@ -409,10 +431,13 @@ export default class InputClass
         y=this.touchLeftSwipeMovement.y;
         this.touchLeftSwipeMovement.y=0;
         return(y);
+            */
+        return(0);
     }
     
     getTouchSwipeRightX()
     {
+        /*
         let x;
         
         if (this.touchRightSwipeMovement.x===0) return(0);
@@ -420,10 +445,13 @@ export default class InputClass
         x=this.touchRightSwipeMovement.x;
         this.touchRightSwipeMovement.x=0;
         return(x);
+            */
+        return(0);
     }
     
     getTouchSwipeRightY()
     {
+        /*
         let y;
         
         if (this.touchRightSwipeMovement.y===0) return(0);
@@ -431,10 +459,13 @@ export default class InputClass
         y=this.touchRightSwipeMovement.y;
         this.touchRightSwipeMovement.y=0;
         return(y);
+            */
+        return(0);
     }
     
     touchClear()
     {
+        /*
         this.core.interface.touchStickLeft.show=false;
         this.core.interface.touchStickRight.show=false;
         
@@ -446,6 +477,7 @@ export default class InputClass
         
         this.touchRightSwipeId=null;
         this.touchRightSwipeMovement.setFromValues(0,0,0);
+         */
     }
     
     touchStart(event)

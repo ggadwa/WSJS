@@ -2,8 +2,13 @@ import PointClass from '../utility/point.js';
 import ColorClass from '../utility/color.js';
 import PlaneClass from '../utility/plane.js';
 import Matrix4Class from '../utility/matrix4.js';
+import NetworkClass from '../game/network.js';
+import TouchStickClass from '../game/touch_stick.js';
+import TouchButtonClass from '../game/touch_button.js';
 import MapClass from '../map/map.js';
-import CameraClass from '../main/camera.js';
+import CameraClass from '../game/camera.js';
+import LiquidTintClass from '../game/liquid_tint.js';
+import HitOverlayClass from '../game/hit_overlay.js';
 import ShadowmapLoadClass from '../light/shadowmap_load.js';
 import SequenceClass from '../sequence/sequence.js';
 import EntityFPSPlayerClass from '../project/entity_fps_player.js';
@@ -104,6 +109,19 @@ export default class GameClass
         this.frustumBottomPlane=new PlaneClass(0.0,0.0,0.0,0.0);
         this.frustumNearPlane=new PlaneClass(0.0,0.0,0.0,0.0);
         this.frustumFarPlane=new PlaneClass(0.0,0.0,0.0,0.0);
+        
+            // networking
+            
+        this.network=new NetworkClass(this.core);
+        
+            // game interfaces
+            
+        this.liquidTint=null;
+        this.hitOverlay=null;
+
+        this.touchStickLeft=null;
+        this.touchStickRight=null;
+        this.touchButtonMenu=null;
         
         Object.seal(this);
     }
@@ -214,12 +232,36 @@ export default class GameClass
             
         this.camera=new CameraClass(this.core);
         if (!this.camera.initialize()) return;
+                
+            // game interface
+            
+        this.liquidTint=new LiquidTintClass(this.core);
+        if (!this.liquidTint.initialize()) return(false);
+        
+        this.hitOverlay=new HitOverlayClass(this.core,'textures/ui_hit.png');
+        if (!this.hitOverlay.initialize()) return(false);
+            
+        this.touchStickLeft=new TouchStickClass(this.core,'textures/ui_touch_stick_left_ring.png','textures/ui_touch_stick_left_thumb.png',this.core.json.config.touchStickSize);
+        if (!(await this.touchStickLeft.initialize())) return(false);
+        
+        this.touchStickRight=new TouchStickClass(this.core,'textures/ui_touch_stick_right_ring.png','textures/ui_touch_stick_right_thumb.png',this.core.json.config.touchStickSize);
+        if (!(await this.touchStickRight.initialize())) return(false);
+        
+        this.touchButtonMenu=new TouchButtonClass(this.core,'textures/ui_touch_menu.png',new PointClass(this.core.json.config.touchMenuPosition[0],this.core.json.config.touchMenuPosition[1],0),this.core.json.config.touchButtonSize);
+        if (!(await this.touchButtonMenu.initialize())) return(false);
 
         return(true);
     }
     
     release()
-    {
+    {        
+        this.touchStickLeft.release();
+        this.touchStickRight.release();
+        this.touchButtonMenu.release();
+        
+        this.liquidTint.release();
+        this.hitOverlay.release();
+        
         this.camera.release();
         this.map.release();
     }
@@ -595,7 +637,7 @@ export default class GameClass
         this.loadingScreenAddString('Connecting to Server');
         this.loadingScreenDraw();
         
-        this.core.network.connect(this.runMultiplayerConnectedOK.bind(this),this.runMultiplayerConnectedError.bind(this));     // return here, callback from connection or error
+        this.network.connect(this.runMultiplayerConnectedOK.bind(this),this.runMultiplayerConnectedError.bind(this));     // return here, callback from connection or error
     }
     
     runMultiplayerConnectedOK()
@@ -609,7 +651,7 @@ export default class GameClass
     
     runMultiplayerConnectedError()
     {
-        alert(this.core.network.lastErrorMessage);
+        alert(this.network.lastErrorMessage);
         this.runMultiplayerDialog();
     }
     */
@@ -778,7 +820,7 @@ export default class GameClass
             this.loadingScreenAddString('Connecting to Server');
             this.loadingScreenDraw();
         
-            this.core.network.sync(this.runMultiplayerSyncOK.bind(this),this.runMultiplayerSyncError.bind(this));     // return here, callback from connection or error
+            this.network.sync(this.runMultiplayerSyncOK.bind(this),this.runMultiplayerSyncError.bind(this));     // return here, callback from connection or error
             return;
         }
         */
@@ -795,7 +837,7 @@ export default class GameClass
     
     runMultiplayerSyncError()
     {
-        alert(this.core.network.lastErrorMessage);  // this all needs to be redone
+        alert(this.network.lastErrorMessage);  // this all needs to be redone
         this.network.disconnect();
     }
        
@@ -1143,9 +1185,28 @@ export default class GameClass
         gl.clear(gl.DEPTH_BUFFER_BIT);
         this.map.entityList.draw(player);
         
+            // tints and overlays
+            
+        this.liquidTint.draw();
+        this.hitOverlay.draw();
+        
             // interface
             
-        if (!this.hideUI) this.core.interface.drawGame();
+        if (!this.hideUI) {
+            this.core.interface.drawGame();
+                    
+                // touch controls
+
+            if (this.core.input.hasTouch) {
+                this.core.shaderList.interfaceShader.drawStart();
+
+                this.touchStickLeft.draw();
+                this.touchStickRight.draw();
+                this.touchButtonMenu.draw();
+
+                this.core.shaderList.interfaceShader.drawEnd();
+            }
+        }
         
             // sequences
             
@@ -1254,7 +1315,7 @@ export default class GameClass
                 // if multiplayer, handle all
                 // the network updates and messages
 
-            if (this.multiplayerMode===this.MULTIPLAYER_MODE_JOIN) this.core.network.run();
+            if (this.multiplayerMode===this.MULTIPLAYER_MODE_JOIN) this.network.run();
         }
 
             // clean up deleted entities

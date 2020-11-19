@@ -1,6 +1,6 @@
 import SetupClass from '../main/setup.js';
-import InterfaceButtonClass from '../interface/interface_button.js';
-import InterfaceControlClass from '../interface/interface_control.js';
+import DialogButtonClass from '../dialog/dialog_button.js';
+import DialogControlClass from '../dialog/dialog_control.js';
 
 export default class DialogBaseClass
 {
@@ -18,6 +18,9 @@ export default class DialogBaseClass
         
         this.clickDown=false;
         this.defButtonId=null;
+        
+        this.currentOpenHeaderControl=null;     // current open header in dialog
+        this.currentTextInputControl=null;      // current text input in dialog
         
         // no seal, base class
     }
@@ -55,11 +58,11 @@ export default class DialogBaseClass
         // dialog controls
         //
         
-    addDialogControl(id,controlType,title,list)
+    addDialogControl(dialog,id,controlType,title,list)
     {
         let control;
         
-        control=new InterfaceControlClass(this.core,controlType,title,list);
+        control=new DialogControlClass(this.core,dialog,controlType,title,list);
         if (!control.initialize()) return(false);
         this.controls.set(id,control);
         
@@ -92,7 +95,7 @@ export default class DialogBaseClass
     {
         let button;
         
-        button=new InterfaceButtonClass(this.core,x,y,wid,high,title);
+        button=new DialogButtonClass(this.core,x,y,wid,high,title);
         if (!button.initialize()) return(false);
         this.buttons.set(id,button);
         
@@ -122,7 +125,7 @@ export default class DialogBaseClass
             // prepare the dialog
             
         this.loadDialogControls();
-        this.core.interface.cursor.center();
+        this.core.cursor.center();
         this.core.input.keyClear();
     }
     
@@ -146,15 +149,15 @@ export default class DialogBaseClass
         
             // keyboard
         
-        if (this.core.interface.currentTextInputControl!==null) {
+        if (this.currentTextInputControl!==null) {
             key=this.core.input.keyGetLastRaw();
             if (key!==null) {
 
                 if (key.toLowerCase()==='enter') return(this.defButtonId);   // enter key can exit dialog
                 
                 if (key.toLowerCase()==='backspace') {
-                    if (this.core.interface.currentTextInputControl.value.length>0) {
-                        this.core.interface.currentTextInputControl.value=this.core.interface.currentTextInputControl.value.substring(0,(this.core.interface.currentTextInputControl.value.length-1));
+                    if (this.currentTextInputControl.value.length>0) {
+                        this.currentTextInputControl.value=this.currentTextInputControl.value.substring(0,(this.currentTextInputControl.value.length-1));
                     }
                     return(null);
                 }
@@ -162,7 +165,7 @@ export default class DialogBaseClass
                 if (key.length>1) return(null);
 
                 if (((key>='a') && (key<='z')) || ((key>='A') && (key<='Z')) || ((key>='0') && (key<='9'))) {
-                    this.core.interface.currentTextInputControl.value+=key;
+                    this.currentTextInputControl.value+=key;
                     return(null);
                 }
             }
@@ -170,7 +173,7 @@ export default class DialogBaseClass
 
             // mouse clicking
             
-        if (this.core.interface.cursor.run()) {
+        if (this.core.cursor.run()) {
             this.clickDown=true;
             return(null);
         }
@@ -184,7 +187,7 @@ export default class DialogBaseClass
 
         for ([key,control] of this.controls) {
             if (control.controlType===this.core.interface.CONTROL_TYPE_HEADER) {
-                show=(this.core.interface.currentOpenHeaderControl===control);
+                show=(this.currentOpenHeaderControl===control);
                 if (control.click()) return(null);
             }
             else {
@@ -225,7 +228,7 @@ export default class DialogBaseClass
         
             // background
          
-        this.core.interface.background.draw(true);
+        this.core.background.draw(true);
                     
             // controls
             
@@ -235,7 +238,7 @@ export default class DialogBaseClass
 
         for ([key,control] of this.controls) {
             if (control.controlType===this.core.interface.CONTROL_TYPE_HEADER) {
-                show=(this.core.interface.currentOpenHeaderControl===control);
+                show=(this.currentOpenHeaderControl===control);
                 y=control.draw(y);
             }
             else {
@@ -249,7 +252,7 @@ export default class DialogBaseClass
         
             // cursor
         
-        if (!this.core.input.hasTouch) this.core.interface.cursor.draw();
+        if (!this.core.input.hasTouch) this.core.cursor.draw();
 
         gl.disable(gl.BLEND);
         gl.enable(gl.DEPTH_TEST);

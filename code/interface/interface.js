@@ -1,17 +1,9 @@
 import PointClass from '../utility/point.js';
 import ColorClass from '../utility/color.js';
 import RectClass from '../utility/rect.js';
-import InterfaceBackgroundClass from '../interface/interface_background.js';
-import InterfaceButtonClass from '../interface/interface_button.js';
-import InterfaceControlClass from '../interface/interface_control.js';
-import InterfaceCursorClass from '../interface/interface_cursor.js';
-import InterfaceLiquidClass from '../interface/interface_liquid.js';
-import InterfaceHitClass from '../interface/interface_hit.js';
 import InterfaceElementClass from '../interface/interface_element.js';
 import InterfaceCountClass from '../interface/interface_count.js';
 import InterfaceTextClass from '../interface/interface_text.js';
-import InterfaceTouchStickClass from '../interface/interface_touch_stick.js';
-import InterfaceTouchButtonClass from '../interface/interface_touch_button.js';
 
 //
 // interface class
@@ -26,14 +18,6 @@ export default class InterfaceClass
         this.TEXT_ALIGN_RIGHT=2;
         
         this.TEXT_ALIGN_LIST=['left','center','right'];
-
-        this.TEXT_TEXTURE_WIDTH=512;
-        this.TEXT_TEXTURE_HEIGHT=512;
-        this.TEXT_CHAR_PER_ROW=10;
-        this.TEXT_CHAR_WIDTH=50;
-        this.TEXT_CHAR_HEIGHT=50;
-        this.TEXT_FONT_NAME='Arial';
-        this.TEXT_FONT_SIZE=48;
         
         this.POSITION_MODE_TOP_LEFT=0;
         this.POSITION_MODE_TOP_RIGHT=1;
@@ -51,26 +35,12 @@ export default class InterfaceClass
         
         this.core=core;
         
-        this.background=null;
-        this.cursor=null;
         this.elements=new Map();
         this.counts=new Map();
         this.texts=new Map();
         this.fpsText=null;
             
         this.uiTextColor=new ColorClass(1,1,0);
-        
-        this.fontTexture=null;
-        this.fontCharWidths=new Float32Array(128);
-        
-        this.liquid=null;
-        this.hit=null;
-        this.touchStickLeft=null;
-        this.touchStickRight=null;
-        this.touchButtonMenu=null;
-        
-        this.currentOpenHeaderControl=null;     // current open header in dialog
-        this.currentTextInputControl=null;      // current text input in dialog
         
         Object.seal(this);
     }
@@ -81,50 +51,11 @@ export default class InterfaceClass
 
     async initialize()
     {
-        let hitSize,hitMargin;
-        let game=this.core.game;
-        
             // clear all current elements and texts
             
         this.elements.clear();
         this.counts.clear();
         this.texts.clear();
-        
-            // create the font texture
-            
-        this.createFontTexture();
-        
-            // background and cursor
-            
-        this.background=new InterfaceBackgroundClass(this.core);
-        if (!(await this.background.initialize())) return(false);
-            
-        this.cursor=new InterfaceCursorClass(this.core);
-        if (!(await this.cursor.initialize())) return(false);
-        
-            // liquid tinting
-            
-        this.liquid=new InterfaceLiquidClass(this.core);
-        if (!this.liquid.initialize()) return(false);
-        
-            // hit elements
-            
-        hitSize=Math.trunc(this.core.canvas.width*0.08);
-        hitMargin=Math.trunc(this.core.canvas.height*0.25);
-        
-        this.hit=new InterfaceHitClass(this.core,'textures/ui_hit.png');
-        if (!this.hit.initialize()) return(false);
-        
-            // touch controls
-            
-        this.touchStickLeft=new InterfaceTouchStickClass(this.core,'textures/ui_touch_stick_left_ring.png','textures/ui_touch_stick_left_thumb.png',this.core.json.config.touchStickSize);
-        if (!(await this.touchStickLeft.initialize())) return(false);
-        
-        this.touchStickRight=new InterfaceTouchStickClass(this.core,'textures/ui_touch_stick_right_ring.png','textures/ui_touch_stick_right_thumb.png',this.core.json.config.touchStickSize);
-        if (!(await this.touchStickRight.initialize())) return(false);
-        
-        this.touchButtonMenu=new InterfaceTouchButtonClass(this.core,'textures/ui_touch_menu.png',new PointClass(this.core.json.config.touchMenuPosition[0],this.core.json.config.touchMenuPosition[1],0),this.core.json.config.touchButtonSize);
-        if (!(await this.touchButtonMenu.initialize())) return(false);
         
             // fps
             
@@ -137,14 +68,6 @@ export default class InterfaceClass
     release()
     {
         let element,count,text;
-        
-        this.liquid.release();
-        
-        this.hit.release();
-        
-        this.touchStickLeft.release();
-        this.touchStickRight.release();
-        this.touchButtonMenu.release();
         
             // release all elements, counts, and texts
             
@@ -161,78 +84,6 @@ export default class InterfaceClass
         }
         
         this.fpsText.release();
-        
-            // background and cursor
-            
-        this.cursor.release();
-        this.background.release();
-        
-            // and the font texture
-            
-        this.deleteFontTexture();
-    }
-        
-        //
-        // build font bitmap
-        //
-        
-    createFontTexture()
-    {
-        let x,y,yAdd,cIdx,charStr,ch;
-        let canvas,ctx;
-        let gl=this.core.gl;
-        
-            // create the text bitmap
-
-        canvas=document.createElement('canvas');
-        canvas.width=this.TEXT_TEXTURE_WIDTH;
-        canvas.height=this.TEXT_TEXTURE_HEIGHT;
-        ctx=canvas.getContext('2d');
-        
-            // background is black, text is white
-            // so it can be colored
-            
-        ctx.fillStyle='#000000';
-        ctx.fillRect(0,0,this.TEXT_TEXTURE_WIDTH,this.TEXT_TEXTURE_HEIGHT);
-
-            // draw the text
-
-        ctx.font=(this.TEXT_FONT_SIZE+'px ')+this.TEXT_FONT_NAME;
-        ctx.textAlign='left';
-        ctx.textBaseline='middle';
-        ctx.fillStyle='#FFFFFF';
-
-        yAdd=Math.trunc(this.TEXT_CHAR_HEIGHT/2);
-
-        for (ch=32;ch!==127;ch++) {
-            cIdx=ch-32;
-            x=(cIdx%this.TEXT_CHAR_PER_ROW)*this.TEXT_CHAR_WIDTH;
-            y=Math.trunc(cIdx/this.TEXT_CHAR_PER_ROW)*this.TEXT_CHAR_HEIGHT;
-            y+=yAdd;
-
-            charStr=String.fromCharCode(ch);
-            this.fontCharWidths[cIdx]=((ctx.measureText(charStr).width+4)/this.TEXT_CHAR_WIDTH);
-            if (this.fontCharWidths[cIdx]>1.0) this.fontCharWidths[cIdx]=1.0;
-
-            ctx.fillText(charStr,(x+2),(y-1));
-
-            x+=this.TEXT_CHAR_WIDTH;
-        }
-
-            // finally load into webGL
-            
-        this.fontTexture=gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D,this.fontTexture);
-        gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,canvas);
-        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_NEAREST);
-        gl.generateMipmap(gl.TEXTURE_2D);
-        gl.bindTexture(gl.TEXTURE_2D,null);
-    }
-    
-    deleteFontTexture()
-    {
-        this.core.gl.deleteTexture(this.fontTexture);
     }
     
         //
@@ -484,11 +335,6 @@ export default class InterfaceClass
         
         gl.disable(gl.DEPTH_TEST);
         gl.enable(gl.BLEND);
-                    
-            // liquid and hits
-        
-        this.liquid.draw();
-        this.hit.draw();
         
             // elements and counts
             
@@ -530,18 +376,6 @@ export default class InterfaceClass
         }
         
         this.core.shaderList.textShader.drawEnd();
-        
-            // touch controls
-            
-        if (this.core.input.hasTouch) {
-            this.core.shaderList.interfaceShader.drawStart();
-            
-            this.touchStickLeft.draw();
-            this.touchStickRight.draw();
-            this.touchButtonMenu.draw();
-            
-            this.core.shaderList.interfaceShader.drawEnd();
-        }
 
         gl.disable(gl.BLEND);
         gl.enable(gl.DEPTH_TEST);

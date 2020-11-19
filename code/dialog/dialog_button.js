@@ -1,7 +1,7 @@
 import ColorClass from '../utility/color.js';
 import InterfaceTextClass from '../interface/interface_text.js';
 
-export default class InterfaceButtonClass
+export default class DialogButtonClass
 {
     constructor(core,x,y,wid,high,title)
     {
@@ -97,7 +97,7 @@ export default class InterfaceButtonClass
         
     cursorInButton()
     {
-        return((this.core.interface.cursor.x>=this.lft) && (this.core.interface.cursor.x<this.rgt) && (this.core.interface.cursor.y>=this.top) && (this.core.interface.cursor.y<this.bot));
+        return((this.core.cursor.x>=this.lft) && (this.core.cursor.x<this.rgt) && (this.core.cursor.y>=this.top) && (this.core.cursor.y<this.bot));
     }
     
         //

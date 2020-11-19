@@ -154,7 +154,7 @@ export default class EntityPlatformPlayerClass extends EntityClass
         
             // hit indicator
             
-        if (this.hitIndicator) this.core.interface.hit.flash(this.core.interface.hit.SIDE_ALL,this.hitIndicatorFlashTick);
+        if (this.hitIndicator) this.core.game.hitOverlay.flash(this.core.game.hitOverlay.SIDE_ALL,this.hitIndicatorFlashTick);
         
             // take damage
             

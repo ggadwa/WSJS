@@ -1,11 +1,12 @@
 import ColorClass from '../utility/color.js';
 import InterfaceTextClass from '../interface/interface_text.js';
 
-export default class InterfaceControlClass
+export default class DialogControlClass
 {
-    constructor(core,controlType,title,list)
+    constructor(core,dialog,controlType,title,list)
     {
         this.core=core;
+        this.dialog=dialog;
         this.controlType=controlType;
         this.title=title;
         this.list=list;
@@ -128,9 +129,9 @@ export default class InterfaceControlClass
         
     clickHeader(y)
     {
-        if ((this.core.interface.cursor.x<this.TITLE_MARGIN) || (this.core.interface.cursor.x>(this.core.wid-this.TITLE_MARGIN)) || (this.core.interface.cursor.y<y) || (this.core.interface.cursor.y>(y+this.CONTROL_HEIGHT))) return(false);
+        if ((this.core.cursor.x<this.TITLE_MARGIN) || (this.core.cursor.x>(this.core.wid-this.TITLE_MARGIN)) || (this.core.cursor.y<y) || (this.core.cursor.y>(y+this.CONTROL_HEIGHT))) return(false);
         
-        this.core.interface.currentOpenHeaderControl=this;
+        this.dialog.currentOpenHeaderControl=this;
         return(true);
     }
     
@@ -155,7 +156,7 @@ export default class InterfaceControlClass
 
             // the fill
             
-        if ((this.core.interface.cursor.x<this.TITLE_MARGIN) || (this.core.interface.cursor.x>(this.core.wid-this.TITLE_MARGIN)) || (this.core.interface.cursor.y<y) || (this.core.interface.cursor.y>(y+this.CONTROL_HEIGHT))) { 
+        if ((this.core.cursor.x<this.TITLE_MARGIN) || (this.core.cursor.x>(this.core.wid-this.TITLE_MARGIN)) || (this.core.cursor.y<y) || (this.core.cursor.y>(y+this.CONTROL_HEIGHT))) { 
             this.colorArray[0]=this.colorArray[4]=this.widgetTopColor.r;
             this.colorArray[1]=this.colorArray[5]=this.widgetTopColor.g;
             this.colorArray[2]=this.colorArray[6]=this.widgetTopColor.b;
@@ -213,9 +214,9 @@ export default class InterfaceControlClass
     {
         let x=Math.trunc(this.core.wid*0.5);
         
-        if ((this.core.interface.cursor.x<x) || (this.core.interface.cursor.x>((x+(this.TITLE_MARGIN*2))+this.TEXT_INPUT_WIDTH)) || (this.core.interface.cursor.y<y) || (this.core.interface.cursor.y>(y+this.CONTROL_HEIGHT))) return(false);
+        if ((this.core.cursor.x<x) || (this.core.cursor.x>((x+(this.TITLE_MARGIN*2))+this.TEXT_INPUT_WIDTH)) || (this.core.cursor.y<y) || (this.core.cursor.y>(y+this.CONTROL_HEIGHT))) return(false);
         
-        this.core.interface.currentTextInputControl=this;
+        this.dialog.currentTextInputControl=this;
         this.core.input.keyClearLastRaw();
         
         return(true);
@@ -284,7 +285,7 @@ export default class InterfaceControlClass
         
         if (this.value===null) this.value='';
         
-        if ((this.core.interface.currentTextInputControl===this) && (!this.core.input.paused) && ((Math.trunc(window.performance.now())&0x200)!=0)) {
+        if ((this.dialog.currentTextInputControl===this) && (!this.core.input.paused) && ((Math.trunc(window.performance.now())&0x200)!=0)) {
             this.valueText.str=this.value+'_';
         }
         else {
@@ -307,11 +308,11 @@ export default class InterfaceControlClass
     {
         let x=Math.trunc(this.core.wid*0.5);
         
-        if ((this.core.interface.cursor.x<(x+this.TITLE_MARGIN)) || (this.core.interface.cursor.x>((x+this.TITLE_MARGIN)+(this.CONTROL_HEIGHT*2))) || (this.core.interface.cursor.y<y) || (this.core.interface.cursor.y>(y+this.CONTROL_HEIGHT))) return(false);
+        if ((this.core.cursor.x<(x+this.TITLE_MARGIN)) || (this.core.cursor.x>((x+this.TITLE_MARGIN)+(this.CONTROL_HEIGHT*2))) || (this.core.cursor.y<y) || (this.core.cursor.y>(y+this.CONTROL_HEIGHT))) return(false);
         
         this.value=!this.value;
         
-        this.core.interface.currentTextInputControl=null;
+        this.dialog.currentTextInputControl=null;
         return(true);
     }
         
@@ -450,15 +451,15 @@ export default class InterfaceControlClass
         let hx;
         let x=Math.trunc(this.core.wid*0.5);
         
-        if ((this.core.interface.cursor.x<x) || (this.core.interface.cursor.x>((x+(this.TITLE_MARGIN*2))+this.TEXT_INPUT_WIDTH)) || (this.core.interface.cursor.y<y) || (this.core.interface.cursor.y>(y+this.CONTROL_HEIGHT))) return(false);
+        if ((this.core.cursor.x<x) || (this.core.cursor.x>((x+(this.TITLE_MARGIN*2))+this.TEXT_INPUT_WIDTH)) || (this.core.cursor.y<y) || (this.core.cursor.y>(y+this.CONTROL_HEIGHT))) return(false);
         
-        hx=Math.trunc(((this.core.interface.cursor.x-(x+this.TITLE_MARGIN))/this.TEXT_INPUT_WIDTH)*100); // we go a little over each edge so we can click to 0/100
+        hx=Math.trunc(((this.core.cursor.x-(x+this.TITLE_MARGIN))/this.TEXT_INPUT_WIDTH)*100); // we go a little over each edge so we can click to 0/100
         if (hx<0) hx=0;
         if (hx>100) hx=100;
         
         this.value=hx;
         
-        this.core.interface.currentTextInputControl=null;
+        this.dialog.currentTextInputControl=null;
         return(false);
     }
         
@@ -588,21 +589,21 @@ export default class InterfaceControlClass
         
             // down
             
-        if ((this.core.interface.cursor.x>=(x+(this.TITLE_MARGIN*2))) && (this.core.interface.cursor.x<((x+(this.TITLE_MARGIN*2))+this.LIST_CONTROL_WIDTH)) && (this.core.interface.cursor.y>=y) && (this.core.interface.cursor.y<(y+this.CONTROL_HEIGHT))) {
+        if ((this.core.cursor.x>=(x+(this.TITLE_MARGIN*2))) && (this.core.cursor.x<((x+(this.TITLE_MARGIN*2))+this.LIST_CONTROL_WIDTH)) && (this.core.cursor.y>=y) && (this.core.cursor.y<(y+this.CONTROL_HEIGHT))) {
             this.value--;
             if (this.value<0) this.value=0;
             
-            this.core.interface.currentTextInputControl=null;
+            this.dialog.currentTextInputControl=null;
             return(true);
         }
         
              // up
             
-        if ((this.core.interface.cursor.x>=((x+this.LIST_INPUT_WIDTH)-this.LIST_CONTROL_WIDTH)) && (this.core.interface.cursor.x<(x+this.LIST_INPUT_WIDTH)) && (this.core.interface.cursor.y>=y) && (this.core.interface.cursor.y<(y+this.CONTROL_HEIGHT))) {
+        if ((this.core.cursor.x>=((x+this.LIST_INPUT_WIDTH)-this.LIST_CONTROL_WIDTH)) && (this.core.cursor.x<(x+this.LIST_INPUT_WIDTH)) && (this.core.cursor.y>=y) && (this.core.cursor.y<(y+this.CONTROL_HEIGHT))) {
             this.value++;
             if (this.value>=this.list.length) this.value=this.list.length-1;
             
-            this.core.interface.currentTextInputControl=null;
+            this.dialog.currentTextInputControl=null;
             return(true);
         }
        

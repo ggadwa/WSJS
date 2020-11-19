@@ -1,4 +1,4 @@
-import UploadClass from '../main/upload.js';
+import UploadClass from '../developer/upload.js';
 import ShadowmapLightClass from '../generate/shadowmap/shadowmap_light.js';
 import ShadowmapMeshClass from '../generate/shadowmap/shadowmap_mesh.js';
 

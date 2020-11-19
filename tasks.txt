@@ -19,16 +19,27 @@
      - interface own bitmaps
      - sequence own bitmaps
 
-- is game ready needed anymore?
-- is map ready (if it exist) needed anymore
+--> interface
+     - text statics to core
+     - make text class for all texts, in core
+     * interface background/cursor outside interface
+     * hit/liquid to map
+     * move text bitmap to core
+     - only core.json has interface, remove from entities
+     * developer interface text to developer
+     - interface becomes map bound, tear down/build up for each map
+
+--> touch needs to be completely reworked
+     - input is abstracted
+     - touch controls are game only (look for touchMenuTrigger, also)
+
+- is map ready needed anymore
 
 --> eventually test full screen
 --> runMultiplayerSyncError redo all this
---> network class to game class (instead of core)
+
 
 1. fix start game -> end game -> start game problem
-4. title needs to work on iPad
-12. iPad touchMenuTrigger (redo, search for it)
 
 
 - won/lost songs (kart/platformer)

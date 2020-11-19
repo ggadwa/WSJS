@@ -1,12 +1,7 @@
 import ColorClass from '../utility/color.js';
 import RectClass from '../utility/rect.js';
 
-
-//
-// interface liquid class
-//
-
-export default class InterfaceLiquidClass
+export default class LiquidTintClass
 {
     constructor(core)
     {
@@ -79,6 +74,9 @@ export default class InterfaceLiquidClass
             // draw tint
             
         shader.drawStart();
+        
+        gl.disable(gl.DEPTH_TEST);
+        gl.enable(gl.BLEND);
         gl.blendFunc(gl.ONE,gl.SRC_COLOR);
         
         gl.uniform4f(shader.colorUniform,liquid.tint.r,liquid.tint.g,liquid.tint.b,1.0);
@@ -95,6 +93,9 @@ export default class InterfaceLiquidClass
             // remove the buffers
 
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
+
+        gl.disable(gl.BLEND);
+        gl.enable(gl.DEPTH_TEST);
         
         shader.drawEnd();
     }

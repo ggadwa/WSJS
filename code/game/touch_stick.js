@@ -1,6 +1,6 @@
 import BitmapInterfaceClass from '../bitmap/bitmap_interface.js';
 
-export default class InterfaceTouchStickClass
+export default class TouchStickClass
 {
     constructor(core,bitmapRingPath,bitmapThumbPath,ringSize)
     {

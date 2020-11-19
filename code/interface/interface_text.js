@@ -76,7 +76,7 @@ export default class InterfaceTextClass
     getStringDrawWidth(charWid,str)
     {
         let n,cIdx,len;
-        let fontCharWidths=this.core.interface.fontCharWidths;
+        let fontCharWidths=this.core.fontCharWidths;
         let wid=0;
 
             // figure out the size
@@ -104,7 +104,7 @@ export default class InterfaceTextClass
         let n,x2,ty,by,vIdx,uvIdx,iIdx,elementIdx;
         let cIdx,gx,gy,gxAdd,gyAdd;
         let len,nTrig;
-        let fontCharWidths=this.core.interface.fontCharWidths;
+        let fontCharWidths=this.core.fontCharWidths;
         let shader=this.core.shaderList.textShader;
         let gl=this.core.gl;
         
@@ -142,8 +142,8 @@ export default class InterfaceTextClass
         iIdx=0;
         elementIdx=0;
 
-        gxAdd=this.core.interface.TEXT_CHAR_WIDTH/this.core.interface.TEXT_TEXTURE_WIDTH;
-        gyAdd=this.core.interface.TEXT_CHAR_HEIGHT/this.core.interface.TEXT_TEXTURE_HEIGHT;
+        gxAdd=this.core.TEXT_CHAR_WIDTH/this.core.TEXT_TEXTURE_WIDTH;
+        gyAdd=this.core.TEXT_CHAR_HEIGHT/this.core.TEXT_TEXTURE_HEIGHT;
 
         for (n=0;n!==len;n++) {
             x2=x+this.fontSize;
@@ -158,8 +158,8 @@ export default class InterfaceTextClass
             this.vertexArray[vIdx++]=by;
 
             cIdx=this.str.charCodeAt(n)-32;
-            gx=((cIdx%this.core.interface.TEXT_CHAR_PER_ROW)*this.core.interface.TEXT_CHAR_WIDTH)/this.core.interface.TEXT_TEXTURE_WIDTH;
-            gy=(Math.trunc(cIdx/this.core.interface.TEXT_CHAR_PER_ROW)*this.core.interface.TEXT_CHAR_HEIGHT)/this.core.interface.TEXT_TEXTURE_HEIGHT;
+            gx=((cIdx%this.core.TEXT_CHAR_PER_ROW)*this.core.TEXT_CHAR_WIDTH)/this.core.TEXT_TEXTURE_WIDTH;
+            gy=(Math.trunc(cIdx/this.core.TEXT_CHAR_PER_ROW)*this.core.TEXT_CHAR_HEIGHT)/this.core.TEXT_TEXTURE_HEIGHT;
 
             this.uvArray[uvIdx++]=gx;
             this.uvArray[uvIdx++]=gy;
@@ -186,7 +186,7 @@ export default class InterfaceTextClass
             // set the shader and bitmap
 
         gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D,this.core.interface.fontTexture);
+        gl.bindTexture(gl.TEXTURE_2D,this.core.fontTexture);
 
         if (overrideColor!==null) {
             gl.uniform4f(shader.colorUniform,overrideColor.r,overrideColor.g,overrideColor.b,this.alpha);
