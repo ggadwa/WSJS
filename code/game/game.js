@@ -1,4 +1,5 @@
 import PointClass from '../utility/point.js';
+import RectClass from '../utility/rect.js';
 import ColorClass from '../utility/color.js';
 import PlaneClass from '../utility/plane.js';
 import Matrix4Class from '../utility/matrix4.js';
@@ -9,6 +10,9 @@ import MapClass from '../map/map.js';
 import CameraClass from '../game/camera.js';
 import LiquidTintClass from '../game/liquid_tint.js';
 import HitOverlayClass from '../game/hit_overlay.js';
+import ElementClass from '../game/element.js';
+import CountClass from '../game/count.js';
+import InterfaceTextClass from '../interface/interface_text.js';
 import ShadowmapLoadClass from '../light/shadowmap_load.js';
 import SequenceClass from '../sequence/sequence.js';
 import EntityFPSPlayerClass from '../project/entity_fps_player.js';
@@ -28,6 +32,15 @@ export default class GameClass
         this.MULTIPLAYER_MODE_NONE=0;
         this.MULTIPLAYER_MODE_LOCAL=1;
         this.MULTIPLAYER_MODE_JOIN=2;
+        
+        this.POSITION_MODE_TOP_LEFT=0;
+        this.POSITION_MODE_TOP_RIGHT=1;
+        this.POSITION_MODE_BOTTOM_LEFT=2;
+        this.POSITION_MODE_BOTTOM_RIGHT=3;
+        this.POSITION_MODE_MIDDLE=4;
+        
+        this.POSITION_MODE_LIST=['topLeft','topRight','bottomLeft','bottomRight','middle'];
+
         
         this.multiplayerMode=this.MULTIPLAYER_MODE_NONE;
         
@@ -116,6 +129,14 @@ export default class GameClass
         
             // game interfaces
             
+        this.uiTextColor=new ColorClass(1,1,0);
+
+        this.elements=new Map();
+        this.counts=new Map();
+        this.texts=new Map();
+        
+        this.fpsText=null;
+        
         this.liquidTint=null;
         this.hitOverlay=null;
 
@@ -235,6 +256,13 @@ export default class GameClass
                 
             // game interface
             
+        this.elements.clear();
+        this.counts.clear();
+        this.texts.clear();
+            
+        this.fpsText=new InterfaceTextClass(this.core,'',(this.core.wid-5),23,20,this.core.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1,true);
+        this.fpsText.initialize();
+            
         this.liquidTint=new LiquidTintClass(this.core);
         if (!this.liquidTint.initialize()) return(false);
         
@@ -254,7 +282,11 @@ export default class GameClass
     }
     
     release()
-    {        
+    {
+        let element,count,text;
+        
+            // touch controls and overlays
+            
         this.touchStickLeft.release();
         this.touchStickRight.release();
         this.touchButtonMenu.release();
@@ -262,6 +294,24 @@ export default class GameClass
         this.liquidTint.release();
         this.hitOverlay.release();
         
+            // release all elements, counts, and texts
+            
+        for (element of this.elements.values()) {
+            element.release();
+        }
+        
+        for (count of this.counts.values()) {
+            count.release();
+        }
+        
+        for (text of this.texts.values()) {
+            text.release();
+        }
+
+        this.fpsText.release();
+        
+            // camera and map
+            
         this.camera.release();
         this.map.release();
     }
@@ -350,7 +400,237 @@ export default class GameClass
             loadSet.add(this.lookupValue(obj[key],data,null));
         }
     }
+    
+        //
+        // interface elements
+        //
+        
+    addElement(id,bitmap,width,height,positionMode,positionOffset,color,alpha,developer)
+    {
+        let element;
+        let rect=new RectClass(positionOffset.x,positionOffset.y,(positionOffset.x+width),(positionOffset.y+height));
+        
+        switch (positionMode) {
+            case this.POSITION_MODE_TOP_RIGHT:
+                rect.move(this.core.canvas.width,0);
+                break;
+            case this.POSITION_MODE_BOTTOM_LEFT:
+                rect.move(0,this.core.canvas.height);
+                break;
+            case this.POSITION_MODE_BOTTOM_RIGHT:
+                rect.move(this.core.canvas.width,this.core.canvas.height);
+                break;
+            case this.POSITION_MODE_MIDDLE:
+                rect.move(Math.trunc(this.core.canvas.width*0.5),Math.trunc(this.core.canvas.height*0.5));
+                break;
+        }
+            
+        element=new ElementClass(this.core,bitmap,rect,color,alpha,developer);
+        element.initialize();
+        this.elements.set(id,element);
+    }
+    
+    showElement(id,show)
+    {
+        let element=this.elements.get(id);
+        if (element===undefined) {
+            console.log('Interface element ID does not exist: '+id);
+            return;
+        }
+        
+        element.show=show;
+    }
+    
+    pulseElement(id,tick,expand)
+    {
+        let element=this.elements.get(id);
+        if (element===undefined) {
+            console.log('Interface element ID does not exist: '+id);
+            return;
+        }
+        
+        element.pulse(tick,expand);
+    }
+    
+        //
+        // interface counts
+        //
+    
+    addCount(id,bitmap,maxCount,width,height,positionMode,positionOffset,addOffset,onColor,onAlpha,offColor,offAlpha,developer)
+    {
+        let count;
+        let rect=new RectClass(positionOffset.x,positionOffset.y,(positionOffset.x+width),(positionOffset.y+height));
+        
+        switch (positionMode) {
+            case this.POSITION_MODE_TOP_RIGHT:
+                rect.move(this.core.canvas.width,0);
+                break;
+            case this.POSITION_MODE_BOTTOM_LEFT:
+                rect.move(0,this.core.canvas.height);
+                break;
+            case this.POSITION_MODE_BOTTOM_RIGHT:
+                rect.move(this.core.canvas.width,this.core.canvas.height);
+                break;
+            case this.POSITION_MODE_MIDDLE:
+                rect.move(Math.trunc(this.core.canvas.width*0.5),Math.trunc(this.core.canvas.height*0.5));
+                break;
+        }
+            
+        count=new CountClass(this.core,bitmap,maxCount,rect,addOffset,onColor,onAlpha,offColor,offAlpha,developer);
+        count.initialize();
+        this.counts.set(id,count);
+    }
+    
+    showCount(id,show)
+    {
+        let count=this.counts.get(id);
+        if (count===undefined) {
+            console.log('Interface count ID does not exist: '+id);
+            return;
+        }
+        
+        count.show=show;
+    }
+    
+    setCount(id,value)
+    {
+        let count=this.counts.get(id);
+        if (count===undefined) {
+            console.log('Interface count ID does not exist: '+id);
+            return;
+        }
+        
+        count.count=value;
+    }
+    
+        //
+        // interface texts
+        //
+        
+    addText(id,str,positionMode,positionOffset,fontSize,align,color,alpha,developer)
+    {
+        let text;
+        let x=positionOffset.x;
+        let y=positionOffset.y;
+        
+        switch (positionMode) {
+            case this.POSITION_MODE_TOP_RIGHT:
+                x+=this.core.canvas.width;
+                break;
+            case this.POSITION_MODE_BOTTOM_LEFT:
+                y+=this.core.canvas.height;
+                break;
+            case this.POSITION_MODE_BOTTOM_RIGHT:
+                x+=this.core.canvas.width;
+                y+=this.core.canvas.height;
+                break;
+            case this.POSITION_MODE_MIDDLE:
+                x+=Math.trunc(this.core.canvas.width*0.5);
+                y+=Math.trunc(this.core.canvas.height*0.5);
+                break;
+        }
 
+        text=new InterfaceTextClass(this.core,(''+str),x,y,fontSize,align,color,alpha,developer);
+        text.initialize();
+        this.texts.set(id,text);
+    }
+    
+    showText(id,show)
+    {
+        let text=this.texts.get(id);
+        if (text===undefined) {
+            console.log('Interface text ID does not exist: '+id);
+            return;
+        }
+        
+        text.show=show;
+        text.hideTick=-1;
+    }
+    
+    updateText(id,str)
+    {
+        let text=this.texts.get(id);
+        if (text===undefined) {
+            console.log('Interface text ID does not exist: '+id);
+            return;
+        }
+        
+        text.str=''+str;      // make sure it's a string
+        text.hideTick=-1;
+    }
+    
+    updateTemporaryText(id,str,tick)
+    {
+        let text=this.texts.get(id);
+        if (text===undefined) {
+            console.log('Interface text ID does not exist: '+id);
+            return;
+        }
+        
+        text.str=''+str;      // make sure it's a string
+        text.show=true;
+        text.hideTick=this.core.game.timestamp+tick;
+    }
+
+        //
+        // load and covert a json interface object into various interface parts
+        //
+        
+    addJsonInterfaceObject(jsonInterface)
+    {
+        let element,count,text;
+        let bitmap,positionMode,align;
+        
+        if (jsonInterface===undefined) return(true);
+        
+        if (jsonInterface.elements!==undefined) {
+            for (element of jsonInterface.elements) {
+                
+                    // the element bitmap
+                    
+                bitmap=this.core.bitmapList.get(element.bitmap);
+                if (bitmap===undefined) {
+                    console.log('Missing bitmap to add to interface: '+element.bitmap);
+                    return(false);
+                }
+                
+                positionMode=this.POSITION_MODE_LIST.indexOf(element.positionMode);
+
+                this.addElement(element.id,bitmap,element.width,element.height,positionMode,element.positionOffset,new ColorClass(element.color.r,element.color.g,element.color.b),element.alpha,false);
+                this.showElement(element.id,element.show);
+            }
+        }
+        
+        if (jsonInterface.counts!==undefined) {
+            for (count of jsonInterface.counts) {
+                
+                    // the element bitmap
+                    
+                bitmap=this.core.bitmapList.get(count.bitmap);
+                if (bitmap===undefined) {
+                    console.log('Missing bitmap to add to interface: '+count.bitmap);
+                    return(false);
+                }
+                
+                positionMode=this.POSITION_MODE_LIST.indexOf(count.positionMode);
+
+                this.addCount(count.id,bitmap,count.count,count.width,count.height,positionMode,count.positionOffset,count.addOffset,new ColorClass(count.onColor.r,count.onColor.g,count.onColor.b),count.onAlpha,new ColorClass(count.offColor.r,count.offColor.g,count.offColor.b),count.offAlpha,false);
+                this.showCount(count.id,count.show);
+            }
+        }
+        
+        if (jsonInterface.texts!==undefined) {
+            for (text of jsonInterface.texts) {
+                align=this.core.TEXT_ALIGN_LIST.indexOf(text.textAlign);
+                positionMode=this.POSITION_MODE_LIST.indexOf(text.positionMode);
+                this.addText(text.id,text.text,positionMode,text.positionOffset,text.textSize,align,new ColorClass(text.color.r,text.color.g,text.color.b),text.alpha,false);
+                this.showText(text.id,text.show);
+            }
+        }
+        
+        return(true);
+    }
+    
         //
         // timing utilities
         //
@@ -439,18 +719,18 @@ export default class GameClass
             if (isTelefrag) {
                 scoreEntity=fromEntity;
                 points=1;
-                if (this.core.json.config.multiplayerMessageText!==null) this.core.interface.updateTemporaryText(this.core.json.config.multiplayerMessageText,(fromEntity.name+' telefragged '+killedEntity.name),this.core.json.config.multiplayerMessageWaitTick);
+                if (this.core.json.config.multiplayerMessageText!==null) this.updateTemporaryText(this.core.json.config.multiplayerMessageText,(fromEntity.name+' telefragged '+killedEntity.name),this.core.json.config.multiplayerMessageWaitTick);
             }
             else {
                 if (fromEntity!==killedEntity) {
                     scoreEntity=fromEntity;
                     points=1;
-                    if (this.core.json.config.multiplayerMessageText!==null) this.core.interface.updateTemporaryText(this.core.json.config.multiplayerMessageText,(fromEntity.name+' killed '+killedEntity.name),this.core.json.config.multiplayerMessageWaitTick);
+                    if (this.core.json.config.multiplayerMessageText!==null) this.updateTemporaryText(this.core.json.config.multiplayerMessageText,(fromEntity.name+' killed '+killedEntity.name),this.core.json.config.multiplayerMessageWaitTick);
                 }
                 else {
                     scoreEntity=killedEntity;
                     points=-1;
-                    if (this.core.json.config.multiplayerMessageText!==null) this.core.interface.updateTemporaryText(this.core.json.config.multiplayerMessageText,(killedEntity.name+' committed suicide'),this.core.json.config.multiplayerMessageWaitTick);
+                    if (this.core.json.config.multiplayerMessageText!==null) this.updateTemporaryText(this.core.json.config.multiplayerMessageText,(killedEntity.name+' committed suicide'),this.core.json.config.multiplayerMessageWaitTick);
                 }
             }
         }
@@ -496,15 +776,15 @@ export default class GameClass
         
         for (n=0;n!=this.MAX_SCORE_COUNT;n++) {
             if (n<this.scoreLastItemCount) {
-                this.core.interface.updateText(('score_name_'+n),sortedNames[n]);
-                this.core.interface.showText(('score_name_'+n),this.scoreShow);
+                this.updateText(('score_name_'+n),sortedNames[n]);
+                this.showText(('score_name_'+n),this.scoreShow);
                 
-                this.core.interface.updateText(('score_point_'+n),this.scores.get(sortedNames[n]));
-                this.core.interface.showText(('score_point_'+n),this.scoreShow);
+                this.updateText(('score_point_'+n),this.scores.get(sortedNames[n]));
+                this.showText(('score_point_'+n),this.scoreShow);
             }
             else {
-                this.core.interface.showText(('score_name_'+n),false);
-                this.core.interface.showText(('score_point_'+n),false);
+                this.showText(('score_name_'+n),false);
+                this.showText(('score_point_'+n),false);
             }
         }
     }
@@ -519,12 +799,12 @@ export default class GameClass
         
         for (n=0;n!=this.MAX_SCORE_COUNT;n++) {
             if (n<this.scoreLastItemCount) {
-                this.core.interface.showText(('score_name_'+n),this.scoreShow);
-                this.core.interface.showText(('score_point_'+n),this.scoreShow);
+                this.showText(('score_name_'+n),this.scoreShow);
+                this.showText(('score_point_'+n),this.scoreShow);
             }
             else {
-                this.core.interface.showText(('score_name_'+n),false);
-                this.core.interface.showText(('score_point_'+n),false);
+                this.showText(('score_name_'+n),false);
+                this.showText(('score_point_'+n),false);
             }
         }
     }
@@ -536,13 +816,13 @@ export default class GameClass
     remoteEntering(name)
     {
         this.scores.set(name,0);
-        if (this.core.json.config.multiplayerMessageText!==null) this.core.interface.updateTemporaryText(this.core.json.config.multiplayerMessageText,(name+' has joined'),5000);
+        if (this.core.json.config.multiplayerMessageText!==null) this.updateTemporaryText(this.core.json.config.multiplayerMessageText,(name+' has joined'),5000);
     }
     
     remoteLeaving(name)
     {
         this.scores.delete(name);
-        if (this.core.json.config.multiplayerMessageText!==null) this.core.interface.updateTemporaryText(this.core.json.config.multiplayerMessageText,(name+' has left'),5000);
+        if (this.core.json.config.multiplayerMessageText!==null) this.updateTemporaryText(this.core.json.config.multiplayerMessageText,(name+' has left'),5000);
     }
     
         //
@@ -756,7 +1036,7 @@ export default class GameClass
         
             // json interface
             
-        if (!this.core.interface.addFromJson(this.core.json.interface)) return(false);
+        if (!this.addJsonInterfaceObject(this.core.json.interface)) return(false);
         
             // multiplayer scores
             
@@ -776,8 +1056,8 @@ export default class GameClass
             y=-Math.trunc((35*(this.MAX_SCORE_COUNT-1))*0.5);
             
             for (n=0;n!==this.MAX_SCORE_COUNT;n++) {
-                this.core.interface.addText(('score_name_'+n),'',this.core.interface.POSITION_MODE_MIDDLE,{"x":0,"y":y},30,this.core.interface.TEXT_ALIGN_RIGHT,this.scoreColor,1,false);
-                this.core.interface.addText(('score_point_'+n),'',this.core.interface.POSITION_MODE_MIDDLE,{"x":10,"y":y},30,this.core.interface.TEXT_ALIGN_LEFT,this.scoreColor,1,false);
+                this.addText(('score_name_'+n),'',this.POSITION_MODE_MIDDLE,{"x":0,"y":y},30,this.core.TEXT_ALIGN_RIGHT,this.scoreColor,1,false);
+                this.addText(('score_point_'+n),'',this.POSITION_MODE_MIDDLE,{"x":10,"y":y},30,this.core.TEXT_ALIGN_LEFT,this.scoreColor,1,false);
                 y+=35;
             }
             
@@ -1116,8 +1396,8 @@ export default class GameClass
 
     draw()
     {
-        let n;
-        let light;
+        let n,light,key,element,count,text;
+        let fpsStr,idx;
         let player=this.map.entityList.getPlayer();
         let gl=this.core.gl;
          
@@ -1185,6 +1465,11 @@ export default class GameClass
         gl.clear(gl.DEPTH_BUFFER_BIT);
         this.map.entityList.draw(player);
         
+            // everything else is blended
+            
+        gl.disable(gl.DEPTH_TEST);
+        gl.enable(gl.BLEND);
+        
             // tints and overlays
             
         this.liquidTint.draw();
@@ -1193,20 +1478,59 @@ export default class GameClass
             // interface
             
         if (!this.hideUI) {
-            this.core.interface.drawGame();
-                    
+
+                // elements
+
+            this.core.shaderList.interfaceShader.drawStart();
+
+            gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+
+            for ([key,element] of this.elements) {
+                element.draw();
+            }
+
+            for ([key,count] of this.counts) {
+                count.draw();
+            }
+
                 // touch controls
 
             if (this.core.input.hasTouch) {
-                this.core.shaderList.interfaceShader.drawStart();
-
                 this.touchStickLeft.draw();
                 this.touchStickRight.draw();
                 this.touchButtonMenu.draw();
-
-                this.core.shaderList.interfaceShader.drawEnd();
             }
+            
+            this.core.shaderList.interfaceShader.drawEnd();
+
+                // text
+
+            this.core.shaderList.textShader.drawStart();
+
+            for ([key,text] of this.texts) {
+                text.draw();
+            }
+
+            if (this.core.setup.showFPS) {
+                fpsStr=this.core.game.fps.toString();
+
+                idx=fpsStr.indexOf('.');
+                if (idx===-1) {
+                    fpsStr+='.0';
+                }
+                else {
+                    fpsStr=fpsStr.substring(0,(idx+3));
+                }
+
+                this.fpsText.str=fpsStr;
+                this.fpsText.draw();
+            }
+
+            this.core.shaderList.textShader.drawEnd();
         }
+
+        gl.disable(gl.BLEND);
+        gl.enable(gl.DEPTH_TEST);
         
             // sequences
             
@@ -1244,6 +1568,8 @@ export default class GameClass
     
     loadingScreenDraw()
     {
+        let n,y,col,text;
+        let nLine=this.loadingStrings.length;
         let gl=this.core.gl;
         
             // the 2D ortho matrix
@@ -1255,9 +1581,32 @@ export default class GameClass
         gl.clearColor(0.0,0.0,0.0,1.0);
         gl.clear(gl.COLOR_BUFFER_BIT,gl.DEPTH_BUFFER_BIT);
         
-            // debug console
+            // draw loading lines
             
-        this.core.interface.drawDebugConsole(this.loadingStrings);
+        gl.disable(gl.DEPTH_TEST);
+
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+
+        this.core.shaderList.textShader.drawStart();
+        
+        y=(this.core.high-5)-((nLine-1)*22);
+        col=new ColorClass(1.0,1.0,1.0);
+        
+        for (n=0;n!==nLine;n++) {
+            if (n===(nLine-1)) col=new ColorClass(1,0.3,0.3);
+            text=new InterfaceTextClass(this.core,this.loadingStrings[n],5,y,20,this.core.TEXT_ALIGN_LEFT,col,1,false);
+            text.initialize();
+            text.draw();
+            text.release();
+            
+            y+=22;
+        }
+        
+        this.core.shaderList.textShader.drawEnd();
+
+        gl.disable(gl.BLEND);
+        gl.enable(gl.DEPTH_TEST);
     }
     
         //

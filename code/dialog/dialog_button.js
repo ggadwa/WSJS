@@ -75,7 +75,7 @@ export default class DialogButtonClass
         fontSize=Math.trunc((this.bot-this.top)*0.6);
         y=(this.bot-Math.trunc(((this.bot-this.top)-fontSize)*0.5))+Math.trunc(fontSize*0.1);
         
-        this.text=new InterfaceTextClass(this.core,this.title,x,y,fontSize,this.core.interface.TEXT_ALIGN_CENTER,new ColorClass(1,1,1,1),1,false);
+        this.text=new InterfaceTextClass(this.core,this.title,x,y,fontSize,this.core.TEXT_ALIGN_CENTER,new ColorClass(1,1,1,1),1,false);
         this.text.initialize();
 
         return(true);

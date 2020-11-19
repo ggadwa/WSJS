@@ -90,7 +90,7 @@ export default class DialogControlClass
             // the title text
             
         fontSize=Math.trunc(this.CONTROL_HEIGHT*0.6);
-        align=(this.controlType===this.core.interface.CONTROL_TYPE_HEADER)?this.core.interface.TEXT_ALIGN_LEFT:this.core.interface.TEXT_ALIGN_RIGHT;
+        align=(this.controlType===this.dialog.CONTROL_TYPE_HEADER)?this.core.TEXT_ALIGN_LEFT:this.core.TEXT_ALIGN_RIGHT;
         
         this.titleText=new InterfaceTextClass(this.core,this.title,0,0,fontSize,align,new ColorClass(1,1,1,1),1,false);
         this.titleText.initialize();
@@ -98,12 +98,12 @@ export default class DialogControlClass
         this.valueText=null;
         
         switch (this.controlType) {
-            case this.core.interface.CONTROL_TYPE_TEXT:
-                this.valueText=new InterfaceTextClass(this.core,'',0,0,fontSize,this.core.interface.TEXT_ALIGN_LEFT,this.widgetTopColor,1,false);
+            case this.dialog.CONTROL_TYPE_TEXT:
+                this.valueText=new InterfaceTextClass(this.core,'',0,0,fontSize,this.core.TEXT_ALIGN_LEFT,this.widgetTopColor,1,false);
                 this.valueText.initialize();
                 break;
-            case this.core.interface.CONTROL_TYPE_LIST:
-                this.valueText=new InterfaceTextClass(this.core,'',0,0,fontSize,this.core.interface.TEXT_ALIGN_CENTER,this.widgetTopColor,1,false);
+            case this.dialog.CONTROL_TYPE_LIST:
+                this.valueText=new InterfaceTextClass(this.core,'',0,0,fontSize,this.core.TEXT_ALIGN_CENTER,this.widgetTopColor,1,false);
                 this.valueText.initialize();
                 break;
         }
@@ -747,15 +747,15 @@ export default class DialogControlClass
     click()
     {
         switch (this.controlType) {
-            case this.core.interface.CONTROL_TYPE_HEADER:
+            case this.dialog.CONTROL_TYPE_HEADER:
                 return(this.clickHeader(this.lastDrawY));
-            case this.core.interface.CONTROL_TYPE_TEXT:
+            case this.dialog.CONTROL_TYPE_TEXT:
                 return(this.clickTextInput(this.lastDrawY));
-            case this.core.interface.CONTROL_TYPE_CHECKBOX:
+            case this.dialog.CONTROL_TYPE_CHECKBOX:
                 return(this.clickCheckbox(this.lastDrawY));
-            case this.core.interface.CONTROL_TYPE_RANGE:
+            case this.dialog.CONTROL_TYPE_RANGE:
                 return(this.clickRange(this.lastDrawY));
-            case this.core.interface.CONTROL_TYPE_LIST:
+            case this.dialog.CONTROL_TYPE_LIST:
                 return(this.clickList(this.lastDrawY));
         }
         
@@ -771,15 +771,15 @@ export default class DialogControlClass
         this.lastDrawY=y;
         
         switch (this.controlType) {
-            case this.core.interface.CONTROL_TYPE_HEADER:
+            case this.dialog.CONTROL_TYPE_HEADER:
                 return(this.drawHeader(y));
-            case this.core.interface.CONTROL_TYPE_TEXT:
+            case this.dialog.CONTROL_TYPE_TEXT:
                 return(this.drawTextInput(y));
-            case this.core.interface.CONTROL_TYPE_CHECKBOX:
+            case this.dialog.CONTROL_TYPE_CHECKBOX:
                 return(this.drawCheckbox(y));
-            case this.core.interface.CONTROL_TYPE_RANGE:
+            case this.dialog.CONTROL_TYPE_RANGE:
                 return(this.drawRange(y));
-            case this.core.interface.CONTROL_TYPE_LIST:
+            case this.dialog.CONTROL_TYPE_LIST:
                 return(this.drawList(y));
         }
         

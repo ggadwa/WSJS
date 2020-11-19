@@ -28,8 +28,8 @@ export default class DialogPromptClass extends DialogBaseClass
         
             // prompt controls
             
-        if (!this.addDialogControl(this,'headPrompt',this.core.interface.CONTROL_TYPE_HEADER,'',null)) return(false);
-        if (!this.addDialogControl(this,'promptValue',this.core.interface.CONTROL_TYPE_TEXT,'',null)) return(false);
+        if (!this.addDialogControl(this,'headPrompt',this.CONTROL_TYPE_HEADER,'',null)) return(false);
+        if (!this.addDialogControl(this,'promptValue',this.CONTROL_TYPE_TEXT,'',null)) return(false);
         
         return(true);
     }

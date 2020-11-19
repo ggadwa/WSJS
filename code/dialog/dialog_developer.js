@@ -27,8 +27,8 @@ export default class DialogDeveloperClass extends DialogBaseClass
         
             // developer controls
             
-        if (!this.addDialogControl(this,'headDeveloper',this.core.interface.CONTROL_TYPE_HEADER,'Developer',null)) return(false);
-        if (!this.addDialogControl(this,'skipShadowMapNormals',this.core.interface.CONTROL_TYPE_CHECKBOX,'Skip Normals on Shadowmap Build:',null)) return(false);
+        if (!this.addDialogControl(this,'headDeveloper',this.CONTROL_TYPE_HEADER,'Developer',null)) return(false);
+        if (!this.addDialogControl(this,'skipShadowMapNormals',this.CONTROL_TYPE_CHECKBOX,'Skip Normals on Shadowmap Build:',null)) return(false);
         
         return(true);
     }

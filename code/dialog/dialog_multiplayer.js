@@ -26,17 +26,17 @@ export default class DialogMultiplayerClass extends DialogBaseClass
         
             // profile controls
             
-        if (!this.addDialogControl(this,'headProfile',this.core.interface.CONTROL_TYPE_HEADER,'Profile',null)) return(false);
-        if (!this.addDialogControl(this,'name',this.core.interface.CONTROL_TYPE_TEXT,'Name:',null)) return(false);
-        if (!this.addDialogControl(this,'showFPS',this.core.interface.CONTROL_TYPE_CHECKBOX,'Show FPS:',null)) return(false);
+        if (!this.addDialogControl(this,'headProfile',this.CONTROL_TYPE_HEADER,'Profile',null)) return(false);
+        if (!this.addDialogControl(this,'name',this.CONTROL_TYPE_TEXT,'Name:',null)) return(false);
+        if (!this.addDialogControl(this,'showFPS',this.CONTROL_TYPE_CHECKBOX,'Show FPS:',null)) return(false);
         
             // multiplayer controls
             
-        if (!this.addDialogControl(this,'headMultiplayer',this.core.interface.CONTROL_TYPE_HEADER,'Multiplayer',null)) return(false);
-        if (!this.addDialogControl(this,'localMap',this.core.interface.CONTROL_TYPE_LIST,'Local Map:',this.core.json.multiplayerMaps)) return(false);
-        if (!this.addDialogControl(this,'botCount',this.core.interface.CONTROL_TYPE_LIST,'Bot Count:',[0,1,2,3,4,5,6,7,8,9])) return(false);
-        if (!this.addDialogControl(this,'botSkill',this.core.interface.CONTROL_TYPE_LIST,'Bot Skill:',['Easy','Moderate','Normal','Skilled','Hard'])) return(false);
-        if (!this.addDialogControl(this,'serverURL',this.core.interface.CONTROL_TYPE_TEXT,'Server URL:',null)) return(false);
+        if (!this.addDialogControl(this,'headMultiplayer',this.CONTROL_TYPE_HEADER,'Multiplayer',null)) return(false);
+        if (!this.addDialogControl(this,'localMap',this.CONTROL_TYPE_LIST,'Local Map:',this.core.json.multiplayerMaps)) return(false);
+        if (!this.addDialogControl(this,'botCount',this.CONTROL_TYPE_LIST,'Bot Count:',[0,1,2,3,4,5,6,7,8,9])) return(false);
+        if (!this.addDialogControl(this,'botSkill',this.CONTROL_TYPE_LIST,'Bot Skill:',['Easy','Moderate','Normal','Skilled','Hard'])) return(false);
+        if (!this.addDialogControl(this,'serverURL',this.CONTROL_TYPE_TEXT,'Server URL:',null)) return(false);
         
         return(true);
     }

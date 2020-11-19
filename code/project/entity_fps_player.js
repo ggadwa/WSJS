@@ -373,7 +373,7 @@ export default class EntityFPSPlayerClass extends EntityClass
     
     addHealth(count)
     {
-        if (this.interfaceHealthIcon!==null) this.core.interface.pulseElement(this.interfaceHealthIcon,500,10);
+        if (this.interfaceHealthIcon!==null) this.core.game.pulseElement(this.interfaceHealthIcon,500,10);
         
         this.health+=count;
         if (this.health>this.healthMaxCount) this.health=this.healthMaxCount;
@@ -381,7 +381,7 @@ export default class EntityFPSPlayerClass extends EntityClass
     
     addArmor(count)
     {
-        if (this.interfaceArmorIcon!==null) this.core.interface.pulseElement(this.interfaceArmorIcon,500,10);
+        if (this.interfaceArmorIcon!==null) this.core.game.pulseElement(this.interfaceArmorIcon,500,10);
         
         this.armor+=count;
         if (this.armor>this.armorMaxCount) this.armor=this.armorMaxCount;
@@ -457,12 +457,12 @@ export default class EntityFPSPlayerClass extends EntityClass
             
         this.armor-=damage;
         if (this.armor<0) {
-            if (this.interfaceHealthIcon!==null) this.core.interface.pulseElement(this.interfaceHealthIcon,500,5);
+            if (this.interfaceHealthIcon!==null) this.core.game.pulseElement(this.interfaceHealthIcon,500,5);
             this.health+=this.armor;
             this.armor=0;
         }
         else {
-            if (this.interfaceArmorIcon!==null) this.core.interface.pulseElement(this.interfaceArmorIcon,500,5);
+            if (this.interfaceArmorIcon!==null) this.core.game.pulseElement(this.interfaceArmorIcon,500,5);
         }
         
             // dead?
@@ -535,8 +535,8 @@ export default class EntityFPSPlayerClass extends EntityClass
         
             // update any UI
             
-        if (this.interfaceHealthCount!==null) this.core.interface.updateText(this.interfaceHealthCount,this.health);
-        if (this.interfaceArmorCount!==null) this.core.interface.updateText(this.interfaceArmorCount,this.armor);
+        if (this.interfaceHealthCount!==null) this.core.game.updateText(this.interfaceHealthCount,this.health);
+        if (this.interfaceArmorCount!==null) this.core.game.updateText(this.interfaceArmorCount,this.armor);
         
             // dead
             

@@ -1,4 +1,4 @@
-export default class InterfaceCountClass
+export default class CountClass
 {
     constructor(core,bitmap,maxCount,rect,addOffset,onColor,onAlpha,offColor,offAlpha,developer)
     {

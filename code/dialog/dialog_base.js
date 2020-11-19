@@ -8,6 +8,12 @@ export default class DialogBaseClass
     {
         this.core=core;
         
+        this.CONTROL_TYPE_HEADER=0;
+        this.CONTROL_TYPE_TEXT=1;
+        this.CONTROL_TYPE_CHECKBOX=2;
+        this.CONTROL_TYPE_RANGE=3;
+        this.CONTROL_TYPE_LIST=4;
+        
         this.timestamp=0;
         this.lastSystemTimestamp=0;
         this.lastRunTimestamp=0;
@@ -186,7 +192,7 @@ export default class DialogBaseClass
         show=false;
 
         for ([key,control] of this.controls) {
-            if (control.controlType===this.core.interface.CONTROL_TYPE_HEADER) {
+            if (control.controlType===this.CONTROL_TYPE_HEADER) {
                 show=(this.currentOpenHeaderControl===control);
                 if (control.click()) return(null);
             }
@@ -237,7 +243,7 @@ export default class DialogBaseClass
         show=false;
 
         for ([key,control] of this.controls) {
-            if (control.controlType===this.core.interface.CONTROL_TYPE_HEADER) {
+            if (control.controlType===this.CONTROL_TYPE_HEADER) {
                 show=(this.currentOpenHeaderControl===control);
                 y=control.draw(y);
             }

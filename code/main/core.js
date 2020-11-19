@@ -16,7 +16,6 @@ import ColorClass from '../utility/color.js';
 import Matrix4Class from '../utility/matrix4.js';
 import GameClass from '../game/game.js';
 import DeveloperClass from '../developer/developer.js';
-import InterfaceClass from '../interface/interface.js';
 import InputClass from '../main/input.js';
 import SetupClass from '../main/setup.js';
 
@@ -60,6 +59,12 @@ export default class CoreClass
         this.TEXT_CHAR_HEIGHT=50;
         this.TEXT_FONT_NAME='Arial';
         this.TEXT_FONT_SIZE=48;
+        
+        this.TEXT_ALIGN_LEFT=0;
+        this.TEXT_ALIGN_CENTER=1;
+        this.TEXT_ALIGN_RIGHT=2;
+        
+        this.TEXT_ALIGN_LIST=['left','center','right'];
         
             // misc statics
             
@@ -129,9 +134,7 @@ export default class CoreClass
         this.perspectiveMatrix=new Matrix4Class();
         this.viewMatrix=new Matrix4Class();
         
-            // additional core classes
-
-        this.interface=null;
+            // setup (preferences)
 
         this.setup=null;
         
@@ -242,13 +245,10 @@ export default class CoreClass
         this.shaderList=new ShaderListClass(this);
         this.shaderList.initialize();
         
-            // game and interface
+            // main game class
             
         this.game=new GameClass(this,data);
         if (!(await this.game.initialize())) return;
-        
-        this.interface=new InterfaceClass(this);
-        if (!(await this.interface.initialize())) return;
         
             // title/dialogs (non game interface)
             
@@ -283,7 +283,6 @@ export default class CoreClass
     release()
     {
         this.developer.release();
-        this.interface.release();
         this.game.release();
         this.title.release();
         this.dialogSetting.release();

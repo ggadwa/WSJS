@@ -1,4 +1,4 @@
-export default class InterfaceElementClass
+export default class ElementClass
 {
     constructor(core,bitmap,rect,color,alpha,developer)
     {

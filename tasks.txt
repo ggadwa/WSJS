@@ -20,14 +20,15 @@
      - sequence own bitmaps
 
 --> interface
-     - text statics to core
+     * text statics to core
      - make text class for all texts, in core
      * interface background/cursor outside interface
      * hit/liquid to map
      * move text bitmap to core
-     - only core.json has interface, remove from entities
+     * only core.json has interface, remove from entities
      * developer interface text to developer
-     - interface becomes map bound, tear down/build up for each map
+     * interface becomes map bound, tear down/build up for each map
+     - text developer flag not required
 
 --> touch needs to be completely reworked
      - input is abstracted

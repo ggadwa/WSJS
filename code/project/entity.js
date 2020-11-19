@@ -145,10 +145,6 @@ export default class EntityClass
         this.collisionSpokeCount=this.json.physics.collisionSpokeCount;
         this.collisionHeightSegmentCount=this.json.physics.collisionHeightSegmentCount;
         this.collisionHeightMargin=this.json.physics.collisionHeightMargin;
-
-            // add any interface elements
-            
-        if (!this.core.interface.addFromJson(this.json.interface)) return(false);
         
             // the collision
             

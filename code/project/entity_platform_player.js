@@ -161,7 +161,7 @@ export default class EntityPlatformPlayerClass extends EntityClass
         this.health-=damage;
         
         if ((this.interfaceHealthBackground!==null) && (this.interfaceHealthBackgroundPulseSize!==0) && (this.interfaceHealthBackgroundPulseTick!==0)) {
-            this.core.interface.pulseElement(this.interfaceHealthBackground,this.interfaceHealthBackgroundPulseTick,this.interfaceHealthBackgroundPulseSize);
+            this.core.game.pulseElement(this.interfaceHealthBackground,this.interfaceHealthBackgroundPulseTick,this.interfaceHealthBackgroundPulseSize);
         }
         
         if (this.health>0) {
@@ -201,11 +201,11 @@ export default class EntityPlatformPlayerClass extends EntityClass
         
             // interface updates
             
-        if (this.interfaceCollectItem!==null) this.core.interface.setCount(this.interfaceCollectItem,this.collectItemCount);
+        if (this.interfaceCollectItem!==null) this.core.game.setCount(this.interfaceCollectItem,this.collectItemCount);
         
         if (this.interfaceHealthBitmapList!==null) {
             for (n=0;n!==this.interfaceHealthBitmapList.length;n++) {
-                this.core.interface.showElement(this.interfaceHealthBitmapList[n],((n+1)===this.health));
+                this.core.game.showElement(this.interfaceHealthBitmapList[n],((n+1)===this.health));
             }
         }
         

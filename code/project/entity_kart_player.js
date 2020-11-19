@@ -69,7 +69,7 @@ export default class EntityKartPlayerClass extends EntityKartBaseClass
         
             // interface updates
             
-        if (this.interfaceSpeedItem!==null) this.core.interface.setCount(this.interfaceSpeedItem,this.speedItemCount);
+        if (this.interfaceSpeedItem!==null) this.core.game.setCount(this.interfaceSpeedItem,this.speedItemCount);
         
             // keys
             
@@ -103,12 +103,12 @@ export default class EntityKartPlayerClass extends EntityKartBaseClass
             
         textLap=(this.lap===-1)?1:(this.lap+1);
             
-        this.core.interface.updateText('place',(this.place+1));
-        this.core.interface.updateText('lap',(textLap+'/3'));
-        this.core.interface.updateText('speed',this.movement.z);      // testing
+        this.core.game.updateText('place',(this.place+1));
+        this.core.game.updateText('lap',(textLap+'/3'));
+        this.core.game.updateText('speed',this.movement.z);      // testing
         
         if ((this.place!==this.previousPlace) || (this.lap!==this.previousLap)) {
-            if ((this.previousPlace!==-1) && (this.previousLap!==-1)) this.core.interface.pulseElement('lap_background',500,10);
+            if ((this.previousPlace!==-1) && (this.previousLap!==-1)) this.core.game.pulseElement('lap_background',500,10);
             this.previousPlace=this.place;
             this.previousLap=this.lap;
         }

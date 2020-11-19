@@ -1,5 +1,4 @@
 import ColorClass from '../utility/color.js';
-import InterfaceClass from '../interface/interface.js';
 
 export default class InterfaceTextClass
 {
@@ -120,10 +119,10 @@ export default class InterfaceTextClass
             // and alignment
 
         switch (this.align) {
-            case this.core.interface.TEXT_ALIGN_CENTER:
+            case this.core.TEXT_ALIGN_CENTER:
                 x-=Math.trunc(this.getStringDrawWidth(this.fontSize,this.str)*0.5);
                 break;
-            case this.core.interface.TEXT_ALIGN_RIGHT:
+            case this.core.TEXT_ALIGN_RIGHT:
                 x-=this.getStringDrawWidth(this.fontSize,this.str);
                 break;
         }

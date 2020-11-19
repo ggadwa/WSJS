@@ -75,8 +75,6 @@ export default class LiquidTintClass
             
         shader.drawStart();
         
-        gl.disable(gl.DEPTH_TEST);
-        gl.enable(gl.BLEND);
         gl.blendFunc(gl.ONE,gl.SRC_COLOR);
         
         gl.uniform4f(shader.colorUniform,liquid.tint.r,liquid.tint.g,liquid.tint.b,1.0);
@@ -93,9 +91,6 @@ export default class LiquidTintClass
             // remove the buffers
 
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
-
-        gl.disable(gl.BLEND);
-        gl.enable(gl.DEPTH_TEST);
         
         shader.drawEnd();
     }
