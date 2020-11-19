@@ -9,6 +9,8 @@ import MapCubeListClass from '../map/map_cube_list.js';
 import MapPathClass from '../map/map_path.js';
 import MapSkyClass from '../map/map_sky.js';
 import MapBackgroundClass from '../map/map_background.js';
+import MapModelListClass from '../map/map_model_list.js';
+import MapSoundListClass from '../map/map_sound_list.js';
 import MusicClass from '../sound/music.js';
 
 //
@@ -39,11 +41,13 @@ export default class MapClass
         this.path=new MapPathClass(core);
         this.sky=new MapSkyClass(core);
         this.background=new MapBackgroundClass(core);
+        this.modelList=new MapModelListClass(core);
+        this.soundList=new MapSoundListClass(core);
         this.music=new MusicClass(core);
         
         this.hasShadowmap=false;
         
-        this.kartStartPositions=[];
+        this.kartStartPositions=[]; // a little hack for kart starting positions on kart games
         
         Object.seal(this);
     }
@@ -61,11 +65,16 @@ export default class MapClass
         if (!this.effectList.initialize()) return(false);
         if (!this.cubeList.initialize()) return(false);
         if (!this.sky.initialize()) return(false);
-        return(this.background.initialize());
+        if (!this.background.initialize()) return(false);
+        if (!this.modelList.initialize()) return(false);
+        return(this.soundList.initialize());
     }
 
     release()
     {
+        this.core.audio.musicStop();
+        this.core.audio.soundStopAll();
+        
         this.meshList.release();
         this.liquidList.release();
         this.lightList.release();
@@ -74,20 +83,8 @@ export default class MapClass
         this.cubeList.release();
         this.sky.release();
         this.background.release();
-    }
-    
-        //
-        // clear map
-        //
-
-    clear()
-    {
-        this.meshList.clear();
-        this.liquidList.clear();
-        this.lightList.clear();
-        this.entityList.clear();
-        this.effectList.clear();
-        this.cubeList.clear();
+        this.modelList.release();
+        this.soundList.release();
     }
     
         //

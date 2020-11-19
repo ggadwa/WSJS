@@ -26,7 +26,6 @@ export default class GameClass
         
         this.multiplayerMode=this.MULTIPLAYER_MODE_NONE;
         
-        this.json=null;
         this.jsonEntityCache=new Map();
         this.jsonEffectCache=new Map();
         this.jsonSequenceCache=new Map();
@@ -130,34 +129,14 @@ export default class GameClass
         
     async initialize()
     {
-        let n,data;
+        let n;
         let promises,name,success;
-        
-            // get the main game json
-            // this is the only hard coded json file
-        
-        data=null;
-        
-        await this.fetchJson('game/game')
-            .then
-                (
-                    value=>{
-                        data=value;
-                    },
-                    reason=>{
-                        console.log(reason);
-                    }
-                );
-        
-        if (data===null) return(false);
-           
-        this.json=data;
         
             // cache all the entity json
             
         promises=[];
         
-        for (name of this.json.entities) {
+        for (name of this.core.json.entities) {
             promises.push(this.fetchJson('entities/'+name));
         }
             
@@ -168,7 +147,7 @@ export default class GameClass
                 (
                     values=>{
                         for (n=0;n<values.length;n++) {
-                            this.jsonEntityCache.set(this.json.entities[n],values[n]);
+                            this.jsonEntityCache.set(this.core.json.entities[n],values[n]);
                         }
                     },
                     reason=>{
@@ -183,7 +162,7 @@ export default class GameClass
             
         promises=[];
         
-        for (name of this.json.effects) {
+        for (name of this.core.json.effects) {
             promises.push(this.fetchJson('effects/'+name));
         }
             
@@ -194,7 +173,7 @@ export default class GameClass
                 (
                     values=>{
                         for (n=0;n<values.length;n++) {
-                            this.jsonEffectCache.set(this.json.effects[n],values[n]);
+                            this.jsonEffectCache.set(this.core.json.effects[n],values[n]);
                         }
                     },
                     reason=>{
@@ -209,7 +188,7 @@ export default class GameClass
             
         promises=[];
         
-        for (name of this.json.sequences) {
+        for (name of this.core.json.sequences) {
             promises.push(this.fetchJson('sequences/'+name));
         }
             
@@ -220,7 +199,7 @@ export default class GameClass
                 (
                     values=>{
                         for (n=0;n<values.length;n++) {
-                            this.jsonSequenceCache.set(this.json.sequences[n],values[n]);
+                            this.jsonSequenceCache.set(this.core.json.sequences[n],values[n]);
                         }
                     },
                     reason=>{
@@ -331,61 +310,6 @@ export default class GameClass
     }
 
         //
-        // game ready
-        //
-        
-    ready()
-    {
-        let n,y;
-        let entity;
-        
-        this.triggers.clear();
-        
-            // json interface
-            
-        if (!this.core.interface.addFromJson(this.json.interface)) return(false);
-        
-            // multiplayer scores
-            
-        if (this.multiplayerMode!==this.MULTIPLAYER_MODE_NONE) {
-            
-                // current scores
-                
-            this.scores=new Map();
-
-            for (entity of this.map.entityList.entities) {
-                if ((entity instanceof EntityFPSPlayerClass) ||
-                    (entity instanceof EntityFPSBotClass)) this.scores.set(entity.name,0);
-            }
-            
-                // max number of scores to display
-                
-            y=-Math.trunc((35*(this.MAX_SCORE_COUNT-1))*0.5);
-            
-            for (n=0;n!==this.MAX_SCORE_COUNT;n++) {
-                this.core.interface.addText(('score_name_'+n),'',this.core.interface.POSITION_MODE_MIDDLE,{"x":0,"y":y},30,this.core.interface.TEXT_ALIGN_RIGHT,this.scoreColor,1,false);
-                this.core.interface.addText(('score_point_'+n),'',this.core.interface.POSITION_MODE_MIDDLE,{"x":10,"y":y},30,this.core.interface.TEXT_ALIGN_LEFT,this.scoreColor,1,false);
-                y+=35;
-            }
-            
-                // no scores yet
-                
-            this.scoreShow=false;
-            this.scoreLastItemCount=0;
-        }
-        
-            // no sequences
-            
-        this.currentSequence=null;
-        
-        this.freezePlayer=false;
-        this.freezeAI=false;
-        this.hideUI=false;
-        
-        return(true);
-    }
-    
-        //
         // timing utilities
         //
         
@@ -433,13 +357,13 @@ export default class GameClass
     won()
     {
         console.info('win');
-        if (this.json.config.sequenceWon!==null) this.startSequence(this.json.config.sequenceWon);
+        if (this.core.json.config.sequenceWon!==null) this.startSequence(this.core.json.config.sequenceWon);
     }
     
     lost()
     {
         console.info('lost');
-        if (this.json.config.sequenceLost!==null) this.startSequence(this.json.config.sequenceLost);
+        if (this.core.json.config.sequenceLost!==null) this.startSequence(this.core.json.config.sequenceLost);
     }
     
         //
@@ -448,7 +372,7 @@ export default class GameClass
         
     runStartSequence()
     {
-        if (this.json.config.sequenceStart!==null) this.startSequence(this.json.config.sequenceStart);
+        if (this.core.json.config.sequenceStart!==null) this.startSequence(this.core.json.config.sequenceStart);
     }
     
         //
@@ -473,18 +397,18 @@ export default class GameClass
             if (isTelefrag) {
                 scoreEntity=fromEntity;
                 points=1;
-                if (this.json.config.multiplayerMessageText!==null) this.core.interface.updateTemporaryText(this.json.config.multiplayerMessageText,(fromEntity.name+' telefragged '+killedEntity.name),this.json.config.multiplayerMessageWaitTick);
+                if (this.core.json.config.multiplayerMessageText!==null) this.core.interface.updateTemporaryText(this.core.json.config.multiplayerMessageText,(fromEntity.name+' telefragged '+killedEntity.name),this.core.json.config.multiplayerMessageWaitTick);
             }
             else {
                 if (fromEntity!==killedEntity) {
                     scoreEntity=fromEntity;
                     points=1;
-                    if (this.json.config.multiplayerMessageText!==null) this.core.interface.updateTemporaryText(this.json.config.multiplayerMessageText,(fromEntity.name+' killed '+killedEntity.name),this.json.config.multiplayerMessageWaitTick);
+                    if (this.core.json.config.multiplayerMessageText!==null) this.core.interface.updateTemporaryText(this.core.json.config.multiplayerMessageText,(fromEntity.name+' killed '+killedEntity.name),this.core.json.config.multiplayerMessageWaitTick);
                 }
                 else {
                     scoreEntity=killedEntity;
                     points=-1;
-                    if (this.json.config.multiplayerMessageText!==null) this.core.interface.updateTemporaryText(this.json.config.multiplayerMessageText,(killedEntity.name+' committed suicide'),this.json.config.multiplayerMessageWaitTick);
+                    if (this.core.json.config.multiplayerMessageText!==null) this.core.interface.updateTemporaryText(this.core.json.config.multiplayerMessageText,(killedEntity.name+' committed suicide'),this.core.json.config.multiplayerMessageWaitTick);
                 }
             }
         }
@@ -570,13 +494,13 @@ export default class GameClass
     remoteEntering(name)
     {
         this.scores.set(name,0);
-        if (this.json.config.multiplayerMessageText!==null) this.core.interface.updateTemporaryText(this.json.config.multiplayerMessageText,(name+' has joined'),5000);
+        if (this.core.json.config.multiplayerMessageText!==null) this.core.interface.updateTemporaryText(this.core.json.config.multiplayerMessageText,(name+' has joined'),5000);
     }
     
     remoteLeaving(name)
     {
         this.scores.delete(name);
-        if (this.json.config.multiplayerMessageText!==null) this.core.interface.updateTemporaryText(this.json.config.multiplayerMessageText,(name+' has left'),5000);
+        if (this.core.json.config.multiplayerMessageText!==null) this.core.interface.updateTemporaryText(this.core.json.config.multiplayerMessageText,(name+' has left'),5000);
     }
     
         //
@@ -596,13 +520,13 @@ export default class GameClass
           // initialize the map
           
         if (this.multiplayerMode===this.MULTIPLAYER_MODE_NONE) {
-            startMap=this.core.game.lookupValue(this.core.game.json.startMap,this.data);
+            startMap=this.core.game.lookupValue(this.core.json.startMap,this.data);
         }
         else {
-            startMap=this.core.game.json.multiplayerMaps[this.core.setup.localMap];
+            startMap=this.core.json.multiplayerMaps[this.core.setup.localMap];
         }
         
-        this.map=new MapClass(this.core,startMap,this.core.game.autoGenerate);
+        this.map=new MapClass(this.core,startMap);
         if (!this.map.initialize()) return;
 
             // next step
@@ -727,7 +651,7 @@ export default class GameClass
     
     async initLoadModels()
     {
-        if (!(await this.core.modelList.loadAllModels())) return;
+        if (!(await this.map.modelList.loadAllModels())) return;
         
         this.loadingScreenUpdate();
         this.loadingScreenAddString('Loading Sounds');
@@ -738,7 +662,7 @@ export default class GameClass
     
     async initLoadSounds()
     {
-        if (!(await this.core.soundList.loadAllSounds())) return;
+        if (!(await this.map.soundList.loadAllSounds())) return;
         if (!(await this.map.music.load())) return;
     
         this.loadingScreenUpdate();
@@ -783,9 +707,43 @@ export default class GameClass
     
     initFinalSetup()
     {
-            // setup the interface
+        let n,y;
+        let entity;
+        
+        this.triggers.clear();
+        
+            // json interface
+            
+        if (!this.core.interface.addFromJson(this.core.json.interface)) return(false);
+        
+            // multiplayer scores
+            
+        if (this.multiplayerMode!==this.MULTIPLAYER_MODE_NONE) {
+            
+                // current scores
+                
+            this.scores=new Map();
 
-        if (!this.core.game.ready()) return;       // halt on bad ready
+            for (entity of this.map.entityList.entities) {
+                if ((entity instanceof EntityFPSPlayerClass) ||
+                    (entity instanceof EntityFPSBotClass)) this.scores.set(entity.name,0);
+            }
+            
+                // max number of scores to display
+                
+            y=-Math.trunc((35*(this.MAX_SCORE_COUNT-1))*0.5);
+            
+            for (n=0;n!==this.MAX_SCORE_COUNT;n++) {
+                this.core.interface.addText(('score_name_'+n),'',this.core.interface.POSITION_MODE_MIDDLE,{"x":0,"y":y},30,this.core.interface.TEXT_ALIGN_RIGHT,this.scoreColor,1,false);
+                this.core.interface.addText(('score_point_'+n),'',this.core.interface.POSITION_MODE_MIDDLE,{"x":10,"y":y},30,this.core.interface.TEXT_ALIGN_LEFT,this.scoreColor,1,false);
+                y+=35;
+            }
+            
+                // no scores yet
+                
+            this.scoreShow=false;
+            this.scoreLastItemCount=0;
+        }
         
             // setup draw buffers
 
@@ -793,7 +751,7 @@ export default class GameClass
         
             // set the listener to this entity
             
-        this.core.soundList.setListenerToEntity(this.map.entityList.getPlayer());
+        this.core.audio.setListenerToEntity(this.map.entityList.getPlayer());
 
             // start the input
 
@@ -802,6 +760,14 @@ export default class GameClass
             // ready all the entities
             
         this.map.entityList.ready();
+        
+            // no sequences
+            
+        this.currentSequence=null;
+        
+        this.freezePlayer=false;
+        this.freezeAI=false;
+        this.hideUI=false;
         
             // if we are in a non-local networked game, last thing to
             // do is request a map_sync to get the map in the right time
@@ -899,7 +865,7 @@ export default class GameClass
         this.currentSequence=new SequenceClass(this.core,jsonName);
         
         if (!this.currentSequence.initialize()) {
-            console.log('unable to start sequence: '+jsonName);
+            console.log(`unable to start sequence: ${jsonName}`);
             this.currentSequence=null;
         }
     }
@@ -1071,7 +1037,7 @@ export default class GameClass
     {
             // special keys
             
-        if (this.core.input.isKeyDownAndClear('pageup')) {
+        if ((this.core.input.isKeyDownAndClear('pageup')) && (this.core.json.developer)) {
             this.core.switchLoop(this.core.LOOP_DEVELOPER);
             return(false);
         }
@@ -1283,7 +1249,7 @@ export default class GameClass
                 // update the listener and all current
                 // playing sound positions
 
-            this.core.soundList.updateListener();
+            this.core.audio.updateListener();
 
                 // if multiplayer, handle all
                 // the network updates and messages

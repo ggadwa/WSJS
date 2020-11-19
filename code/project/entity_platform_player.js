@@ -138,7 +138,7 @@ export default class EntityPlatformPlayerClass extends EntityClass
     {
         this.health=0;
         
-        this.core.soundList.playJson(this.position,this.dieSound);
+        this.core.audio.soundStartGame(this.core.game.map.soundList,this.position,this.dieSound);
         
         this.modelEntityAlter.startAnimationChunkInFrames(this.dieAnimation);
         this.modelEntityAlter.queueAnimationStop();
@@ -165,7 +165,7 @@ export default class EntityPlatformPlayerClass extends EntityClass
         }
         
         if (this.health>0) {
-            this.core.soundList.playJson(this.position,this.hurtSound);
+            this.core.audio.soundStartGame(this.core.game.map.soundList,this.position,this.hurtSound);
         }
         else {
             this.die();
@@ -265,7 +265,7 @@ export default class EntityPlatformPlayerClass extends EntityClass
                 this.movement.y=this.jumpHeight;
                 this.inJumpCameraPause=this.platformCameraJumpPause;
                 this.modelEntityAlter.startAnimationChunkInFrames(this.jumpAnimation);
-                this.core.soundList.playJson(this.position,this.jumpSound);
+                this.core.audio.soundStartGame(this.core.game.map.soundList,this.position,this.jumpSound);
             }
         }
         
@@ -278,7 +278,7 @@ export default class EntityPlatformPlayerClass extends EntityClass
                 this.inJumpCameraPause=this.platformCameraJumpPause;
                 if (this.standOnEntity.stompBounceHeight!==0) {
                     this.movement.y=this.standOnEntity.stompBounceHeight;
-                    this.core.soundList.playJson(this.position,this.standOnEntity.stompSound);
+                    this.core.audio.soundStartGame(this.core.game.map.soundList,this.position,this.standOnEntity.stompSound);
                 }
             }
         }
@@ -298,7 +298,7 @@ export default class EntityPlatformPlayerClass extends EntityClass
         else {
             if (this.lastFall) {
                 this.lastFall=false;
-                this.core.soundList.playJson(this.position,this.landSound);
+                this.core.audio.soundStartGame(this.core.game.map.soundList,this.position,this.landSound);
             }
         }
         

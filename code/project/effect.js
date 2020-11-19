@@ -409,7 +409,7 @@ export default class EffectClass
         
             // finally any start sound, shaking or damage
             
-        if (this.json.sounds!==undefined) this.core.soundList.playJson(this.position,this.json.sounds.start);
+        if (this.json.sounds!==undefined) this.core.audio.soundStartGame(this.core.game.map.soundList,this.position,this.json.sounds.start);
         
         if (this.json.shake!==undefined) {
             dist=this.position.distance(this.core.game.map.entityList.getPlayer().position);

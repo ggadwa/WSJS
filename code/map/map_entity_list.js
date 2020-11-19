@@ -73,7 +73,7 @@ export default class MapEntityListClass
             
         json=this.core.game.jsonEntityCache.get(jsonName);
         if (json===undefined) {
-            console.log('Unable to find entity json in the cache, probably missing from game.json entities list: '+jsonName);
+            console.log('Unable to find entity json in the cache, probably missing from core.json entities list: '+jsonName);
             return(null);
         }
         
@@ -204,9 +204,9 @@ export default class MapEntityListClass
             
         if (this.core.game.multiplayerMode===this.core.game.MULTIPLAYER_MODE_LOCAL) {
             for (n=0;n!==this.core.setup.botCount;n++) {
-                nameIdx=n%this.core.game.json.bot.names.length;
+                nameIdx=n%this.core.json.bot.names.length;
                 
-                if (this.addFromMap(this.core.game.json.bot.json,this.core.game.json.bot.names[nameIdx],new PointClass(0,0,0),new PointClass(0,0,0),null,true)===null) return(false);
+                if (this.addFromMap(this.core.json.bot.json,this.core.json.bot.names[nameIdx],new PointClass(0,0,0),new PointClass(0,0,0),null,true)===null) return(false);
             }
         }
 

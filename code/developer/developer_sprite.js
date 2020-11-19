@@ -16,11 +16,6 @@ export default class DeveloperSpriteClass
             // pre-allocates
             
         this.tempPoint=new PointClass(0,0,0);
-        
-            // some developer bitmaps
-            
-        this.core.bitmapList.addEffect('../developer/sprites/effect.png');
-        this.core.bitmapList.addEffect('../developer/sprites/light.png');
     }
 
     initialize()

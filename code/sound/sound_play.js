@@ -4,9 +4,9 @@
 
 export default class SoundPlayClass
 {
-    constructor(soundList)
+    constructor(core)
     {
-        this.soundList=soundList;
+        this.core=core;
         
         this.free=true;
         this.position=null;
@@ -55,7 +55,7 @@ export default class SoundPlayClass
             
         if (position===null) {
             this.gainNode=ctx.createGain();
-            this.gainNode.gain.value=this.soundList.core.setup.soundVolume;
+            this.gainNode.gain.value=this.core.setup.soundVolume;
         
             this.sourceNode.connect(this.gainNode);
             this.gainNode.connect(ctx.destination);
@@ -93,7 +93,7 @@ export default class SoundPlayClass
             this.sourceNode.connect(this.pannerNode);
             
             this.gainNode=ctx.createGain();
-            this.gainNode.gain.value=this.soundList.core.setup.soundVolume;
+            this.gainNode.gain.value=this.core.setup.soundVolume;
 
             this.pannerNode.connect(this.gainNode);
             this.gainNode.connect(ctx.destination);
@@ -116,9 +116,14 @@ export default class SoundPlayClass
     {
         this.free=true;
         this.position=null;
+        
+        this.gainNode.disconnect();
+        if (this.pannerNode!==null) this.pannerNode.disconnect();
+        this.sourceNode.disconnect();
+        
         this.sourceNode=null;
-        this.gainNode=null;
         this.pannerNode=null;
+        this.gainNode=null;
     }
     
         //

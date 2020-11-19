@@ -278,7 +278,7 @@ export default class EntityFPSBotClass extends EntityClass
         this.respawnTick=this.core.game.timestamp+this.respawnWaitTick;
         this.passThrough=true;
         
-        this.core.soundList.playJson(this.position,this.dieSound);
+        this.core.audio.soundStartGame(this.core.game.map.soundList,this.position,this.dieSound);
         this.modelEntityAlter.startAnimationChunkInFrames(this.dieAnimation);
         this.modelEntityAlter.queueAnimationStop();
 

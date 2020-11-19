@@ -91,7 +91,7 @@ export default class EntityContainerClass extends EntityClass
             this.opened=true;
             this.pauseTick=this.core.game.timestamp+this.openPause;
             
-            if (this.openSound!==null) this.core.soundList.playJson(this.position,this.openSound);
+            if (this.openSound!==null) this.core.audio.soundStartGame(this.core.game.map.soundList,this.position,this.openSound);
             this.modelEntityAlter.startAnimationChunkInFrames(this.openingAnimation);
             this.modelEntityAlter.queueAnimationChunkInFrames(this.openAnimation);
             
@@ -105,7 +105,7 @@ export default class EntityContainerClass extends EntityClass
             this.opened=false;
             this.pauseTick=this.core.game.timestamp+this.openPause;
             
-            if (this.closeSound!==null) this.core.soundList.playJson(this.position,this.closeSound);
+            if (this.closeSound!==null) this.core.audio.soundStartGame(this.core.game.map.soundList,this.position,this.closeSound);
             this.modelEntityAlter.startAnimationChunkInFrames(this.closingAnimation);
             this.modelEntityAlter.queueAnimationChunkInFrames(this.closedAnimation);
             

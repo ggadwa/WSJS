@@ -50,12 +50,12 @@ export default class SetupClass
     
     load(core)  // core has to be passed in other JSON is circular
     {
-        let jsonStr=window.localStorage.getItem(core.game.json.name+'_setup');
+        let jsonStr=window.localStorage.getItem(core.json.name+'_setup');
         if (jsonStr!==null) Object.assign(this,JSON.parse(jsonStr));
     }
     
     save(core)
     {
-        window.localStorage.setItem((core.game.json.name+'_setup'),JSON.stringify(this));
+        window.localStorage.setItem((core.json.name+'_setup'),JSON.stringify(this));
     }
 }

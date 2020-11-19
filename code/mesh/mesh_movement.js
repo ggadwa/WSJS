@@ -111,7 +111,7 @@ export default class MeshMovementClass
                     // set any trigger or sound
                     
                 if (move.triggerName!==null) this.core.game.setTrigger(move.triggerName);
-                if (move.sound!==null) this.core.soundList.playJson(this.mesh.center,move.sound);
+                if (move.sound!==null) this.core.audio.soundStartGame(this.core.game.map.soundList,this.mesh.center,move.sound);
             }
         }
         

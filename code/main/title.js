@@ -29,19 +29,19 @@ export default class TitleClass
     
     async initialize()
     {
-        this.playButton=new InterfaceButtonClass(this.core,this.core.game.json.title.playButton.x,this.core.game.json.title.playButton.y,this.core.game.json.title.playButton.width,this.core.game.json.title.playButton.height,this.core.game.json.title.playButton.title);
+        this.playButton=new InterfaceButtonClass(this.core,this.core.json.title.playButton.x,this.core.json.title.playButton.y,this.core.json.title.playButton.width,this.core.json.title.playButton.height,this.core.json.title.playButton.title);
         if (!this.playButton.initialize()) return(false);
         
-        if (this.core,this.core.game.json.title.multiplayerButton.show) {
-            this.multiplayerButton=new InterfaceButtonClass(this.core,this.core.game.json.title.multiplayerButton.x,this.core.game.json.title.multiplayerButton.y,this.core.game.json.title.multiplayerButton.width,this.core.game.json.title.multiplayerButton.height,this.core.game.json.title.multiplayerButton.title);
+        if (this.core,this.core.json.title.multiplayerButton.show) {
+            this.multiplayerButton=new InterfaceButtonClass(this.core,this.core.json.title.multiplayerButton.x,this.core.json.title.multiplayerButton.y,this.core.json.title.multiplayerButton.width,this.core.json.title.multiplayerButton.height,this.core.json.title.multiplayerButton.title);
             if (!this.multiplayerButton.initialize()) return(false);
         }
         else {
             this.multiplayerButton=null;
         }
         
-        if (this.core,this.core.game.json.title.setupButton.show) {
-            this.setupButton=new InterfaceButtonClass(this.core,this.core.game.json.title.setupButton.x,this.core.game.json.title.setupButton.y,this.core.game.json.title.setupButton.width,this.core.game.json.title.setupButton.height,this.core.game.json.title.setupButton.title);
+        if (this.core,this.core.json.title.setupButton.show) {
+            this.setupButton=new InterfaceButtonClass(this.core,this.core.json.title.setupButton.x,this.core.json.title.setupButton.y,this.core.json.title.setupButton.width,this.core.json.title.setupButton.height,this.core.json.title.setupButton.title);
             if (!this.setupButton.initialize()) return(false);
         }
         else {

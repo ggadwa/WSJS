@@ -398,7 +398,7 @@ export default class EntityFPSPlayerClass extends EntityClass
         
         if (this.isTopDownCameraOnDeath) this.core.game.camera.gotoTopDown(this.topDownCameraDistance);
 
-        this.core.soundList.playJson(this.position,this.dieSound);
+        this.core.audio.soundStartGame(this.core.game.map.soundList,this.position,this.dieSound);
         this.modelEntityAlter.startAnimationChunkInFrames(this.dieAnimation);
         this.modelEntityAlter.queueAnimationStop();
         
@@ -476,7 +476,7 @@ export default class EntityFPSPlayerClass extends EntityClass
             
         if (this.core.game.timestamp>this.nextDamageTick) {
             this.nextDamageTick=this.core.game.timestamp+this.damageFlinchWaitTick;
-            this.core.soundList.playJson(this.position,this.hurtSound);
+            this.core.audio.soundStartGame(this.core.game.map.soundList,this.position,this.hurtSound);
         }
     }
     

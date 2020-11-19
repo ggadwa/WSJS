@@ -307,7 +307,7 @@ export default class EntityWeaponClass extends EntityClass
         fire.ammo--;
         fire.resetRegenerateAmmo();
         
-        fire.core.soundList.playJson(firePosition,fire.fireSound);
+        this.core.audio.soundStartGame(this.core.game.map.soundList,firePosition,fire.fireSound);
            
            // weapon animation
            

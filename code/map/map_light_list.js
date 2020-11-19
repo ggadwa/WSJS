@@ -156,13 +156,11 @@ export default class MapLightListClass
         
     drawDeveloper()
     {
-        let n,light,bitmap;
+        let n,light;
         
-        bitmap=this.core.bitmapList.get('../developer/sprites/light.png');
-            
         for (n=0;n!==this.lights.length;n++) {
             light=this.lights[n];
-            this.core.developer.developerSprite.drawBillboardSprite(bitmap,light.position,this.core.developer.isLightSelected(n));
+            this.core.developer.developerSprite.drawBillboardSprite(this.core.developer.bitmapLight,light.position,this.core.developer.isLightSelected(n));
         }
     }
     

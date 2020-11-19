@@ -117,13 +117,13 @@ export default class InterfaceClass
         
             // touch controls
             
-        this.touchStickLeft=new InterfaceTouchStickClass(this.core,'textures/ui_touch_stick_left_ring.png','textures/ui_touch_stick_left_thumb.png',game.json.config.touchStickSize);
+        this.touchStickLeft=new InterfaceTouchStickClass(this.core,'textures/ui_touch_stick_left_ring.png','textures/ui_touch_stick_left_thumb.png',this.core.json.config.touchStickSize);
         if (!(await this.touchStickLeft.initialize())) return(false);
         
-        this.touchStickRight=new InterfaceTouchStickClass(this.core,'textures/ui_touch_stick_right_ring.png','textures/ui_touch_stick_right_thumb.png',game.json.config.touchStickSize);
+        this.touchStickRight=new InterfaceTouchStickClass(this.core,'textures/ui_touch_stick_right_ring.png','textures/ui_touch_stick_right_thumb.png',this.core.json.config.touchStickSize);
         if (!(await this.touchStickRight.initialize())) return(false);
         
-        this.touchButtonMenu=new InterfaceTouchButtonClass(this.core,'textures/ui_touch_menu.png',new PointClass(game.json.config.touchMenuPosition[0],game.json.config.touchMenuPosition[1],0),game.json.config.touchButtonSize);
+        this.touchButtonMenu=new InterfaceTouchButtonClass(this.core,'textures/ui_touch_menu.png',new PointClass(this.core.json.config.touchMenuPosition[0],this.core.json.config.touchMenuPosition[1],0),this.core.json.config.touchButtonSize);
         if (!(await this.touchButtonMenu.initialize())) return(false);
         
             // fps

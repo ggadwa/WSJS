@@ -35,7 +35,7 @@ export default class DialogMultiplayerClass extends DialogBaseClass
             // multiplayer controls
             
         if (!this.addDialogControl('headMultiplayer',this.core.interface.CONTROL_TYPE_HEADER,'Multiplayer',null)) return(false);
-        if (!this.addDialogControl('localMap',this.core.interface.CONTROL_TYPE_LIST,'Local Map:',this.core.game.json.multiplayerMaps)) return(false);
+        if (!this.addDialogControl('localMap',this.core.interface.CONTROL_TYPE_LIST,'Local Map:',this.core.json.multiplayerMaps)) return(false);
         if (!this.addDialogControl('botCount',this.core.interface.CONTROL_TYPE_LIST,'Bot Count:',[0,1,2,3,4,5,6,7,8,9])) return(false);
         if (!this.addDialogControl('botSkill',this.core.interface.CONTROL_TYPE_LIST,'Bot Skill:',['Easy','Moderate','Normal','Skilled','Hard'])) return(false);
         if (!this.addDialogControl('serverURL',this.core.interface.CONTROL_TYPE_TEXT,'Server URL:',null)) return(false);

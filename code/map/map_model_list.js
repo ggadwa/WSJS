@@ -1,10 +1,10 @@
 import ModelClass from '../model/model.js';
 
 //
-// core model list class
+// map model list class
 //
 
-export default class ModelListClass
+export default class MapModelListClass
 {
     constructor(core)
     {

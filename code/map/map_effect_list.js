@@ -159,18 +159,16 @@ export default class MapEffectListClass
     
     drawDeveloper()
     {
-        let n,effect,bitmap;
+        let n,effect;
         
             // developer draw, just draw icons
             // for where effects are (only draw for
             // map spawned effects because that's all
             // we edit)
             
-        bitmap=this.core.bitmapList.get('../developer/sprites/effect.png');
-            
         for (n=0;n!==this.effects.length;n++) {
             effect=this.effects[n];
-            if (effect.mapSpawn) this.core.developer.developerSprite.drawBillboardSprite(bitmap,effect.position,this.core.developer.isEffectSelected(n));
+            if (effect.mapSpawn) this.core.developer.developerSprite.drawBillboardSprite(this.core.developer.bitmapEffect,effect.position,this.core.developer.isEffectSelected(n));
         }
     }
 

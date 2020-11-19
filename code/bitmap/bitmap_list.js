@@ -76,7 +76,7 @@ export default class BitmapListClass
             
         bitmapSet=new Set();
         
-        game.addJsonObjectToLoadSet(bitmapSet,null,null,false,['bitmap'],game.json);
+        game.addJsonObjectToLoadSet(bitmapSet,null,null,false,['bitmap'],this.core.json);
         
         for (entity of game.map.entityList.entities) {
             jsonEntity=game.jsonEntityCache.get(entity.jsonName);

@@ -5,9 +5,7 @@ import DialogDeveloperClass from '../main/dialog_developer.js';
 import DialogPromptClass from '../main/dialog_prompt.js';
 import MapClass from '../map/map.js';
 import BitmapListClass from '../bitmap/bitmap_list.js';
-import SoundListClass from '../sound/sound_list.js';
 import ShaderListClass from '../shader/shader_list.js';
-import ModelListClass from '../model/model_list.js';
 import AudioClass from '../sound/audio.js';
 import PointClass from '../utility/point.js';
 import RectClass from '../utility/rect.js';
@@ -66,14 +64,16 @@ export default class CoreClass
             
         this.audio=new AudioClass(this);
         
+            // the core.json
+            
+        this.json=null;
+        
             // the cached objects
             // list, these are usually created by
             // name and loaded after all the imports
             
         this.bitmapList=null;
-        this.soundList=null;
         this.shaderList=null;
-        this.modelList=null;
         
             // loops
             
@@ -128,6 +128,23 @@ export default class CoreClass
     async initialize(data)
     {
         let lft,top,wid,high;
+        let resp;
+        
+            // get the core json
+            
+        try {
+            resp=await fetch('../html/core.json');
+            if (!resp.ok) {
+                alert(`Unable to load core.json: ${resp.statusText}`);
+                return(false);
+            }
+            
+            this.json=await resp.json();
+        }
+        catch (e) {
+            alert(`Unable to load core.json: ${e.message}`);
+            return(false);
+        }
         
             // canvas position
             
@@ -181,21 +198,15 @@ export default class CoreClass
             
         if (!this.audio.initialize()) return(false);
         
-            // bitmap, sound, shader, and model list
+            // bitmap, shader list
             // a lot of these are deffered load or
             // versions that cache objects
             
         this.bitmapList=new BitmapListClass(this);
         this.bitmapList.initialize();
         
-        this.soundList=new SoundListClass(this);
-        this.soundList.initialize();
-        
         this.shaderList=new ShaderListClass(this);
         this.shaderList.initialize();
-            
-        this.modelList=new ModelListClass(this);
-        this.modelList.initialize();
         
             // game and interface
             
@@ -225,9 +236,9 @@ export default class CoreClass
             // developer
             
         this.developer=new DeveloperClass(this);
-        if (!this.developer.initialize()) return(false);
+        if (!(await this.developer.initialize())) return(false);
         
-            // create misc objects
+            // the project user setup
             
         this.setup=new SetupClass();
         this.setup.load(this);      // requires game to be initialized, so we do this later
@@ -245,9 +256,7 @@ export default class CoreClass
         this.dialogMultiplayer.release();
         this.dialogDeveloper.release();
         this.dialogPrompt.release();
-        this.modelList.release();
         this.shaderList.release();
-        this.soundList.release();
         this.bitmapList.release();
         this.audio.release();
     }

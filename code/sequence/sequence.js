@@ -32,6 +32,8 @@ export default class SequenceClass
         
         this.bitmaps=[];
         this.entities=[];
+        
+        Object.seal(this);
     }
     
     isFinished()
@@ -189,7 +191,7 @@ export default class SequenceClass
             for (n=this.lastSoundPlayIdx;n<this.json.sounds.length;n++) {
                 if (tick>=this.json.sounds[n].tick) {
                     this.lastSoundPlayIdx=n+1;
-                    this.core.soundList.playJson(null,this.json.sounds[n]);
+                    this.core.audio.soundStartGame(this.core.game.map.soundList,null,this.json.sounds[n]);
                 }
             }
         }

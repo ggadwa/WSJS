@@ -1,19 +1,26 @@
 
 --> audio
      * need independent audio object on core
-     - map sound list
-     - sound play independent on list
+     * map sound list
+     * sound play independent on list
      * pause stops all audio
      * dialogs stop music
-     - disconnect nodes on sound plays
+     * disconnect nodes on sound plays
+     - click sound for title (need audio.soundStartUI)
+     - need to be able to start/stop looping sounds in dialogs
 
 --> models
-     - model_list into map
-     - init/release with map
+     * model_list into map
+     * init/release with map
+     - whats problem with animations wacky on second play?
 
---> game json -> core json, at root, put index at root, too, load in core
+--> bitmap list to map
+     * developer own bitmaps
+     - interface own bitmaps
+     - sequence own bitmaps
 
-
+- is game ready needed anymore?
+- is map ready (if it exist) needed anymore
 
 --> eventually test full screen
 --> runMultiplayerSyncError redo all this

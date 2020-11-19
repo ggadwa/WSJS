@@ -2,6 +2,7 @@ import PointClass from '../utility/point.js';
 import ColorClass from '../utility/color.js';
 import BoundClass from '../utility/bound.js';
 import QuaternionClass from '../utility/quaternion.js';
+import BitmapEffectClass from '../bitmap/bitmap_effect.js';
 import InterfaceTextClass from '../interface/interface_text.js';
 import DeveloperBuildersClass from '../developer/developer_builders.js';
 import DeveloperSpriteClass from '../developer/developer_sprite.js';
@@ -63,6 +64,10 @@ export default class DeveloperClass
         this.meshText=null;
         this.targetText=null;
         this.selectText=null;
+        
+        this.bitmapTarget=null;
+        this.bitmapEffect=null;
+        this.bitmapLight=null;
             
         this.developerBuilders=new DeveloperBuildersClass(core);
         this.developerSprite=new DeveloperSpriteClass(core);
@@ -81,8 +86,10 @@ export default class DeveloperClass
         Object.seal(this);
     }
     
-    initialize()
+    async initialize()
     {
+            // info texts
+            
         this.positionText=new InterfaceTextClass(this.core,'',5,(this.core.high-95),20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
         this.positionText.initialize();
         
@@ -98,6 +105,19 @@ export default class DeveloperClass
         this.selectText=new InterfaceTextClass(this.core,'',5,(this.core.high-3),20,this.core.interface.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
         this.selectText.initialize();
         
+            // drawing bitmaps
+            
+        this.bitmapTarget=new BitmapEffectClass(this.core,'../developer/sprites/target.png');
+        if (!(await this.bitmapTarget.load())) return(false);
+        
+        this.bitmapEffect=new BitmapEffectClass(this.core,'../developer/sprites/effect.png');
+        if (!(await this.bitmapEffect.load())) return(false);
+        
+        this.bitmapLight=new BitmapEffectClass(this.core,'../developer/sprites/light.png');
+        if (!(await this.bitmapLight.load())) return(false);
+        
+            // utility classes
+            
         if (!this.developerSprite.initialize()) return(false);
         if (!this.developerRay.initialize()) return(false);
 
@@ -114,6 +134,10 @@ export default class DeveloperClass
         
         this.developerRay.release();
         this.developerSprite.release();
+        
+        this.bitmapTarget.release();
+        this.bitmapEffect.release();
+        this.bitmapLight.release();
     }
         
         //

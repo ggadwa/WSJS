@@ -136,7 +136,7 @@ export default class EntityPlatformMonsterClass extends EntityClass
         this.effectLaunchTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.disappearEffectFrame,this.dieAnimation);
         this.animationFinishTick=this.core.game.timestamp+this.modelEntityAlter.getAnimationTickCount(this.dieAnimation);
         
-        this.core.soundList.playJson(this.position,this.dieSound);
+        this.core.audio.soundStartGame(this.core.game.map.soundList,this.position,this.dieSound);
     }
     
     isMeleeOK(player)
@@ -189,7 +189,7 @@ export default class EntityPlatformMonsterClass extends EntityClass
             if (this.core.game.timestamp>=this.meleeNextTick) {
                 this.meleeNextTick=0;
                 if (this.isMeleeOK(player)) player.meleeHit(this.meleeDamage,(Math.sign(player.position.x-this.position.x)*this.shoveSpeed),this.shoveFadeFactor);
-                this.core.soundList.playJson(this.position,this.meleeSound);
+                this.core.audio.soundStartGame(this.core.game.map.soundList,this.position,this.meleeSound);
             }
         }
         

@@ -27,10 +27,6 @@ export default class DeveloperRayClass
         this.rayXBound=new BoundClass(0,0,0);
         this.rayYBound=new BoundClass(0,0,0);
         this.rayZBound=new BoundClass(0,0,0);
-        
-            // some developer bitmaps
-            
-        this.core.bitmapList.addEffect('../developer/sprites/target.png');
     }
     
         //
@@ -40,6 +36,7 @@ export default class DeveloperRayClass
     initialize()
     {
         this.collision.initialize(null);
+        
         return(true);
     }
     
@@ -247,7 +244,6 @@ export default class DeveloperRayClass
 
     draw()
     {
-        let bitmap;
         let gl=this.core.gl;
         
             // the target
@@ -257,8 +253,7 @@ export default class DeveloperRayClass
         gl.enable(gl.BLEND);
         gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
         
-        bitmap=this.core.bitmapList.get('../developer/sprites/target.png');
-        this.core.developer.developerSprite.drawBillboardSprite(bitmap,this.lookEndPoint,false);
+        this.core.developer.developerSprite.drawBillboardSprite(this.core.developer.bitmapTarget,this.lookEndPoint,false);
         
         gl.disable(gl.BLEND);
         
