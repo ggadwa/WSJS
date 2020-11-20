@@ -1,10 +1,12 @@
+import BitmapInterfaceClass from '../bitmap/bitmap_interface.js';
+
 export default class CountClass
 {
-    constructor(core,bitmap,maxCount,rect,addOffset,onColor,onAlpha,offColor,offAlpha,developer)
+    constructor(core,colorURL,maxCount,rect,addOffset,onColor,onAlpha,offColor,offAlpha,developer)
     {
         this.core=core;
         
-        this.bitmap=bitmap;
+        this.colorURL=colorURL;
         this.maxCount=maxCount;
         this.rect=rect;
         this.addOffset=addOffset;
@@ -14,6 +16,7 @@ export default class CountClass
         this.offAlpha=offAlpha;
         this.developer=developer;
         
+        this.bitmap=null;
         this.count=maxCount;
         this.show=true;
         
@@ -24,12 +27,17 @@ export default class CountClass
         Object.seal(this);
     }
     
-    initialize()
+    async initialize()
     {
         let n,vIdx,uvIdx,iIdx,elemIdx;
         let vertexArray,uvArray,indexArray;
         let r;
         let gl=this.core.gl;
+        
+            // load the bitmap
+            
+        this.bitmap=new BitmapInterfaceClass(this.core,this.colorURL);
+        if (!(await this.bitmap.load())) return(false);
         
             // build the arrays
          
@@ -96,6 +104,8 @@ export default class CountClass
     release()
     {
         let gl=this.core.gl;
+        
+        this.bitmap.release();
         
         gl.deleteBuffer(this.vertexBuffer);
         gl.deleteBuffer(this.uvBuffer);

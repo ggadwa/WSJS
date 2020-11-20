@@ -2,7 +2,7 @@ import ColorClass from '../utility/color.js';
 
 export default class InterfaceTextClass
 {
-    constructor(core,str,x,y,fontSize,align,color,alpha,developer)
+    constructor(core,str,x,y,fontSize,align,color,alpha)
     {
         this.TEXT_MAX_STRING_LEN=256;
     
@@ -14,7 +14,6 @@ export default class InterfaceTextClass
         this.align=align;
         this.color=color;
         this.alpha=alpha;
-        this.developer=developer;
         
         this.show=true;
         this.hideTick=-1;

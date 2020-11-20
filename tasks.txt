@@ -8,6 +8,7 @@
      * disconnect nodes on sound plays
      - click sound for title (need audio.soundStartUI)
      - need to be able to start/stop looping sounds in dialogs
+     - no sound list?  Entities keep own sounds?
 
 --> models
      * model_list into map
@@ -21,14 +22,18 @@
 
 --> interface
      * text statics to core
-     - make text class for all texts, in core
+     - move interface_text to text class in core
      * interface background/cursor outside interface
      * hit/liquid to map
      * move text bitmap to core
      * only core.json has interface, remove from entities
      * developer interface text to developer
      * interface becomes map bound, tear down/build up for each map
-     - text developer flag not required
+     * text developer flag not required
+     - make interface_overlay in \game, move elements and count and texts there (then check game.js for unused imports)
+     - in game can we get rid of the json loading object stuff (used in bitmap, but maybe used in sound?)
+     * elements & counts load their own bitmaps
+     - effects load their own bitmaps
 
 --> touch needs to be completely reworked
      - input is abstracted

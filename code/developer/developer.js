@@ -90,19 +90,19 @@ export default class DeveloperClass
     {
             // info texts
             
-        this.positionText=new InterfaceTextClass(this.core,'',5,(this.core.high-95),20,this.core.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
+        this.positionText=new InterfaceTextClass(this.core,'',5,(this.core.high-95),20,this.core.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1);
         this.positionText.initialize();
         
-        this.angleText=new InterfaceTextClass(this.core,'',5,(this.core.high-72),20,this.core.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
+        this.angleText=new InterfaceTextClass(this.core,'',5,(this.core.high-72),20,this.core.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1);
         this.angleText.initialize();
 
-        this.meshText=new InterfaceTextClass(this.core,'',5,(this.core.high-49),20,this.core.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
+        this.meshText=new InterfaceTextClass(this.core,'',5,(this.core.high-49),20,this.core.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1);
         this.meshText.initialize();
 
-        this.targetText=new InterfaceTextClass(this.core,'',5,(this.core.high-26),20,this.core.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
+        this.targetText=new InterfaceTextClass(this.core,'',5,(this.core.high-26),20,this.core.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1);
         this.targetText.initialize();
 
-        this.selectText=new InterfaceTextClass(this.core,'',5,(this.core.high-3),20,this.core.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1,true);
+        this.selectText=new InterfaceTextClass(this.core,'',5,(this.core.high-3),20,this.core.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1);
         this.selectText.initialize();
         
             // drawing bitmaps

@@ -92,18 +92,18 @@ export default class DialogControlClass
         fontSize=Math.trunc(this.CONTROL_HEIGHT*0.6);
         align=(this.controlType===this.dialog.CONTROL_TYPE_HEADER)?this.core.TEXT_ALIGN_LEFT:this.core.TEXT_ALIGN_RIGHT;
         
-        this.titleText=new InterfaceTextClass(this.core,this.title,0,0,fontSize,align,new ColorClass(1,1,1,1),1,false);
+        this.titleText=new InterfaceTextClass(this.core,this.title,0,0,fontSize,align,new ColorClass(1,1,1,1),1);
         this.titleText.initialize();
         
         this.valueText=null;
         
         switch (this.controlType) {
             case this.dialog.CONTROL_TYPE_TEXT:
-                this.valueText=new InterfaceTextClass(this.core,'',0,0,fontSize,this.core.TEXT_ALIGN_LEFT,this.widgetTopColor,1,false);
+                this.valueText=new InterfaceTextClass(this.core,'',0,0,fontSize,this.core.TEXT_ALIGN_LEFT,this.widgetTopColor,1);
                 this.valueText.initialize();
                 break;
             case this.dialog.CONTROL_TYPE_LIST:
-                this.valueText=new InterfaceTextClass(this.core,'',0,0,fontSize,this.core.TEXT_ALIGN_CENTER,this.widgetTopColor,1,false);
+                this.valueText=new InterfaceTextClass(this.core,'',0,0,fontSize,this.core.TEXT_ALIGN_CENTER,this.widgetTopColor,1);
                 this.valueText.initialize();
                 break;
         }

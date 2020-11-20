@@ -168,7 +168,7 @@ export default class GameClass
         
     async initialize()
     {
-        let n;
+        let n,y;
         let promises,name,success;
         
             // cache all the entity json
@@ -254,20 +254,38 @@ export default class GameClass
         this.camera=new CameraClass(this.core);
         if (!this.camera.initialize()) return;
                 
-            // game interface
+            // interface overlay
             
         this.elements.clear();
         this.counts.clear();
         this.texts.clear();
             
-        this.fpsText=new InterfaceTextClass(this.core,'',(this.core.wid-5),23,20,this.core.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1,true);
+        if (!(await this.addJsonInterfaceObject(this.core.json.interface))) return(false);
+        
+        this.fpsText=new InterfaceTextClass(this.core,'',(this.core.wid-5),23,20,this.core.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1);
         this.fpsText.initialize();
+        
+            // multiplayer interface
+                
+        y=-Math.trunc((35*(this.MAX_SCORE_COUNT-1))*0.5);
+
+        for (n=0;n!==this.MAX_SCORE_COUNT;n++) {
+            this.addText(('score_name_'+n),'',this.POSITION_MODE_MIDDLE,{"x":0,"y":y},30,this.core.TEXT_ALIGN_RIGHT,this.scoreColor,1);
+            this.showText(('score_name_'+n),false);
+            this.addText(('score_point_'+n),'',this.POSITION_MODE_MIDDLE,{"x":10,"y":y},30,this.core.TEXT_ALIGN_LEFT,this.scoreColor,1);
+            this.showText(('score_point_'+n),false);
+            y+=35;
+        }
+            
+            // overlays
             
         this.liquidTint=new LiquidTintClass(this.core);
         if (!this.liquidTint.initialize()) return(false);
         
         this.hitOverlay=new HitOverlayClass(this.core,'textures/ui_hit.png');
         if (!this.hitOverlay.initialize()) return(false);
+            
+            // virtual touch controls
             
         this.touchStickLeft=new TouchStickClass(this.core,'textures/ui_touch_stick_left_ring.png','textures/ui_touch_stick_left_thumb.png',this.core.json.config.touchStickSize);
         if (!(await this.touchStickLeft.initialize())) return(false);
@@ -405,7 +423,7 @@ export default class GameClass
         // interface elements
         //
         
-    addElement(id,bitmap,width,height,positionMode,positionOffset,color,alpha,developer)
+    async addElement(id,colorURL,width,height,positionMode,positionOffset,color,alpha,developer)
     {
         let element;
         let rect=new RectClass(positionOffset.x,positionOffset.y,(positionOffset.x+width),(positionOffset.y+height));
@@ -425,9 +443,11 @@ export default class GameClass
                 break;
         }
             
-        element=new ElementClass(this.core,bitmap,rect,color,alpha,developer);
-        element.initialize();
+        element=new ElementClass(this.core,colorURL,rect,color,alpha,developer);
+        if (!(await element.initialize())) return(false);
         this.elements.set(id,element);
+        
+        return(true);
     }
     
     showElement(id,show)
@@ -456,7 +476,7 @@ export default class GameClass
         // interface counts
         //
     
-    addCount(id,bitmap,maxCount,width,height,positionMode,positionOffset,addOffset,onColor,onAlpha,offColor,offAlpha,developer)
+    async addCount(id,colorURL,maxCount,width,height,positionMode,positionOffset,addOffset,onColor,onAlpha,offColor,offAlpha,developer)
     {
         let count;
         let rect=new RectClass(positionOffset.x,positionOffset.y,(positionOffset.x+width),(positionOffset.y+height));
@@ -476,9 +496,11 @@ export default class GameClass
                 break;
         }
             
-        count=new CountClass(this.core,bitmap,maxCount,rect,addOffset,onColor,onAlpha,offColor,offAlpha,developer);
-        count.initialize();
+        count=new CountClass(this.core,colorURL,maxCount,rect,addOffset,onColor,onAlpha,offColor,offAlpha,developer);
+        if (!(await count.initialize())) return(false);
         this.counts.set(id,count);
+        
+        return(true);
     }
     
     showCount(id,show)
@@ -576,45 +598,27 @@ export default class GameClass
         // load and covert a json interface object into various interface parts
         //
         
-    addJsonInterfaceObject(jsonInterface)
+    async addJsonInterfaceObject(jsonInterface)
     {
         let element,count,text;
-        let bitmap,positionMode,align;
+        let positionMode,align;
         
         if (jsonInterface===undefined) return(true);
         
         if (jsonInterface.elements!==undefined) {
             for (element of jsonInterface.elements) {
-                
-                    // the element bitmap
-                    
-                bitmap=this.core.bitmapList.get(element.bitmap);
-                if (bitmap===undefined) {
-                    console.log('Missing bitmap to add to interface: '+element.bitmap);
-                    return(false);
-                }
-                
                 positionMode=this.POSITION_MODE_LIST.indexOf(element.positionMode);
 
-                this.addElement(element.id,bitmap,element.width,element.height,positionMode,element.positionOffset,new ColorClass(element.color.r,element.color.g,element.color.b),element.alpha,false);
+                if (!await (this.addElement(element.id,element.bitmap,element.width,element.height,positionMode,element.positionOffset,new ColorClass(element.color.r,element.color.g,element.color.b),element.alpha,false))) return(false);
                 this.showElement(element.id,element.show);
             }
         }
         
         if (jsonInterface.counts!==undefined) {
             for (count of jsonInterface.counts) {
-                
-                    // the element bitmap
-                    
-                bitmap=this.core.bitmapList.get(count.bitmap);
-                if (bitmap===undefined) {
-                    console.log('Missing bitmap to add to interface: '+count.bitmap);
-                    return(false);
-                }
-                
                 positionMode=this.POSITION_MODE_LIST.indexOf(count.positionMode);
 
-                this.addCount(count.id,bitmap,count.count,count.width,count.height,positionMode,count.positionOffset,count.addOffset,new ColorClass(count.onColor.r,count.onColor.g,count.onColor.b),count.onAlpha,new ColorClass(count.offColor.r,count.offColor.g,count.offColor.b),count.offAlpha,false);
+                if (!await (this.addCount(count.id,count.bitmap,count.count,count.width,count.height,positionMode,count.positionOffset,count.addOffset,new ColorClass(count.onColor.r,count.onColor.g,count.onColor.b),count.onAlpha,new ColorClass(count.offColor.r,count.offColor.g,count.offColor.b),count.offAlpha,false))) return(false);
                 this.showCount(count.id,count.show);
             }
         }
@@ -839,7 +843,7 @@ export default class GameClass
         
         this.loadingScreenClear();
         
-          // initialize the map
+            // initialize the map
           
         if (this.multiplayerMode===this.MULTIPLAYER_MODE_NONE) {
             startMap=this.core.game.lookupValue(this.core.json.startMap,this.data);
@@ -1034,10 +1038,6 @@ export default class GameClass
         
         this.triggers.clear();
         
-            // json interface
-            
-        if (!this.addJsonInterfaceObject(this.core.json.interface)) return(false);
-        
             // multiplayer scores
             
         if (this.multiplayerMode!==this.MULTIPLAYER_MODE_NONE) {
@@ -1049,16 +1049,6 @@ export default class GameClass
             for (entity of this.map.entityList.entities) {
                 if ((entity instanceof EntityFPSPlayerClass) ||
                     (entity instanceof EntityFPSBotClass)) this.scores.set(entity.name,0);
-            }
-            
-                // max number of scores to display
-                
-            y=-Math.trunc((35*(this.MAX_SCORE_COUNT-1))*0.5);
-            
-            for (n=0;n!==this.MAX_SCORE_COUNT;n++) {
-                this.addText(('score_name_'+n),'',this.POSITION_MODE_MIDDLE,{"x":0,"y":y},30,this.core.TEXT_ALIGN_RIGHT,this.scoreColor,1,false);
-                this.addText(('score_point_'+n),'',this.POSITION_MODE_MIDDLE,{"x":10,"y":y},30,this.core.TEXT_ALIGN_LEFT,this.scoreColor,1,false);
-                y+=35;
             }
             
                 // no scores yet
@@ -1676,7 +1666,6 @@ export default class GameClass
             // exit game trigger
             
         if (this.exitGame) {
-            this.release();
             this.core.switchLoop(this.core.LOOP_TITLE);
             return;
         }

@@ -1,15 +1,18 @@
+import BitmapInterfaceClass from '../bitmap/bitmap_interface.js';
+
 export default class ElementClass
 {
-    constructor(core,bitmap,rect,color,alpha,developer)
+    constructor(core,colorURL,rect,color,alpha,developer)
     {
         this.core=core;
         
-        this.bitmap=bitmap;
+        this.colorURL=colorURL;
         this.rect=rect;
         this.color=color;
         this.alpha=alpha;
         this.developer=developer;
         
+        this.bitmap=null;
         this.show=true;
         
         this.pulseStartTick=0;
@@ -26,10 +29,15 @@ export default class ElementClass
         Object.seal(this);
     }
     
-    initialize()
+    async initialize()
     {
         let indexArray;
         let gl=this.core.gl;
+        
+            // load the bitmap
+            
+        this.bitmap=new BitmapInterfaceClass(this.core,this.colorURL);
+        if (!(await this.bitmap.load())) return(false);
         
             // pre build data for vertex and uv
             // so we can use the more efficient subdata later
@@ -64,6 +72,8 @@ export default class ElementClass
     release()
     {
         let gl=this.core.gl;
+        
+        this.bitmap.release();
         
         gl.deleteBuffer(this.vertexBuffer);
         gl.deleteBuffer(this.uvBuffer);
