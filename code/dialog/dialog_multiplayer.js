@@ -20,9 +20,9 @@ export default class DialogMultiplayerClass extends DialogBaseClass
         
             // dialog buttons
             
-        if (!this.addDialogButton('cancel',0.78,0.93,0.1,0.05,'Cancel',false)) return(false);
-        if (!this.addDialogButton('localGame',0.01,0.93,0.1,0.05,'Local Game',false)) return(false);
-        if (!this.addDialogButton('joinGame',0.89,0.93,0.1,0.05,'Join Game',true)) return(false);
+        if (!this.addDialogButton('cancel',0.755,0.93,0.1,0.05,'Cancel',false)) return(false);
+        if (!this.addDialogButton('localGame',0.01,0.93,0.125,0.05,'Local Game',false)) return(false);
+        if (!this.addDialogButton('joinGame',0.865,0.93,0.125,0.05,'Join Game',true)) return(false);
         
             // profile controls
             

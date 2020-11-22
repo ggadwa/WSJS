@@ -264,6 +264,60 @@ export default class AudioClass
         return(idx);
     }
     
+    soundStartGame2(sound,position,obj)
+    {
+        let n,idx;
+        let distance,rate,loopStart,loopEnd,loop;
+        let soundPlay=null;
+        
+        if ((obj===undefined) || (obj===null)) return(-1);
+        if ((obj.name===undefined) || (obj.name==='')) {
+            console.log('Sound is missing or has a blank name');
+            return(-1);
+        }
+        
+            // null positions have no distance
+            
+        distance=0;
+        
+        if (position!==null) {
+            if (obj.distance===undefined) {
+                console.info(`Sound ${obj.name} is missing a distance value`);
+                return(-1);
+            }
+            distance=obj.distance;
+        }
+        
+            // lookup sound attributes
+            
+        rate=(obj.rate===undefined)?1.0:obj.rate;
+        if (obj.randomRateAdd!==undefined) {
+            if (obj.randomRateAdd!==0) rate+=(Math.random()*obj.randomRateAdd);
+        }
+        
+        loopStart=(obj.loopStart===undefined)?0:obj.loopStart;
+        loopEnd=(obj.loopEnd===undefined)?0:obj.loopEnd;
+        loop=(obj.loop===undefined)?false:obj.loop;
+        
+            // find a free sound play
+            
+        for (n=0;n!==this.MAX_CONCURRENT_SOUNDS;n++) {
+            if (this.soundPlays[n].free) {
+                idx=n;
+                soundPlay=this.soundPlays[n];
+                break;
+            }
+        }
+        
+        if (soundPlay===null) return(-1);
+        
+            // set it to entity
+            
+        if (!soundPlay.play(this.audioCTX,this.currentListenerEntity,position,sound,rate,distance,loopStart,loopEnd,loop)) return(-1);
+        
+        return(idx);
+    }
+    
     soundStartUI(sound)
     {
         let n,idx;

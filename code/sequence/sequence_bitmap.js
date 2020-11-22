@@ -1,17 +1,20 @@
 import PointClass from '../utility/point.js';
 import ColorClass from '../utility/color.js';
 import BoundClass from '../utility/bound.js';
+import BitmapInterfaceClass from '../bitmap/bitmap_interface.js';
 
 export default class SequenceBitmapClass
 {
-    constructor(core,sequence,bitmap,positionMode,drawMode,frames)
+    constructor(core,sequence,colorURL,positionMode,drawMode,frames)
     {
         this.core=core;
         this.sequence=sequence;
-        this.bitmap=bitmap;
+        this.colorURL=colorURL;
         this.positionMode=positionMode;
         this.drawMode=drawMode;
         this.frames=frames;
+        
+        this.bitmap=null;
         
             // the vertexe buffers
             
@@ -30,10 +33,15 @@ export default class SequenceBitmapClass
         Object.seal(this);
     }
     
-    initialize()
+    async initialize()
     {
         let uvs;
         let gl=this.core.gl;
+        
+            // bitmap
+            
+        this.bitmap=new BitmapInterfaceClass(this.core,this.colorURL);
+        if (!(await this.bitmap.load())) return(false);
         
             // vertexes are dynamic
             
@@ -75,6 +83,8 @@ export default class SequenceBitmapClass
         
         gl.deleteBuffer(this.vertexPosBuffer);
         gl.deleteBuffer(this.vertexUVBuffer);
+        
+        this.bitmap.release();
     }
     
     draw(shader,startTimestamp)

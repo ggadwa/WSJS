@@ -1,5 +1,5 @@
 import ColorClass from '../utility/color.js';
-import InterfaceTextClass from '../interface/interface_text.js';
+import TextClass from '../main/text.js';
 
 export default class DialogButtonClass
 {
@@ -75,7 +75,7 @@ export default class DialogButtonClass
         fontSize=Math.trunc((this.bot-this.top)*0.6);
         y=(this.bot-Math.trunc(((this.bot-this.top)-fontSize)*0.5))+Math.trunc(fontSize*0.1);
         
-        this.text=new InterfaceTextClass(this.core,this.title,x,y,fontSize,this.core.TEXT_ALIGN_CENTER,new ColorClass(1,1,1,1),1);
+        this.text=new TextClass(this.core,this.title,x,y,fontSize,this.core.TEXT_ALIGN_CENTER,new ColorClass(1,1,1,1),1);
         this.text.initialize();
 
         return(true);

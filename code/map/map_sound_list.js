@@ -89,13 +89,6 @@ export default class MapSoundListClass
             game.addJsonObjectToLoadSet(soundSet,null,"sounds",false,['name'],jsonEffect);
         }
         
-            // sequence sounds
-            
-        for (jsonSequence of game.jsonSequenceCache.values())
-        {
-            game.addJsonObjectToLoadSet(soundSet,null,"sounds",false,['name'],jsonSequence);
-        }
-        
             // load the sounds
             
         promises=[];

@@ -8,7 +8,7 @@ import MeshMoveClass from '../mesh/mesh_move.js';
 import MeshMovementClass from '../mesh/mesh_movement.js';
 import MapCubeClass from '../map/map_cube.js';
 import MapLiquidClass from '../map/map_liquid.js';
-import EffectClass from '../project/effect.js';
+import EffectClass from '../effect/effect.js';
 import ModelNodeClass from '../model/model_node.js';
 import ModelSkinClass from '../model/model_skin.js';
 import ModelJointClass from '../model/model_joint.js';

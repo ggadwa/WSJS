@@ -46,7 +46,7 @@ class EntityWeaponFireClass
     
     addAmmo(count)
     {
-        if ((this.interfaceAmmoIcon!==null) && (this.weapon.heldBy===this.core.game.map.entityList.getPlayer())) this.core.game.pulseElement(this.interfaceAmmoIcon,500,10);
+        if ((this.interfaceAmmoIcon!==null) && (this.weapon.heldBy===this.core.game.map.entityList.getPlayer())) this.core.game.overlay.pulseElement(this.interfaceAmmoIcon,500,10);
         
         this.ammo+=count;
         if (this.ammo>this.ammoMaxCount) this.ammo=this.ammoMaxCount;
@@ -54,8 +54,8 @@ class EntityWeaponFireClass
     
     updateUI()
     {
-        if (this.interfaceAmmoText!==null) this.core.game.updateText(this.interfaceAmmoText,this.ammo);
-        if (this.interfaceAmmoCount!==null) this.core.game.setCount(this.interfaceAmmoCount,this.ammo);
+        if (this.interfaceAmmoText!==null) this.core.game.overlay.updateText(this.interfaceAmmoText,this.ammo);
+        if (this.interfaceAmmoCount!==null) this.core.game.overlay.setCount(this.interfaceAmmoCount,this.ammo);
     }
     
     resetRegenerateAmmo()
@@ -410,7 +410,7 @@ export default class EntityWeaponClass extends EntityClass
             // update any UI if player
             
         if (parentEntity===this.core.game.map.entityList.getPlayer()) {
-            if (this.interfaceCrosshair!==null) this.core.game.showElement(this.interfaceCrosshair,((this.show)&&(this.core.game.camera.isFirstPerson())));
+            if (this.interfaceCrosshair!==null) this.core.game.overlay.showElement(this.interfaceCrosshair,((this.show)&&(this.core.game.camera.isFirstPerson())));
             if (this.primary!==null) this.primary.updateUI();
             if (this.secondary!==null) this.secondary.updateUI();
             if (this.tertiary!==null) this.tertiary.updateUI();

@@ -1,6 +1,6 @@
 import ColorClass from '../utility/color.js';
 
-export default class InterfaceTextClass
+export default class TextClass
 {
     constructor(core,str,x,y,fontSize,align,color,alpha)
     {

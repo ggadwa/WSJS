@@ -3,6 +3,7 @@ import ColorClass from '../utility/color.js';
 import BoundClass from '../utility/bound.js';
 import SequenceBitmapClass from '../sequence/sequence_bitmap.js';
 import SequenceEntityClass from '../sequence/sequence_entity.js';
+import SequenceSoundClass from '../sequence/sequence_sound.js';
 
 export default class SequenceClass
 {
@@ -32,38 +33,38 @@ export default class SequenceClass
         
         this.bitmaps=[];
         this.entities=[];
+        this.sounds=[];
         
         Object.seal(this);
     }
     
-    isFinished()
+    async initialize()
     {
-        return(this.core.game.timestamp>(this.startTimestamp+this.json.lifeTick));
-    }
-    
-    lookupValue(value)
-    {
-        return(this.core.game.lookupValue(value,this.data));
-    }
-    
-    initialize()
-    {
-        let bitmapDef,sequenceBitmap,bitmap;
-        let entityDef,sequenceEntity;
-        let name,mode,drawMode,positionMode;
+        let resp,url;
+        let bitmapDef,bitmap;
+        let entityDef,entity;
+        let soundDef,sound;
+        let name,colorURL,mode,drawMode,positionMode;
         
-        this.startTimestamp=this.core.game.timestamp;
-        
-            // get the named json
+            // get the json
             
-        this.json=this.core.game.jsonSequenceCache.get(this.jsonName);
-        if (this.json===undefined) return(false);
+        url='../sequences/'+this.jsonName+'.json';
         
-            // stop any music
+        try {
+            resp=await fetch(url);
+            if (!resp.ok) { 
+                console.info(`Unable to load ${url}; ${resp.statusText}`);
+                return(false);
+            }
             
-        this.core.audio.musicStop();
+            this.json=await resp.json();
+        }
+        catch (e) {
+            console.info(`Unable to load ${url}; ${e.message}`);
+            return(false);
+        }
         
-            // setup the bitmaps
+            // load any bitmaps
             
         this.bitmaps=[];
         
@@ -73,35 +74,30 @@ export default class SequenceClass
                 
                     // setup the bitmap
 
-                mode=this.lookupValue(bitmapDef.drawMode);
+                mode=this.core.game.lookupValue(bitmapDef.drawMode,this.data);
                 drawMode=this.DRAW_MODE_LIST.indexOf(mode);
                 if (drawMode===-1) {
                     console.log('Unknown sequence bitmap draw mode: '+mode);
                     return(false);
                 }
                 
-                mode=this.lookupValue(bitmapDef.positionMode);
+                mode=this.core.game.lookupValue(bitmapDef.positionMode,this.data);
                 positionMode=this.POSITION_MODE_LIST.indexOf(mode);
                 if (positionMode===-1) {
                     console.log('Unknown sequence bitmap position mode: '+mode);
                     return(false);
                 }
                 
-                name=this.lookupValue(bitmapDef.bitmap);
-                bitmap=this.core.bitmapList.get(name);
-                if (bitmap===undefined) {
-                    console.log('Unknown sequence bitmap: '+name);
-                    return(false);
-                }
+                colorURL=this.core.game.lookupValue(bitmapDef.bitmap,this.data);
                 
-                sequenceBitmap=new SequenceBitmapClass(this.core,this,bitmap,positionMode,drawMode,bitmapDef.frames);
-                if (!sequenceBitmap.initialize()) return(false);
+                bitmap=new SequenceBitmapClass(this.core,this,colorURL,positionMode,drawMode,bitmapDef.frames);
+                if (!(await bitmap.initialize())) return(false);
                 
-                this.bitmaps.push(sequenceBitmap);
+                this.bitmaps.push(bitmap);
             }
         }
         
-            // setup entities
+            // load any entities
             
         this.entities=[];
         
@@ -109,39 +105,87 @@ export default class SequenceClass
             
             for (entityDef of this.json.entities) {
                 
-                name=this.lookupValue(entityDef.entity);
-                sequenceEntity=new SequenceEntityClass(this.core,this,name,entityDef.frames);
-                if (!sequenceEntity.initialize()) return(false);
+                name=this.core.game.lookupValue(entityDef.entity,this.data);
+                entity=new SequenceEntityClass(this.core,this,name,entityDef.frames);
+                if (!entity.initialize()) return(false);
                 
-                this.entities.push(sequenceEntity);
+                this.entities.push(entity);
             }
         }
         
-            // no sounds played yet
+            // load any sounds
             
-        this.lastSoundPlayIdx=0;
+        this.sounds=[];
+        
+        if (this.json.sounds!==undefined) {
+            
+            for (soundDef of this.json.sounds) {
+                
+                name=this.core.game.lookupValue(soundDef.name,this.data);
+                sound=new SequenceSoundClass(this.core,this,name,soundDef);
+                if (!sound.initialize()) return(false);
+                
+                this.sounds.push(sound);
+            }
+        }
         
         return(true);
     }
 
     release()
     {
-        let sequenceBitmap,sequenceEntity;
-
+        let bitmap,entity;
+        
+            // release any bitmaps/entities
+            
+        for (bitmap of this.bitmaps) {
+            bitmap.release();
+        }
+        
+        for (entity of this.entities) {
+            entity.release();
+        }
+    }
+    
+        //
+        // start and stop
+        //
+        
+    start()
+    {
+        let entity;
+        
+        this.startTimestamp=this.core.game.timestamp;
+        
+            // stop any music
+            
+        this.core.audio.musicStop();
+        
+            // no sounds played yet
+            
+        this.lastSoundPlayIdx=0;
+        
+            // setup the entities
+            
+        for (entity of this.entities) {
+            entity.start();
+        }
+    }
+    
+    stop()
+    {
+        let entity;
+        
             // all freezes end
          
         this.core.game.freezePlayer=false;
         this.core.game.freezeAI=false;
         this.core.game.hideUI=false;
         
-            // release any bitmaps/entities
+            // get entities back to original position
             
-        for (sequenceBitmap of this.bitmaps) {
-            sequenceBitmap.release();
-        }
-        
-        for (sequenceEntity of this.entities) {
-            sequenceEntity.release();
+        for (entity of this.entities) {
+            entity.stop();
         }
         
             // the exit flag
@@ -156,13 +200,18 @@ export default class SequenceClass
         this.core.audio.musicStart(this.core.game.map.music);
     }
     
+    isFinished()
+    {
+        return(this.core.game.timestamp>(this.startTimestamp+this.json.lifeTick));
+    }
+    
         //
         // mainline run
         //
         
     run()
     {
-        let n,tick,sequenceEntity;
+        let n,tick,entity,sound;
         let game=this.core.game;
         
         tick=game.timestamp-this.startTimestamp;
@@ -181,18 +230,17 @@ export default class SequenceClass
         
             // entities
             
-        for (sequenceEntity of this.entities) {
-            sequenceEntity.run(tick);
+        for (entity of this.entities) {
+            entity.run(tick);
         }
 
             // sound effects
         
-        if (this.json.sounds!==undefined) {
-            for (n=this.lastSoundPlayIdx;n<this.json.sounds.length;n++) {
-                if (tick>=this.json.sounds[n].tick) {
-                    this.lastSoundPlayIdx=n+1;
-                    this.core.audio.soundStartGame(this.core.game.map.soundList,null,this.json.sounds[n]);
-                }
+        for (n=this.lastSoundPlayIdx;n<this.sounds.length;n++) {
+            sound=this.sounds[n];
+            if (tick>=sound.json.tick) {
+                this.lastSoundPlayIdx=n+1;
+                this.core.audio.soundStartGame2(sound.sound,null,sound.json);
             }
         }
     }
@@ -203,7 +251,7 @@ export default class SequenceClass
         
     draw()
     {
-        let sequenceBitmap;
+        let bitmap;
         let gl=this.core.gl;
         let shader=this.core.shaderList.interfaceShader;
         
@@ -216,8 +264,8 @@ export default class SequenceClass
         
             // run through the bitmaps
             
-        for (sequenceBitmap of this.bitmaps) {
-            sequenceBitmap.draw(shader,this.startTimestamp);
+        for (bitmap of this.bitmaps) {
+            bitmap.draw(shader,this.startTimestamp);
         }
         
         shader.drawEnd();

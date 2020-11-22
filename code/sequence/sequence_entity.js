@@ -26,7 +26,24 @@ export default class SequenceEntityClass
         Object.seal(this);
     }
     
+        //
+        // initialize and release
+        //
+        
     initialize()
+    {
+        return(true);
+    }
+    
+    release()
+    {
+    }
+    
+        //
+        // called when a sequence starts up or stops
+        //
+        
+    start()
     {
         this.entity=this.core.game.map.entityList.find(this.entityName);
         if (this.entity===null) {
@@ -40,10 +57,12 @@ export default class SequenceEntityClass
         
         this.entity.modelEntityAlter.getAnimationCurrentFrames(this.originalAnimationFrames);
         
+        this.currentFrameIdx=-1;
+        
         return(true);
     }
     
-    release()
+    stop()
     {
         this.entity.position.setFromPoint(this.originalPosition);
         this.entity.angle.setFromPoint(this.originalAngle);

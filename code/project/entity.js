@@ -5,7 +5,7 @@ import QuaternionClass from '../utility/quaternion.js';
 import MeshClass from '../mesh/mesh.js';
 import ModelClass from '../model/model.js';
 import ModelEntityAlterClass from '../model/model_entity_alter.js';
-import EffectClass from '../project/effect.js';
+import EffectClass from '../effect/effect.js';
 import CollisionClass from '../collision/collisions.js';
 
 export default class EntityClass

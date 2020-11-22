@@ -4,26 +4,16 @@ import ColorClass from '../utility/color.js';
 import PlaneClass from '../utility/plane.js';
 import Matrix4Class from '../utility/matrix4.js';
 import NetworkClass from '../game/network.js';
-import TouchStickClass from '../game/touch_stick.js';
-import TouchButtonClass from '../game/touch_button.js';
 import MapClass from '../map/map.js';
 import CameraClass from '../game/camera.js';
-import LiquidTintClass from '../game/liquid_tint.js';
-import HitOverlayClass from '../game/hit_overlay.js';
-import ElementClass from '../game/element.js';
-import CountClass from '../game/count.js';
-import InterfaceTextClass from '../interface/interface_text.js';
+import GameOverlayClass from '../game/game_overlay.js';
 import ShadowmapLoadClass from '../light/shadowmap_load.js';
 import SequenceClass from '../sequence/sequence.js';
-import EntityFPSPlayerClass from '../project/entity_fps_player.js';
-import EntityFPSBotClass from '../project/entity_fps_bot.js';
 
 export default class GameClass
 {
     constructor(core,data)
     {
-        this.MAX_SCORE_COUNT=10;
-        
         this.core=core;
         this.data=data;
         
@@ -33,25 +23,10 @@ export default class GameClass
         this.MULTIPLAYER_MODE_LOCAL=1;
         this.MULTIPLAYER_MODE_JOIN=2;
         
-        this.POSITION_MODE_TOP_LEFT=0;
-        this.POSITION_MODE_TOP_RIGHT=1;
-        this.POSITION_MODE_BOTTOM_LEFT=2;
-        this.POSITION_MODE_BOTTOM_RIGHT=3;
-        this.POSITION_MODE_MIDDLE=4;
-        
-        this.POSITION_MODE_LIST=['topLeft','topRight','bottomLeft','bottomRight','middle'];
-
-        
         this.multiplayerMode=this.MULTIPLAYER_MODE_NONE;
         
         this.jsonEntityCache=new Map();
         this.jsonEffectCache=new Map();
-        this.jsonSequenceCache=new Map();
-        
-        this.scores=null;
-        this.scoreShow=false;
-        this.scoreLastItemCount=0;
-        this.scoreColor=new ColorClass(0,1,0.2);
         
             // camera
             
@@ -59,10 +34,11 @@ export default class GameClass
         this.cameraShakeTick=0;
         this.cameraShakeShift=0;
         
-        this.camera=null;
+        this.camera=new CameraClass(this.core);
         
             // sequences
             
+        this.sequences=new Map();
         this.currentSequence=null;
         
         this.freezePlayer=false;
@@ -127,22 +103,9 @@ export default class GameClass
             
         this.network=new NetworkClass(this.core);
         
-            // game interfaces
+            // the overlay
             
-        this.uiTextColor=new ColorClass(1,1,0);
-
-        this.elements=new Map();
-        this.counts=new Map();
-        this.texts=new Map();
-        
-        this.fpsText=null;
-        
-        this.liquidTint=null;
-        this.hitOverlay=null;
-
-        this.touchStickLeft=null;
-        this.touchStickRight=null;
-        this.touchButtonMenu=null;
+        this.overlay=new GameOverlayClass(this.core);
         
         Object.seal(this);
     }
@@ -168,7 +131,7 @@ export default class GameClass
         
     async initialize()
     {
-        let n,y;
+        let n,sequence;
         let promises,name,success;
         
             // cache all the entity json
@@ -223,115 +186,36 @@ export default class GameClass
         
         if (!success) return(false);
         
-            // cache all the sequence json
-            
-        promises=[];
-        
-        for (name of this.core.json.sequences) {
-            promises.push(this.fetchJson('sequences/'+name));
-        }
-            
-        success=true;
-        
-        await Promise.all(promises)
-            .then
-                (
-                    values=>{
-                        for (n=0;n<values.length;n++) {
-                            this.jsonSequenceCache.set(this.core.json.sequences[n],values[n]);
-                        }
-                    },
-                    reason=>{
-                        console.log(reason);
-                        success=false;
-                    }
-                );
-        
-        if (!success) return(false);
-        
             // the camera
             
-        this.camera=new CameraClass(this.core);
-        if (!this.camera.initialize()) return;
+        if (!this.camera.initialize()) return(false);
                 
             // interface overlay
             
-        this.elements.clear();
-        this.counts.clear();
-        this.texts.clear();
+        if (!(await this.overlay.initialize())) return(false);
+        
+            // the sequences
+        
+        for (name of this.core.json.sequences) {
+            sequence=new SequenceClass(this.core,name);
+            if (!(await sequence.initialize())) return(false);
             
-        if (!(await this.addJsonInterfaceObject(this.core.json.interface))) return(false);
-        
-        this.fpsText=new InterfaceTextClass(this.core,'',(this.core.wid-5),23,20,this.core.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1);
-        this.fpsText.initialize();
-        
-            // multiplayer interface
-                
-        y=-Math.trunc((35*(this.MAX_SCORE_COUNT-1))*0.5);
-
-        for (n=0;n!==this.MAX_SCORE_COUNT;n++) {
-            this.addText(('score_name_'+n),'',this.POSITION_MODE_MIDDLE,{"x":0,"y":y},30,this.core.TEXT_ALIGN_RIGHT,this.scoreColor,1);
-            this.showText(('score_name_'+n),false);
-            this.addText(('score_point_'+n),'',this.POSITION_MODE_MIDDLE,{"x":10,"y":y},30,this.core.TEXT_ALIGN_LEFT,this.scoreColor,1);
-            this.showText(('score_point_'+n),false);
-            y+=35;
+            this.sequences.set(name,sequence);
         }
-            
-            // overlays
-            
-        this.liquidTint=new LiquidTintClass(this.core);
-        if (!this.liquidTint.initialize()) return(false);
-        
-        this.hitOverlay=new HitOverlayClass(this.core,'textures/ui_hit.png');
-        if (!this.hitOverlay.initialize()) return(false);
-            
-            // virtual touch controls
-            
-        this.touchStickLeft=new TouchStickClass(this.core,'textures/ui_touch_stick_left_ring.png','textures/ui_touch_stick_left_thumb.png',this.core.json.config.touchStickSize);
-        if (!(await this.touchStickLeft.initialize())) return(false);
-        
-        this.touchStickRight=new TouchStickClass(this.core,'textures/ui_touch_stick_right_ring.png','textures/ui_touch_stick_right_thumb.png',this.core.json.config.touchStickSize);
-        if (!(await this.touchStickRight.initialize())) return(false);
-        
-        this.touchButtonMenu=new TouchButtonClass(this.core,'textures/ui_touch_menu.png',new PointClass(this.core.json.config.touchMenuPosition[0],this.core.json.config.touchMenuPosition[1],0),this.core.json.config.touchButtonSize);
-        if (!(await this.touchButtonMenu.initialize())) return(false);
 
         return(true);
     }
     
     release()
     {
-        let element,count,text;
+        let sequence;
         
-            // touch controls and overlays
-            
-        this.touchStickLeft.release();
-        this.touchStickRight.release();
-        this.touchButtonMenu.release();
-        
-        this.liquidTint.release();
-        this.hitOverlay.release();
-        
-            // release all elements, counts, and texts
-            
-        for (element of this.elements.values()) {
-            element.release();
+        for (sequence of this.sequences) {
+            sequence.release();
         }
         
-        for (count of this.counts.values()) {
-            count.release();
-        }
-        
-        for (text of this.texts.values()) {
-            text.release();
-        }
-
-        this.fpsText.release();
-        
-            // camera and map
-            
+        this.overlay.release();
         this.camera.release();
-        this.map.release();
     }
  
         //
@@ -418,223 +302,7 @@ export default class GameClass
             loadSet.add(this.lookupValue(obj[key],data,null));
         }
     }
-    
-        //
-        // interface elements
-        //
         
-    async addElement(id,colorURL,width,height,positionMode,positionOffset,color,alpha,developer)
-    {
-        let element;
-        let rect=new RectClass(positionOffset.x,positionOffset.y,(positionOffset.x+width),(positionOffset.y+height));
-        
-        switch (positionMode) {
-            case this.POSITION_MODE_TOP_RIGHT:
-                rect.move(this.core.canvas.width,0);
-                break;
-            case this.POSITION_MODE_BOTTOM_LEFT:
-                rect.move(0,this.core.canvas.height);
-                break;
-            case this.POSITION_MODE_BOTTOM_RIGHT:
-                rect.move(this.core.canvas.width,this.core.canvas.height);
-                break;
-            case this.POSITION_MODE_MIDDLE:
-                rect.move(Math.trunc(this.core.canvas.width*0.5),Math.trunc(this.core.canvas.height*0.5));
-                break;
-        }
-            
-        element=new ElementClass(this.core,colorURL,rect,color,alpha,developer);
-        if (!(await element.initialize())) return(false);
-        this.elements.set(id,element);
-        
-        return(true);
-    }
-    
-    showElement(id,show)
-    {
-        let element=this.elements.get(id);
-        if (element===undefined) {
-            console.log('Interface element ID does not exist: '+id);
-            return;
-        }
-        
-        element.show=show;
-    }
-    
-    pulseElement(id,tick,expand)
-    {
-        let element=this.elements.get(id);
-        if (element===undefined) {
-            console.log('Interface element ID does not exist: '+id);
-            return;
-        }
-        
-        element.pulse(tick,expand);
-    }
-    
-        //
-        // interface counts
-        //
-    
-    async addCount(id,colorURL,maxCount,width,height,positionMode,positionOffset,addOffset,onColor,onAlpha,offColor,offAlpha,developer)
-    {
-        let count;
-        let rect=new RectClass(positionOffset.x,positionOffset.y,(positionOffset.x+width),(positionOffset.y+height));
-        
-        switch (positionMode) {
-            case this.POSITION_MODE_TOP_RIGHT:
-                rect.move(this.core.canvas.width,0);
-                break;
-            case this.POSITION_MODE_BOTTOM_LEFT:
-                rect.move(0,this.core.canvas.height);
-                break;
-            case this.POSITION_MODE_BOTTOM_RIGHT:
-                rect.move(this.core.canvas.width,this.core.canvas.height);
-                break;
-            case this.POSITION_MODE_MIDDLE:
-                rect.move(Math.trunc(this.core.canvas.width*0.5),Math.trunc(this.core.canvas.height*0.5));
-                break;
-        }
-            
-        count=new CountClass(this.core,colorURL,maxCount,rect,addOffset,onColor,onAlpha,offColor,offAlpha,developer);
-        if (!(await count.initialize())) return(false);
-        this.counts.set(id,count);
-        
-        return(true);
-    }
-    
-    showCount(id,show)
-    {
-        let count=this.counts.get(id);
-        if (count===undefined) {
-            console.log('Interface count ID does not exist: '+id);
-            return;
-        }
-        
-        count.show=show;
-    }
-    
-    setCount(id,value)
-    {
-        let count=this.counts.get(id);
-        if (count===undefined) {
-            console.log('Interface count ID does not exist: '+id);
-            return;
-        }
-        
-        count.count=value;
-    }
-    
-        //
-        // interface texts
-        //
-        
-    addText(id,str,positionMode,positionOffset,fontSize,align,color,alpha,developer)
-    {
-        let text;
-        let x=positionOffset.x;
-        let y=positionOffset.y;
-        
-        switch (positionMode) {
-            case this.POSITION_MODE_TOP_RIGHT:
-                x+=this.core.canvas.width;
-                break;
-            case this.POSITION_MODE_BOTTOM_LEFT:
-                y+=this.core.canvas.height;
-                break;
-            case this.POSITION_MODE_BOTTOM_RIGHT:
-                x+=this.core.canvas.width;
-                y+=this.core.canvas.height;
-                break;
-            case this.POSITION_MODE_MIDDLE:
-                x+=Math.trunc(this.core.canvas.width*0.5);
-                y+=Math.trunc(this.core.canvas.height*0.5);
-                break;
-        }
-
-        text=new InterfaceTextClass(this.core,(''+str),x,y,fontSize,align,color,alpha,developer);
-        text.initialize();
-        this.texts.set(id,text);
-    }
-    
-    showText(id,show)
-    {
-        let text=this.texts.get(id);
-        if (text===undefined) {
-            console.log('Interface text ID does not exist: '+id);
-            return;
-        }
-        
-        text.show=show;
-        text.hideTick=-1;
-    }
-    
-    updateText(id,str)
-    {
-        let text=this.texts.get(id);
-        if (text===undefined) {
-            console.log('Interface text ID does not exist: '+id);
-            return;
-        }
-        
-        text.str=''+str;      // make sure it's a string
-        text.hideTick=-1;
-    }
-    
-    updateTemporaryText(id,str,tick)
-    {
-        let text=this.texts.get(id);
-        if (text===undefined) {
-            console.log('Interface text ID does not exist: '+id);
-            return;
-        }
-        
-        text.str=''+str;      // make sure it's a string
-        text.show=true;
-        text.hideTick=this.core.game.timestamp+tick;
-    }
-
-        //
-        // load and covert a json interface object into various interface parts
-        //
-        
-    async addJsonInterfaceObject(jsonInterface)
-    {
-        let element,count,text;
-        let positionMode,align;
-        
-        if (jsonInterface===undefined) return(true);
-        
-        if (jsonInterface.elements!==undefined) {
-            for (element of jsonInterface.elements) {
-                positionMode=this.POSITION_MODE_LIST.indexOf(element.positionMode);
-
-                if (!await (this.addElement(element.id,element.bitmap,element.width,element.height,positionMode,element.positionOffset,new ColorClass(element.color.r,element.color.g,element.color.b),element.alpha,false))) return(false);
-                this.showElement(element.id,element.show);
-            }
-        }
-        
-        if (jsonInterface.counts!==undefined) {
-            for (count of jsonInterface.counts) {
-                positionMode=this.POSITION_MODE_LIST.indexOf(count.positionMode);
-
-                if (!await (this.addCount(count.id,count.bitmap,count.count,count.width,count.height,positionMode,count.positionOffset,count.addOffset,new ColorClass(count.onColor.r,count.onColor.g,count.onColor.b),count.onAlpha,new ColorClass(count.offColor.r,count.offColor.g,count.offColor.b),count.offAlpha,false))) return(false);
-                this.showCount(count.id,count.show);
-            }
-        }
-        
-        if (jsonInterface.texts!==undefined) {
-            for (text of jsonInterface.texts) {
-                align=this.core.TEXT_ALIGN_LIST.indexOf(text.textAlign);
-                positionMode=this.POSITION_MODE_LIST.indexOf(text.positionMode);
-                this.addText(text.id,text.text,positionMode,text.positionOffset,text.textSize,align,new ColorClass(text.color.r,text.color.g,text.color.b),text.alpha,false);
-                this.showText(text.id,text.show);
-            }
-        }
-        
-        return(true);
-    }
-    
         //
         // timing utilities
         //
@@ -700,133 +368,21 @@ export default class GameClass
     {
         if (this.core.json.config.sequenceStart!==null) this.startSequence(this.core.json.config.sequenceStart);
     }
-    
-        //
-        // multiplayer/networking
-        //
         
-    multiplayerAddScore(fromEntity,killedEntity,isTelefrag)
-    {
-        let n;
-        let score,points;
-        let scoreEntity=null;
-        let iter,rtn,name,insertIdx;
-        let sortedNames=[];
-        
-        if (this.multiplayerMode===this.MULTIPLAYER_MODE_NONE) return;
-        
-            // any messages
-            
-        points=0;
-            
-        if ((fromEntity!==null) && ((fromEntity instanceof EntityFPSPlayerClass) || (fromEntity instanceof EntityFPSBotClass))) {
-            if (isTelefrag) {
-                scoreEntity=fromEntity;
-                points=1;
-                if (this.core.json.config.multiplayerMessageText!==null) this.updateTemporaryText(this.core.json.config.multiplayerMessageText,(fromEntity.name+' telefragged '+killedEntity.name),this.core.json.config.multiplayerMessageWaitTick);
-            }
-            else {
-                if (fromEntity!==killedEntity) {
-                    scoreEntity=fromEntity;
-                    points=1;
-                    if (this.core.json.config.multiplayerMessageText!==null) this.updateTemporaryText(this.core.json.config.multiplayerMessageText,(fromEntity.name+' killed '+killedEntity.name),this.core.json.config.multiplayerMessageWaitTick);
-                }
-                else {
-                    scoreEntity=killedEntity;
-                    points=-1;
-                    if (this.core.json.config.multiplayerMessageText!==null) this.updateTemporaryText(this.core.json.config.multiplayerMessageText,(killedEntity.name+' committed suicide'),this.core.json.config.multiplayerMessageWaitTick);
-                }
-            }
-        }
-        
-            // add the points
-            
-        if (scoreEntity!==null) {
-            score=this.scores.get(scoreEntity.name);
-            if (score===undefined) score=0;
-
-            this.scores.set(scoreEntity.name,(score+points));
-        }
-        
-            // update scores
-             
-        iter=this.scores.keys();
-        
-        while (true) {
-            rtn=iter.next();
-            if (rtn.done) break;
-            
-            name=rtn.value;
-            points=this.scores.get(name);
-            
-            if (sortedNames.length===0) {
-                sortedNames.push(name);
-            }
-            else {
-                insertIdx=0;
-
-                for (n=(sortedNames.length-1);n>=0;n--) {
-                    if (points<this.scores.get(sortedNames[n])) {
-                        insertIdx=n+1;
-                        break;
-                    }
-                }
-
-                sortedNames.splice(insertIdx,0,name);
-            }
-        }
-        
-        this.scoreLastItemCount=sortedNames.length;
-        
-        for (n=0;n!=this.MAX_SCORE_COUNT;n++) {
-            if (n<this.scoreLastItemCount) {
-                this.updateText(('score_name_'+n),sortedNames[n]);
-                this.showText(('score_name_'+n),this.scoreShow);
-                
-                this.updateText(('score_point_'+n),this.scores.get(sortedNames[n]));
-                this.showText(('score_point_'+n),this.scoreShow);
-            }
-            else {
-                this.showText(('score_name_'+n),false);
-                this.showText(('score_point_'+n),false);
-            }
-        }
-    }
-    
-    showScoreDisplay(show)
-    {
-        let n;
-        
-        if (this.multiplayerMode===this.MULTIPLAYER_MODE_NONE) return;
-        
-        this.scoreShow=show;
-        
-        for (n=0;n!=this.MAX_SCORE_COUNT;n++) {
-            if (n<this.scoreLastItemCount) {
-                this.showText(('score_name_'+n),this.scoreShow);
-                this.showText(('score_point_'+n),this.scoreShow);
-            }
-            else {
-                this.showText(('score_name_'+n),false);
-                this.showText(('score_point_'+n),false);
-            }
-        }
-    }
-    
         //
         // remote changes
         //
         
     remoteEntering(name)
     {
-        this.scores.set(name,0);
-        if (this.core.json.config.multiplayerMessageText!==null) this.updateTemporaryText(this.core.json.config.multiplayerMessageText,(name+' has joined'),5000);
+        this.overlay.scores.set(name,0);
+        if (this.core.json.config.multiplayerMessageText!==null) this.overlay.updateTemporaryText(this.core.json.config.multiplayerMessageText,(name+' has joined'),5000);
     }
     
     remoteLeaving(name)
     {
-        this.scores.delete(name);
-        if (this.core.json.config.multiplayerMessageText!==null) this.updateTemporaryText(this.core.json.config.multiplayerMessageText,(name+' has left'),5000);
+        this.overlay.scores.delete(name);
+        if (this.core.json.config.multiplayerMessageText!==null) this.overlay.updateTemporaryText(this.core.json.config.multiplayerMessageText,(name+' has left'),5000);
     }
     
         //
@@ -841,7 +397,7 @@ export default class GameClass
             
         this.inLoading=true;
         
-        this.loadingScreenClear();
+        this.overlay.loadingScreenClear();
         
             // initialize the map
           
@@ -858,17 +414,17 @@ export default class GameClass
             // next step
 
         //if (!this.multiplayer) {
-            this.loadingScreenUpdate();
-            this.loadingScreenAddString('Loading Map');
-            this.loadingScreenDraw();
+            this.overlay.loadingScreenUpdate();
+            this.overlay.loadingScreenAddString('Loading Map');
+            this.overlay.loadingScreenDraw();
 
             setTimeout(this.initLoadMap.bind(this),1);
             /*
         }
         else {
-            this.loadingScreenUpdate();
-            this.loadingScreenAddString('Waiting for Setup');
-            this.loadingScreenDraw();
+            this.overlay.loadingScreenUpdate();
+            this.overlay.loadingScreenAddString('Waiting for Setup');
+            this.overlay.loadingScreenDraw();
             
             setTimeout(this.runMultiplayerDialog.bind(this),1);
         }
@@ -917,18 +473,18 @@ export default class GameClass
         
             // connect to server
             
-        this.loadingScreenUpdate();
-        this.loadingScreenAddString('Connecting to Server');
-        this.loadingScreenDraw();
+        this.overlay.loadingScreenUpdate();
+        this.overlay.loadingScreenAddString('Connecting to Server');
+        this.overlay.loadingScreenDraw();
         
         this.network.connect(this.runMultiplayerConnectedOK.bind(this),this.runMultiplayerConnectedError.bind(this));     // return here, callback from connection or error
     }
     
     runMultiplayerConnectedOK()
     {
-        this.loadingScreenUpdate();
-        this.loadingScreenAddString('Loading Map');
-        this.loadingScreenDraw();
+        this.overlay.loadingScreenUpdate();
+        this.overlay.loadingScreenAddString('Loading Map');
+        this.overlay.loadingScreenDraw();
         
         setTimeout(this.initLoadMap.bind(this),1);
     }
@@ -943,9 +499,9 @@ export default class GameClass
     {
         if (!(await this.map.loadMap())) return;
         
-        this.loadingScreenUpdate();
-        this.loadingScreenAddString('Building Collision Geometry');
-        this.loadingScreenDraw();
+        this.overlay.loadingScreenUpdate();
+        this.overlay.loadingScreenAddString('Building Collision Geometry');
+        this.overlay.loadingScreenDraw();
         
         setTimeout(this.initCollisionGeometry.bind(this),1);
     }
@@ -954,10 +510,10 @@ export default class GameClass
     {
         this.map.meshList.buildCollisionGeometry();
         
-        this.loadingScreenUpdate();
+        this.overlay.loadingScreenUpdate();
 
-        this.loadingScreenAddString('Loading Shadowmap');
-        this.loadingScreenDraw();
+        this.overlay.loadingScreenAddString('Loading Shadowmap');
+        this.overlay.loadingScreenDraw();
 
         setTimeout(this.initLoadShadowmap.bind(this),1);
     }
@@ -968,9 +524,9 @@ export default class GameClass
         
         if (!(await shadowmapLoad.load())) return;
         
-        this.loadingScreenUpdate();
-        this.loadingScreenAddString('Loading Models');
-        this.loadingScreenDraw();
+        this.overlay.loadingScreenUpdate();
+        this.overlay.loadingScreenAddString('Loading Models');
+        this.overlay.loadingScreenDraw();
        
         setTimeout(this.initLoadModels.bind(this),1);    
     }
@@ -979,9 +535,9 @@ export default class GameClass
     {
         if (!(await this.map.modelList.loadAllModels())) return;
         
-        this.loadingScreenUpdate();
-        this.loadingScreenAddString('Loading Sounds');
-        this.loadingScreenDraw();
+        this.overlay.loadingScreenUpdate();
+        this.overlay.loadingScreenAddString('Loading Sounds');
+        this.overlay.loadingScreenDraw();
         
         setTimeout(this.initLoadSounds.bind(this),1);
     }
@@ -991,9 +547,9 @@ export default class GameClass
         if (!(await this.map.soundList.loadAllSounds())) return;
         if (!(await this.map.music.load())) return;
     
-        this.loadingScreenUpdate();
-        this.loadingScreenAddString('Loading Images');
-        this.loadingScreenDraw();
+        this.overlay.loadingScreenUpdate();
+        this.overlay.loadingScreenAddString('Loading Images');
+        this.overlay.loadingScreenDraw();
 
         setTimeout(this.initLoadImages.bind(this),1);
     }
@@ -1002,9 +558,9 @@ export default class GameClass
     {
         if (!(await this.core.bitmapList.loadAllBitmaps())) return;
         
-        this.loadingScreenUpdate();
-        this.loadingScreenAddString('Initializing Entities and Effects');
-        this.loadingScreenDraw();
+        this.overlay.loadingScreenUpdate();
+        this.overlay.loadingScreenAddString('Initializing Entities and Effects');
+        this.overlay.loadingScreenDraw();
         
         setTimeout(this.initLoadEntities.bind(this),1);
     }
@@ -1023,9 +579,9 @@ export default class GameClass
             
         if (!this.map.entityList.initializeMapEntities()) return;    // halt on bad entity start
         
-        this.loadingScreenUpdate();
-        this.loadingScreenAddString('Finalizing');
-        this.loadingScreenDraw();
+        this.overlay.loadingScreenUpdate();
+        this.overlay.loadingScreenAddString('Finalizing');
+        this.overlay.loadingScreenDraw();
         this.core.canvas.style.display='';
         
         setTimeout(this.initFinalSetup.bind(this),1);
@@ -1040,22 +596,7 @@ export default class GameClass
         
             // multiplayer scores
             
-        if (this.multiplayerMode!==this.MULTIPLAYER_MODE_NONE) {
-            
-                // current scores
-                
-            this.scores=new Map();
-
-            for (entity of this.map.entityList.entities) {
-                if ((entity instanceof EntityFPSPlayerClass) ||
-                    (entity instanceof EntityFPSBotClass)) this.scores.set(entity.name,0);
-            }
-            
-                // no scores yet
-                
-            this.scoreShow=false;
-            this.scoreLastItemCount=0;
-        }
+        this.overlay.multiplayerInitScores();
         
             // setup draw buffers
 
@@ -1086,9 +627,9 @@ export default class GameClass
             
             /*
         if (this.multiplayer) {
-            this.loadingScreenUpdate();
-            this.loadingScreenAddString('Connecting to Server');
-            this.loadingScreenDraw();
+            this.overlay.loadingScreenUpdate();
+            this.overlay.loadingScreenAddString('Connecting to Server');
+            this.overlay.loadingScreenDraw();
         
             this.network.sync(this.runMultiplayerSyncOK.bind(this),this.runMultiplayerSyncError.bind(this));     // return here, callback from connection or error
             return;
@@ -1172,14 +713,10 @@ export default class GameClass
         // sequences
         //
         
-    startSequence(jsonName)
+    startSequence(name)
     {
-        this.currentSequence=new SequenceClass(this.core,jsonName);
-        
-        if (!this.currentSequence.initialize()) {
-            console.log(`unable to start sequence: ${jsonName}`);
-            this.currentSequence=null;
-        }
+        this.currentSequence=this.sequences.get(name);
+        this.currentSequence.start();
     }
     
         //
@@ -1362,14 +899,14 @@ export default class GameClass
             // score functions
 
         if (this.multiplayerMode!==this.MULTIPLAYER_MODE_NONE) {
-            if (this.core.input.isKeyDownAndClear('`')) this.showScoreDisplay(!this.scoreShow);
+            if (this.core.input.isKeyDownAndClear('`')) this.overlay.multiplayerFlipScoreDisplay();
         }
 
             // sequences
             
         if (this.currentSequence!==null) {
             if (this.currentSequence.isFinished()) {
-                this.currentSequence.release();
+                this.currentSequence.stop();
                 this.currentSequence=null;
             }
             else {  
@@ -1381,13 +918,12 @@ export default class GameClass
     }
     
         //
-        // draw view
+        // draw game
         //
 
     draw()
     {
-        let n,light,key,element,count,text;
-        let fpsStr,idx;
+        let n,light;
         let player=this.map.entityList.getPlayer();
         let gl=this.core.gl;
          
@@ -1455,148 +991,13 @@ export default class GameClass
         gl.clear(gl.DEPTH_BUFFER_BIT);
         this.map.entityList.draw(player);
         
-            // everything else is blended
+            // overlay
             
-        gl.disable(gl.DEPTH_TEST);
-        gl.enable(gl.BLEND);
-        
-            // tints and overlays
-            
-        this.liquidTint.draw();
-        this.hitOverlay.draw();
-        
-            // interface
-            
-        if (!this.hideUI) {
-
-                // elements
-
-            this.core.shaderList.interfaceShader.drawStart();
-
-            gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
-
-            for ([key,element] of this.elements) {
-                element.draw();
-            }
-
-            for ([key,count] of this.counts) {
-                count.draw();
-            }
-
-                // touch controls
-
-            if (this.core.input.hasTouch) {
-                this.touchStickLeft.draw();
-                this.touchStickRight.draw();
-                this.touchButtonMenu.draw();
-            }
-            
-            this.core.shaderList.interfaceShader.drawEnd();
-
-                // text
-
-            this.core.shaderList.textShader.drawStart();
-
-            for ([key,text] of this.texts) {
-                text.draw();
-            }
-
-            if (this.core.setup.showFPS) {
-                fpsStr=this.core.game.fps.toString();
-
-                idx=fpsStr.indexOf('.');
-                if (idx===-1) {
-                    fpsStr+='.0';
-                }
-                else {
-                    fpsStr=fpsStr.substring(0,(idx+3));
-                }
-
-                this.fpsText.str=fpsStr;
-                this.fpsText.draw();
-            }
-
-            this.core.shaderList.textShader.drawEnd();
-        }
-
-        gl.disable(gl.BLEND);
-        gl.enable(gl.DEPTH_TEST);
+        this.overlay.draw();
         
             // sequences
             
         if (this.currentSequence!==null) this.currentSequence.draw();
-    }
-    
-        //
-        // loading screen
-        //
-    
-    loadingScreenClear()
-    {
-        this.loadingStrings=[];
-    }
-    
-    loadingScreenAddString(str)
-    {
-        this.loadingStrings.push(str);
-        
-        this.loadingLastAddMsec=Date.now();
-    }
-    
-    loadingScreenUpdate()
-    {
-        let msec;
-        let idx=this.loadingStrings.length-1;
-        if (idx<0) return;
-        
-        msec=Date.now()-this.loadingLastAddMsec;
-        
-        this.loadingStrings[idx]+=(' ['+msec+'ms]');
-        
-        console.info(this.loadingStrings[idx]);      // supergumba -- temporary for optimization testing
-    }
-    
-    loadingScreenDraw()
-    {
-        let n,y,col,text;
-        let nLine=this.loadingStrings.length;
-        let gl=this.core.gl;
-        
-            // the 2D ortho matrix
-
-        this.core.orthoMatrix.setOrthoMatrix(this.core.wid,this.core.high,-1.0,1.0);
-        
-            // clear to black
-            
-        gl.clearColor(0.0,0.0,0.0,1.0);
-        gl.clear(gl.COLOR_BUFFER_BIT,gl.DEPTH_BUFFER_BIT);
-        
-            // draw loading lines
-            
-        gl.disable(gl.DEPTH_TEST);
-
-        gl.enable(gl.BLEND);
-        gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
-
-        this.core.shaderList.textShader.drawStart();
-        
-        y=(this.core.high-5)-((nLine-1)*22);
-        col=new ColorClass(1.0,1.0,1.0);
-        
-        for (n=0;n!==nLine;n++) {
-            if (n===(nLine-1)) col=new ColorClass(1,0.3,0.3);
-            text=new InterfaceTextClass(this.core,this.loadingStrings[n],5,y,20,this.core.TEXT_ALIGN_LEFT,col,1,false);
-            text.initialize();
-            text.draw();
-            text.release();
-            
-            y+=22;
-        }
-        
-        this.core.shaderList.textShader.drawEnd();
-
-        gl.disable(gl.BLEND);
-        gl.enable(gl.DEPTH_TEST);
     }
     
         //
@@ -1666,6 +1067,7 @@ export default class GameClass
             // exit game trigger
             
         if (this.exitGame) {
+            this.map.release();
             this.core.switchLoop(this.core.LOOP_TITLE);
             return;
         }

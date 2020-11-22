@@ -83,10 +83,6 @@ export default class BitmapListClass
             if (jsonEntity!==null) game.addJsonObjectToLoadSet(bitmapSet,entity.data,null,false,['bitmap'],jsonEntity);
         }
 
-        for (jsonSequence of game.jsonSequenceCache) {
-            game.addJsonObjectToLoadSet(bitmapSet,null,"bitmaps",false,['bitmap'],jsonSequence);
-        }
-
         for (colorURL of bitmapSet) {
             if (!this.bitmaps.has(colorURL)) {
                 bitmap=new BitmapInterfaceClass(this.core,colorURL);

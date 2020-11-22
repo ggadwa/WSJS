@@ -154,14 +154,14 @@ export default class EntityPlatformPlayerClass extends EntityClass
         
             // hit indicator
             
-        if (this.hitIndicator) this.core.game.hitOverlay.flash(this.core.game.hitOverlay.SIDE_ALL,this.hitIndicatorFlashTick);
+        if (this.hitIndicator) this.core.game.overlay.hitOverlay.flash(this.core.game.overlay.hitOverlay.SIDE_ALL,this.hitIndicatorFlashTick);
         
             // take damage
             
         this.health-=damage;
         
         if ((this.interfaceHealthBackground!==null) && (this.interfaceHealthBackgroundPulseSize!==0) && (this.interfaceHealthBackgroundPulseTick!==0)) {
-            this.core.game.pulseElement(this.interfaceHealthBackground,this.interfaceHealthBackgroundPulseTick,this.interfaceHealthBackgroundPulseSize);
+            this.core.game.overlay.pulseElement(this.interfaceHealthBackground,this.interfaceHealthBackgroundPulseTick,this.interfaceHealthBackgroundPulseSize);
         }
         
         if (this.health>0) {
@@ -201,11 +201,11 @@ export default class EntityPlatformPlayerClass extends EntityClass
         
             // interface updates
             
-        if (this.interfaceCollectItem!==null) this.core.game.setCount(this.interfaceCollectItem,this.collectItemCount);
+        if (this.interfaceCollectItem!==null) this.core.game.overlay.setCount(this.interfaceCollectItem,this.collectItemCount);
         
         if (this.interfaceHealthBitmapList!==null) {
             for (n=0;n!==this.interfaceHealthBitmapList.length;n++) {
-                this.core.game.showElement(this.interfaceHealthBitmapList[n],((n+1)===this.health));
+                this.core.game.overlay.showElement(this.interfaceHealthBitmapList[n],((n+1)===this.health));
             }
         }
         

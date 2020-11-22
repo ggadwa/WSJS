@@ -282,7 +282,7 @@ export default class EntityFPSBotClass extends EntityClass
         this.modelEntityAlter.startAnimationChunkInFrames(this.dieAnimation);
         this.modelEntityAlter.queueAnimationStop();
 
-        this.core.game.multiplayerAddScore(fromEntity,this,isTelefrag);
+        this.core.game.overlay.multiplayerAddScore(fromEntity,this,isTelefrag);
     }
     
     damage(fromEntity,damage,hitPoint)

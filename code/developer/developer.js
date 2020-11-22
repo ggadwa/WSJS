@@ -3,7 +3,7 @@ import ColorClass from '../utility/color.js';
 import BoundClass from '../utility/bound.js';
 import QuaternionClass from '../utility/quaternion.js';
 import BitmapEffectClass from '../bitmap/bitmap_effect.js';
-import InterfaceTextClass from '../interface/interface_text.js';
+import TextClass from '../main/text.js';
 import DeveloperBuildersClass from '../developer/developer_builders.js';
 import DeveloperSpriteClass from '../developer/developer_sprite.js';
 import DeveloperRayClass from '../developer/developer_ray.js';
@@ -90,19 +90,19 @@ export default class DeveloperClass
     {
             // info texts
             
-        this.positionText=new InterfaceTextClass(this.core,'',5,(this.core.high-95),20,this.core.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1);
+        this.positionText=new TextClass(this.core,'',5,(this.core.high-95),20,this.core.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1);
         this.positionText.initialize();
         
-        this.angleText=new InterfaceTextClass(this.core,'',5,(this.core.high-72),20,this.core.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1);
+        this.angleText=new TextClass(this.core,'',5,(this.core.high-72),20,this.core.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1);
         this.angleText.initialize();
 
-        this.meshText=new InterfaceTextClass(this.core,'',5,(this.core.high-49),20,this.core.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1);
+        this.meshText=new TextClass(this.core,'',5,(this.core.high-49),20,this.core.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1);
         this.meshText.initialize();
 
-        this.targetText=new InterfaceTextClass(this.core,'',5,(this.core.high-26),20,this.core.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1);
+        this.targetText=new TextClass(this.core,'',5,(this.core.high-26),20,this.core.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1);
         this.targetText.initialize();
 
-        this.selectText=new InterfaceTextClass(this.core,'',5,(this.core.high-3),20,this.core.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1);
+        this.selectText=new TextClass(this.core,'',5,(this.core.high-3),20,this.core.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1);
         this.selectText.initialize();
         
             // drawing bitmaps
