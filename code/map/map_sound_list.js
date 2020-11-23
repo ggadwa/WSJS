@@ -48,7 +48,7 @@ export default class MapSoundListClass
     {
         let soundSet,name,sound;
         let mesh,move,liquid;
-        let entity,jsonEntity,jsonEffect,jsonSequence;
+        let entity,jsonEntity;
         let success,promises;
         let game=this.core.game;
         let map=game.map;
@@ -78,15 +78,8 @@ export default class MapSoundListClass
             // entity sounds
             
         for (entity of map.entityList.entities) {
-            jsonEntity=game.jsonEntityCache.get(entity.jsonName);
+            jsonEntity=game.entityCache.getJson(entity.jsonName);
             if (jsonEntity!==null) game.addJsonObjectToLoadSet(soundSet,entity.data,"sounds",false,['name'],jsonEntity);
-        }
-        
-            // effect sounds
-            
-        for (jsonEffect of game.jsonEffectCache.values())
-        {
-            game.addJsonObjectToLoadSet(soundSet,null,"sounds",false,['name'],jsonEffect);
         }
         
             // load the sounds

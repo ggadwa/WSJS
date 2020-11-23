@@ -1,6 +1,6 @@
 import PointClass from '../utility/point.js';
-import EntityClass from '../project/entity.js';
-import EntityPickupClass from '../project/entity_pickup.js';
+import EntityClass from '../game/entity.js';
+import EntityPickupClass from '../entity/entity_pickup.js';
 
 export default class EntityProjectileClass extends EntityClass
 {

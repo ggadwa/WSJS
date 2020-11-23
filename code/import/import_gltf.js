@@ -8,7 +8,7 @@ import MeshMoveClass from '../mesh/mesh_move.js';
 import MeshMovementClass from '../mesh/mesh_movement.js';
 import MapCubeClass from '../map/map_cube.js';
 import MapLiquidClass from '../map/map_liquid.js';
-import EffectClass from '../effect/effect.js';
+import EffectClass from '../game/effect.js';
 import ModelNodeClass from '../model/model_node.js';
 import ModelSkinClass from '../model/model_skin.js';
 import ModelJointClass from '../model/model_joint.js';
@@ -34,6 +34,8 @@ export default class ImportGLTFClass
         
         this.jsonData=null;
         this.binData=null;
+        
+        this.bitmapCache=new Map();         // model meshes can use the same bitmaps over and over so we cache them here
         
         Object.seal(this);
     }
@@ -691,18 +693,18 @@ export default class ImportGLTFClass
             // add to list to be loaded later
             
         if (colorURL!==null) {
-            bitmap=this.core.bitmapList.get(colorURL);
+            bitmap=this.bitmapCache.get(colorURL);
             if (bitmap===undefined) {
                 bitmap=new BitmapPBRClass(this.core,colorURL,normalURL,metallicRoughnessURL,emissiveURL,emissiveFactor,scale);
-                this.core.bitmapList.add(bitmap);
+                this.bitmapCache.set(colorURL,bitmap);
             }
         }
         else {
             if (colorBase!==null) {
-                bitmap=this.core.bitmapList.get(materialNode.name);
+                bitmap=this.bitmapCache.get(materialNode.name);
                 if (bitmap===undefined) {
                     bitmap=new BitmapColorClass(this.core,materialNode.name,colorBase);
-                    this.core.bitmapList.add(bitmap);
+                    this.bitmapCache.set(materialNode.name,bitmap);
                 }
             }
             else {
@@ -1256,8 +1258,12 @@ export default class ImportGLTFClass
         
     async import(map,meshList,skeleton)
     {
+        let bitmap;
+        
         this.jsonData=null;
         this.binData=null;
+        
+        this.bitmapCache.clear();
         
             // load the gltf
             
@@ -1304,6 +1310,12 @@ export default class ImportGLTFClass
         if (skeleton!==null) {
             if (!this.decodeAnimations(skeleton)) return(false);
         }
+        
+            // load all the bitmaps
+            
+        for (bitmap of this.bitmapCache.values()) {
+            if (!(await bitmap.load())) return(false);
+        }   
         
         return(true);
     }

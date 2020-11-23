@@ -34,28 +34,20 @@ export default class MeshListClass
 
     initialize()
     {
+            // bitmaps are loaded during import_gltf
+            
         return(true);
     }
 
     release()
     {
+        let mesh;
+        
+        for (mesh of this.meshes) {
+            if (mesh.bitmap.loaded) mesh.bitmap.release();          // check loaded so we don't unload twice since meshes can share bitmaps
+        }
     }
     
-        //
-        // clear mesh list
-        //
-
-    clear()
-    {
-        let mesh;
-
-        for (mesh of this.meshes) {
-            mesh.close();
-        }
-        
-        this.meshes=[];
-    }
-
         //
         // mesh items
         //

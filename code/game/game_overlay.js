@@ -8,8 +8,8 @@ import LiquidTintClass from '../game/liquid_tint.js';
 import HitOverlayClass from '../game/hit_overlay.js';
 import TouchStickClass from '../game/touch_stick.js';
 import TouchButtonClass from '../game/touch_button.js';
-import EntityFPSPlayerClass from '../project/entity_fps_player.js';
-import EntityFPSBotClass from '../project/entity_fps_bot.js';
+import EntityFPSPlayerClass from '../entity/entity_fps_player.js';
+import EntityFPSBotClass from '../entity/entity_fps_bot.js';
 
 export default class GameOverlayClass
 {

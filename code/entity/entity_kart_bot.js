@@ -1,6 +1,6 @@
 import PointClass from '../utility/point.js';
-import Entity from '../project/entity.js';
-import EntityKartBaseClass from '../project/entity_kart_base.js';
+import Entity from '../game/entity.js';
+import EntityKartBaseClass from '../entity/entity_kart_base.js';
 
 //
 // kart bot module

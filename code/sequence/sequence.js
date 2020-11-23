@@ -134,7 +134,7 @@ export default class SequenceClass
 
     release()
     {
-        let bitmap,entity;
+        let bitmap,entity,sound;
         
             // release any bitmaps/entities
             
@@ -144,6 +144,10 @@ export default class SequenceClass
         
         for (entity of this.entities) {
             entity.release();
+        }
+        
+        for (sound of this.sounds) {
+            sound.release();
         }
     }
     

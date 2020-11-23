@@ -1,28 +1,18 @@
 
+--> setting dialog needs a "quit to title" when in game
+
+--> entities
+      - rename folder to entity
+
 --> audio
-     * need independent audio object on core
-     * map sound list
-     * sound play independent on list
-     * pause stops all audio
-     * dialogs stop music
-     * disconnect nodes on sound plays
      - click sound for title (need audio.soundStartUI)
      - need to be able to start/stop looping sounds in dialogs
-     - no sound list?  Entities keep own sounds?
-
-     - sounds class have rate/etc in them, do away with json sound calls
+     * entities keep own sounds?
+     - only load sounds from entities that are in level (later, optimization)
 
 --> models
-     * model_list into map
-     * init/release with map
      - whats problem with animations wacky on second play?
-
---> bitmap list to map
-     * developer own bitmaps
-
---> interface
-     - in game can we get rid of the json loading object stuff (used in bitmap, but maybe used in sound?)
-     - effects load their own bitmaps
+     - only load models from entities that are in level (later, optimization)
 
 --> touch needs to be completely reworked
      - input is abstracted
@@ -35,6 +25,7 @@
 
 - won/lost songs (kart/platformer)
 
+- kart = tracker bowling ball needs to only track things within path (ahead of it)
 - kart = weird bug with laps near goal line
 - kart = need win closing
 - kart = going backwards

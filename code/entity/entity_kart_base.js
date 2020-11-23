@@ -2,8 +2,8 @@ import PointClass from '../utility/point.js';
 import QuaternionClass from '../utility/quaternion.js';
 import BoundClass from '../utility/bound.js';
 import ColorClass from '../utility/color.js';
-import EntityClass from '../project/entity.js';
-import EntityPickupClass from '../project/entity_pickup.js';
+import EntityClass from '../game/entity.js';
+import EntityPickupClass from '../entity/entity_pickup.js';
 
 //
 // kart base module

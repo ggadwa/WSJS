@@ -1,5 +1,5 @@
 import PointClass from '../utility/point.js';
-import EntityClass from '../project/entity.js';
+import EntityClass from '../game/entity.js';
 
 export default class EntityContainerClass extends EntityClass
 {

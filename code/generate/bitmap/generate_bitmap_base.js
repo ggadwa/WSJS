@@ -2331,7 +2331,7 @@ export default class GenerateBitmapBaseClass
             // add the bitmap object
             
         bitmap=new BitmapGeneratedClass(this.core,('generated_'+this.constructor.name),this.colorCanvas,this.normalCanvas,this.specularCanvas,this.glowCanvas,this.emissiveFactor);
-        this.core.bitmapList.add(bitmap);
+        //this.core.bitmapList.add(bitmap);
         
         return(bitmap);
     }

@@ -1,7 +1,7 @@
 import PointClass from '../utility/point.js';
 import ColorClass from '../utility/color.js';
 import BoundClass from '../utility/bound.js';
-import EntityClass from '../project/entity.js';
+import EntityClass from '../game/entity.js';
 
 //
 // monster class

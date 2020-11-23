@@ -1,16 +1,16 @@
 import PointClass from '../utility/point.js';
-import EntityFPSPlayerClass from '../project/entity_fps_player.js';
-import EntityFPSBotClass from '../project/entity_fps_bot.js';
-import EntityFPSMonsterClass from '../project/entity_fps_monster.js';
-import EntityKartPlayerClass from '../project/entity_kart_player.js';
-import EntityKartBotClass from '../project/entity_kart_bot.js';
-import EntityPlatformPlayerClass from '../project/entity_platform_player.js';
-import EntityPlatformMonsterClass from '../project/entity_platform_monster.js';
-import EntityWeaponClass from '../project/entity_weapon.js';
-import EntityProjectileClass from '../project/entity_projectile.js';
-import EntityContainerClass from '../project/entity_container.js';
-import EntityPickupClass from '../project/entity_pickup.js';
-import EntityDecorationClass from '../project/entity_decoration.js';
+import EntityFPSPlayerClass from '../entity/entity_fps_player.js';
+import EntityFPSBotClass from '../entity/entity_fps_bot.js';
+import EntityFPSMonsterClass from '../entity/entity_fps_monster.js';
+import EntityKartPlayerClass from '../entity/entity_kart_player.js';
+import EntityKartBotClass from '../entity/entity_kart_bot.js';
+import EntityPlatformPlayerClass from '../entity/entity_platform_player.js';
+import EntityPlatformMonsterClass from '../entity/entity_platform_monster.js';
+import EntityWeaponClass from '../entity/entity_weapon.js';
+import EntityProjectileClass from '../entity/entity_projectile.js';
+import EntityContainerClass from '../entity/entity_container.js';
+import EntityPickupClass from '../entity/entity_pickup.js';
+import EntityDecorationClass from '../entity/entity_decoration.js';
 
 //
 // map entity list class
@@ -67,11 +67,9 @@ export default class MapEntityListClass
     {
         let json;
         
-        let e=new Error('yes');
-        
             // get json
             
-        json=this.core.game.jsonEntityCache.get(jsonName);
+        json=this.core.game.entityCache.getJson(jsonName);
         if (json===undefined) {
             console.log('Unable to find entity json in the cache, probably missing from core.json entities list: '+jsonName);
             return(null);

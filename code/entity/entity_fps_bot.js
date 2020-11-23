@@ -1,7 +1,7 @@
 import PointClass from '../utility/point.js';
-import EntityClass from '../project/entity.js';
-import EntityFPSPlayerClass from '../project/entity_fps_player.js';
-import EntityFPSMonsterClass from '../project/entity_fps_monster.js';
+import EntityClass from '../game/entity.js';
+import EntityFPSPlayerClass from '../entity/entity_fps_player.js';
+import EntityFPSMonsterClass from '../entity/entity_fps_monster.js';
 
 export default class EntityFPSBotClass extends EntityClass
 {

@@ -1,6 +1,6 @@
 import PointClass from '../utility/point.js';
 import CoreClass from '../main/core.js';
-import EffectClass from '../effect/effect.js';
+import EffectClass from '../game/effect.js';
 
 //
 // map effect list class

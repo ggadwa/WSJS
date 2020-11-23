@@ -41,12 +41,6 @@ class EffectChunkClass
         this.drawPoints=[];
         this.motionPoints=[];
         
-            // triangles
-            
-        this.trigV0=null;
-        this.trigV1=null;
-        this.trigV2=null;
-        
             // waves
             
         this.wave=false;
@@ -88,13 +82,6 @@ class EffectChunkClass
         }
     }
     
-    setTriangle(v0,v1,v2)
-    {
-        this.trigV0=v0;
-        this.trigV1=v1;
-        this.trigV2=v2;
-    }
-    
     setParticle(motionPoints)
     {
         let n;
@@ -117,8 +104,7 @@ export default class EffectClass
     constructor(core,spawnedBy,jsonName,position,data,mapSpawn,show)
     {
         this.CHUNK_BILLBOARD=0;
-        this.CHUNK_TRIANGLE=1;
-        this.CHUNK_PARTICLE=2;
+        this.CHUNK_PARTICLE=1;
         
         this.core=core;
         this.spawnedBy=spawnedBy;
@@ -168,7 +154,7 @@ export default class EffectClass
     
     initialize()
     {
-        let n,indexes,chunk,billboard,triangle,particle,bitmap;
+        let n,indexes,chunk,billboard,particle,bitmap;
         let name,mode,drawMode,grid,gridPeriod,gridOffset;
         let wave,waveRandomStart,wavePeriod,waveSize;
         let pmx,pmy,pmz,dx,dy,dz,motionPoints,dist;
@@ -180,8 +166,11 @@ export default class EffectClass
         
             // get the named json
             
-        this.json=this.core.game.jsonEffectCache.get(this.jsonName);
-        if (this.json===null) return(false);
+        this.json=this.core.game.effectCache.getJson(this.jsonName);
+        if (this.json===undefined) {
+            console.log(`Unknown effect: ${this.jsonName}`);
+            return(false);
+        }
         
             // lights
             
@@ -206,15 +195,15 @@ export default class EffectClass
                 mode=this.lookupValue(billboard.mode);
                 drawMode=this.DRAW_MODE_LIST.indexOf(mode);
                 if (drawMode===-1) {
-                    console.log('Unknown effect draw mode: '+mode);
+                    console.log(`Unknown effect draw mode: ${mode}`);
                     return(false);
                 }
                 
                 
                 name=this.lookupValue(billboard.bitmap);
-                bitmap=this.core.bitmapList.get(name);
+                bitmap=this.core.game.effectCache.getBitmap(name);
                 if (bitmap===undefined) {
-                    console.log('Unknown effect bitmap: '+name);
+                    console.log(`Unknown effect bitmap: ${name}`);
                     return(false);
                 }
                 
@@ -239,45 +228,6 @@ export default class EffectClass
                 indexCount+=6;
             }
         }
-            
-        if (this.json.triangles!==undefined) {
-            
-            for (triangle of this.json.triangles) {
-                
-                    // setup the chunk
-
-                mode=this.lookupValue(triangle.mode);
-                drawMode=this.DRAW_MODE_LIST.indexOf(mode);
-                if (drawMode===-1) {
-                    console.log('Unknown effect draw mode: '+mode);
-                    return(false);
-                }
-                
-                name=this.lookupValue(triangle.bitmap);
-                bitmap=this.core.bitmapList.get(name);
-                if (bitmap===undefined) {
-                    console.log('Unknown effect bitmap: '+name);
-                    return(false);
-                }
-                
-                chunk=new EffectChunkClass(this.CHUNK_TRIANGLE,bitmap,3,drawMode,triangle.frames);
-                
-                wave=this.lookupValue(triangle.wave);
-                waveRandomStart=this.lookupValue(triangle.waveRandomStart);
-                wavePeriod=this.lookupValue(triangle.wavePeriod);
-                waveSize=this.lookupValue(triangle.waveSize);
-                chunk.setWave(wave,waveRandomStart,wavePeriod,waveSize);
-                
-                chunk.setTriangle(this.lookupValue(triangle.v0),this.lookupValue(triangle.v1),this.lookupValue(triangle.v2));
-                
-                this.chunks.push(chunk);
-                
-                    // drawing one quad
-                    
-                vertexCount+=3;
-                indexCount+=3;
-            }
-        }
         
         if (this.json.particles!==undefined) {
             
@@ -288,15 +238,15 @@ export default class EffectClass
                 mode=this.lookupValue(particle.mode);
                 drawMode=this.DRAW_MODE_LIST.indexOf(mode);
                 if (drawMode===-1) {
-                    console.log('Unknown effect draw mode: '+mode);
+                    console.log(`Unknown effect draw mode: ${mode}`);
                     return(false);
                 }
                 
                 
                 name=this.lookupValue(particle.bitmap);
-                bitmap=this.core.bitmapList.get(name);
+                bitmap=this.core.game.effectCache.getBitmap(name);
                 if (bitmap===undefined) {
-                    console.log('Unknown effect bitmap: '+name);
+                    console.log(`Unknown effect bitmap: ${name}`);
                     return(false);
                 }
                 
@@ -367,7 +317,6 @@ export default class EffectClass
                 chunk.indexOffset=iIdx;
                 
                 switch (chunk.chunkType) {
-                    
 
                     case this.CHUNK_BILLBOARD:
                         indexes[iIdx++]=elementIdx;     // triangle 1
@@ -377,13 +326,6 @@ export default class EffectClass
                         indexes[iIdx++]=elementIdx+2;
                         indexes[iIdx++]=elementIdx+3;
                         elementIdx+=4;
-                        break;
-
-                    case this.CHUNK_TRIANGLE:
-                        indexes[iIdx++]=elementIdx;     // triangle 1
-                        indexes[iIdx++]=elementIdx+1;
-                        indexes[iIdx++]=elementIdx+2;
-                        elementIdx+=3;
                         break;
 
                     case this.CHUNK_PARTICLE:
@@ -409,7 +351,7 @@ export default class EffectClass
         
             // finally any start sound, shaking or damage
             
-        if (this.json.sounds!==undefined) this.core.audio.soundStartGame(this.core.game.map.soundList,this.position,this.json.sounds.start);
+        if (this.json.sounds!==undefined) this.core.audio.soundStartGame2(this.core.game.effectCache.getSound(this.json.sounds.start.name),this.position,this.json.sounds.start);
         
         if (this.json.shake!==undefined) {
             dist=this.position.distance(this.core.game.map.entityList.getPlayer().position);
@@ -518,32 +460,6 @@ export default class EffectClass
 
         this.uvs[this.uvIdx++]=u;
         this.uvs[this.uvIdx++]=v+chunk.vSize;
-    }
-    
-    addTriangleToVertexList(chunk)
-    {
-            // build the triangle
-            
-        this.vertexes[this.vertexIdx++]=chunk.trigV0.x;
-        this.vertexes[this.vertexIdx++]=chunk.trigV0.y;
-        this.vertexes[this.vertexIdx++]=chunk.trigV0.z;
-
-        this.uvs[this.uvIdx++]=chunk.trigV0.u;
-        this.uvs[this.uvIdx++]=chunk.trigV0.v;
-
-        this.vertexes[this.vertexIdx++]=chunk.trigV1.x;
-        this.vertexes[this.vertexIdx++]=chunk.trigV1.y;
-        this.vertexes[this.vertexIdx++]=chunk.trigV1.z;
-
-        this.uvs[this.uvIdx++]=chunk.trigV1.u;
-        this.uvs[this.uvIdx++]=chunk.trigV1.v;
-        
-        this.vertexes[this.vertexIdx++]=chunk.trigV2.x;
-        this.vertexes[this.vertexIdx++]=chunk.trigV2.y;
-        this.vertexes[this.vertexIdx++]=chunk.trigV2.z;
-
-        this.uvs[this.uvIdx++]=chunk.trigV2.u;
-        this.uvs[this.uvIdx++]=chunk.trigV2.v;
     }
     
         //
@@ -770,18 +686,6 @@ export default class EffectClass
                     this.zBound.adjust(this.position.z+halfWid);
                     break;
                     
-                case this.CHUNK_TRIANGLE:
-                    this.xBound.adjust(chunk.trigV0.x);
-                    this.xBound.adjust(chunk.trigV1.x);
-                    this.xBound.adjust(chunk.trigV2.x);
-                    this.yBound.adjust(chunk.trigV0.y);
-                    this.yBound.adjust(chunk.trigV1.y);
-                    this.yBound.adjust(chunk.trigV2.y);
-                    this.zBound.adjust(chunk.trigV0.z);
-                    this.zBound.adjust(chunk.trigV1.z);
-                    this.zBound.adjust(chunk.trigV2.z);
-                    break;
-                    
                 case this.CHUNK_PARTICLE:
                     halfWid=Math.trunc(chunk.width*0.5);
                     halfHigh=Math.trunc(chunk.height*0.5);
@@ -828,11 +732,6 @@ export default class EffectClass
                 
                 case this.CHUNK_BILLBOARD:
                     this.addQuadToVertexList(chunk,this.position);
-                    this.addWave(chunk);
-                    break;
-                    
-                case this.CHUNK_TRIANGLE:
-                    this.addTriangleToVertexList(chunk);
                     this.addWave(chunk);
                     break;
                     

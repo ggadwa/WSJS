@@ -5,7 +5,7 @@ import QuaternionClass from '../utility/quaternion.js';
 import MeshClass from '../mesh/mesh.js';
 import ModelClass from '../model/model.js';
 import ModelEntityAlterClass from '../model/model_entity_alter.js';
-import EffectClass from '../effect/effect.js';
+import EffectClass from '../game/effect.js';
 import CollisionClass from '../collision/collisions.js';
 
 export default class EntityClass
@@ -99,7 +99,7 @@ export default class EntityClass
         
             // get the json
             
-        this.json=this.core.game.jsonEntityCache.get(this.jsonName);
+        this.json=this.core.game.entityCache.getJson(this.jsonName);
         if (this.json===null) return(false);
         
             // setup

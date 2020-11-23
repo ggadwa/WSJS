@@ -8,6 +8,8 @@ import MapClass from '../map/map.js';
 import CameraClass from '../game/camera.js';
 import GameOverlayClass from '../game/game_overlay.js';
 import ShadowmapLoadClass from '../light/shadowmap_load.js';
+import EntityCacheClass from '../game/entity_cache.js';
+import EffectCacheClass from '../game/effect_cache.js';
 import SequenceClass from '../sequence/sequence.js';
 
 export default class GameClass
@@ -25,8 +27,12 @@ export default class GameClass
         
         this.multiplayerMode=this.MULTIPLAYER_MODE_NONE;
         
-        this.jsonEntityCache=new Map();
-        this.jsonEffectCache=new Map();
+            // cache for entity and effects
+            // plus effects keep their bitmaps-sounds
+            // as they are global
+            
+        this.entityCache=new EntityCacheClass(this.core);
+        this.effectCache=new EffectCacheClass(this.core);
         
             // camera
             
@@ -114,77 +120,17 @@ export default class GameClass
         // initialize and release
         //
         
-    async fetchJson(name)
-    {
-        let resp;
-        let url='../'+name+'.json';
-        
-        try {
-            resp=await fetch(url);
-            if (!resp.ok) return(Promise.reject('Unable to load '+url+'; '+resp.statusText));
-            return(await resp.json());
-        }
-        catch (e) {
-            return(Promise.reject('Unable to load '+url+'; '+e.message));
-        }
-    }
-        
     async initialize()
     {
-        let n,sequence;
-        let promises,name,success;
+        let name,sequence;
         
-            // cache all the entity json
+            // entities
             
-        promises=[];
+        if (!(await this.entityCache.initialize())) return(false);
         
-        for (name of this.core.json.entities) {
-            promises.push(this.fetchJson('entities/'+name));
-        }
+            // effects
             
-        success=true;
-        
-        await Promise.all(promises)
-            .then
-                (
-                    values=>{
-                        for (n=0;n<values.length;n++) {
-                            this.jsonEntityCache.set(this.core.json.entities[n],values[n]);
-                        }
-                    },
-                    reason=>{
-                        console.log(reason);
-                        success=false;
-                    }
-                );
-        
-        if (!success) return(false);
-        
-            // cache all the effect json
-            
-        promises=[];
-        
-        for (name of this.core.json.effects) {
-            promises.push(this.fetchJson('effects/'+name));
-        }
-            
-        success=true;
-        
-        await Promise.all(promises)
-            .then
-                (
-                    values=>{
-                        for (n=0;n<values.length;n++) {
-                            this.jsonEffectCache.set(this.core.json.effects[n],values[n]);
-                        }
-                    },
-                    reason=>{
-                        console.log(reason);
-                        success=false;
-                    }
-                );
-        
-        if (!success) return(false);
+        if (!(await this.effectCache.initialize())) return(false);
         
             // the camera
             
@@ -216,6 +162,8 @@ export default class GameClass
         
         this.overlay.release();
         this.camera.release();
+        this.effectCache.release();
+        this.entityCache.release();
     }
  
         //
@@ -283,13 +231,13 @@ export default class GameClass
                 // recurse into other entities
                 
             if (key==='weaponJson') {
-                jsonEntity=this.jsonEntityCache.get(obj[key]);
+                jsonEntity=this.entityCache.getJson(obj[key]);
                 if (jsonEntity!==null) this.addJsonObjectToLoadSet(loadSet,obj['weaponData'],requiredParentObjectKey,false,keyNames,jsonEntity);
                 continue;
             }
             
             if (key==='projectileJson') {
-                jsonEntity=this.jsonEntityCache.get(obj[key]);
+                jsonEntity=this.entityCache.getJson(obj[key]);
                 if (jsonEntity!==null) this.addJsonObjectToLoadSet(loadSet,obj['projectileData'],requiredParentObjectKey,false,keyNames,jsonEntity);
                 continue;
             }
@@ -547,17 +495,6 @@ export default class GameClass
         if (!(await this.map.soundList.loadAllSounds())) return;
         if (!(await this.map.music.load())) return;
     
-        this.overlay.loadingScreenUpdate();
-        this.overlay.loadingScreenAddString('Loading Images');
-        this.overlay.loadingScreenDraw();
-
-        setTimeout(this.initLoadImages.bind(this),1);
-    }
-    
-    async initLoadImages()
-    {
-        if (!(await this.core.bitmapList.loadAllBitmaps())) return;
-        
         this.overlay.loadingScreenUpdate();
         this.overlay.loadingScreenAddString('Initializing Entities and Effects');
         this.overlay.loadingScreenDraw();

@@ -6,7 +6,6 @@ import DialogMultiplayerClass from '../dialog/dialog_multiplayer.js';
 import DialogDeveloperClass from '../dialog/dialog_developer.js';
 import DialogPromptClass from '../dialog/dialog_prompt.js';
 import MapClass from '../map/map.js';
-import BitmapListClass from '../bitmap/bitmap_list.js';
 import ShaderListClass from '../shader/shader_list.js';
 import AudioClass from '../sound/audio.js';
 import PointClass from '../utility/point.js';
@@ -100,11 +99,8 @@ export default class CoreClass
         this.background=null;
         this.cursor=null;
         
-            // the cached objects
-            // list, these are usually created by
-            // name and loaded after all the imports
+            // the shader list
             
-        this.bitmapList=null;
         this.shaderList=null;
         
             // loops
@@ -235,12 +231,7 @@ export default class CoreClass
         this.cursor=new CursorClass(this);
         if (!(await this.cursor.initialize())) return(false);
         
-            // bitmap, shader list
-            // a lot of these are deffered load or
-            // versions that cache objects
-            
-        this.bitmapList=new BitmapListClass(this);
-        this.bitmapList.initialize();
+            // shader list
         
         this.shaderList=new ShaderListClass(this);
         this.shaderList.initialize();
@@ -290,7 +281,6 @@ export default class CoreClass
         this.dialogDeveloper.release();
         this.dialogPrompt.release();
         this.shaderList.release();
-        this.bitmapList.release();
         this.audio.release();
         this.cursor.release();
         this.background.release();

@@ -1,4 +1,4 @@
-//import EntityRemoteClass from '../project/entity_remote.js';
+//import EntityRemoteClass from '../entity/entity_remote.js';
 
 //
 // network class
