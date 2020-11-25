@@ -276,7 +276,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.modelEntityAlter.startAnimationChunkInFrames(this.wakeUpAnimation);
         this.animationFinishTick=this.core.game.timestamp+this.modelEntityAlter.getAnimationTickCount(this.wakeUpAnimation);
         
-        this.core.audio.soundStartGame(this.core.game.map.soundList,this.position,this.wakeUpSound);
+        this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.wakeUpSound);
         if (this.wakeUpSetTriggerName!==null) this.core.game.setTrigger(this.wakeUpSetTriggerName);
         
         if (noRecurse) return;
@@ -339,7 +339,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         
         if (this.noiseFinishTick<=this.core.game.timestamp) {
             this.noiseFinishTick=this.core.game.timestamp+this.core.game.map.soundList.getMillisecondDurationJson(this.hurtSound);
-            this.core.audio.soundStartGame(this.core.game.map.soundList,this.position,this.hurtSound);
+            this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.hurtSound);
         }
         
             // if still in hurt, that means the animation
@@ -413,7 +413,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.modelEntityAlter.queueAnimationStop();
         this.animationFinishTick=this.core.game.timestamp+this.modelEntityAlter.getAnimationTickCount(this.dieAnimation);
 
-        this.core.audio.soundStartGame(this.core.game.map.soundList,this.position,this.deathSound);
+        this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.deathSound);
 
         this.fallSoundNextTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.deathFallSoundFrame,this.dieAnimation);
     }
@@ -477,7 +477,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.gravity=this.core.game.map.gravityMinValue;
         this.movement.y=this.jumpHeight;
         
-        this.core.audio.soundStartGame(this.core.game.map.soundList,this.position,this.wakeUpSound);
+        this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.wakeUpSound);
     }
             
     findSlideDirection(player)
@@ -751,7 +751,7 @@ export default class EntityFPSMonsterClass extends EntityClass
             // the hit itself
             
         if ((this.meleeHitNextTick<=this.core.game.timestamp) && (this.meleeHitNextTick!==0)) {
-            this.core.audio.soundStartGame(this.core.game.map.soundList,this.position,this.meleeSound);
+            this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.meleeSound);
             player.damage(this,this.meleeDamage,this.position);
             
             this.meleeHitNextTick=0;
@@ -798,7 +798,7 @@ export default class EntityFPSMonsterClass extends EntityClass
                
         if (this.fallSound!==null) {
             if ((this.fallSoundNextTick<=this.core.game.timestamp) && (this.fallSoundNextTick!==0)) {
-                this.core.audio.soundStartGame(this.core.game.map.soundList,this.position,this.fallSound);
+                this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.fallSound);
                 this.fallSoundNextTick=0;
             }
         }

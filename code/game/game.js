@@ -387,9 +387,10 @@ export default class GameClass
         this.lastRunTimestamp=this.timestamp;
         this.lastDrawTimestamp=this.timestamp;
         
-        this.exitGame=false;
-        
+            // resume any music/looping sounds
+            
         this.core.audio.musicStart(this.map.music);
+        this.core.audio.soundResumeAllLooping();
     }
     
     setMultiplayerMode(multiplayerMode)

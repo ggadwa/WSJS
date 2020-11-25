@@ -110,6 +110,11 @@ export default class DialogBaseClass
         return(true);
     }
     
+    setDialogButtonShow(id,show)
+    {
+        return(this.buttons.get(id).show=show);
+    }
+    
         //
         // start and stop dialog loop
         //
@@ -124,9 +129,10 @@ export default class DialogBaseClass
         
         this.clickDown=false;
         
-            // stop music
+            // stop music/looping sounds
             
         this.core.audio.musicStop();
+        this.core.audio.soundPauseAllLooping();
         
             // prepare the dialog
             
@@ -194,11 +200,17 @@ export default class DialogBaseClass
         for ([key,control] of this.controls) {
             if (control.controlType===this.CONTROL_TYPE_HEADER) {
                 show=(this.currentOpenHeaderControl===control);
-                if (control.click()) return(null);
+                if (control.click()) {
+                    this.core.audio.soundStartUI(this.core.title.clickSound);
+                    return(null);
+                }
             }
             else {
                 if (show) {
-                    if (control.click()) return(null);
+                    if (control.click()) {
+                        this.core.audio.soundStartUI(this.core.title.clickSound);
+                        return(null);
+                    }
                 }
             }
         }
@@ -206,7 +218,10 @@ export default class DialogBaseClass
             // buttons
 
         for ([key,button] of this.buttons) {
-            if (button.cursorInButton()) return(key);
+            if (button.cursorInButton()) {
+                this.core.audio.soundStartUI(this.core.title.clickSound);
+                return(key);
+            }
         }
         
         return(null);

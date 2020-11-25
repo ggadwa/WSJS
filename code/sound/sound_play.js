@@ -9,6 +9,7 @@ export default class SoundPlayClass
         this.core=core;
         
         this.free=true;
+        this.loop=false;
         this.position=null;
         
         this.sourceNode=null;
@@ -104,6 +105,7 @@ export default class SoundPlayClass
         this.position=position;
         
         this.free=false;
+        this.loop=loop;
         
             // finally play the sound
             
@@ -133,6 +135,22 @@ export default class SoundPlayClass
     stop()
     {
         this.sourceNode.stop();
+    }
+    
+        //
+        // pause/resume
+        // we fake this by disconnecting the gain node
+        // and it's only used for looping sounds
+        //
+        
+    pauseIfLooped()
+    {
+        if (this.loop) this.gainNode.disconnect();
+    }
+    
+    resumeIfLooped(ctx)
+    {
+        if (this.loop) this.gainNode.connect(ctx.destination);
     }
     
         //

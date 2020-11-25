@@ -1,24 +1,14 @@
 
---> setting dialog needs a "quit to title" when in game
-
---> entities
-      - rename folder to entity
-
 --> audio
-     - click sound for title (need audio.soundStartUI)
      - need to be able to start/stop looping sounds in dialogs
-     * entities keep own sounds?
-     - only load sounds from entities that are in level (later, optimization)
 
 --> models
      - whats problem with animations wacky on second play?
-     - only load models from entities that are in level (later, optimization)
 
 --> touch needs to be completely reworked
      - input is abstracted
      - touch controls are game only (look for touchMenuTrigger, also)
 
-- is map ready needed anymore
 
 --> eventually test full screen
 --> runMultiplayerSyncError redo all this
@@ -55,9 +45,12 @@ NETWORKING
     - predictions
     - need open system for passing message (like firing weapons, etc)
 
+OPTIMIZATIONS
+    - only load models from entities that are in level
+    - only load sounds from entities that are in level
+
 GENERATOR
-    - make the whole thing part of developer
-    - nodes don't seem right in certain rooms (like boxes)
+    - make stand alone application
     - the random color scheme
     - lights
        - regular

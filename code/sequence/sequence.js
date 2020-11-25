@@ -244,7 +244,7 @@ export default class SequenceClass
             sound=this.sounds[n];
             if (tick>=sound.json.tick) {
                 this.lastSoundPlayIdx=n+1;
-                this.core.audio.soundStartGame2(sound.sound,null,sound.json);
+                this.core.audio.soundStartGame(sound.sound,null,sound.json);
             }
         }
     }

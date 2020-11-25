@@ -72,12 +72,12 @@ export default class MapLiquidClass
         
     playSoundIn(position)
     {
-        if (this.soundIn!==null) this.core.audio.soundStartGame(this.core.game.map.soundList,position,this.soundIn);
+        if (this.soundIn!==null) this.core.audio.soundStartGameFromList(this.core.game.map.soundList,position,this.soundIn);
     }
     
     playSoundOut(position)
     {
-        if (this.soundOut!==null) this.core.audio.soundStartGame(this.core.game.map.soundList,position,this.soundOut);
+        if (this.soundOut!==null) this.core.audio.soundStartGameFromList(this.core.game.map.soundList,position,this.soundOut);
     }
     
         //

@@ -94,7 +94,7 @@ export default class EntityProjectileClass extends EntityClass
         this.motion.setFromValues(0,0,this.speed);
         this.motion.rotate(this.angle);
         
-        if (this.spawnSound!==null) this.core.audio.soundStartGame(this.core.game.map.soundList,this.position,this.spawnSound);
+        if (this.spawnSound!==null) this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.spawnSound);
         
         this.nextTrailTick=this.core.game.timestamp;
     }
@@ -191,7 +191,7 @@ export default class EntityProjectileClass extends EntityClass
                 return;
             }
             
-            if ((!this.stopped) && (this.bounceSound!==null)) this.core.audio.soundStartGame(this.core.game.map.soundList,this.position,this.bounceSound);
+            if ((!this.stopped) && (this.bounceSound!==null)) this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.bounceSound);
             
             this.position.setFromPoint(this.savePoint);
             if (this.canBounce) this.floorBounce(this.motion);
@@ -220,7 +220,7 @@ export default class EntityProjectileClass extends EntityClass
                 return;
             }
             
-            this.core.audio.soundStartGame(this.core.game.map.soundList,this.position,this.bounceSound);
+            this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.bounceSound);
 
             this.position.setFromPoint(this.savePoint);
             this.motion.y=0;
@@ -234,7 +234,7 @@ export default class EntityProjectileClass extends EntityClass
                 return;
             }
             
-            this.core.audio.soundStartGame(this.core.game.map.soundList,this.position,this.reflectSound);
+            this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.reflectSound);
             
             this.position.setFromPoint(this.savePoint);
             
@@ -258,7 +258,7 @@ export default class EntityProjectileClass extends EntityClass
             }
             
             if (!this.stopped) {
-                this.core.audio.soundStartGame(this.core.game.map.soundList,this.position,this.reflectSound);
+                this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.reflectSound);
 
                 this.position.setFromPoint(this.savePoint);
                 this.motion.x=0;

@@ -1,4 +1,5 @@
 import ColorClass from '../utility/color.js';
+import SoundClass from '../sound/sound.js';
 import BitmapInterfaceClass from '../bitmap/bitmap_interface.js';
 import DialogButtonClass from '../dialog/dialog_button.js';
 
@@ -16,6 +17,8 @@ export default class TitleClass
         
         this.clickDown=false;
         
+        this.clickSound=null;
+        
         this.playButton=null;
         this.multiplayerButton=null;
         this.setupButton=null;
@@ -29,6 +32,15 @@ export default class TitleClass
     
     async initialize()
     {
+            // click audio
+            // will share with dialogs
+            
+        this.clickSound=new SoundClass(this.core,this.core.json.title.clickSound);
+        this.clickSound.initialize();
+        if (!(await this.clickSound.load())) return(false);
+        
+            // buttons
+            
         this.playButton=new DialogButtonClass(this.core,this.core.json.title.playButton.x,this.core.json.title.playButton.y,this.core.json.title.playButton.width,this.core.json.title.playButton.height,this.core.json.title.playButton.title);
         if (!this.playButton.initialize()) return(false);
         
@@ -74,6 +86,7 @@ export default class TitleClass
                 this.clickDown=false;
                 
                 if (this.playButton.cursorInButton()) {
+                    this.core.audio.soundStartUI(this.clickSound);
                     this.core.game.setMultiplayerMode(this.core.game.MULTIPLAYER_MODE_NONE);
                     this.core.switchLoop(this.core.LOOP_GAME);
                     return(false);
@@ -81,6 +94,7 @@ export default class TitleClass
                 
                 if (this.multiplayerButton!==null) {
                     if (this.multiplayerButton.cursorInButton()) {
+                        this.core.audio.soundStartUI(this.clickSound);
                         this.core.switchLoop(this.core.LOOP_DIALOG_MULTIPLAYER);
                         return(false);
                     }
@@ -88,6 +102,7 @@ export default class TitleClass
                 
                 if (this.setupButton!==null) {
                     if (this.setupButton.cursorInButton()) {
+                        this.core.audio.soundStartUI(this.clickSound);
                         this.core.switchLoop(this.core.LOOP_DIALOG_SETTING);
                         return(false);
                     }

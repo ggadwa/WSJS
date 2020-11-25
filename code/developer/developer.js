@@ -55,8 +55,6 @@ export default class DeveloperClass
         this.lastRunTimestamp=0;
         this.lastDrawTimestamp=0;
         
-        this.exitGame=false;
-        
             // misc drawing class
             
         this.positionText=null;

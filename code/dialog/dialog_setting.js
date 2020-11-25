@@ -22,6 +22,7 @@ export default class DialogSettingClass extends DialogBaseClass
             
         if (!this.addDialogButton('cancel',0.78,0.93,0.1,0.05,'Cancel',false)) return(false);
         if (!this.addDialogButton('ok',0.89,0.93,0.1,0.05,'Ok',true)) return(false);
+        if (!this.addDialogButton('quit',0.01,0.93,0.125,0.05,'Quit to Title',false)) return(false);
         
             // profile controls
             
@@ -109,6 +110,16 @@ export default class DialogSettingClass extends DialogBaseClass
     }
     
         //
+        // override start loop to hide quit button
+        //
+        
+    startLoop()
+    {
+        super.startLoop();
+        this.setDialogButtonShow('quit',(this.core.previousLoop===this.core.LOOP_GAME));
+    }
+    
+        //
         // running
         //
         
@@ -123,6 +134,12 @@ export default class DialogSettingClass extends DialogBaseClass
 
         if (buttonId==='ok') {
             this.saveDialogControls();
+            this.core.switchLoop(this.core.previousLoop);
+            return(false);
+        }
+        
+        if (buttonId==='quit') {
+            this.core.game.exitGame=true;
             this.core.switchLoop(this.core.previousLoop);
             return(false);
         }

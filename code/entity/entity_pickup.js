@@ -112,7 +112,7 @@ export default class EntityPickupClass extends EntityClass
         this.show=false;
         this.hideStartTick=this.core.game.timestamp;
         
-        this.core.audio.soundStartGame(this.core.game.map.soundList,this.position,this.pickupSound);
+        this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.pickupSound);
         
         this.runActions(this.touchEntity,this.json.config.actions);
     }

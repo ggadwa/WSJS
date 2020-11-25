@@ -254,7 +254,7 @@ export default class EntityKartBaseClass extends EntityClass
             // engine sound
             
         this.engineSoundRateAirIncrease=0;
-        this.engineSoundPlayIdx=this.core.audio.soundStartGame(this.core.game.map.soundList,this.position,this.engineSound);
+        this.engineSoundPlayIdx=this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.engineSound);
         
             // some specific nodes
             
@@ -322,7 +322,7 @@ export default class EntityKartBaseClass extends EntityClass
         this.burstSpeed=burstSpeed;
         this.burstEndTimestamp=this.core.game.timestamp+burstLifeTick;
         
-        this.core.audio.soundStartGame(this.core.game.map.soundList,this.position,this.burstSound);
+        this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.burstSound);
     }
     
     addAmmo(weaponName,fireMethod,count)
@@ -345,7 +345,7 @@ export default class EntityKartBaseClass extends EntityClass
     {
         this.inDrift=true;
         this.driftMovement.setFromPoint(this.rotMovement);
-        this.lastDriftSoundPlayIdx=this.core.audio.soundStartGame(this.core.game.map.soundList,this.position,this.skidSound);
+        this.lastDriftSoundPlayIdx=this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.skidSound);
     }
     
     driftEnd()
@@ -372,7 +372,7 @@ export default class EntityKartBaseClass extends EntityClass
         
         this.movement.z=0;          // clear all forward movement for a bounce
         
-        this.core.audio.soundStartGame(this.core.game.map.soundList,this.position,this.crashWallSound);
+        this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.crashWallSound);
         
             // bounce cost a speed item
             
@@ -393,7 +393,7 @@ export default class EntityKartBaseClass extends EntityClass
         this.bounceReflectMovement.setFromPoint(this.movement);
         this.bounceReflectMovement.rotateY(null,hitEntity.position.angleYTo(this.position));
         
-        this.core.audio.soundStartGame(this.core.game.map.soundList,this.position,this.crashKartSound);
+        this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.crashKartSound);
         
             // reflect cost a speed item
             
@@ -416,7 +416,7 @@ export default class EntityKartBaseClass extends EntityClass
         this.spinOutCount=360;
         this.removeSpeed(1);
         
-        this.core.audio.soundStartGame(this.core.game.map.soundList,this.position,this.crashWallSound);
+        this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.crashWallSound);
     }
 
         //

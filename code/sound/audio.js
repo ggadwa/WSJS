@@ -211,64 +211,19 @@ export default class AudioClass
         //
         // playing sounds
         //
-        
-    soundStartGame(soundList,position,obj)
-    {
-        let n,idx;
-        let sound,rate,loopStart,loopEnd,loop;
-        let soundPlay=null;
-        
-        if ((obj===undefined) || (obj===null)) return(-1);
-        if ((obj.name===undefined) || (obj.name==='')) {
-            console.log('Sound is missing or has a blank name');
-            return(-1);
-        }
-        if (obj.distance===undefined) {
-            console.info(`Sound ${obj.name} is missing a distance value`);
-            return(-1);
-        }
-        
-            // lookup sound attributes
-            
-        sound=soundList.sounds.get(obj.name);
-        if (sound===undefined) {
-            console.log(`warning: unknown sound: ${obj.name}`);
-            return(-1);
-        }
-
-        rate=(obj.rate===undefined)?1.0:obj.rate;
-        if (obj.randomRateAdd!==undefined) {
-            if (obj.randomRateAdd!==0) rate+=(Math.random()*obj.randomRateAdd);
-        }
-        
-        loopStart=(obj.loopStart===undefined)?0:obj.loopStart;
-        loopEnd=(obj.loopEnd===undefined)?0:obj.loopEnd;
-        loop=(obj.loop===undefined)?false:obj.loop;
-        
-            // find a free sound play
-            
-        for (n=0;n!==this.MAX_CONCURRENT_SOUNDS;n++) {
-            if (this.soundPlays[n].free) {
-                idx=n;
-                soundPlay=this.soundPlays[n];
-                break;
-            }
-        }
-        
-        if (soundPlay===null) return(-1);
-        
-            // set it to entity
-            
-        if (!soundPlay.play(this.audioCTX,this.currentListenerEntity,position,sound,rate,obj.distance,loopStart,loopEnd,loop)) return(-1);
-        
-        return(idx);
-    }
     
-    soundStartGame2(sound,position,obj)
+    soundStartGame(sound,position,obj)
     {
         let n,idx;
         let distance,rate,loopStart,loopEnd,loop;
         let soundPlay=null;
+        
+            // check for bad sounds/setup
+            
+        if (sound===undefined) {
+            console.log(`warning: unknown sound: ${obj.name}`);
+            return(-1);
+        }
         
         if ((obj===undefined) || (obj===null)) return(-1);
         if ((obj.name===undefined) || (obj.name==='')) {
@@ -316,6 +271,11 @@ export default class AudioClass
         if (!soundPlay.play(this.audioCTX,this.currentListenerEntity,position,sound,rate,distance,loopStart,loopEnd,loop)) return(-1);
         
         return(idx);
+    }
+    
+    soundStartGameFromList(soundList,position,obj)
+    {
+        return(this.soundStartGame(soundList.sounds.get(obj.name),position,obj));
     }
     
     soundStartUI(sound)
@@ -369,6 +329,26 @@ export default class AudioClass
                 
         soundPlay=this.soundPlays[playIdx];
         if (!soundPlay.free) soundPlay.changeRate(rate);
+    }
+    
+    soundPauseAllLooping()
+    {
+        let n;
+        
+        for (n=0;n!==this.MAX_CONCURRENT_SOUNDS;n++) {
+            if (!this.soundPlays[n].free) this.soundPlays[n].pauseIfLooped();
+        }
+        
+    }
+    
+    soundResumeAllLooping()
+    {
+        let n;
+        
+        for (n=0;n!==this.MAX_CONCURRENT_SOUNDS;n++) {
+            if (!this.soundPlays[n].free) this.soundPlays[n].resumeIfLooped(this.audioCTX);
+        }
+        
     }
     
 }
