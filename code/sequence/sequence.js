@@ -192,10 +192,15 @@ export default class SequenceClass
             entity.stop();
         }
         
-            // the exit flag
+            // the exit/switch levels
             
-        if (this.json.exitLevel) {
+        if (this.json.exitGame) {
             this.core.game.exitGame=true;
+            return;
+        }
+        
+        if ((this.json.switchMap!==undefined) && (this.json.switchMap!==null)) {
+            this.core.game.switchMap(this.json.switchMap);
             return;
         }
         

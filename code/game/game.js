@@ -76,6 +76,7 @@ export default class GameClass
         
         this.inLoading=false;
         this.exitGame=false;
+        this.switchMapGame=false;
         
             // eye
             
@@ -104,6 +105,10 @@ export default class GameClass
         this.frustumBottomPlane=new PlaneClass(0.0,0.0,0.0,0.0);
         this.frustumNearPlane=new PlaneClass(0.0,0.0,0.0,0.0);
         this.frustumFarPlane=new PlaneClass(0.0,0.0,0.0,0.0);
+        
+            // current map
+            
+        this.currentMapName=null;
         
             // networking
             
@@ -293,28 +298,106 @@ export default class GameClass
     }
     
         //
+        // actions
+        //
+        
+    hasActions(entity,actions)
+    {
+        let action;
+        
+        if (actions===null) return(true);
+        
+        for (action of actions) {
+            
+            switch (action.action) {
+                case 'addWeapon':
+                    if (entity.addWeapon===undefined) return(false);
+                    break;
+                case 'addAmmo':
+                    if (entity.addAmmo===undefined) return(false);
+                    break;
+                case 'addHealth':
+                    if (entity.addHealth===undefined) return(false);
+                    break;
+                case 'addArmor':
+                    if (entity.addArmor===undefined) return(false);
+                    break;
+                case 'addSpeed':
+                    if (entity.addSpeed===undefined) return(false);
+                    break;
+                case 'addBurst':
+                    if (entity.addBurst===undefined) return(false);
+                    break;
+                case 'addWinCollect':
+                    if (entity.addWinCollect===undefined) return(false);
+                    break;
+                case 'kill':
+                    if (entity.die===undefined) return(false);
+                    break;
+            }
+        }
+        
+        return(true);
+    }
+    
+    runActions(entity,actions,data)
+    {
+        let action;
+        
+        if (actions===null) return;
+        
+        for (action of actions) {
+            
+            switch (action.action) {
+                case 'trigger':
+                    this.setTrigger(this.lookupValue(action.name,data,''));
+                    break;
+                case 'switchMap':
+                    this.switchMap(this.lookupValue(action.name,data,''));
+                    break;
+                case 'sequence':
+                    this.startSequence(this.lookupValue(action.name,data,''));
+                    break;
+                case 'addWeapon':
+                    if (entity!==null) entity.addWeapon(this.lookupValue(action.weapon,data,''));
+                    break;
+                case 'addAmmo':
+                    if (entity!==null) entity.addAmmo(this.lookupValue(action.weapon,data,''),this.lookupValue(action.fireMethod,data,''),this.lookupValue(action.count,data,0));
+                    break;
+                case 'addHealth':
+                    if (entity!==null) entity.addHealth(this.lookupValue(action.count,data,0));
+                    break;
+                case 'addArmor':
+                    if (entity!==null) entity.addArmor(this.lookupValue(action.count,data,0));
+                    break;
+                case 'addSpeed':
+                    if (entity!==null) entity.addSpeed(this.lookupValue(action.count,data,0));
+                    break;
+                case 'addBurst':
+                    if (entity!==null) entity.addBurst(this.lookupValue(action.speed,data,0),this.lookupValue(action.lifeTick,data,0));
+                    break;
+                case 'addWinCollect':
+                    if (entity!==null) entity.addWinCollect(this.lookupValue(action.winCount,data,10));
+                    break;
+                case 'kill':
+                    if (entity!==null) entity.die(null,false);
+                    break;
+            }
+        }
+    }
+    
+        //
         // won-lost
         //
         
-    won()
+    won(entity)
     {
-        console.info('win');
-        if (this.core.json.config.sequenceWon!==null) this.startSequence(this.core.json.config.sequenceWon);
+        if (this.core.json.config.wonActions!==null) this.runActions(entity,this.core.json.config.wonActions,this.data);
     }
     
-    lost()
+    lost(entity)
     {
-        console.info('lost');
-        if (this.core.json.config.sequenceLost!==null) this.startSequence(this.core.json.config.sequenceLost);
-    }
-    
-        //
-        // sequences
-        //
-        
-    runStartSequence()
-    {
-        if (this.core.json.config.sequenceStart!==null) this.startSequence(this.core.json.config.sequenceStart);
+        if (this.core.json.config.lostActions!==null) this.runActions(entity,this.core.json.config.lostActions,this.data);
     }
         
         //
@@ -334,13 +417,45 @@ export default class GameClass
     }
     
         //
+        // game setup
+        //
+        
+    setMapName(mapName)
+    {
+            // switching to a map
+            
+        if (mapName!==null) {
+            this.currentMapName=mapName;
+            return;
+        }
+        
+            // no map, so pick the right start map
+            
+        if (this.multiplayerMode===this.MULTIPLAYER_MODE_NONE) {
+            this.currentMapName=this.lookupValue(this.core.json.startMap,this.data);
+        }
+        else {
+            this.currentMapName=this.core.json.multiplayerMaps[this.core.setup.localMap];
+        }
+    }
+    
+    setMultiplayerMode(multiplayerMode)
+    {
+        this.multiplayerMode=multiplayerMode;
+    }
+        
+    switchMap(mapName)
+    {
+        this.currentMapName=mapName;
+        this.switchMapGame=true;
+    }
+    
+        //
         // game loop
         //
         
     startLoop()
     {
-        let startMap;
-        
             // need to pause loop if in loading
             
         this.inLoading=true;
@@ -349,14 +464,7 @@ export default class GameClass
         
             // initialize the map
           
-        if (this.multiplayerMode===this.MULTIPLAYER_MODE_NONE) {
-            startMap=this.core.game.lookupValue(this.core.json.startMap,this.data);
-        }
-        else {
-            startMap=this.core.json.multiplayerMaps[this.core.setup.localMap];
-        }
-        
-        this.map=new MapClass(this.core,startMap);
+        this.map=new MapClass(this.core,this.currentMapName);
         if (!this.map.initialize()) return;
 
             // next step
@@ -391,11 +499,6 @@ export default class GameClass
             
         this.core.audio.musicStart(this.map.music);
         this.core.audio.soundResumeAllLooping();
-    }
-    
-    setMultiplayerMode(multiplayerMode)
-    {
-        this.multiplayerMode=multiplayerMode;
     }
     
         //
@@ -604,14 +707,15 @@ export default class GameClass
         
         this.inLoading=false;
         this.exitGame=false;
+        this.switchMapGame=false;
         
             // start any music
             
         this.core.audio.musicStart(this.map.music);
         
-            // start any sequence
+            // start actions
             
-        this.runStartSequence();
+        if (this.core.json.config.startActions!==null) this.runActions(null,this.core.json.config.startActions,this.data);
     }
     
         //
@@ -822,6 +926,10 @@ export default class GameClass
         
     run()
     {
+            // overlay (mostly for virtual controls)
+            
+        if (!this.overlay.run()) return(false);
+        
             // special keys
             
         if ((this.core.input.isKeyDownAndClear('pageup')) && (this.core.json.developer)) {
@@ -1009,6 +1117,14 @@ export default class GameClass
             this.core.switchLoop(this.core.LOOP_TITLE);
             return;
         }
+        
+            // switch map trigger
+            
+        if (this.switchMapGame) {
+            this.map.release();
+            this.core.switchLoop(this.core.LOOP_GAME);
+            return;
+        }
 
             // drawing
 
@@ -1038,11 +1154,6 @@ export default class GameClass
             this.fpsTotal=0;
             this.fpsCount=0;
         }
-
-            // special check for touch controls
-            // pausing the game
-
-        //if (this.core.input.touchMenuTrigger) this.core.setPauseState(true,false);
     }
 
 }

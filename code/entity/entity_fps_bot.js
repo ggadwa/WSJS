@@ -730,7 +730,7 @@ export default class EntityFPSBotClass extends EntityClass
             // any cube actions
             
         cube=this.core.game.map.cubeList.findCubeContainingEntity(this);
-        if (cube!==null) this.runActions(this,cube.actions);
+        if (cube!==null) this.core.game.runActions(this,cube.actions,this.data);
     }
     
     drawSetup()

@@ -143,7 +143,7 @@ export default class EntityPlatformPlayerClass extends EntityClass
         this.modelEntityAlter.startAnimationChunkInFrames(this.dieAnimation);
         this.modelEntityAlter.queueAnimationStop();
         
-        this.core.game.lost();
+        this.core.game.lost(this);
     }
     
     damage(damage)
@@ -186,7 +186,7 @@ export default class EntityPlatformPlayerClass extends EntityClass
         
             // going into win
             
-        if (this.collectItemCount>=winCount) this.core.game.won();
+        if (this.collectItemCount>=winCount) this.core.game.won(this);
     }
         
     run()
@@ -350,7 +350,7 @@ export default class EntityPlatformPlayerClass extends EntityClass
         
         
         let cube=this.core.game.map.cubeList.findCubeContainingEntity(this);
-        if (cube!==null) this.runActions(this,cube.actions);
+        if (cube!==null) this.core.game.runActions(this,cube.actions,this.data);
     }
 
     drawSetup()

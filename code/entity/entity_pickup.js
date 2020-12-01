@@ -105,7 +105,7 @@ export default class EntityPickupClass extends EntityClass
             // only trigger for entities that can do
             // all the required actions
             
-        if (!this.hasActions(this.touchEntity,this.json.config.actions)) return;
+        if (!this.core.game.hasActions(this.touchEntity,this.json.config.actions)) return;
         
             // pickup and run actions
             
@@ -114,7 +114,7 @@ export default class EntityPickupClass extends EntityClass
         
         this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.pickupSound);
         
-        this.runActions(this.touchEntity,this.json.config.actions);
+        this.core.game.runActions(this.touchEntity,this.json.config.actions,this.data);
     }
     
     drawSetup()

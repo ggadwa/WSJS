@@ -275,6 +275,8 @@ export default class AudioClass
     
     soundStartGameFromList(soundList,position,obj)
     {
+        if ((obj===undefined) || (obj===null)) return;      // no sound setup
+        
         return(this.soundStartGame(soundList.sounds.get(obj.name),position,obj));
     }
     

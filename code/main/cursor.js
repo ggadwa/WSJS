@@ -21,6 +21,8 @@ export default class CursorClass
         this.x=0;
         this.y=0;
         
+        this.currentTouchId=-1;
+        
         Object.seal(this);
     }
     
@@ -99,29 +101,74 @@ export default class CursorClass
     {
         this.x=Math.trunc(this.core.wid*0.5);
         this.y=Math.trunc(this.core.high*0.5);
+        
+        this.currentTouchId=-1;
     }
     
     run()
     {
+        let touch;
         let input=this.core.input;
         
-            // mouse move cursor
+            // touch cursor
             
         if (input.hasTouch) {
+            
+                // is there a current touch?
+                
+            if (this.currentTouchId!==-1) {
+                
+                    // get any movement
+                    
+                while(true) {
+                    touch=input.getNextTouchMove();
+                    if (touch===null) break;
+                    
+                    if (touch.id===this.currentTouchId) {
+                        this.x=touch.x;
+                        this.y=touch.y;
+                    }
+                }
+                
+                    // see if we are going up
+                    
+                while(true) {
+                    touch=input.getNextTouchEnd();
+                    if (touch===null) break;
+                    
+                    if (touch.id===this.currentTouchId) return(true);           // a click
+                }
+                
+                return(false);
+            }
+            
+                // any new touches?
+                
             this.x=-1;
             this.y=-1;
-        }
-        else {
-            this.x+=input.getMouseMoveX();
-            if (this.x<0) this.x=0;
-            if (this.x>=this.core.wid) this.x=this.core.wid-1;
-
-            this.y+=input.getMouseMoveY();
-            if (this.y<0) this.y=0;
-            if (this.y>=this.core.high) this.y=this.core.high-1;
+            
+            while (true) {
+                touch=input.getNextTouchStart();
+                if (touch===null) break;
+                
+                this.currentTouchId=touch.id;
+                this.x=touch.x;
+                this.y=touch.y;
+                break;
+            }
+            
+            return(false);
         }
         
-            // clicks
+            // mouse cursor
+            
+        this.x+=input.getMouseMoveX();
+        if (this.x<0) this.x=0;
+        if (this.x>=this.core.wid) this.x=this.core.wid-1;
+
+        this.y+=input.getMouseMoveY();
+        if (this.y<0) this.y=0;
+        if (this.y>=this.core.high) this.y=this.core.high-1;
             
         return(input.mouseButtonFlags[0]);
     }

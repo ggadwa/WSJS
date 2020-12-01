@@ -95,7 +95,7 @@ export default class EntityContainerClass extends EntityClass
             this.modelEntityAlter.startAnimationChunkInFrames(this.openingAnimation);
             this.modelEntityAlter.queueAnimationChunkInFrames(this.openAnimation);
             
-            this.runActions(player,this.json.config.openActions);
+            this.core.game.runActions(player,this.json.config.openActions,this.data);
             return;
         }
         
@@ -109,7 +109,7 @@ export default class EntityContainerClass extends EntityClass
             this.modelEntityAlter.startAnimationChunkInFrames(this.closingAnimation);
             this.modelEntityAlter.queueAnimationChunkInFrames(this.closedAnimation);
             
-            this.runActions(player,this.json.config.closeActions);
+            this.core.game.runActions(player,this.json.config.closeActions,this.data);
             return;
         }
     }

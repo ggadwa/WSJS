@@ -485,6 +485,7 @@ export default class CoreClass
                     this.game.resumeLoop();
                 }
                 else {
+                    this.game.setMapName(null);
                     this.game.startLoop();
                 }
                 break;

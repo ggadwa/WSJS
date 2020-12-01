@@ -511,6 +511,174 @@ export default class GameOverlayClass
     }
     
         //
+        // run
+        //
+        
+    run()
+    {
+        let touch;
+        let input=this.core.input;
+        
+            // rest is touches, ignore if no touch
+            
+        if (!input.hasTouch) return(true);
+        
+            // touch starts
+            
+        while (true) {
+            touch=input.getNextTouchStart();
+            if (touch===null) break;
+            
+            /*
+                // check sticks
+
+            if (y>this.canvasMidY) {
+                if (x<this.canvasMidX) {
+                    if (!iface.touchStickLeft.show) iface.touchStickLeft.touchUp();
+                    iface.touchStickLeft.touchDown(touch.identifier,x,y);
+                }
+                else {
+                    if (iface.touchStickRight.show) iface.touchStickRight.touchUp();
+                    iface.touchStickRight.touchDown(touch.identifier,x,y);
+                }
+            }
+            
+                // check swipes
+                
+            else {
+                if (x<this.canvasMidX) {
+                    this.touchLeftSwipeId=touch.identifier;
+                    this.touchLeftSwipePosition.setFromValues(x,y,0);
+                }
+                else {
+                    this.touchRightSwipeId=touch.identifier;
+                    this.touchRightSwipePosition.setFromValues(x,y,0);
+                }
+            }
+            
+                // check menu button
+                
+            if (iface.touchButtonMenu.isTouchInButton(x,y)) {
+                if (iface.touchButtonMenu.id!==touch.identifier) {
+                    iface.touchButtonMenu.touchDown(touch.identifier);
+                    this.touchMenuTrigger=true;
+                }
+            }
+                                                                */
+        }
+        
+            // touch ends
+            
+        while (true) {
+            touch=input.getNextTouchEnd();
+            if (touch===null) break;
+            
+            /*
+             *                 // release on either stick?
+                
+            if (iface.touchStickLeft.id===touch.identifier) {
+                this.touchStickLeftClick=iface.touchStickLeft.touchUp();
+                break;
+            }
+            
+            if (iface.touchStickRight.id===touch.identifier) {
+                this.touchStickRightClick=iface.touchStickRight.touchUp();
+                break;
+            }
+            
+                // release either swipe
+                
+            x=(touch.clientX-this.canvasLeft);
+            y=(touch.clientY-this.canvasTop);
+                
+            if (this.touchLeftSwipeId===touch.identifier) {
+                this.touchLeftSwipeId=null;
+                x-=this.touchLeftSwipePosition.x;
+                y-=this.touchLeftSwipePosition.y;
+                ax=Math.abs(x);
+                ay=Math.abs(y);
+                if ((ax>this.TOUCH_SWIPE_DEAD_ZONE) && (ax>ay)) {
+                    this.touchLeftSwipeMovement.setFromValues(x,0,0);
+                }
+                else {
+                    if (ay>this.TOUCH_SWIPE_DEAD_ZONE) {
+                        this.touchLeftSwipeMovement.setFromValues(0,y,0);
+                    }
+                }
+                
+                break;
+            }
+            
+            if (this.touchRightSwipeId===touch.identifier) {
+                this.touchRightSwipeId=null;
+                x-=this.touchRightSwipePosition.x;
+                y-=this.touchRightSwipePosition.y;
+                ax=Math.abs(x);
+                ay=Math.abs(y);
+                if ((ax>this.TOUCH_SWIPE_DEAD_ZONE) && (ax>ay)) {
+                    this.touchRightSwipeMovement.setFromValues(x,0,0);
+                }
+                else {
+                    if (ay>this.TOUCH_SWIPE_DEAD_ZONE) {
+                        this.touchRightSwipeMovement.setFromValues(0,y,0);
+                    }
+                }
+                
+                break;
+            }
+            
+                // release on menu button
+                
+            if (iface.touchButtonMenu.id===touch.identifier) {
+                iface.touchButtonMenu.touchUp();
+                break;
+            }
+
+             */
+        }
+        
+            // touch moves
+            
+        while (true) {
+            touch=input.getNextTouchMove();
+            if (touch===null) break;
+        
+        /*
+                // check the sticks
+                
+            if (this.core.interface.touchStickLeft.id===touch.identifier) {
+                this.core.interface.touchStickLeft.touchMove(x,y);
+                break;
+            }
+            
+            if (this.core.interface.touchStickRight.id===touch.identifier) {
+                this.core.interface.touchStickRight.touchMove(x,y);
+                break;
+            }
+         */
+        }
+        
+        
+        /*
+         * 
+            // special check for touch controls
+            // pausing the game
+
+        //if (this.core.input.touchMenuTrigger) this.core.setPauseState(true,false);
+
+         */
+        
+        /*
+        if (this.core.input.isKeyDownAndClear('backspace')) {
+            this.core.switchLoop(this.core.LOOP_DIALOG_SETTING);
+            return(false);
+        }
+        */
+       
+       return(true);
+    }
+    
+        //
         // draw game
         //
 

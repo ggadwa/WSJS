@@ -1,7 +1,4 @@
 
---> audio
-     - need to be able to start/stop looping sounds in dialogs
-
 --> models
      - whats problem with animations wacky on second play?
 

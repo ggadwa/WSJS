@@ -404,6 +404,8 @@ export default class EntityFPSPlayerClass extends EntityClass
         
         this.core.game.overlay.multiplayerAddScore(fromEntity,this,isTelefrag);
         this.core.game.overlay.multiplayerShowScores(true);
+        
+        if (this.core.game.multiplayerMode===this.core.game.MULTIPLAYER_MODE_NONE) this.core.game.lost(this);
     }
     
     damage(fromEntity,damage,hitPoint)
@@ -765,7 +767,7 @@ export default class EntityFPSPlayerClass extends EntityClass
             // any cube actions
             
         cube=this.core.game.map.cubeList.findCubeContainingEntity(this);
-        if (cube!==null) this.runActions(this,cube.actions);
+        if (cube!==null) this.core.game.runActions(this,cube.actions,this.data);
     }
     
     drawSetup()

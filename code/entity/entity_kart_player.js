@@ -117,10 +117,10 @@ export default class EntityKartPlayerClass extends EntityKartBaseClass
             
         if (textLap===this.lapCount) {
             if (this.place===0) {
-                this.core.game.won();
+                this.core.game.won(this);
             }
             else {
-                this.core.game.lost();
+                this.core.game.lost(this);
             }
         }
     }
