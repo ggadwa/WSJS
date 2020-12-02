@@ -500,6 +500,7 @@ export default class EntityFPSPlayerClass extends EntityClass
         let turnAdd,lookAdd,startWeaponIdx;
         let weapChangeDir,cube;
         let input=this.core.input;
+        let overlay=this.core.game.overlay;
         let setup=this.core.setup;
         
         if (this.core.game.freezePlayer) return;
@@ -590,7 +591,7 @@ export default class EntityFPSPlayerClass extends EntityClass
         
             // weapon switching
             
-        weapChangeDir=input.mouseWheelRead()+input.getTouchSwipeLeftX();
+        weapChangeDir=input.mouseWheelRead()+overlay.getTouchSwipeLeftX();
         
         if (weapChangeDir<0) {
             startWeaponIdx=this.currentCarouselWeaponIdx;
@@ -635,9 +636,9 @@ export default class EntityFPSPlayerClass extends EntityClass
         
             // weapon firing
             
-        firePrimary=input.mouseButtonFlags[0]||input.isTouchStickRightClick();
+        firePrimary=input.mouseButtonFlags[0]||overlay.isTouchStickRightClick();
         fireSecondary=input.mouseButtonFlags[1];
-        fireTertiary=input.mouseButtonFlags[2]||(input.getTouchSwipeRightY()<0);
+        fireTertiary=input.mouseButtonFlags[2]||(overlay.getTouchSwipeRightY()<0);
         
         this.firePosition.setFromPoint(this.position);
         this.firePosition.y+=this.eyeOffset;
@@ -661,8 +662,8 @@ export default class EntityFPSPlayerClass extends EntityClass
         
             // forward and shift controls
             
-        x=input.getTouchStickLeftX(setup.touchStickLeftXDeadZone,setup.touchStickLeftXAcceleration);
-        y=input.getTouchStickLeftY(setup.touchStickLeftYDeadZone,setup.touchStickLeftYAcceleration);
+        x=overlay.getTouchStickLeftX();
+        y=overlay.getTouchStickLeftY();
             
         moveForward=(input.isKeyDown('w')) || (input.isKeyDown('ArrowUp')) || (y<0);
         moveBackward=(input.isKeyDown('s')) || (input.isKeyDown('ArrowDown')) || (y>0);
@@ -681,7 +682,7 @@ export default class EntityFPSPlayerClass extends EntityClass
             if (Math.abs(turnAdd)>this.maxTurnSpeed) turnAdd=this.maxTurnSpeed*Math.sign(turnAdd);
         }
         
-        x=input.getTouchStickRightX(setup.touchStickRightXDeadZone,setup.touchStickRightXAcceleration);
+        x=overlay.getTouchStickRightX();
         turnAdd-=x;
         
         if (turnAdd!==0) {
@@ -703,7 +704,7 @@ export default class EntityFPSPlayerClass extends EntityClass
                 if (Math.abs(lookAdd)>this.maxLookSpeed) lookAdd=this.maxLookSpeed*Math.sign(lookAdd);
             }
 
-            y=input.getTouchStickRightY(setup.touchStickRightYDeadZone,setup.touchStickRightYAcceleration);
+            y=overlay.getTouchStickRightY();
             lookAdd+=y;
 
             if ((setup.snapLook) && (moveForward || moveBackward || moveLeft || moveRight)) {

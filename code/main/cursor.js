@@ -136,17 +136,20 @@ export default class CursorClass
                     touch=input.getNextTouchEnd();
                     if (touch===null) break;
                     
-                    if (touch.id===this.currentTouchId) return(true);           // a click
+                    if (touch.id===this.currentTouchId) {
+                        this.currentTouchId=-1;
+                        break;
+                    }
                 }
                 
-                return(false);
+                return(this.currentTouchId!==-1);       // continue reporting a click until it ends, so it works like a mouse click
             }
             
                 // any new touches?
-                
+            
             this.x=-1;
             this.y=-1;
-            
+
             while (true) {
                 touch=input.getNextTouchStart();
                 if (touch===null) break;
@@ -154,7 +157,8 @@ export default class CursorClass
                 this.currentTouchId=touch.id;
                 this.x=touch.x;
                 this.y=touch.y;
-                break;
+                
+                return(true);           // a click
             }
             
             return(false);

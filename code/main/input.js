@@ -10,7 +10,6 @@ export default class InputClass
     constructor(core)
     {
         this.INPUT_WHEEL_REFRESH_TICK=500;
-        this.TOUCH_SWIPE_DEAD_ZONE=20;
 
         this.core=core;
 
@@ -56,26 +55,12 @@ export default class InputClass
         
             // touches
             
-        this.hasTouch=(navigator.maxTouchPoints>1);
+        this.hasTouch=true; // (navigator.maxTouchPoints>1);
         
         this.touchStartList=[];
         this.touchEndList=[];
         this.touchMoveList=[];
         
-        /* clean
-        this.touchMenuTrigger=false;
-        
-        this.touchStickLeftClick=false;
-        this.touchStickRightClick=false;
-        
-        this.touchLeftSwipeId=null;
-        this.touchLeftSwipePosition=new PointClass(0,0,0);
-        this.touchLeftSwipeMovement=new PointClass(0,0,0);
-        
-        this.touchRightSwipeId=null;
-        this.touchRightSwipePosition=new PointClass(0,0,0);
-        this.touchRightSwipeMovement=new PointClass(0,0,0);
-            */
         Object.seal(this);
     }
     
@@ -178,7 +163,7 @@ export default class InputClass
     pointerLockStart()
     {
         let rect;
-
+        
         this.keyClear();
         this.mouseButtonClear();
         this.touchClear();
@@ -205,6 +190,11 @@ export default class InputClass
         
         this.canvasMidX=Math.trunc(this.core.canvas.width*0.5);
         this.canvasMidY=Math.trunc(this.core.canvas.height*0.5);
+        
+            // if in touch, there's never a pointer lock
+            // capture callback, so auto resume it here
+            
+        if (this.hasTouch) this.core.resumeLoop();
     }
     
     pointerLockEnd()
@@ -255,7 +245,7 @@ export default class InputClass
     
     pointerLockError(err)
     {
-        console.log('PointerLock: '+err);
+        alert(`PointerLock: ${err}`);
     }
     
         //
@@ -345,129 +335,7 @@ export default class InputClass
         //
         // touch events
         //
-    
-    isTouchStickLeftClick()
-    {
-        /* clean --> etc, all downwards
-        let click=this.touchStickLeftClick;
-        this.touchStickLeftClick=false;
         
-        return(click);
-            */
-        return(false);
-    }
-    
-    getTouchStickLeftX(deadZone,acceleration)
-    {
-        /*
-        let x=this.core.interface.touchStickLeft.getX();
-        
-        if (Math.abs(x)<deadZone) return(0);
-        return(x*acceleration);
-            */
-        return(0);
-    }
-    
-    getTouchStickLeftY(deadZone,acceleration)
-    {
-        /*
-        let y=this.core.interface.touchStickLeft.getY();
-        
-        if (Math.abs(y)<deadZone) return(0);
-        return(y*acceleration);
-            */
-        return(0);
-    }
-    
-    isTouchStickRightClick()
-    {
-        /*
-        let click=this.touchStickRightClick;
-        this.touchStickRightClick=false;
-        
-        return(click);
-            */
-        return(false);
-    }
-    
-    getTouchStickRightX(deadZone,acceleration)
-    {
-        /*
-        let x=this.core.interface.touchStickRight.getX();
-        
-        if (Math.abs(x)<deadZone) return(0);
-        return(x*acceleration);
-            */
-        return(0);
-    }
-    
-    getTouchStickRightY(deadZone,acceleration)
-    {
-        /*
-        let y=this.core.interface.touchStickRight.getY();
-        
-        if (Math.abs(y)<deadZone) return(0);
-        return(y*acceleration);
-            */
-        return(0);
-    }
-    
-    getTouchSwipeLeftX()
-    {
-        /*
-        let x;
-        
-        if (this.touchLeftSwipeMovement.x===0) return(0);
-        
-        x=this.touchLeftSwipeMovement.x;
-        this.touchLeftSwipeMovement.x=0;
-        return(x);
-            */
-        return(0);
-    }
-    
-    getTouchSwipeLeftY()
-    {
-        /*
-        let y;
-        
-        if (this.touchLeftSwipeMovement.y===0) return(0);
-        
-        y=this.touchLeftSwipeMovement.y;
-        this.touchLeftSwipeMovement.y=0;
-        return(y);
-            */
-        return(0);
-    }
-    
-    getTouchSwipeRightX()
-    {
-        /*
-        let x;
-        
-        if (this.touchRightSwipeMovement.x===0) return(0);
-        
-        x=this.touchRightSwipeMovement.x;
-        this.touchRightSwipeMovement.x=0;
-        return(x);
-            */
-        return(0);
-    }
-    
-    getTouchSwipeRightY()
-    {
-        /*
-        let y;
-        
-        if (this.touchRightSwipeMovement.y===0) return(0);
-        
-        y=this.touchRightSwipeMovement.y;
-        this.touchRightSwipeMovement.y=0;
-        return(y);
-            */
-        return(0);
-    }
-    
     touchClear()
     {
         this.touchStartList=[];
@@ -522,7 +390,7 @@ export default class InputClass
     
     touchMove(event)
     {
-        let touch,x,y;
+        let touch;
         
         event.preventDefault();
         

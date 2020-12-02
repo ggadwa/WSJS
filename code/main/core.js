@@ -439,6 +439,8 @@ export default class CoreClass
         this.currentLoop=this.LOOP_TITLE;
         
             // always start the game paused
+            // when the input gets started, it'll
+            // resume it
             
         this.paused=true;
         

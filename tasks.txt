@@ -2,12 +2,12 @@
 --> models
      - whats problem with animations wacky on second play?
 
---> touch needs to be completely reworked
-     - input is abstracted
-     - touch controls are game only (look for touchMenuTrigger, also)
+--> full screen
+     - browser
+     - ipad
+     - add to prefs
 
-
---> eventually test full screen
+--> gamepad support
 --> runMultiplayerSyncError redo all this
 
 - won/lost songs (kart/platformer)
@@ -47,7 +47,7 @@ OPTIMIZATIONS
     - only load sounds from entities that are in level
 
 GENERATOR
-    - make stand alone application
+    - make stand alone application (java?)
     - the random color scheme
     - lights
        - regular

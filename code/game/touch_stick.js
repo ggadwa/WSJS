@@ -1,3 +1,4 @@
+import PointClass from '../utility/point.js';
 import BitmapInterfaceClass from '../bitmap/bitmap_interface.js';
 
 export default class TouchStickClass
@@ -32,6 +33,8 @@ export default class TouchStickClass
         this.vertexBuffer=null;
         this.uvBuffer=null;
         this.indexBuffer=null;
+        
+        this.thumbVector=new PointClass(0,0,0);
     }
     
     async initialize()
@@ -141,10 +144,17 @@ export default class TouchStickClass
         this.thumbX=x;
         this.thumbY=y;
         
-        if ((this.thumbX-this.thumbRadius)<(this.x-this.ringRadius)) this.thumbX=((this.x-this.ringRadius)+this.thumbRadius);
-        if ((this.thumbX+this.thumbRadius)>(this.x+this.ringRadius)) this.thumbX=((this.x+this.ringRadius)-this.thumbRadius);
-        if ((this.thumbY-this.thumbRadius)<(this.y-this.ringRadius)) this.thumbY=((this.y-this.ringRadius)+this.thumbRadius);
-        if ((this.thumbY+this.thumbRadius)>(this.y+this.ringRadius)) this.thumbY=((this.y+this.ringRadius)-this.thumbRadius);
+            // constrain in ring
+            
+        this.thumbVector.x=x-this.x;
+        this.thumbVector.y=y-this.y;
+        
+        if (this.thumbVector.length()>(this.ringRadius-this.thumbRadius)) {
+            this.thumbVector.normalize();
+            this.thumbVector.scale(this.ringRadius-this.thumbRadius);
+            this.thumbX=this.x+this.thumbVector.x;
+            this.thumbY=this.y+this.thumbVector.y;
+        }
     }
     
     getX()

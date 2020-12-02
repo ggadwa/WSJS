@@ -15,9 +15,9 @@ export default class GameOverlayClass
 {
     constructor(core)
     {
-        this.MAX_SCORE_COUNT=10;
-        
         this.core=core;
+        
+        this.MAX_SCORE_COUNT=10;
         
         this.POSITION_MODE_TOP_LEFT=0;
         this.POSITION_MODE_TOP_RIGHT=1;
@@ -26,6 +26,8 @@ export default class GameOverlayClass
         this.POSITION_MODE_MIDDLE=4;
         
         this.POSITION_MODE_LIST=['topLeft','topRight','bottomLeft','bottomRight','middle'];
+        
+        this.TOUCH_SWIPE_DEAD_ZONE=20;
         
             // some colors
             
@@ -57,6 +59,19 @@ export default class GameOverlayClass
         this.scores=null;
         this.scoreShow=false;
         this.scoreLastItemCount=0;
+        
+            // touch stick flags
+            
+        this.touchStickLeftClick=false;
+        this.touchStickRightClick=false;
+        
+        this.touchLeftSwipeId=null;
+        this.touchLeftSwipePosition=new PointClass(0,0,0);
+        this.touchLeftSwipeMovement=new PointClass(0,0,0);
+        
+        this.touchRightSwipeId=null;
+        this.touchRightSwipePosition=new PointClass(0,0,0);
+        this.touchRightSwipeMovement=new PointClass(0,0,0);
         
         Object.seal(this);
     }
@@ -108,7 +123,7 @@ export default class GameOverlayClass
         this.touchStickRight=new TouchStickClass(this.core,'textures/ui_touch_stick_right_ring.png','textures/ui_touch_stick_right_thumb.png',this.core.json.config.touchStickSize);
         if (!(await this.touchStickRight.initialize())) return(false);
         
-        this.touchButtonMenu=new TouchButtonClass(this.core,'textures/ui_touch_menu.png',new PointClass(this.core.json.config.touchMenuPosition[0],this.core.json.config.touchMenuPosition[1],0),this.core.json.config.touchButtonSize);
+        this.touchButtonMenu=new TouchButtonClass(this.core,'textures/ui_touch_menu.png',new PointClass(Math.trunc(this.core.json.config.touchMenuPosition[0]*this.core.wid),Math.trunc(this.core.json.config.touchMenuPosition[1]*this.core.high),0),this.core.json.config.touchButtonSize);
         if (!(await this.touchButtonMenu.initialize())) return(false);
 
         return(true);
@@ -511,12 +526,118 @@ export default class GameOverlayClass
     }
     
         //
+        // touch controls
+        //
+        
+    isTouchStickLeftOn()
+    {
+        return(this.touchStickLeft.show);
+    }
+    
+    isTouchStickLeftClick()
+    {
+        let click=this.touchStickLeftClick;
+        this.touchStickLeftClick=false;
+        
+        return(click);
+    }
+    
+    getTouchStickLeftX()
+    {
+        let x=this.touchStickLeft.getX();
+        
+        if (Math.abs(x)<this.core.setup.touchStickLeftXDeadZone) return(0);
+        return(x*this.core.setup.touchStickLeftXAcceleration);
+    }
+    
+    getTouchStickLeftY()
+    {
+        let y=this.touchStickLeft.getY();
+        
+        if (Math.abs(y)<this.core.setup.touchStickLeftYDeadZone) return(0);
+        return(y*this.core.setup.touchStickLeftYAcceleration);
+    }
+    
+    isTouchStickRightOn()
+    {
+        return(this.touchStickRight.show);
+    }
+    
+    isTouchStickRightClick()
+    {
+        let click=this.touchStickRightClick;
+        this.touchStickRightClick=false;
+        
+        return(click);
+    }
+    
+    getTouchStickRightX()
+    {
+        let x=this.touchStickRight.getX();
+        
+        if (Math.abs(x)<this.core.setup.touchStickRightXDeadZone) return(0);
+        return(x*this.core.setup.touchStickRightXAcceleration);
+    }
+    
+    getTouchStickRightY()
+    {
+        let y=this.touchStickRight.getY();
+        
+        if (Math.abs(y)<this.core.setup.touchStickRightYDeadZone) return(0);
+        return(y*this.core.setup.touchStickRightYAcceleration);
+    }
+    
+    getTouchSwipeLeftX()
+    {
+        let x;
+        
+        if (this.touchLeftSwipeMovement.x===0) return(0);
+        
+        x=this.touchLeftSwipeMovement.x;
+        this.touchLeftSwipeMovement.x=0;
+        return(x);
+    }
+    
+    getTouchSwipeLeftY()
+    {
+        let y;
+        
+        if (this.touchLeftSwipeMovement.y===0) return(0);
+        
+        y=this.touchLeftSwipeMovement.y;
+        this.touchLeftSwipeMovement.y=0;
+        return(y);
+    }
+    
+    getTouchSwipeRightX()
+    {
+        let x;
+        
+        if (this.touchRightSwipeMovement.x===0) return(0);
+        
+        x=this.touchRightSwipeMovement.x;
+        this.touchRightSwipeMovement.x=0;
+        return(x);
+    }
+    
+    getTouchSwipeRightY()
+    {
+        let y;
+        
+        if (this.touchRightSwipeMovement.y===0) return(0);
+        
+        y=this.touchRightSwipeMovement.y;
+        this.touchRightSwipeMovement.y=0;
+        return(y);
+    }        
+    
+        //
         // run
         //
         
     run()
     {
-        let touch;
+        let touch,x,y,ax,ay;
         let input=this.core.input;
         
             // rest is touches, ignore if no touch
@@ -529,42 +650,41 @@ export default class GameOverlayClass
             touch=input.getNextTouchStart();
             if (touch===null) break;
             
-            /*
                 // check sticks
 
-            if (y>this.canvasMidY) {
-                if (x<this.canvasMidX) {
-                    if (!iface.touchStickLeft.show) iface.touchStickLeft.touchUp();
-                    iface.touchStickLeft.touchDown(touch.identifier,x,y);
+            if (touch.y>input.canvasMidY) {
+                if (touch.x<input.canvasMidX) {
+                    if (!this.touchStickLeft.show) this.touchStickLeft.touchUp();
+                    this.touchStickLeft.touchDown(touch.id,touch.x,touch.y);
                 }
                 else {
-                    if (iface.touchStickRight.show) iface.touchStickRight.touchUp();
-                    iface.touchStickRight.touchDown(touch.identifier,x,y);
+                    if (this.touchStickRight.show) this.touchStickRight.touchUp();
+                    this.touchStickRight.touchDown(touch.id,touch.x,touch.y);
                 }
             }
             
                 // check swipes
                 
             else {
-                if (x<this.canvasMidX) {
-                    this.touchLeftSwipeId=touch.identifier;
-                    this.touchLeftSwipePosition.setFromValues(x,y,0);
+                if (touch.x<input.canvasMidX) {
+                    this.touchLeftSwipeId=touch.id;
+                    this.touchLeftSwipePosition.setFromValues(touch.x,touch.y,0);
                 }
                 else {
-                    this.touchRightSwipeId=touch.identifier;
-                    this.touchRightSwipePosition.setFromValues(x,y,0);
+                    this.touchRightSwipeId=touch.id;
+                    this.touchRightSwipePosition.setFromValues(touch.x,touch.y,0);
                 }
             }
             
                 // check menu button
                 
-            if (iface.touchButtonMenu.isTouchInButton(x,y)) {
-                if (iface.touchButtonMenu.id!==touch.identifier) {
-                    iface.touchButtonMenu.touchDown(touch.identifier);
-                    this.touchMenuTrigger=true;
+            if (this.touchButtonMenu.isTouchInButton(touch.x,touch.y)) {
+                if (this.touchButtonMenu.id!==touch.id) {
+                    this.touchButtonMenu.touchDown(touch.id);
+                    this.core.switchLoop(this.core.LOOP_DIALOG_SETTING);
+                    return(false);
                 }
             }
-                                                                */
         }
         
             // touch ends
@@ -573,28 +693,24 @@ export default class GameOverlayClass
             touch=input.getNextTouchEnd();
             if (touch===null) break;
             
-            /*
-             *                 // release on either stick?
+                // release on either stick?
                 
-            if (iface.touchStickLeft.id===touch.identifier) {
-                this.touchStickLeftClick=iface.touchStickLeft.touchUp();
+            if (this.touchStickLeft.id===touch.id) {
+                this.touchStickLeftClick=this.touchStickLeft.touchUp();
                 break;
             }
             
-            if (iface.touchStickRight.id===touch.identifier) {
-                this.touchStickRightClick=iface.touchStickRight.touchUp();
+            if (this.touchStickRight.id===touch.id) {
+                this.touchStickRightClick=this.touchStickRight.touchUp();
                 break;
             }
             
                 // release either swipe
                 
-            x=(touch.clientX-this.canvasLeft);
-            y=(touch.clientY-this.canvasTop);
-                
-            if (this.touchLeftSwipeId===touch.identifier) {
+            if (this.touchLeftSwipeId===touch.id) {
                 this.touchLeftSwipeId=null;
-                x-=this.touchLeftSwipePosition.x;
-                y-=this.touchLeftSwipePosition.y;
+                x=touch.x-this.touchLeftSwipePosition.x;
+                y=touch.y-this.touchLeftSwipePosition.y;
                 ax=Math.abs(x);
                 ay=Math.abs(y);
                 if ((ax>this.TOUCH_SWIPE_DEAD_ZONE) && (ax>ay)) {
@@ -609,10 +725,10 @@ export default class GameOverlayClass
                 break;
             }
             
-            if (this.touchRightSwipeId===touch.identifier) {
+            if (this.touchRightSwipeId===touch.id) {
                 this.touchRightSwipeId=null;
-                x-=this.touchRightSwipePosition.x;
-                y-=this.touchRightSwipePosition.y;
+                x=touch.x-this.touchRightSwipePosition.x;
+                y=touch.y-this.touchRightSwipePosition.y;
                 ax=Math.abs(x);
                 ay=Math.abs(y);
                 if ((ax>this.TOUCH_SWIPE_DEAD_ZONE) && (ax>ay)) {
@@ -629,12 +745,10 @@ export default class GameOverlayClass
             
                 // release on menu button
                 
-            if (iface.touchButtonMenu.id===touch.identifier) {
-                iface.touchButtonMenu.touchUp();
+            if (this.touchButtonMenu.id===touch.id) {
+                this.touchButtonMenu.touchUp();
                 break;
             }
-
-             */
         }
         
             // touch moves
@@ -643,38 +757,17 @@ export default class GameOverlayClass
             touch=input.getNextTouchMove();
             if (touch===null) break;
         
-        /*
                 // check the sticks
                 
-            if (this.core.interface.touchStickLeft.id===touch.identifier) {
-                this.core.interface.touchStickLeft.touchMove(x,y);
-                break;
+            if (this.touchStickLeft.id===touch.id) {
+                this.touchStickLeft.touchMove(touch.x,touch.y);
             }
             
-            if (this.core.interface.touchStickRight.id===touch.identifier) {
-                this.core.interface.touchStickRight.touchMove(x,y);
-                break;
+            if (this.touchStickRight.id===touch.id) {
+                this.touchStickRight.touchMove(touch.x,touch.y);
             }
-         */
         }
-        
-        
-        /*
-         * 
-            // special check for touch controls
-            // pausing the game
-
-        //if (this.core.input.touchMenuTrigger) this.core.setPauseState(true,false);
-
-         */
-        
-        /*
-        if (this.core.input.isKeyDownAndClear('backspace')) {
-            this.core.switchLoop(this.core.LOOP_DIALOG_SETTING);
-            return(false);
-        }
-        */
-       
+               
        return(true);
     }
     

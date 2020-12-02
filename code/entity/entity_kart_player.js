@@ -63,6 +63,7 @@ export default class EntityKartPlayerClass extends EntityKartBaseClass
         let forward,reverse,drifting,brake,jump;
         let textLap;
         let input=this.core.input;
+        let overlay=this.core.game.overlay;
         let setup=this.core.setup;
         
         if (this.core.game.freezePlayer) return;
@@ -77,7 +78,7 @@ export default class EntityKartPlayerClass extends EntityKartBaseClass
         reverse=input.isKeyDown('s');
         drifting=(input.isKeyDown('a')||input.isKeyDown('d'));
         brake=input.isKeyDown('q');
-        jump=input.isKeyDown(' ');
+        jump=input.isKeyDown(' ')||overlay.isTouchStickLeftClick();
         
             // turning
             
@@ -90,9 +91,20 @@ export default class EntityKartPlayerClass extends EntityKartBaseClass
             if (setup.mouseXInvert) turnAdd=-turnAdd;
         }
         
+        if (input.hasTouch) {
+            if (!overlay.isTouchStickRightOn()) {
+                brake=true;
+                forward=false;
+            }
+            else {
+                forward=true;
+                turnAdd-=overlay.getTouchStickRightX();
+            }
+        }
+        
             // run the kart
         
-        fire=input.mouseButtonFlags[0];  
+        fire=input.mouseButtonFlags[0]||overlay.isTouchStickRightClick();  
         this.moveKart(turnAdd,forward,reverse,drifting,brake,fire,jump);
         
             // calculate place
