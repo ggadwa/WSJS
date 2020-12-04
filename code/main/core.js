@@ -266,7 +266,7 @@ export default class CoreClass
             // the project user setup
             
         this.setup=new SetupClass();
-        this.setup.load(this);      // requires game to be initialized, so we do this later
+        this.setup.load(this);
         
         return(true);
     }
@@ -509,6 +509,10 @@ export default class CoreClass
         
         this.paused=true;
         
+            // exit fullscreen
+            
+        if (this.setup.fullScreen) document.exitFullscreen();
+        
             // suspend the sound
             
         this.audio.suspend();
@@ -580,6 +584,10 @@ export default class CoreClass
             // resume the sound (if not in developer)
             
         if (this.currentLoop!==this.LOOP_DEVELOPER) this.audio.resume();
+        
+            // enter full screen
+            
+        if (this.setup.fullScreen) this.canvas.requestFullscreen();
         
             // and restart the loop
         

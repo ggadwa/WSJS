@@ -29,6 +29,7 @@ export default class DialogSettingClass extends DialogBaseClass
         if (!this.addDialogControl(this,'headProfile',this.CONTROL_TYPE_HEADER,'Profile',null)) return(false);
         if (!this.addDialogControl(this,'name',this.CONTROL_TYPE_TEXT,'Name:',null)) return(false);
         if (!this.addDialogControl(this,'showFPS',this.CONTROL_TYPE_CHECKBOX,'Show FPS:',null)) return(false);
+        if (!this.addDialogControl(this,'fullScreen',this.CONTROL_TYPE_CHECKBOX,'Full Screen:',null)) return(false);
         
             // movement controls
             
@@ -69,6 +70,7 @@ export default class DialogSettingClass extends DialogBaseClass
 
         this.setDialogControl('name',this.core.setup.name);
         this.setDialogControl('showFPS',this.core.setup.showFPS);
+        this.setDialogControl('fullScreen',this.core.setup.fullScreen);
         
         this.setDialogControl('mouseXSensitivity',Math.trunc(this.core.setup.mouseXSensitivity*100));
         this.setDialogControl('mouseXAcceleration',Math.trunc(this.core.setup.mouseXAcceleration*100));
@@ -88,8 +90,11 @@ export default class DialogSettingClass extends DialogBaseClass
     
     saveDialogControls()
     {
+        let oldFullScreen=this.core.setup.fullScreen;
+        
         this.core.setup.name=this.getDialogControl('name');
         this.core.setup.showFPS=this.getDialogControl('showFPS');
+        this.core.setup.fullScreen=this.getDialogControl('fullScreen');
         
         this.core.setup.mouseXSensitivity=this.getDialogControl('mouseXSensitivity')/100;
         this.core.setup.mouseXAcceleration=this.getDialogControl('mouseXAcceleration')/100;
@@ -107,6 +112,17 @@ export default class DialogSettingClass extends DialogBaseClass
         this.core.setup.musicOn=this.getDialogControl('musicOn');
         
         this.core.setup.save(this.core);
+        
+            // need to detect if we've changed full screen
+            
+        if (oldFullScreen!==this.core.setup.fullScreen) {
+            if (this.core.setup.fullScreen) {
+                this.core.canvas.requestFullscreen();
+            }
+            else {
+                document.exitFullscreen();
+            }
+        }
     }
     
         //

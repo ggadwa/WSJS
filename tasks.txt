@@ -2,10 +2,7 @@
 --> models
      - whats problem with animations wacky on second play?
 
---> full screen
-     - browser
-     - ipad
-     - add to prefs
+--> full screen -- test on iPad/mac
 
 --> gamepad support
 --> runMultiplayerSyncError redo all this

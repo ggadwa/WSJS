@@ -11,6 +11,7 @@ export default class SetupClass
         this.name='Player';
 
         this.showFPS=false;
+        this.fullScreen=true;
 
         this.localMap=0;
         this.botCount=5;

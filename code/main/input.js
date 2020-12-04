@@ -55,7 +55,7 @@ export default class InputClass
         
             // touches
             
-        this.hasTouch=true; // (navigator.maxTouchPoints>1);
+        this.hasTouch=(navigator.maxTouchPoints>1);
         
         this.touchStartList=[];
         this.touchEndList=[];
@@ -245,7 +245,7 @@ export default class InputClass
     
     pointerLockError(err)
     {
-        alert(`PointerLock: ${err}`);
+        alert('Error in capturing input -- this is a browser thing.\nIt can happen when you esc and then click to start the game again too fast.\nTry again');
     }
     
         //
