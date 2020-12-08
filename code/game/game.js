@@ -623,7 +623,6 @@ export default class GameClass
         this.overlay.loadingScreenUpdate();
         this.overlay.loadingScreenAddString('Finalizing');
         this.overlay.loadingScreenDraw();
-        this.core.canvas.style.display='';
         
         setTimeout(this.initFinalSetup.bind(this),1);
     }

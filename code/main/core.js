@@ -26,6 +26,11 @@ export default class CoreClass
 {
     constructor()
     {
+            // some testing flags
+            
+        this.debugNoFullScreen=true;
+        this.debugForceTouch=false;
+
             // loop types
             
         this.LOOP_TITLE=0;
@@ -78,8 +83,8 @@ export default class CoreClass
 
             // the opengl context
 
-        this.gl=null;
         this.canvas=null;
+        this.gl=null;
         
             // the audio
             
@@ -142,13 +147,25 @@ export default class CoreClass
         Object.seal(this);
     }
     
+        // change all this around to move stuff to top
+        
+    async run(data)
+    {
+            // initialize the core and
+            // go into the title run
+        
+        if (!(await this.initialize(data))) return;
+        if (!(await this.loadShaders())) return;
+        
+        this.startLoop();
+    }
+    
         //
         // initialize and release
         //
     
     async initialize(data)
     {
-        let lft,top,wid,high;
         let resp;
         
             // get the core json
@@ -167,33 +184,30 @@ export default class CoreClass
             return(false);
         }
         
-            // canvas position
+            // clear html
             
-        wid=window.innerWidth;
-        high=Math.trunc((wid*9)/16);
+        document.body.innerHTML='';
         
-        if (high>window.innerHeight) {
-            high=window.innerHeight;
-            wid=Math.trunc((high*16)/9);
-        }
-        
-        lft=Math.trunc((window.innerWidth-wid)/2);
-        top=Math.trunc((window.innerHeight-high)/2);
-        
-            // create the canvas
+            // the canvas
             
         this.canvas=document.createElement('canvas');
         this.canvas.style.position='absolute';
-        this.canvas.style.left=lft+'px';
-        this.canvas.style.top=top+'px';
+        this.canvas.style.left='0px';
+        this.canvas.style.top='0px';
         this.canvas.style.touchAction='none';
-        this.canvas.width=wid;
-        this.canvas.height=high;
+        this.canvas.width=window.innerWidth;
+        this.canvas.height=window.innerHeight;
         
-        this.canvas.oncontextmenu=this.canvasRightClickCancel.bind(this);
+        this.canvas.oncontextmenu=function(event) { event.preventDefault(); return(false); };
         
         document.body.appendChild(this.canvas);
         
+            // we go into full screen and/or
+            // get the input here because it needs to
+            // happen after an interactive click
+            
+        if (!this.debugNoFullScreen) this.canvas.requestFullscreen();
+
             // get the gl context
 
         this.gl=this.canvas.getContext("webgl2",this.GL_OPTIONS);
@@ -351,16 +365,6 @@ export default class CoreClass
     }        
     
         //
-        // canvas right click, always disabled
-        //
-        
-    canvasRightClickCancel(event)
-    {
-        event.preventDefault();
-        return(false);
-    }
-    
-        //
         // load the shaders
         //
         
@@ -511,7 +515,7 @@ export default class CoreClass
         
             // exit fullscreen
             
-        if (this.setup.fullScreen) document.exitFullscreen();
+        //if (this.setup.fullScreen) document.exitFullscreen();
         
             // suspend the sound
             
@@ -587,7 +591,7 @@ export default class CoreClass
         
             // enter full screen
             
-        if (this.setup.fullScreen) this.canvas.requestFullscreen();
+        //if (this.setup.fullScreen) this.canvas.requestFullscreen();
         
             // and restart the loop
         
@@ -602,7 +606,7 @@ export default class CoreClass
 
 function mainLoop(timestamp)
 {
-    let core=window.main.core;
+    let core=window.core;
     
         // skip right out if paused
         // so we no longer have any callbacks
@@ -639,4 +643,3 @@ function mainLoop(timestamp)
         
     window.requestAnimationFrame(mainLoop);
 }
-

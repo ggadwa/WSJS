@@ -55,7 +55,7 @@ export default class InputClass
         
             // touches
             
-        this.hasTouch=(navigator.maxTouchPoints>1);
+        this.hasTouch=(navigator.maxTouchPoints>1)||(this.core.debugForceTouch);
         
         this.touchStartList=[];
         this.touchEndList=[];
