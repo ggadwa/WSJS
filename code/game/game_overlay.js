@@ -269,7 +269,7 @@ export default class GameOverlayClass
         // interface texts
         //
         
-    addText(id,str,positionMode,positionOffset,fontSize,align,color,alpha,developer)
+    addText(id,str,positionMode,positionOffset,fontSize,align,color,alpha)
     {
         let text;
         let x=positionOffset.x;
@@ -292,7 +292,7 @@ export default class GameOverlayClass
                 break;
         }
 
-        text=new TextClass(this.core,(''+str),x,y,fontSize,align,color,alpha,developer);
+        text=new TextClass(this.core,(''+str),x,y,fontSize,align,color,alpha);
         text.initialize();
         this.texts.set(id,text);
     }
@@ -905,7 +905,7 @@ export default class GameOverlayClass
         
         for (n=0;n!==nLine;n++) {
             if (n===(nLine-1)) col=new ColorClass(1,0.3,0.3);
-            text=new TextClass(this.core,this.loadingStrings[n],5,y,20,this.core.TEXT_ALIGN_LEFT,col,1,false);
+            text=new TextClass(this.core,this.loadingStrings[n],5,y,20,this.core.TEXT_ALIGN_LEFT,col,1);
             text.initialize();
             text.draw();
             text.release();

@@ -84,11 +84,14 @@ export default class CoreClass
             // the opengl context
 
         this.canvas=null;
+        this.canvasClick=null;
+        
         this.gl=null;
         
-            // the audio
+            // the audio and input
             
         this.audio=new AudioClass(this);
+        this.input=new InputClass(this);
         
             // fonts
             
@@ -118,11 +121,6 @@ export default class CoreClass
         this.game=null;
         this.developer=null;
         
-            // input
-            
-        this.input=new InputClass(this);
-        this.input.initialize();
-        
             // the core setup
 
         this.wid=0;
@@ -147,17 +145,59 @@ export default class CoreClass
         Object.seal(this);
     }
     
-        // change all this around to move stuff to top
+        //
+        // main run
+        // 
+        // this is the main run for the entire application.  We
+        // need to do some important things, like create the canvas,
+        // go to full screen, start the audio and start the input
+        // because all of this is locked out without user input
+        //
         
     async run(data)
     {
+            // clear html
+            
+        document.body.innerHTML='';
+        
+            // the canvas
+            
+        this.canvas=document.createElement('canvas');
+        this.canvas.style.position='absolute';
+        this.canvas.style.left='0px';
+        this.canvas.style.top='0px';
+        this.canvas.style.touchAction='none';
+        this.canvas.width=window.innerWidth;
+        this.canvas.height=window.innerHeight;
+        
+        this.canvas.oncontextmenu=function(event) { event.preventDefault(); return(false); };
+        
+        document.body.appendChild(this.canvas);
+        
+            // we go into full screen and/or
+            // get the input here because it needs to
+            // happen after an interactive click
+            
+        if (!this.debugNoFullScreen) this.canvas.requestFullscreen();
+        
+        this.canvas.addEventListener('fullscreenchange',this.fullscreenChange.bind(this));
+        
+            // capture the input
+            
+        this.input.initialize();
+        
             // initialize the core and
             // go into the title run
         
         if (!(await this.initialize(data))) return;
         if (!(await this.loadShaders())) return;
         
-        this.startLoop();
+            // start the title loop
+            
+        this.paused=false;
+        this.title.startLoop();
+            
+        window.requestAnimationFrame(mainLoop);
     }
     
         //
@@ -183,30 +223,6 @@ export default class CoreClass
             alert(`Unable to load core.json: ${e.message}`);
             return(false);
         }
-        
-            // clear html
-            
-        document.body.innerHTML='';
-        
-            // the canvas
-            
-        this.canvas=document.createElement('canvas');
-        this.canvas.style.position='absolute';
-        this.canvas.style.left='0px';
-        this.canvas.style.top='0px';
-        this.canvas.style.touchAction='none';
-        this.canvas.width=window.innerWidth;
-        this.canvas.height=window.innerHeight;
-        
-        this.canvas.oncontextmenu=function(event) { event.preventDefault(); return(false); };
-        
-        document.body.appendChild(this.canvas);
-        
-            // we go into full screen and/or
-            // get the input here because it needs to
-            // happen after an interactive click
-            
-        if (!this.debugNoFullScreen) this.canvas.requestFullscreen();
 
             // get the gl context
 
@@ -295,10 +311,13 @@ export default class CoreClass
         this.dialogDeveloper.release();
         this.dialogPrompt.release();
         this.shaderList.release();
-        this.audio.release();
         this.cursor.release();
         this.background.release();
         this.deleteFontTexture();
+        this.audio.release();
+        this.input.release();
+        
+        if (!this.debugNoFullScreen) document.exitFullscreen();
     }
     
         //
@@ -435,30 +454,19 @@ export default class CoreClass
     }
     
         //
+        // full screen change event
+        // this can trigger going into pause mode
+        //
+        
+    fullscreenChange(event)
+    {
+        if (document.fullscreenElement===null) this.pauseLoop(); 
+    }
+    
+        //
         // main loop
         //
         
-    startLoop()
-    {
-        this.currentLoop=this.LOOP_TITLE;
-        
-            // always start the game paused
-            // when the input gets started, it'll
-            // resume it
-            
-        this.paused=true;
-        
-            // start the title loop
-            
-        this.title.startLoop();
-                
-            // finally start the input
-            // this starts a pointerlock which
-            // unpauses the game and starts the loop
-            
-        this.input.startInput();
-    }
-    
     switchLoop(gotoLoop)
     {
         this.previousLoop=this.currentLoop;
@@ -509,55 +517,37 @@ export default class CoreClass
     
     pauseLoop()
     {
-        let div,y;
+            // both full screen and pointer lock can
+            // force us into a pause state, so ignore one or the other
+            // this should automatically force us out of fullscreen
+            
+        if (this.paused) return;
         
         this.paused=true;
-        
-            // exit fullscreen
-            
-        //if (this.setup.fullScreen) document.exitFullscreen();
         
             // suspend the sound
             
         this.audio.suspend();
-        
-            // the pause click
 
-        y=parseInt(this.canvas.style.top)+Math.trunc(this.canvas.height*0.5);
+            // draw the title in pause state
+            
+        this.title.drawPause();
         
-        div=document.createElement('div');
-        div.id='pauseDiv';
-        div.style.position='absolute';
-        div.style.left=(parseInt(this.canvas.style.left)+50)+'px';
-        div.style.top=(y-25)+'px';
-        div.style.width=(this.canvas.width-100)+'px';
-        div.style.height='50px';
-        div.style.border='2px solid black';
-        div.style.backgroundColor='#EEEE00';
-        div.style.boxShadow='2px 2px 2px #AAAAAA';
-        div.style.fontFamily='Arial';
-        div.style.fontSize='36pt';
-        div.style.textAlign='center';
-        div.style.cursor='pointer';
-        div.appendChild(document.createTextNode("Paused - Click To Continue"));
-        
-        div.addEventListener('mouseover',function(){this.style.backgroundColor='#FFFF00'});
-        div.addEventListener('mouseout',function(){this.style.backgroundColor='#EEEE00'});
-        div.addEventListener("click",this.input.pointerLockClickResume.bind(this.input));
-        
-        document.body.appendChild(div);
+            // click to resume
+            
+        this.canvasClick=this.resumeLoop.bind(this);
+        this.canvas.addEventListener('click',this.canvasClick);
+        this.canvas.style.cursor='pointer';
     }
     
     resumeLoop()
     {
-        let div;
-        
         this.paused=false;
         
-            // remove the pause click
-            
-        div=document.getElementById('pauseDiv');
-        if (div!==null) document.body.removeChild(div);
+            // turn off any click
+         
+        this.canvas.removeEventListener('click',this.canvasClick);
+        this.canvas.style.cursor='auto';
         
             // resume the proper loop
             
@@ -589,9 +579,10 @@ export default class CoreClass
             
         if (this.currentLoop!==this.LOOP_DEVELOPER) this.audio.resume();
         
-            // enter full screen
+            // enter full screen and pointer lock
             
-        //if (this.setup.fullScreen) this.canvas.requestFullscreen();
+        if (!this.debugNoFullScreen) this.canvas.requestFullscreen();
+        if (!this.input.hasTouch) this.canvas.requestPointerLock();
         
             // and restart the loop
         

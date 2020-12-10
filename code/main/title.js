@@ -1,4 +1,5 @@
 import ColorClass from '../utility/color.js';
+import TextClass from '../main/text.js';
 import SoundClass from '../sound/sound.js';
 import BitmapInterfaceClass from '../bitmap/bitmap_interface.js';
 import DialogButtonClass from '../dialog/dialog_button.js';
@@ -145,6 +146,39 @@ export default class TitleClass
             // cursor
         
         if (!this.core.input.hasTouch) this.core.cursor.draw();
+
+        gl.disable(gl.BLEND);
+        gl.enable(gl.DEPTH_TEST);
+    }
+    
+    drawPause()
+    {
+        let col,text;
+        let gl=this.core.gl;
+        
+        this.core.orthoMatrix.setOrthoMatrix(this.core.wid,this.core.high,-1.0,1.0);
+        
+        gl.disable(gl.DEPTH_TEST);
+        
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+        
+            // background
+         
+        this.core.background.draw(true);
+        
+            // the pause text
+            // this can be slow, it's only drawn once before the pause takes effect
+            
+        this.core.shaderList.textShader.drawStart();
+        
+        col=new ColorClass(1.0,1.0,0.0);
+        text=new TextClass(this.core,'Paused - Click To Continue',Math.trunc(this.core.wid*0.5),Math.trunc(this.core.high*0.5),40,this.core.TEXT_ALIGN_CENTER,col,1,false);
+        text.initialize();
+        text.draw();
+        text.release();
+        
+        this.core.shaderList.textShader.drawEnd();
 
         gl.disable(gl.BLEND);
         gl.enable(gl.DEPTH_TEST);

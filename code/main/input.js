@@ -70,32 +70,66 @@ export default class InputClass
 
     initialize()
     {
+        let rect;
+        
+        this.keyClear();
+        this.mouseButtonClear();
+        this.touchClear();
+        
+            // set the events
+            
+        if (!this.hasTouch) {
+            document.addEventListener('mousedown',this.mouseDownListener,false);
+            document.addEventListener('mouseup',this.mouseUpListener,false);
+            document.addEventListener('wheel',this.mouseWheelListener,false);
+            document.addEventListener('mousemove',this.mouseMovedListener,false);
+            document.addEventListener('keydown',this.keyDownListener,true);
+            document.addEventListener('keyup',this.keyUpListener.bind(this),true);
+        }
+        else {
+            document.addEventListener('touchstart',this.touchStartListener,false);
+            document.addEventListener('touchend',this.touchEndListener,false);
+            document.addEventListener('touchcancel',this.touchCancelListener,false);
+            document.addEventListener('touchmove',this.touchMoveListener,false);
+        }
+        
+            // if not touch, request pointer lock
+            
+        if (!this.hasTouch) {
+            document.addEventListener('pointerlockchange',this.pointerLockChangeListener,false);
+            document.addEventListener('pointerlockerror',this.pointerLockErrorListener,false);
+            this.core.canvas.requestPointerLock();
+        }
+        
+            // remember canvas positioning
+            // for touch clicks
+            
+        rect=this.core.canvas.getBoundingClientRect();
+        this.canvasLeft=rect.left;
+        this.canvasTop=rect.top;
+        
+        this.canvasMidX=Math.trunc(this.core.canvas.width*0.5);
+        this.canvasMidY=Math.trunc(this.core.canvas.height*0.5);
     }
 
     release()
     {
-        if (this.eventsAttached) {
-            this.pointerLockEnd();
+        if (!this.hasTouch) {
+            document.removeEventListener('pointerlockchange',this.pointerLockChangeListener,false);
+            document.removeEventListener('pointerlockerror',this.pointerLockErrorListener,false);
+            document.removeEventListener('mousedown',this.mouseDownListener,false);
+            document.removeEventListener('mouseup',this.mouseUpListener,false);
+            document.removeEventListener('wheel',this.mouseWheelListener,false);
+            document.removeEventListener('mousemove',this.mouseMovedListener,false);
+            document.removeEventListener('keydown',this.keyDownListener,true);
+            document.removeEventListener('keyup',this.keyUpListener,true);
+            document.exitPointerLock();
         }
-    }
-    
-        //
-        // endable/disable input
-        //
-        
-    startInput()
-    {
-            // attach events
-
-        this.pointerLockStart();    // activates mouse, keys, and touch
-        this.eventsAttached=true;
-    }
-        
-    stopInput()
-    {
-        if (this.eventsAttached) {
-            this.pointerLockEnd();
-            this.eventsAttached=false;
+        else {
+            document.removeEventListener('touchstart',this.touchStartListener,false);
+            document.removeEventListener('touchend',this.touchEndListener,false);
+            document.removeEventListener('touchcancel',this.touchCancelListener,false);
+            document.removeEventListener('touchmove',this.touchMoveListener,false);
         }
     }
     
@@ -160,92 +194,17 @@ export default class InputClass
         // pointer lock
         //
         
-    pointerLockStart()
-    {
-        let rect;
-        
-        this.keyClear();
-        this.mouseButtonClear();
-        this.touchClear();
-        
-            // if not touch, request pointer lock
-            
-        if (!this.hasTouch) {
-            document.addEventListener('pointerlockchange',this.pointerLockChangeListener,false);
-            document.addEventListener('pointerlockerror',this.pointerLockErrorListener,false);
-            this.core.canvas.requestPointerLock();
-        }
-        else {
-            document.addEventListener('touchstart',this.touchStartListener,false);
-            document.addEventListener('touchend',this.touchEndListener,false);
-            document.addEventListener('touchcancel',this.touchCancelListener,false);
-            document.addEventListener('touchmove',this.touchMoveListener,false);
-        }
-        
-            // remember canvas positioning
-            
-        rect=this.core.canvas.getBoundingClientRect();
-        this.canvasLeft=rect.left;
-        this.canvasTop=rect.top;
-        
-        this.canvasMidX=Math.trunc(this.core.canvas.width*0.5);
-        this.canvasMidY=Math.trunc(this.core.canvas.height*0.5);
-        
-            // if in touch, there's never a pointer lock
-            // capture callback, so auto resume it here
-            
-        if (this.hasTouch) this.core.resumeLoop();
-    }
-    
-    pointerLockEnd()
-    {
-            // if not touch, stop pointer lock
-            
-        if (!this.hasTouch) {
-            document.exitPointerLock();
-            document.removeEventListener('pointerlockchange',this.pointerLockChangeListener,false);
-            document.removeEventListener('pointerlockerror',this.pointerLockErrorListener,false);
-        }
-        else {
-            document.removeEventListener('touchstart',this.touchStartListener,false);
-            document.removeEventListener('touchend',this.touchEndListener,false);
-            document.removeEventListener('touchcancel',this.touchCancelListener,false);
-            document.removeEventListener('touchmove',this.touchMoveListener,false);
-        }
-    }
-    
     pointerLockChange(event)
     {
-        if (document.pointerLockElement===this.core.canvas) {
-            document.addEventListener('mousedown',this.mouseDownListener,false);
-            document.addEventListener('mouseup',this.mouseUpListener,false);
-            document.addEventListener('wheel',this.mouseWheelListener,false);
-            document.addEventListener('mousemove',this.mouseMovedListener,false);
-            document.addEventListener('keydown',this.keyDownListener,true);
-            document.addEventListener('keyup',this.keyUpListener.bind(this),true);
-            
-            this.core.resumeLoop();
-        }
-        else {
-            document.removeEventListener('mousedown',this.mouseDownListener,false);
-            document.removeEventListener('mouseup',this.mouseUpListener,false);
-            document.removeEventListener('wheel',this.mouseWheelListener,false);
-            document.removeEventListener('mousemove',this.mouseMovedListener,false);
-            document.removeEventListener('keydown',this.keyDownListener,true);
-            document.removeEventListener('keyup',this.keyUpListener,true);
-            
-            this.core.pauseLoop();
-        }
-    }
-    
-    pointerLockClickResume()
-    {
-        this.pointerLockStart();
+        if (document.pointerLockElement!==this.core.canvas) this.core.pauseLoop();
     }
     
     pointerLockError(err)
     {
-        alert('Error in capturing input -- this is a browser thing.\nIt can happen when you esc and then click to start the game again too fast.\nTry again');
+            // it seems that if you go in and out of pointer lock too fast, it
+            // fails on some browsers, this is annoying so just go back to pause
+            
+        this.core.pauseLoop();
     }
     
         //

@@ -462,6 +462,12 @@ export default class GameClass
         
         this.overlay.loadingScreenClear();
         
+            // game timestamp to 0, won't start
+            // counting until game officially starts later
+            // as there is a "last system time" clock
+            
+        this.timestamp=0;
+        
             // initialize the map
           
         this.map=new MapClass(this.core,this.currentMapName);
@@ -629,9 +635,6 @@ export default class GameClass
     
     initFinalSetup()
     {
-        let n,y;
-        let entity;
-        
         this.triggers.clear();
         
             // multiplayer scores
@@ -698,7 +701,6 @@ export default class GameClass
             
         this.core.currentLoop=this.core.LOOP_GAME;
         
-        this.timestamp=0;
         this.lastSystemTimestamp=Math.trunc(window.performance.now());
         
         this.lastRunTimestamp=0;

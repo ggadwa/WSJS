@@ -1,13 +1,7 @@
 
---> models
-     - whats problem with animations wacky on second play?
-
---> need to move fullscreen and pointer lock to top
-       * get rid of main and more to core
-       - re-arrange core so full screen and pointer lock and audio come up before any other calls
-       - resume full screen after pause
-       - pause draws on canvas
-       - developer flag to skip full screen
+- touch click needs "just down" version jumping on platformer
+- sound on iOS broken (check safari)
+  - get rid of animation index in modelentityalter (only ever have one track)
 
 --> full screen -- test on iPad/mac
 
@@ -36,7 +30,6 @@ BOTS
 MISC
   - death messages by game with json setup
   - eventually clean up entity and unnecessary pass through APIs
-  - get rid of animation index in modelentityalter (only ever have one track)
 
 NETWORKING
     - multiplayer needs a complete rebuild
