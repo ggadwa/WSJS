@@ -3,7 +3,7 @@ import BitmapInterfaceClass from '../bitmap/bitmap_interface.js';
 
 export default class TouchStickClass
 {
-    constructor(core,bitmapRingPath,bitmapThumbPath,ringSize)
+    constructor(core,bitmapRingPath,bitmapThumbPath,ringSize,drawUI)
     {
         this.TOUCH_CLICK_TICK=300;
         
@@ -11,6 +11,7 @@ export default class TouchStickClass
         this.bitmapRingPath=bitmapRingPath;
         this.bitmapThumbPath=bitmapThumbPath;
         this.ringSize=ringSize;
+        this.drawUI=drawUI;
         
         this.id=null;
         this.timestamp=0;
@@ -139,6 +140,11 @@ export default class TouchStickClass
         return((this.core.game.timestamp-this.timestamp)<=this.TOUCH_CLICK_TICK);        // return TRUE if this counts as a click
     }
     
+    isTouchDown()
+    {
+        return(this.id!==null);
+    }
+    
     touchMove(x,y)
     {
         this.thumbX=x;
@@ -174,7 +180,7 @@ export default class TouchStickClass
         let shader=this.core.shaderList.interfaceShader;
         let gl=this.core.gl;
         
-        if (!this.show) return;
+        if ((!this.show) || (!this.drawUI)) return;
         
         gl.uniform4f(shader.colorUniform,1,1,1,1);
         

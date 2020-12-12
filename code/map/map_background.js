@@ -37,12 +37,12 @@ export default class MapBackgroundClass
         
         vertexes[0]=0;
         vertexes[1]=0;
-        vertexes[2]=this.core.wid;
+        vertexes[2]=this.core.canvas.width;
         vertexes[3]=0;
-        vertexes[4]=this.core.wid;
-        vertexes[5]=this.core.high;
+        vertexes[4]=this.core.canvas.width;
+        vertexes[5]=this.core.canvas.height;
         vertexes[6]=0;
-        vertexes[7]=this.core.high;
+        vertexes[7]=this.core.canvas.height;
             
         this.vertexBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);

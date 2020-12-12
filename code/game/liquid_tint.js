@@ -28,17 +28,17 @@ export default class LiquidTintClass
             
         vertexArray[0]=0;
         vertexArray[1]=0;
-        vertexArray[2]=this.core.wid;
+        vertexArray[2]=this.core.canvas.width;
         vertexArray[3]=0;
-        vertexArray[4]=this.core.wid;
-        vertexArray[5]=this.core.high;
+        vertexArray[4]=this.core.canvas.width;
+        vertexArray[5]=this.core.canvas.height;
         
         vertexArray[6]=0;
         vertexArray[7]=0;
-        vertexArray[8]=this.core.wid;
-        vertexArray[9]=this.core.high;
+        vertexArray[8]=this.core.canvas.width;
+        vertexArray[9]=this.core.canvas.height;
         vertexArray[10]=0;
-        vertexArray[11]=this.core.high;
+        vertexArray[11]=this.core.canvas.height;
             
         this.vertexBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);

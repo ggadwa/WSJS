@@ -38,8 +38,8 @@ export default class InterfaceBackgroundClass
         
         vertexArray[0]=vertexArray[6]=0;
         vertexArray[1]=vertexArray[3]=0;
-        vertexArray[2]=vertexArray[4]=this.core.wid;
-        vertexArray[5]=vertexArray[7]=this.core.high;
+        vertexArray[2]=vertexArray[4]=this.core.canvas.width;
+        vertexArray[5]=vertexArray[7]=this.core.canvas.height;
             
         this.vertexBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);

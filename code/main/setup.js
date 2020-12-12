@@ -26,9 +26,6 @@ export default class SetupClass
         this.mouseYAcceleration=0.1;
         this.mouseYInvert=false;
         
-        this.touchStickXSensitivity=0.6;
-        this.touchStickYSensitivity=0.5;
-        
         this.touchStickLeftXDeadZone=0.5;
         this.touchStickLeftXAcceleration=1;
         this.touchStickLeftYDeadZone=0.5;

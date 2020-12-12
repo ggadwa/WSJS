@@ -191,7 +191,7 @@ export default class EntityPlatformPlayerClass extends EntityClass
         
     run()
     {
-        let n,speed,fallY,oldY,cameraDiff;
+        let n,speed,fallY,x,oldY,cameraDiff;
         let backward,forward;
         let moveKeyDown,runKeyDown;
         let input=this.core.input;
@@ -246,11 +246,14 @@ export default class EntityPlatformPlayerClass extends EntityClass
             backward=input.isKeyDown('a');
             if (input.hasTouch) {
                 if (overlay.isTouchStickLeftOn()) {
-                    if (overlay.getTouchStickLeftX()>=0) {
-                        forward=true;
-                    }
-                    else {
-                        backward=true;
+                    x=overlay.getTouchStickLeftX();
+                    if (x!==0) {
+                        if (x>0) {
+                            forward=true;
+                        }
+                        else {
+                            backward=true;
+                        }
                     }
                 }
             }
@@ -276,7 +279,7 @@ export default class EntityPlatformPlayerClass extends EntityClass
             // jumping
             
         if (this.jumpHeight!==0) {
-            if (((input.isKeyDown(' ')) || (overlay.isTouchStickRightClick())) && ((this.standOnMeshIdx!==-1) || (this.standOnEntity!==null))) {
+            if (((input.isKeyDown(' ')) || (overlay.isTouchStickRightDown())) && ((this.standOnMeshIdx!==-1) || (this.standOnEntity!==null))) {
                 this.movement.y=this.jumpHeight;
                 this.inJumpCameraPause=this.platformCameraJumpPause;
                 this.modelEntityAlter.startAnimationChunkInFrames(this.jumpAnimation);

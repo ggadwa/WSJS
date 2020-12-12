@@ -8,10 +8,10 @@ export default class DialogButtonClass
         this.core=core;
         this.title=title;
         
-        this.lft=Math.trunc(this.core.wid*x);
-        this.rgt=this.lft+Math.trunc(this.core.wid*wid);
-        this.top=Math.trunc(this.core.high*y);
-        this.bot=this.top+Math.trunc(this.core.high*high);
+        this.lft=Math.trunc(this.core.canvas.width*x);
+        this.rgt=this.lft+Math.trunc(this.core.canvas.width*wid);
+        this.top=Math.trunc(this.core.canvas.height*y);
+        this.bot=this.top+Math.trunc(this.core.canvas.height*high);
         
         this.colorArray=new Float32Array(4*4);
         

@@ -236,7 +236,7 @@ export default class DialogBaseClass
         let y,key,control,button,show;
         let gl=this.core.gl;
         
-        this.core.orthoMatrix.setOrthoMatrix(this.core.wid,this.core.high,-1.0,1.0);
+        this.core.orthoMatrix.setOrthoMatrix(this.core.canvas.width,this.core.canvas.height,-1.0,1.0);
         
         gl.disable(gl.DEPTH_TEST);
         

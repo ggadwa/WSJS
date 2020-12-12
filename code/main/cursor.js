@@ -99,8 +99,8 @@ export default class CursorClass
         
     center()
     {
-        this.x=Math.trunc(this.core.wid*0.5);
-        this.y=Math.trunc(this.core.high*0.5);
+        this.x=Math.trunc(this.core.canvas.width*0.5);
+        this.y=Math.trunc(this.core.canvas.height*0.5);
         
         this.currentTouchId=-1;
     }
@@ -168,11 +168,11 @@ export default class CursorClass
             
         this.x+=input.getMouseMoveX();
         if (this.x<0) this.x=0;
-        if (this.x>=this.core.wid) this.x=this.core.wid-1;
+        if (this.x>=this.core.canvas.width) this.x=this.core.canvas.width-1;
 
         this.y+=input.getMouseMoveY();
         if (this.y<0) this.y=0;
-        if (this.y>=this.core.high) this.y=this.core.high-1;
+        if (this.y>=this.core.canvas.height) this.y=this.core.canvas.height-1;
             
         return(input.mouseButtonFlags[0]);
     }

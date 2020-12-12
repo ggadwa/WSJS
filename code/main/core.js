@@ -28,7 +28,7 @@ export default class CoreClass
     {
             // some testing flags
             
-        this.debugNoFullScreen=true;
+        this.debugNoFullScreen=false;
         this.debugForceTouch=false;
 
             // loop types
@@ -121,14 +121,8 @@ export default class CoreClass
         this.game=null;
         this.developer=null;
         
-            // the core setup
-
-        this.wid=0;
-        this.high=0;
-        this.aspect=0;
-        
             // gl matrixes
-            
+          
         this.orthoMatrix=new Matrix4Class();
         this.perspectiveMatrix=new Matrix4Class();
         this.viewMatrix=new Matrix4Class();
@@ -167,10 +161,14 @@ export default class CoreClass
         this.canvas.style.left='0px';
         this.canvas.style.top='0px';
         this.canvas.style.touchAction='none';
+        this.canvas.style.userSelect='none';
+        this.canvas.style.userDrag='none';
         this.canvas.width=window.innerWidth;
         this.canvas.height=window.innerHeight;
         
-        this.canvas.oncontextmenu=function(event) { event.preventDefault(); return(false); };
+        this.canvas.addEventListener('click',function(event) { event.preventDefault(); });
+        this.canvas.addEventListener('dblclick',function(event) { event.preventDefault(); });
+        this.canvas.addEventListener('contextmenu',function(event) { event.preventDefault(); });
         
         document.body.appendChild(this.canvas);
         
@@ -178,7 +176,14 @@ export default class CoreClass
             // get the input here because it needs to
             // happen after an interactive click
             
-        if (!this.debugNoFullScreen) this.canvas.requestFullscreen();
+        if (!this.debugNoFullScreen) {
+            if (this.canvas.requestFullscreen===undefined) {
+                this.canvas.webkitRequestFullscreen();
+            }
+            else {
+                this.canvas.requestFullscreen();
+            }
+        }
         
         this.canvas.addEventListener('fullscreenchange',this.fullscreenChange.bind(this));
         
@@ -238,12 +243,6 @@ export default class CoreClass
 
         this.gl.clearColor(0.0,0.0,0.0,1.0);
         this.gl.enable(this.gl.DEPTH_TEST);
-         
-            // cache some values
-
-        this.wid=this.canvas.width;
-        this.high=this.canvas.height;
-        this.aspect=this.canvas.width/this.canvas.height;
         
             // the audio context
             
@@ -317,7 +316,14 @@ export default class CoreClass
         this.audio.release();
         this.input.release();
         
-        if (!this.debugNoFullScreen) document.exitFullscreen();
+        if (!this.debugNoFullScreen) {
+            if (this.canvas.exitFullscreen===undefined) {
+                this.canvas.webkitExitFullscreen();
+            }
+            else {
+                this.canvas.exitFullscreen();
+            }
+        }
     }
     
         //
@@ -581,7 +587,15 @@ export default class CoreClass
         
             // enter full screen and pointer lock
             
-        if (!this.debugNoFullScreen) this.canvas.requestFullscreen();
+        if (!this.debugNoFullScreen) {
+            if (this.canvas.requestFullscreen===undefined) {
+                this.canvas.webkitRequestFullscreen();
+            }
+            else {
+                this.canvas.requestFullscreen();
+            }
+        }
+
         if (!this.input.hasTouch) this.canvas.requestPointerLock();
         
             // and restart the loop

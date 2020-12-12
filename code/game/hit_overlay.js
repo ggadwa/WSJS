@@ -70,15 +70,15 @@ export default class HitOverlayClass
     
     drawLeft()
     {
-        let hitSize=Math.trunc(this.core.wid*0.08);
-        let hitMargin=Math.trunc(this.core.high*0.25);
+        let hitSize=Math.trunc(this.core.canvas.width*0.08);
+        let hitMargin=Math.trunc(this.core.canvas.height*0.25);
         let shader=this.core.shaderList.interfaceShader;
         let gl=this.core.gl;
         
         this.vertexArray[0]=this.vertexArray[6]=this.vertexArray[10]=0;
         this.vertexArray[1]=this.vertexArray[3]=this.vertexArray[7]=hitMargin;
         this.vertexArray[2]=this.vertexArray[4]=this.vertexArray[8]=hitSize;
-        this.vertexArray[5]=this.vertexArray[9]=this.vertexArray[11]=(this.core.high-hitMargin);
+        this.vertexArray[5]=this.vertexArray[9]=this.vertexArray[11]=(this.core.canvas.height-hitMargin);
         
         this.uvArray[0]=this.uvArray[6]=1;
         this.uvArray[1]=this.uvArray[7]=0;
@@ -102,15 +102,15 @@ export default class HitOverlayClass
     
     drawRight()
     {
-        let hitSize=Math.trunc(this.core.wid*0.08);
-        let hitMargin=Math.trunc(this.core.high*0.25);
+        let hitSize=Math.trunc(this.core.canvas.width*0.08);
+        let hitMargin=Math.trunc(this.core.canvas.height*0.25);
         let shader=this.core.shaderList.interfaceShader;
         let gl=this.core.gl;
         
-        this.vertexArray[0]=this.vertexArray[6]=this.vertexArray[10]=(this.core.wid-hitSize);
+        this.vertexArray[0]=this.vertexArray[6]=this.vertexArray[10]=(this.core.canvas.width-hitSize);
         this.vertexArray[1]=this.vertexArray[3]=this.vertexArray[7]=hitMargin;
-        this.vertexArray[2]=this.vertexArray[4]=this.vertexArray[8]=this.core.wid;
-        this.vertexArray[5]=this.vertexArray[9]=this.vertexArray[11]=(this.core.high-hitMargin);
+        this.vertexArray[2]=this.vertexArray[4]=this.vertexArray[8]=this.core.canvas.width;
+        this.vertexArray[5]=this.vertexArray[9]=this.vertexArray[11]=(this.core.canvas.height-hitMargin);
         
         this.uvArray[0]=this.uvArray[6]=1;
         this.uvArray[1]=this.uvArray[7]=1;
@@ -134,14 +134,14 @@ export default class HitOverlayClass
     
     drawTop()
     {
-        let hitSize=Math.trunc(this.core.high*0.08);
-        let hitMargin=Math.trunc(this.core.wid*0.25);
+        let hitSize=Math.trunc(this.core.canvas.height*0.08);
+        let hitMargin=Math.trunc(this.core.canvas.width*0.25);
         let shader=this.core.shaderList.interfaceShader;
         let gl=this.core.gl;
         
         this.vertexArray[0]=this.vertexArray[6]=this.vertexArray[10]=hitMargin;
         this.vertexArray[1]=this.vertexArray[3]=this.vertexArray[7]=0;
-        this.vertexArray[2]=this.vertexArray[4]=this.vertexArray[8]=(this.core.wid-hitMargin);
+        this.vertexArray[2]=this.vertexArray[4]=this.vertexArray[8]=(this.core.canvas.width-hitMargin);
         this.vertexArray[5]=this.vertexArray[9]=this.vertexArray[11]=hitSize;
         
         this.uvArray[0]=this.uvArray[6]=0;
@@ -166,15 +166,15 @@ export default class HitOverlayClass
  
     drawBottom()
     {
-        let hitSize=Math.trunc(this.core.high*0.08);
-        let hitMargin=Math.trunc(this.core.wid*0.25);
+        let hitSize=Math.trunc(this.core.canvas.height*0.08);
+        let hitMargin=Math.trunc(this.core.canvas.width*0.25);
         let shader=this.core.shaderList.interfaceShader;
         let gl=this.core.gl;
         
         this.vertexArray[0]=this.vertexArray[6]=this.vertexArray[10]=hitMargin;
-        this.vertexArray[1]=this.vertexArray[3]=this.vertexArray[7]=(this.core.high-hitSize);
-        this.vertexArray[2]=this.vertexArray[4]=this.vertexArray[8]=(this.core.wid-hitMargin);
-        this.vertexArray[5]=this.vertexArray[9]=this.vertexArray[11]=this.core.high;
+        this.vertexArray[1]=this.vertexArray[3]=this.vertexArray[7]=(this.core.canvas.height-hitSize);
+        this.vertexArray[2]=this.vertexArray[4]=this.vertexArray[8]=(this.core.canvas.width-hitMargin);
+        this.vertexArray[5]=this.vertexArray[9]=this.vertexArray[11]=this.core.canvas.height;
         
         this.uvArray[0]=this.uvArray[6]=1;
         this.uvArray[1]=this.uvArray[7]=1;

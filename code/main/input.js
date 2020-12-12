@@ -28,11 +28,6 @@ export default class InputClass
         this.mouseWheelClick=0;
         this.mouseWheelClickRefreshTick=0;
         
-        this.canvasLeft=0;
-        this.canvasTop=0;
-        this.canvasMidX=0;
-        this.canvasMidY=0;
-        
             // listeners
             // need to set them to a variables so remove
             // can find them later
@@ -70,8 +65,6 @@ export default class InputClass
 
     initialize()
     {
-        let rect;
-        
         this.keyClear();
         this.mouseButtonClear();
         this.touchClear();
@@ -100,16 +93,6 @@ export default class InputClass
             document.addEventListener('pointerlockerror',this.pointerLockErrorListener,false);
             this.core.canvas.requestPointerLock();
         }
-        
-            // remember canvas positioning
-            // for touch clicks
-            
-        rect=this.core.canvas.getBoundingClientRect();
-        this.canvasLeft=rect.left;
-        this.canvasTop=rect.top;
-        
-        this.canvasMidX=Math.trunc(this.core.canvas.width*0.5);
-        this.canvasMidY=Math.trunc(this.core.canvas.height*0.5);
     }
 
     release()
@@ -324,22 +307,22 @@ export default class InputClass
     {
         let touch;
         
-        event.preventDefault();
-        
         for (touch of event.changedTouches) {
-            this.touchStartList.push(new InputTouchClass(touch.identifier,(touch.clientX-this.canvasLeft),(touch.clientY-this.canvasTop)));
+            this.touchStartList.push(new InputTouchClass(touch.identifier,touch.clientX,touch.clientY));
         }
+        
+        event.preventDefault();
     }
     
     touchEnd(event)
     {
         let touch;
         
-        event.preventDefault();
-        
         for (touch of event.changedTouches) {
-            this.touchEndList.push(new InputTouchClass(touch.identifier,(touch.clientX-this.canvasLeft),(touch.clientY-this.canvasTop)));
+            this.touchEndList.push(new InputTouchClass(touch.identifier,touch.clientX,touch.clientY));
         }
+        
+        event.preventDefault();
     }
     
     touchCancel(event)
@@ -351,11 +334,11 @@ export default class InputClass
     {
         let touch;
         
-        event.preventDefault();
-        
         for (touch of event.changedTouches) {
-            this.touchMoveList.push(new InputTouchClass(touch.identifier,(touch.clientX-this.canvasLeft),(touch.clientY-this.canvasTop)));
+            this.touchMoveList.push(new InputTouchClass(touch.identifier,touch.clientX,touch.clientY));
         }
+        
+        event.preventDefault();
     }
 
 }

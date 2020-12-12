@@ -879,7 +879,7 @@ export default class GameClass
             // create the perspective matrix
             // note this function has a translate in it for NEAR_Z
 
-        this.core.perspectiveMatrix.setPerspectiveMatrix(this.camera.glFOV,this.core.aspect,this.camera.glNearZ,this.camera.glFarZ);
+        this.core.perspectiveMatrix.setPerspectiveMatrix(this.camera.glFOV,(this.core.canvas.width/this.core.canvas.height),this.camera.glNearZ,this.camera.glFarZ);
 
             // the eye point is -this.camera.glNearZ behind
             // the player
@@ -907,7 +907,7 @@ export default class GameClass
 
             // the 2D ortho matrix (at the core level)
 
-        this.core.orthoMatrix.setOrthoMatrix(this.core.wid,this.core.high,-1.0,1.0);
+        this.core.orthoMatrix.setOrthoMatrix(this.core.canvas.width,this.core.canvas.height,-1.0,1.0);
         
             // build the billboarding matrixes
             // mostly used for particles

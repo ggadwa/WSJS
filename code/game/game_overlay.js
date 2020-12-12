@@ -92,7 +92,7 @@ export default class GameOverlayClass
             
         if (!(await this.addJsonInterfaceObject(this.core.json.interface))) return(false);
         
-        this.fpsText=new TextClass(this.core,'',(this.core.wid-5),23,20,this.core.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1);
+        this.fpsText=new TextClass(this.core,'',(this.core.canvas.width-5),23,20,this.core.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1);
         this.fpsText.initialize();
         
             // multiplayer interface
@@ -117,13 +117,13 @@ export default class GameOverlayClass
             
             // virtual touch controls
             
-        this.touchStickLeft=new TouchStickClass(this.core,'textures/ui_touch_stick_left_ring.png','textures/ui_touch_stick_left_thumb.png',this.core.json.config.touchStickSize);
+        this.touchStickLeft=new TouchStickClass(this.core,'textures/ui_touch_stick_left_ring.png','textures/ui_touch_stick_left_thumb.png',this.core.json.config.touchStickSize,this.core.json.config.touchShowLeftStick);
         if (!(await this.touchStickLeft.initialize())) return(false);
         
-        this.touchStickRight=new TouchStickClass(this.core,'textures/ui_touch_stick_right_ring.png','textures/ui_touch_stick_right_thumb.png',this.core.json.config.touchStickSize);
+        this.touchStickRight=new TouchStickClass(this.core,'textures/ui_touch_stick_right_ring.png','textures/ui_touch_stick_right_thumb.png',this.core.json.config.touchStickSize,this.core.json.config.touchShowRightStick);
         if (!(await this.touchStickRight.initialize())) return(false);
         
-        this.touchButtonMenu=new TouchButtonClass(this.core,'textures/ui_touch_menu.png',new PointClass(Math.trunc(this.core.json.config.touchMenuPosition[0]*this.core.wid),Math.trunc(this.core.json.config.touchMenuPosition[1]*this.core.high),0),this.core.json.config.touchButtonSize);
+        this.touchButtonMenu=new TouchButtonClass(this.core,'textures/ui_touch_menu.png',new PointClass(Math.trunc(this.core.json.config.touchMenuPosition[0]*this.core.canvas.width),Math.trunc(this.core.json.config.touchMenuPosition[1]*this.core.canvas.height),0),this.core.json.config.touchButtonSize);
         if (!(await this.touchButtonMenu.initialize())) return(false);
 
         return(true);
@@ -542,6 +542,11 @@ export default class GameOverlayClass
         return(click);
     }
     
+    isTouchStickLeftDown()
+    {
+        return(this.touchStickLeft.isTouchDown());
+    }
+    
     getTouchStickLeftX()
     {
         let x=this.touchStickLeft.getX();
@@ -569,6 +574,11 @@ export default class GameOverlayClass
         this.touchStickRightClick=false;
         
         return(click);
+    }
+    
+    isTouchStickRightDown()
+    {
+        return(this.touchStickRight.isTouchDown());
     }
     
     getTouchStickRightX()
@@ -652,8 +662,8 @@ export default class GameOverlayClass
             
                 // check sticks
 
-            if (touch.y>input.canvasMidY) {
-                if (touch.x<input.canvasMidX) {
+            if (touch.y>Math.trunc(this.core.canvas.height*0.5)) {
+                if (touch.x<Math.trunc(this.core.canvas.width*0.5)) {
                     if (!this.touchStickLeft.show) this.touchStickLeft.touchUp();
                     this.touchStickLeft.touchDown(touch.id,touch.x,touch.y);
                 }
@@ -666,7 +676,7 @@ export default class GameOverlayClass
                 // check swipes
                 
             else {
-                if (touch.x<input.canvasMidX) {
+                if (touch.x<Math.trunc(this.core.canvas.width*0.5)) {
                     this.touchLeftSwipeId=touch.id;
                     this.touchLeftSwipePosition.setFromValues(touch.x,touch.y,0);
                 }
@@ -884,7 +894,7 @@ export default class GameOverlayClass
         
             // the 2D ortho matrix
 
-        this.core.orthoMatrix.setOrthoMatrix(this.core.wid,this.core.high,-1.0,1.0);
+        this.core.orthoMatrix.setOrthoMatrix(this.core.canvas.width,this.core.canvas.height,-1.0,1.0);
         
             // clear to black
             
@@ -900,7 +910,7 @@ export default class GameOverlayClass
 
         this.core.shaderList.textShader.drawStart();
         
-        y=(this.core.high-5)-((nLine-1)*22);
+        y=(this.core.canvas.height-5)-((nLine-1)*22);
         col=new ColorClass(1.0,1.0,1.0);
         
         for (n=0;n!==nLine;n++) {

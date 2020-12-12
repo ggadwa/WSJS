@@ -122,7 +122,7 @@ export default class TitleClass
     {
         let gl=this.core.gl;
         
-        this.core.orthoMatrix.setOrthoMatrix(this.core.wid,this.core.high,-1.0,1.0);
+        this.core.orthoMatrix.setOrthoMatrix(this.core.canvas.width,this.core.canvas.height,-1.0,1.0);
         
         gl.disable(gl.DEPTH_TEST);
         
@@ -156,7 +156,7 @@ export default class TitleClass
         let col,text;
         let gl=this.core.gl;
         
-        this.core.orthoMatrix.setOrthoMatrix(this.core.wid,this.core.high,-1.0,1.0);
+        this.core.orthoMatrix.setOrthoMatrix(this.core.canvas.width,this.core.canvas.height,-1.0,1.0);
         
         gl.disable(gl.DEPTH_TEST);
         
@@ -173,7 +173,7 @@ export default class TitleClass
         this.core.shaderList.textShader.drawStart();
         
         col=new ColorClass(1.0,1.0,0.0);
-        text=new TextClass(this.core,'Paused - Click To Continue',Math.trunc(this.core.wid*0.5),Math.trunc(this.core.high*0.5),40,this.core.TEXT_ALIGN_CENTER,col,1,false);
+        text=new TextClass(this.core,'Paused - Click To Continue',Math.trunc(this.core.canvas.width*0.5),Math.trunc(this.core.canvas.height*0.5),40,this.core.TEXT_ALIGN_CENTER,col,1,false);
         text.initialize();
         text.draw();
         text.release();

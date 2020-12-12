@@ -104,7 +104,7 @@ export default class EntityKartPlayerClass extends EntityKartBaseClass
         
             // run the kart
         
-        fire=input.mouseButtonFlags[0]||overlay.isTouchStickRightClick();  
+        fire=input.mouseButtonFlags[0]||overlay.isTouchStickRightDown();  
         this.moveKart(turnAdd,forward,reverse,drifting,brake,fire,jump);
         
             // calculate place

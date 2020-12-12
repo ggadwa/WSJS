@@ -129,7 +129,7 @@ export default class DialogControlClass
         
     clickHeader(y)
     {
-        if ((this.core.cursor.x<this.TITLE_MARGIN) || (this.core.cursor.x>(this.core.wid-this.TITLE_MARGIN)) || (this.core.cursor.y<y) || (this.core.cursor.y>(y+this.CONTROL_HEIGHT))) return(false);
+        if ((this.core.cursor.x<this.TITLE_MARGIN) || (this.core.cursor.x>(this.core.canvas.width-this.TITLE_MARGIN)) || (this.core.cursor.y<y) || (this.core.cursor.y>(y+this.CONTROL_HEIGHT))) return(false);
         
         this.dialog.currentOpenHeaderControl=this;
         return(true);
@@ -141,13 +141,13 @@ export default class DialogControlClass
         let shader=this.core.shaderList.colorShader;
         let gl=this.core.gl;
         
-        x=Math.trunc(this.core.wid*0.5);
+        x=Math.trunc(this.core.canvas.width*0.5);
         
         shader.drawStart();
         
         this.vertexArray[0]=this.vertexArray[6]=this.TITLE_MARGIN;
         this.vertexArray[1]=this.vertexArray[3]=y;
-        this.vertexArray[2]=this.vertexArray[4]=this.core.wid-this.TITLE_MARGIN;
+        this.vertexArray[2]=this.vertexArray[4]=this.core.canvas.width-this.TITLE_MARGIN;
         this.vertexArray[5]=this.vertexArray[7]=y+this.CONTROL_HEIGHT;
             
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
@@ -156,7 +156,7 @@ export default class DialogControlClass
 
             // the fill
             
-        if ((this.core.cursor.x<this.TITLE_MARGIN) || (this.core.cursor.x>(this.core.wid-this.TITLE_MARGIN)) || (this.core.cursor.y<y) || (this.core.cursor.y>(y+this.CONTROL_HEIGHT))) { 
+        if ((this.core.cursor.x<this.TITLE_MARGIN) || (this.core.cursor.x>(this.core.canvas.width-this.TITLE_MARGIN)) || (this.core.cursor.y<y) || (this.core.cursor.y>(y+this.CONTROL_HEIGHT))) { 
             this.colorArray[0]=this.colorArray[4]=this.widgetTopColor.r;
             this.colorArray[1]=this.colorArray[5]=this.widgetTopColor.g;
             this.colorArray[2]=this.colorArray[6]=this.widgetTopColor.b;
@@ -212,7 +212,7 @@ export default class DialogControlClass
         
     clickTextInput(y)
     {
-        let x=Math.trunc(this.core.wid*0.5);
+        let x=Math.trunc(this.core.canvas.width*0.5);
         
         if ((this.core.cursor.x<x) || (this.core.cursor.x>((x+(this.TITLE_MARGIN*2))+this.TEXT_INPUT_WIDTH)) || (this.core.cursor.y<y) || (this.core.cursor.y>(y+this.CONTROL_HEIGHT))) return(false);
         
@@ -228,7 +228,7 @@ export default class DialogControlClass
         let shader=this.core.shaderList.colorShader;
         let gl=this.core.gl;
         
-        x=Math.trunc(this.core.wid*0.5);
+        x=Math.trunc(this.core.canvas.width*0.5);
         
         shader.drawStart();
         
@@ -306,7 +306,7 @@ export default class DialogControlClass
         
     clickCheckbox(y)
     {
-        let x=Math.trunc(this.core.wid*0.5);
+        let x=Math.trunc(this.core.canvas.width*0.5);
         
         if ((this.core.cursor.x<(x+this.TITLE_MARGIN)) || (this.core.cursor.x>((x+this.TITLE_MARGIN)+(this.CONTROL_HEIGHT*2))) || (this.core.cursor.y<y) || (this.core.cursor.y>(y+this.CONTROL_HEIGHT))) return(false);
         
@@ -322,7 +322,7 @@ export default class DialogControlClass
         let shader=this.core.shaderList.colorShader;
         let gl=this.core.gl;
         
-        x=Math.trunc(this.core.wid*0.5);
+        x=Math.trunc(this.core.canvas.width*0.5);
         
         shader.drawStart();
         
@@ -449,7 +449,7 @@ export default class DialogControlClass
     clickRange(y)
     {
         let hx;
-        let x=Math.trunc(this.core.wid*0.5);
+        let x=Math.trunc(this.core.canvas.width*0.5);
         
         if ((this.core.cursor.x<x) || (this.core.cursor.x>((x+(this.TITLE_MARGIN*2))+this.TEXT_INPUT_WIDTH)) || (this.core.cursor.y<y) || (this.core.cursor.y>(y+this.CONTROL_HEIGHT))) return(false);
         
@@ -469,7 +469,7 @@ export default class DialogControlClass
         let shader=this.core.shaderList.colorShader;
         let gl=this.core.gl;
         
-        x=Math.trunc(this.core.wid*0.5);
+        x=Math.trunc(this.core.canvas.width*0.5);
         my=(y+Math.trunc(this.CONTROL_HEIGHT*0.5))-Math.trunc(this.CONTROL_RAIL_HEIGHT*0.5);
         
         shader.drawStart();
@@ -585,7 +585,7 @@ export default class DialogControlClass
         
     clickList(y)
     {
-        let x=Math.trunc(this.core.wid*0.5);
+        let x=Math.trunc(this.core.canvas.width*0.5);
         
             // down
             
@@ -616,7 +616,7 @@ export default class DialogControlClass
         let shader=this.core.shaderList.colorShader;
         let gl=this.core.gl;
         
-        x=Math.trunc(this.core.wid*0.5);
+        x=Math.trunc(this.core.canvas.width*0.5);
         
         shader.drawStart();
         

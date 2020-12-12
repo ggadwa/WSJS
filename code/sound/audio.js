@@ -50,6 +50,7 @@ export default class AudioClass
             return(false);
         }
         
+        this.audioCTX.resume();         // contexts are sometimes started suspended
        
             // get a reference to the listener
             
