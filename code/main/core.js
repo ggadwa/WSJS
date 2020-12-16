@@ -185,7 +185,8 @@ export default class CoreClass
             }
         }
         
-        this.canvas.addEventListener('fullscreenchange',this.fullscreenChange.bind(this));
+        document.addEventListener('fullscreenchange',this.fullscreenChange.bind(this));
+        document.addEventListener('webkitfullscreenchange',this.fullscreenChange.bind(this));      // iOS
         
             // capture the input
             
@@ -466,7 +467,8 @@ export default class CoreClass
         
     fullscreenChange(event)
     {
-        if (document.fullscreenElement===null) this.pauseLoop(); 
+        
+        if ((document.fullscreenElement===null) || (document.webkitFullscreenElement===null)) this.pauseLoop();
     }
     
         //

@@ -3,11 +3,6 @@
 
 - dim background on pause screen
 - more info on loading
-- can't go to menu twice on touch
-
---> full screen -- test on mac
-
---> why is touch off on full screen iPad?
 
 --> gamepad support
 --> runMultiplayerSyncError redo all this

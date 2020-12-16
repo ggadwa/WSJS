@@ -308,7 +308,7 @@ export default class InputClass
         let touch;
         
         for (touch of event.changedTouches) {
-            this.touchStartList.push(new InputTouchClass(touch.identifier,touch.clientX,touch.clientY));
+            this.touchStartList.push(new InputTouchClass(touch.identifier,((touch.screenX*this.core.canvas.width)/window.innerWidth),((touch.screenY*this.core.canvas.height)/window.innerHeight)));
         }
         
         event.preventDefault();
@@ -319,7 +319,7 @@ export default class InputClass
         let touch;
         
         for (touch of event.changedTouches) {
-            this.touchEndList.push(new InputTouchClass(touch.identifier,touch.clientX,touch.clientY));
+            this.touchEndList.push(new InputTouchClass(touch.identifier,((touch.screenX*this.core.canvas.width)/window.innerWidth),((touch.screenY*this.core.canvas.height)/window.innerHeight)));
         }
         
         event.preventDefault();
@@ -335,7 +335,7 @@ export default class InputClass
         let touch;
         
         for (touch of event.changedTouches) {
-            this.touchMoveList.push(new InputTouchClass(touch.identifier,touch.clientX,touch.clientY));
+            this.touchMoveList.push(new InputTouchClass(touch.identifier,((touch.screenX*this.core.canvas.width)/window.innerWidth),((touch.screenY*this.core.canvas.height)/window.innerHeight)));
         }
         
         event.preventDefault();

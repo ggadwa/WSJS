@@ -46,6 +46,7 @@ export default class GameOverlayClass
         this.texts=new Map();
         
         this.fpsText=null;
+        this.debugText=null;
         
         this.liquidTint=null;
         this.hitOverlay=null;
@@ -94,6 +95,9 @@ export default class GameOverlayClass
         
         this.fpsText=new TextClass(this.core,'',(this.core.canvas.width-5),23,20,this.core.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1);
         this.fpsText.initialize();
+        
+        this.debugText=new TextClass(this.core,'',5,(this.core.canvas.height-5),20,this.core.TEXT_ALIGN_LEFT,new ColorClass(1,1,0),1);
+        this.debugText.initialize();
         
             // multiplayer interface
                 
@@ -148,6 +152,7 @@ export default class GameOverlayClass
         }
 
         this.fpsText.release();
+        this.debugText.release();
         
             // touch controls and overlays
             
@@ -660,6 +665,15 @@ export default class GameOverlayClass
             touch=input.getNextTouchStart();
             if (touch===null) break;
             
+            this.debugText.str=touch.id+'>'+touch.x+','+touch.y+'>('+this.core.canvas.height+','+window.innerWidth+','+window.screen.width+window.innerHeight+','+window.screen.height+')';
+            
+                // check menu button
+                
+            if (this.touchButtonMenu.isTouchInButton(touch.x,touch.y)) {
+                this.touchButtonMenu.id=touch.id;
+                continue;
+            }
+            
                 // check sticks
 
             if (touch.y>Math.trunc(this.core.canvas.height*0.5)) {
@@ -683,16 +697,6 @@ export default class GameOverlayClass
                 else {
                     this.touchRightSwipeId=touch.id;
                     this.touchRightSwipePosition.setFromValues(touch.x,touch.y,0);
-                }
-            }
-            
-                // check menu button
-                
-            if (this.touchButtonMenu.isTouchInButton(touch.x,touch.y)) {
-                if (this.touchButtonMenu.id!==touch.id) {
-                    this.touchButtonMenu.touchDown(touch.id);
-                    this.core.switchLoop(this.core.LOOP_DIALOG_SETTING);
-                    return(false);
                 }
             }
         }
@@ -757,7 +761,9 @@ export default class GameOverlayClass
                 
             if (this.touchButtonMenu.id===touch.id) {
                 this.touchButtonMenu.touchUp();
-                break;
+                this.touchButtonMenu.touchDown(touch.id);
+                this.core.switchLoop(this.core.LOOP_DIALOG_SETTING);
+                return(false);
             }
         }
         
@@ -849,6 +855,8 @@ export default class GameOverlayClass
                 this.fpsText.str=fpsStr;
                 this.fpsText.draw();
             }
+            
+            if (this.debugText.str!=='') this.debugText.draw();
 
             this.core.shaderList.textShader.drawEnd();
         }
