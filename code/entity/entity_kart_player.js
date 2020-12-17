@@ -17,6 +17,7 @@ export default class EntityKartPlayerClass extends EntityKartBaseClass
         this.interfaceSpeedItem=null;
         
         this.lapCount=0;
+        this.runningPath=false;
         
         Object.seal(this);
     }
@@ -33,7 +34,7 @@ export default class EntityKartPlayerClass extends EntityKartBaseClass
         this.interfaceSpeedItem=this.core.game.lookupValue(this.json.config.interfaceSpeedItem,this.data,null);
         
         this.lapCount=this.core.game.lookupValue(this.json.config.lapCount,this.data,3);
-            
+        
         return(true);
     }
     
@@ -50,6 +51,9 @@ export default class EntityKartPlayerClass extends EntityKartBaseClass
     {
         super.ready();
         
+        this.runningPath=false;     // this triggers kart to start running a path after win/loss
+        this.trackOffsetSetup();    // setup for running the track when ai takes over
+        
         this.core.game.camera.gotoThirdPerson(this.thirdPersonCameraDistance,this.thirdPersonCameraLookAngle);
     }
         
@@ -59,7 +63,7 @@ export default class EntityKartPlayerClass extends EntityKartBaseClass
     
     run()
     {
-        let x,y,turnAdd,fire;
+        let x,turnAdd,ang,fire;
         let forward,reverse,drifting,brake,jump;
         let textLap;
         let input=this.core.input;
@@ -71,6 +75,19 @@ export default class EntityKartPlayerClass extends EntityKartBaseClass
             // interface updates
             
         if (this.interfaceSpeedItem!==null) this.core.game.overlay.setCount(this.interfaceSpeedItem,this.speedItemCount);
+        
+            // are we running a path (we already won/lost)
+            
+        if (this.runningPath)
+        {
+            this.pathRun();
+        
+            turnAdd=this.angle.getTurnYTowards(this.position.angleYTo(this.gotoPosition));
+            ang=Math.abs(turnAdd);
+            
+            this.moveKart(turnAdd,true,false,(ang>=60),(ang>=90),false,false);
+            return;
+        }
         
             // keys
             
@@ -128,12 +145,20 @@ export default class EntityKartPlayerClass extends EntityKartBaseClass
             // win or lose
             
         if (textLap===this.lapCount) {
+            
+                // trigger the win/loss
+                
             if (this.place===0) {
                 this.core.game.won(this);
             }
             else {
                 this.core.game.lost(this);
             }
+            
+                // start pathing like a bot
+            
+            this.runningPath=true;    
+            this.pathSetup(2);
         }
     }
 }

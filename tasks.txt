@@ -7,13 +7,8 @@
 --> gamepad support
 --> runMultiplayerSyncError redo all this
 
-- won/lost songs (kart/platformer)
-
-- kart = tracker bowling ball needs to only track things within path (ahead of it)
 - kart = weird bug with laps near goal line
-- kart = need win closing
 - kart = going backwards
-- platform = warp in/dance warp out sequence
 - fps = pulses need to be in json
 
 

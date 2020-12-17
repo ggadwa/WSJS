@@ -16,24 +16,14 @@ export default class EntityKartBotClass extends EntityKartBaseClass
         this.maxFireDistance=0;
         this.minFireDistance=0;
         this.fireWaitTick=0;
-
-        this.driftMinAngle=0;
-        this.brakeMinAngle=0;
-        this.pathNodeSlop=0;
         
             // variables
             
-        this.pathNodeIdx=-1;
-        
-        this.trackZOffset=0;
         this.currentTargetYScan=0;
         this.nextFireTick=0;
         
             // pre-allocates
             
-        this.gotoRotPoint=new PointClass(0,0,0);
-        this.gotoPosition=new PointClass(0,0,0);
-        
         this.lookPoint=new PointClass(0,0,0);
         this.lookVector=new PointClass(0,0,0);
         this.lookHitPoint=new PointClass(0,0,0);
@@ -52,10 +42,6 @@ export default class EntityKartBotClass extends EntityKartBaseClass
         this.minFireDistance=this.core.game.lookupValue(this.json.config.minFireDistance,this.data,0);
         this.fireWaitTick=this.core.game.lookupValue(this.json.config.fireWaitTick,this.data,0);
 
-        this.driftMinAngle=this.core.game.lookupValue(this.json.config.driftMinAngle,this.data,60);
-        this.brakeMinAngle=this.core.game.lookupValue(this.json.config.brakeMinAngle,this.data,90);
-        this.pathNodeSlop=this.core.game.lookupValue(this.json.config.pathNodeSlop,this.data,0);
-
         return(true);
     }
     
@@ -65,22 +51,12 @@ export default class EntityKartBotClass extends EntityKartBaseClass
         
     ready()
     {
-        let goalPosition;
-        
         super.ready();
         
-            // we assume all maps have the starting direction
-            // heading -x, so we get the Z distance and that
-            // makes our track when turned 90 degrees from
-            // the node path
+            // setup the path
             
-        goalPosition=this.getNodePosition(this.goalNodeIdx);
-        this.trackZOffset=goalPosition.z-this.position.z;
-        
-            // always start by going to node directly after goal
-            
-        this.pathNodeIdx=this.goalNodeIdx+1;
-        this.calcGotoPosition(this.goalNodeIdx,this.pathNodeIdx);
+        this.trackOffsetSetup();
+        this.pathSetup(1);
         
             // start scanning in middle
             
@@ -89,28 +65,6 @@ export default class EntityKartBotClass extends EntityKartBaseClass
             // can fire at any time
             
         this.nextFireTick=this.core.game.timestamp;
-    }
-    
-        //
-        // calc the goto position from the
-        // next node and the track offset
-        //
-        
-    calcGotoPosition(fromNodeIdx,toNodeIdx)
-    {
-        let angY;
-        
-            // get direction of driving,
-            // add in 90 degrees and then rotate
-            // the offset
-            
-        angY=this.getNodePosition(fromNodeIdx).angleYTo(this.getNodePosition(toNodeIdx))+90;
-        if (angY>360.0) angY-=360.0;
-        
-        this.gotoRotPoint.setFromValues(0,0,this.trackZOffset);
-        this.gotoRotPoint.rotateY(null,angY);
-        
-        this.gotoPosition.setFromAddPoint(this.getNodePosition(toNodeIdx),this.gotoRotPoint);
     }
     
         //
@@ -154,8 +108,7 @@ export default class EntityKartBotClass extends EntityKartBaseClass
     run()
     {
         let turnAdd,ang,drifting,brake;
-        let fromNodeIdx;
-        
+
             // skip if AI is frozen
             
         if (this.core.game.freezeAI) return;
@@ -164,20 +117,9 @@ export default class EntityKartBotClass extends EntityKartBaseClass
         
         super.run();
         
-            // have we hit the next drive to position?
+            // run the path
             
-        if (this.position.distance(this.gotoPosition)<this.pathNodeSlop) {
-            fromNodeIdx=this.pathNodeIdx;
-            
-            if (this.getNodeKey(this.pathNodeIdx)==='end') {
-                this.pathNodeIdx=this.findKeyNodeIndex('goal');
-            }
-            else {
-                this.pathNodeIdx++;
-            }
-            
-            this.calcGotoPosition(fromNodeIdx,this.pathNodeIdx);
-        }
+        this.pathRun();
         
             // turn towards the position
             // and figure out if we need to drift or break

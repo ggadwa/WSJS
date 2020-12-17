@@ -81,6 +81,10 @@ export default class EntityKartBaseClass extends EntityClass
         
         this.turnSmooth=0;
         this.turnCoolDown=0;
+
+        this.driftMinAngle=0;
+        this.brakeMinAngle=0;
+        this.pathNodeSlop=0;
     
         this.lastDrawTick=0;
         
@@ -88,6 +92,16 @@ export default class EntityKartBaseClass extends EntityClass
         this.engineSoundRateAirIncrease=0;
         
         this.speedItemCount=0;
+        
+            // variables for bots, they
+            // are here so player kart can self-drive
+            // after win/loss
+            
+        this.pathNodeIdx=-1;
+        this.trackZOffset=0;
+        
+        this.gotoRotPoint=new PointClass(0,0,0);
+        this.gotoPosition=new PointClass(0,0,0);
         
             // lap calculations
             
@@ -169,6 +183,10 @@ export default class EntityKartBaseClass extends EntityClass
         this.speedItemIncrease=this.core.game.lookupValue(this.json.config.speedItemIncrease,this.data,0);
         
         this.turnCoolDownPeriod=this.core.game.lookupValue(this.json.config.turnCoolDownPeriod,this.data,15);
+
+        this.driftMinAngle=this.core.game.lookupValue(this.json.config.driftMinAngle,this.data,60);
+        this.brakeMinAngle=this.core.game.lookupValue(this.json.config.brakeMinAngle,this.data,90);
+        this.pathNodeSlop=this.core.game.lookupValue(this.json.config.pathNodeSlop,this.data,0);
         
         this.rigidBodyMaxDrop=this.core.game.lookupValue(this.json.config.rigidBodyMaxDrop,this.data,0);
         this.rigidBodyMaxAngle=this.core.game.lookupValue(this.json.config.rigidBodyMaxAngle,this.data,0);
@@ -417,6 +435,71 @@ export default class EntityKartBaseClass extends EntityClass
         this.removeSpeed(1);
         
         this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.crashWallSound);
+    }
+    
+        //
+        // ai routines
+        //
+        
+    calcGotoPosition(fromNodeIdx,toNodeIdx)
+    {
+        let angY;
+        
+            // calc the goto position from the
+            // next node and the track offset
+            
+            // get direction of driving,
+            // add in 90 degrees and then rotate
+            // the offset
+            
+        angY=this.getNodePosition(fromNodeIdx).angleYTo(this.getNodePosition(toNodeIdx))+90;
+        if (angY>360.0) angY-=360.0;
+        
+        this.gotoRotPoint.setFromValues(0,0,this.trackZOffset);
+        this.gotoRotPoint.rotateY(null,angY);
+        
+        this.gotoPosition.setFromAddPoint(this.getNodePosition(toNodeIdx),this.gotoRotPoint);
+    }
+    
+    trackOffsetSetup()
+    {
+        let goalPosition;
+        
+            // we assume all maps have the starting direction
+            // heading -x, so we get the Z distance and that
+            // makes our track when turned 90 degrees from
+            // the node path
+            
+        goalPosition=this.getNodePosition(this.goalNodeIdx);
+        this.trackZOffset=goalPosition.z-this.position.z;
+    }
+    
+    pathSetup(nodeAdd)
+    {
+            // always start by going to node after the goal
+            
+        this.pathNodeIdx=this.goalNodeIdx+nodeAdd;
+        this.calcGotoPosition(this.goalNodeIdx,this.pathNodeIdx);
+    }
+    
+    pathRun()
+    {
+        let fromNodeIdx;
+        
+            // have we hit the next drive to position?
+            
+        if (this.position.distance(this.gotoPosition)<this.pathNodeSlop) {
+            fromNodeIdx=this.pathNodeIdx;
+            
+            if (this.getNodeKey(this.pathNodeIdx)==='end') {
+                this.pathNodeIdx=this.findKeyNodeIndex('goal');
+            }
+            else {
+                this.pathNodeIdx++;
+            }
+            
+            this.calcGotoPosition(fromNodeIdx,this.pathNodeIdx);
+        }
     }
 
         //

@@ -11,6 +11,7 @@ export default class MusicClass
         this.name=null;
         this.loopStart=0;
         this.loopEnd=0;
+        this.autoStop=false;
         
         this.buffer=null;
         this.loaded=false;
@@ -40,11 +41,12 @@ export default class MusicClass
         // set the music
         //
         
-    setMusic(name,loopStart,loopEnd)
+    setMusic(name,loopStart,loopEnd,autoStop)
     {
         this.name=name;
         this.loopStart=loopStart;
         this.loopEnd=loopEnd;
+        this.autoStop=autoStop;
     }
     
         //
@@ -85,7 +87,7 @@ export default class MusicClass
         
             // any music?
             
-        if ((this.name===null) || (!this.core.setup.musicOn)) return(true);
+        if (this.name===null) return(true);
         
             // load the mp3 file
             

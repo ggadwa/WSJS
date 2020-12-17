@@ -28,7 +28,7 @@ export default class CoreClass
     {
             // some testing flags
             
-        this.debugNoFullScreen=false;
+        this.debugNoFullScreen=true;
         this.debugForceTouch=false;
 
             // loop types

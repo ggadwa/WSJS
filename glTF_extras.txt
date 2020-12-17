@@ -45,6 +45,13 @@ wsjsSky                     Mesh is a sky box definition.  Material determines t
                                     "size":50000
                                 }
 
+wsjsMusic                   Music for this map
+                                {
+                                    "name":"my music",
+                                    "loopStart":0,
+                                    "loopEnd":1000
+                                }
+
 wsjsBackground              Mesh is a background definition (3 scrolling planes for platformers.)  Material determines the texture
                                 {
                                     "shift":[0.1,0.15,0.2]

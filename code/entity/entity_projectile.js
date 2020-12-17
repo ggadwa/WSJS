@@ -24,6 +24,7 @@ export default class EntityProjectileClass extends EntityClass
         this.rollDeceleration=0;
         this.bounceFactor=0;
         this.trackList=null;
+        this.trackMaxAngle=0;
         this.trackSpeed=0;
         
         this.bounceSound=null;
@@ -43,6 +44,8 @@ export default class EntityProjectileClass extends EntityClass
             // pre-allocations
 
         this.motion=new PointClass(0,0,0);
+        this.trackMotion=new PointClass(0,0,0);
+        this.combinedMotion=new PointClass(0,0,0);
         this.savePoint=new PointClass(0,0,0);
         this.drawAngle=new PointClass(0,0,0);
         
@@ -70,6 +73,7 @@ export default class EntityProjectileClass extends EntityClass
         this.bounceFactor=this.core.game.lookupValue(this.json.config.bounceFactor,this.data,0);
         
         this.trackList=(this.json.config.trackList===undefined)?null:this.json.config.trackList;
+        this.trackMaxAngle=this.core.game.lookupValue(this.json.config.trackMaxAngle,this.data,360);
         this.trackSpeed=this.core.game.lookupValue(this.json.config.trackSpeed,this.data,0);
         
         this.bounceSound=this.core.game.lookupSoundValue(this.json.sounds.bounceSound);
@@ -93,6 +97,8 @@ export default class EntityProjectileClass extends EntityClass
         
         this.motion.setFromValues(0,0,this.speed);
         this.motion.rotate(this.angle);
+        
+        this.trackMotion.setFromValues(0,0,0);
         
         if (this.spawnSound!==null) this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.spawnSound);
         
@@ -153,12 +159,14 @@ export default class EntityProjectileClass extends EntityClass
         
             // tracking
             
+        this.trackMotion.setFromValues(0,0,0);
+            
         if (this.trackList!==null) {
-            trackEntity=this.core.game.map.entityList.findClosest(this.position,this.trackList);
+            trackEntity=this.core.game.map.entityList.findClosestWithMaxAngle(this.position,this.angle,this.trackList,this.trackMaxAngle);
             if ((trackEntity!==null) && (trackEntity!==this.spawnedBy)) {
-                this.motion.x+=Math.sign(trackEntity.position.x-this.position.x)*this.trackSpeed;
-                this.motion.y+=Math.sign(trackEntity.position.y-this.position.y)*this.trackSpeed;
-                this.motion.z+=Math.sign(trackEntity.position.z-this.position.z)*this.trackSpeed;
+                this.trackMotion.x=Math.sign(trackEntity.position.x-this.position.x)*this.trackSpeed;
+                this.trackMotion.y=Math.sign(trackEntity.position.y-this.position.y)*this.trackSpeed;
+                this.trackMotion.z=Math.sign(trackEntity.position.z-this.position.z)*this.trackSpeed;
             }
         }
         
@@ -179,8 +187,10 @@ export default class EntityProjectileClass extends EntityClass
             
         this.savePoint.setFromPoint(this.position);
         
-        if (!this.stopped) this.moveInMapXZ(this.motion,false,false);
-        this.moveInMapY(this.motion,1.0,this.floats);
+        this.combinedMotion.setFromAddPoint(this.motion,this.trackMotion);
+        
+        if (!this.stopped) this.moveInMapXZ(this.combinedMotion,false,false);
+        this.moveInMapY(this.combinedMotion,1.0,this.floats);
        
             // hitting floor
             // we can either start rolling, stop, or finish

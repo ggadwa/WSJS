@@ -300,6 +300,49 @@ export default class MapEntityListClass
         return(foundEntity);
     }
     
+    findClosestWithMaxAngle(position,angle,typeList,maxAngle)
+    {
+        let d,dist,ang,y,addway,subway;
+        let entity,foundEntity;
+        
+        dist=0;
+        foundEntity=null;
+         
+        for (entity of this.entities) {
+            if (typeList!==null) {
+                if (typeList.indexOf(entity.json.type)===-1) continue;
+            }
+            
+                // check angle
+                
+            if (maxAngle!==360) {
+                y=position.angleYTo(entity.position);
+                
+                if (angle.y>y) {
+                    addway=360.0-(angle.y-y);
+                    subway=angle.y-y;
+                }
+                else {
+                    addway=y-angle.y;
+                    subway=360.0-(y-angle.y);
+                }
+                
+                ang=(addway<subway)?addway:subway;
+                if (ang>maxAngle) continue;
+            }
+            
+                // then distance
+            
+            d=entity.position.distance(position);
+            if ((foundEntity===null) || (d<dist)) {
+                dist=d;
+                foundEntity=entity;
+            }
+        }
+        
+        return(foundEntity);
+    }
+    
         //
         // multi entity routines
         //

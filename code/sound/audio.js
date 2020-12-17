@@ -182,7 +182,7 @@ export default class AudioClass
         this.musicSourceNode.playbackRate.value=1.0;
         this.musicSourceNode.loopStart=music.loopStart;
         this.musicSourceNode.loopEnd=music.loopEnd;
-        this.musicSourceNode.loop=true;
+        this.musicSourceNode.loop=!music.autoStop;
         
         this.musicGainNode=this.core.audio.audioCTX.createGain();
         this.musicGainNode.gain.value=this.core.setup.musicVolume;

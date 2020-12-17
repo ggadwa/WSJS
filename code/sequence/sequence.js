@@ -4,6 +4,7 @@ import BoundClass from '../utility/bound.js';
 import SequenceBitmapClass from '../sequence/sequence_bitmap.js';
 import SequenceEntityClass from '../sequence/sequence_entity.js';
 import SequenceSoundClass from '../sequence/sequence_sound.js';
+import MusicClass from '../sound/music.js';
 
 export default class SequenceClass
 {
@@ -34,6 +35,7 @@ export default class SequenceClass
         this.bitmaps=[];
         this.entities=[];
         this.sounds=[];
+        this.music=null;
         
         Object.seal(this);
     }
@@ -129,6 +131,17 @@ export default class SequenceClass
             }
         }
         
+            // load music
+            
+        if (this.json.music!==undefined) {
+            name=this.core.game.lookupValue(this.json.music.name,this.data);
+            this.music=new MusicClass(this.core);
+            this.music.setMusic(this.json.music.name,((this.json.music.loopStart===undefined)?0:this.json.music.loopStart),((this.json.music.loopEnd===undefined)?0:this.json.music.loopEnd),((this.json.music.autoStop===undefined)?false:this.json.music.autoStop));
+            
+            if (!this.music.initialize()) return(false);
+            if (!(await this.music.load())) return(false);
+        }
+        
         return(true);
     }
 
@@ -149,6 +162,8 @@ export default class SequenceClass
         for (sound of this.sounds) {
             sound.release();
         }
+        
+        if (this.music!==null) this.music.release();
     }
     
         //
@@ -161,9 +176,10 @@ export default class SequenceClass
         
         this.startTimestamp=this.core.game.timestamp;
         
-            // stop any music
+            // music
             
         this.core.audio.musicStop();
+        if (this.music!==null) this.core.audio.musicStart(this.music);
         
             // no sounds played yet
             
@@ -185,6 +201,10 @@ export default class SequenceClass
         this.core.game.freezePlayer=false;
         this.core.game.freezeAI=false;
         this.core.game.hideUI=false;
+        
+            // stop any music
+            
+        if (this.music!==null) this.core.audio.musicStop();
         
             // get entities back to original position
             
