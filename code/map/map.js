@@ -103,14 +103,18 @@ export default class MapClass
         
     async loadMap()
     {
-        let importGLTF;
-        
+        let importGLTF,bitmapCache,bitmap;
+                
         importGLTF=new ImportGLTFClass(this.core,this.name);
-        if (!(await importGLTF.import(this,this.meshList,null))) return(false);
-       
-            // paths json
+        bitmapCache=new Map();
+        
+        if (!(await importGLTF.import(this,this.meshList,null,bitmapCache))) return(false);
+        
+            // bitmaps
             
-        await this.path.load();
+        for (bitmap of bitmapCache.values()) {
+            if (!(await bitmap.load())) return(false);
+        }
 
         return(true);
     }

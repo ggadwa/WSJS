@@ -34,11 +34,6 @@ export default class GameOverlayClass
         this.scoreColor=new ColorClass(0,1,0.2);
         this.uiTextColor=new ColorClass(1,1,0);
         
-            // loading screen
-
-        this.loadingStrings=[];
-        this.loadingLastAddMsec=0;
-        
             // the overlays
 
         this.elements=new Map();
@@ -864,77 +859,4 @@ export default class GameOverlayClass
         gl.disable(gl.BLEND);
         gl.enable(gl.DEPTH_TEST);
     }
-    
-        //
-        // loading screen
-        //
-    
-    loadingScreenClear()
-    {
-        this.loadingStrings=[];
-    }
-    
-    loadingScreenAddString(str)
-    {
-        this.loadingStrings.push(str);
-        
-        this.loadingLastAddMsec=Date.now();
-    }
-    
-    loadingScreenUpdate()
-    {
-        let msec;
-        let idx=this.loadingStrings.length-1;
-        if (idx<0) return;
-        
-        msec=Date.now()-this.loadingLastAddMsec;
-        
-        this.loadingStrings[idx]+=(' ['+msec+'ms]');
-        
-        console.info(this.loadingStrings[idx]);      // supergumba -- temporary for optimization testing
-    }
-    
-    loadingScreenDraw()
-    {
-        let n,y,col,text;
-        let nLine=this.loadingStrings.length;
-        let gl=this.core.gl;
-        
-            // the 2D ortho matrix
-
-        this.core.orthoMatrix.setOrthoMatrix(this.core.canvas.width,this.core.canvas.height,-1.0,1.0);
-        
-            // clear to black
-            
-        gl.clearColor(0.0,0.0,0.0,1.0);
-        gl.clear(gl.COLOR_BUFFER_BIT,gl.DEPTH_BUFFER_BIT);
-        
-            // draw loading lines
-            
-        gl.disable(gl.DEPTH_TEST);
-
-        gl.enable(gl.BLEND);
-        gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
-
-        this.core.shaderList.textShader.drawStart();
-        
-        y=(this.core.canvas.height-5)-((nLine-1)*22);
-        col=new ColorClass(1.0,1.0,1.0);
-        
-        for (n=0;n!==nLine;n++) {
-            if (n===(nLine-1)) col=new ColorClass(1,0.3,0.3);
-            text=new TextClass(this.core,this.loadingStrings[n],5,y,20,this.core.TEXT_ALIGN_LEFT,col,1);
-            text.initialize();
-            text.draw();
-            text.release();
-            
-            y+=22;
-        }
-        
-        this.core.shaderList.textShader.drawEnd();
-
-        gl.disable(gl.BLEND);
-        gl.enable(gl.DEPTH_TEST);
-    }
-   
 }

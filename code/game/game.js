@@ -62,11 +62,6 @@ export default class GameClass
         this.fpsCount=0;
         this.fpsStartTimestamp=0;
         
-            // loading screen
-
-        this.loadingStrings=[];
-        this.loadingLastAddMsec=0;
-        
             // loop
             
         this.timestamp=0;
@@ -74,7 +69,6 @@ export default class GameClass
         this.lastRunTimestamp=0;
         this.lastDrawTimestamp=0;
         
-        this.inLoading=false;
         this.exitGame=false;
         this.switchMapGame=false;
         
@@ -456,42 +450,32 @@ export default class GameClass
         
     startLoop()
     {
-            // need to pause loop if in loading
-            
-        this.inLoading=true;
-        
-        this.overlay.loadingScreenClear();
-        
             // game timestamp to 0, won't start
             // counting until game officially starts later
             // as there is a "last system time" clock
             
         this.timestamp=0;
+        this.lastSystemTimestamp=Math.trunc(window.performance.now());
         
-            // initialize the map
-          
-        this.map=new MapClass(this.core,this.currentMapName);
-        if (!this.map.initialize()) return;
-
-            // next step
-
-        //if (!this.multiplayer) {
-            this.overlay.loadingScreenUpdate();
-            this.overlay.loadingScreenAddString('Loading Map');
-            this.overlay.loadingScreenDraw();
-
-            setTimeout(this.initLoadMap.bind(this),1);
-            /*
-        }
-        else {
-            this.overlay.loadingScreenUpdate();
-            this.overlay.loadingScreenAddString('Waiting for Setup');
-            this.overlay.loadingScreenDraw();
+        this.lastRunTimestamp=0;
+        this.lastDrawTimestamp=0;
+        
+        this.exitGame=false;
+        this.switchMapGame=false;
+        
+        this.currentSequence=null;
+        
+        this.freezePlayer=false;
+        this.freezeAI=false;
+        this.hideUI=false;
+        
+            // start any music
             
-            setTimeout(this.runMultiplayerDialog.bind(this),1);
-        }
-
-             */
+        this.core.audio.musicStart(this.map.music);
+        
+            // start actions
+            
+        if (this.core.json.config.startActions!==null) this.runActions(null,this.core.json.config.startActions,this.data);
     }
     
     resumeLoop()
@@ -505,218 +489,6 @@ export default class GameClass
             
         this.core.audio.musicStart(this.map.music);
         this.core.audio.soundResumeAllLooping();
-    }
-    
-        //
-        // game startup
-        //
-    
-    
-    /*
-    runMultiplayerDialog()
-    {
-        this.core.connectDialog.open(this.runMultiplayerDialogContinueLoad.bind(this));     // return here, exit of this dialog will continue on to runMultiplayerDialogContinueLoad()
-    }
-        
-    runMultiplayerDialogContinueLoad()
-    {
-        this.core.connectDialog.close();
-        
-            // local games don't connect
-            
-        if (this.core.setup.localGame) {
-            this.runMultiplayerConnectedOK();
-            return;
-        }
-        
-            // connect to server
-            
-        this.overlay.loadingScreenUpdate();
-        this.overlay.loadingScreenAddString('Connecting to Server');
-        this.overlay.loadingScreenDraw();
-        
-        this.network.connect(this.runMultiplayerConnectedOK.bind(this),this.runMultiplayerConnectedError.bind(this));     // return here, callback from connection or error
-    }
-    
-    runMultiplayerConnectedOK()
-    {
-        this.overlay.loadingScreenUpdate();
-        this.overlay.loadingScreenAddString('Loading Map');
-        this.overlay.loadingScreenDraw();
-        
-        setTimeout(this.initLoadMap.bind(this),1);
-    }
-    
-    runMultiplayerConnectedError()
-    {
-        alert(this.network.lastErrorMessage);
-        this.runMultiplayerDialog();
-    }
-    */
-    async initLoadMap()
-    {
-        if (!(await this.map.loadMap())) return;
-        
-        this.overlay.loadingScreenUpdate();
-        this.overlay.loadingScreenAddString('Building Collision Geometry');
-        this.overlay.loadingScreenDraw();
-        
-        setTimeout(this.initCollisionGeometry.bind(this),1);
-    }
-    
-    initCollisionGeometry()
-    {
-        this.map.meshList.buildCollisionGeometry();
-        
-        this.overlay.loadingScreenUpdate();
-
-        this.overlay.loadingScreenAddString('Loading Shadowmap');
-        this.overlay.loadingScreenDraw();
-
-        setTimeout(this.initLoadShadowmap.bind(this),1);
-    }
-    
-    async initLoadShadowmap()
-    {
-        let shadowmapLoad=new ShadowmapLoadClass(this.core);
-        
-        if (!(await shadowmapLoad.load())) return;
-        
-        this.overlay.loadingScreenUpdate();
-        this.overlay.loadingScreenAddString('Loading Models');
-        this.overlay.loadingScreenDraw();
-       
-        setTimeout(this.initLoadModels.bind(this),1);    
-    }
-    
-    async initLoadModels()
-    {
-        if (!(await this.map.modelList.loadAllModels())) return;
-        
-        this.overlay.loadingScreenUpdate();
-        this.overlay.loadingScreenAddString('Loading Sounds');
-        this.overlay.loadingScreenDraw();
-        
-        setTimeout(this.initLoadSounds.bind(this),1);
-    }
-    
-    async initLoadSounds()
-    {
-        if (!(await this.map.soundList.loadAllSounds())) return;
-        if (!(await this.map.music.load())) return;
-    
-        this.overlay.loadingScreenUpdate();
-        this.overlay.loadingScreenAddString('Initializing Entities and Effects');
-        this.overlay.loadingScreenDraw();
-        
-        setTimeout(this.initLoadEntities.bind(this),1);
-    }
-    
-    initLoadEntities()
-    {
-            // call the map ready
-        
-        this.map.ready();
-        
-            // initialize any map effects
-            
-        if (!this.map.effectList.initializeMapEffects()) return;        // halt on bad effect start
-
-            // initialize any map entities
-            
-        if (!this.map.entityList.initializeMapEntities()) return;    // halt on bad entity start
-        
-        this.overlay.loadingScreenUpdate();
-        this.overlay.loadingScreenAddString('Finalizing');
-        this.overlay.loadingScreenDraw();
-        
-        setTimeout(this.initFinalSetup.bind(this),1);
-    }
-    
-    initFinalSetup()
-    {
-        this.triggers.clear();
-        
-            // multiplayer scores
-            
-        this.overlay.multiplayerInitScores();
-        
-            // setup draw buffers
-
-        this.map.setupBuffers();
-        
-            // set the listener to this entity
-            
-        this.core.audio.setListenerToEntity(this.map.entityList.getPlayer());
-
-            // start the input
-
-        this.core.input.initialize(this.map.entityList.getPlayer());
-        
-            // ready all the entities
-            
-        this.map.entityList.ready();
-        
-            // no sequences
-            
-        this.currentSequence=null;
-        
-        this.freezePlayer=false;
-        this.freezeAI=false;
-        this.hideUI=false;
-        
-            // if we are in a non-local networked game, last thing to
-            // do is request a map_sync to get the map in the right time
-            
-            /*
-        if (this.multiplayer) {
-            this.overlay.loadingScreenUpdate();
-            this.overlay.loadingScreenAddString('Connecting to Server');
-            this.overlay.loadingScreenDraw();
-        
-            this.network.sync(this.runMultiplayerSyncOK.bind(this),this.runMultiplayerSyncError.bind(this));     // return here, callback from connection or error
-            return;
-        }
-        */
-       
-            // start the main loop
-            
-        this.initDone();
-    }
-    
-    runMultiplayerSyncOK()
-    {
-        initDone();
-    }
-    
-    runMultiplayerSyncError()
-    {
-        alert(this.network.lastErrorMessage);  // this all needs to be redone
-        this.network.disconnect();
-    }
-       
-    initDone()
-    {
-            // start the main loop
-            
-        this.core.currentLoop=this.core.LOOP_GAME;
-        
-        this.lastSystemTimestamp=Math.trunc(window.performance.now());
-        
-        this.lastRunTimestamp=0;
-        this.lastDrawTimestamp=0;
-        
-        this.inLoading=false;
-        this.exitGame=false;
-        this.switchMapGame=false;
-        
-            // start any music
-            
-        this.core.audio.musicStart(this.map.music);
-        
-            // start actions
-            
-        if (this.core.json.config.startActions!==null) this.runActions(null,this.core.json.config.startActions,this.data);
     }
     
         //
@@ -1123,7 +895,7 @@ export default class GameClass
             
         if (this.switchMapGame) {
             this.map.release();
-            this.core.switchLoop(this.core.LOOP_GAME);
+            this.core.switchLoop(this.core.LOOP_GAME_LOAD);
             return;
         }
 

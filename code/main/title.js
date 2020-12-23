@@ -89,7 +89,7 @@ export default class TitleClass
                 if (this.playButton.cursorInButton()) {
                     this.core.audio.soundStartUI(this.clickSound);
                     this.core.game.setMultiplayerMode(this.core.game.MULTIPLAYER_MODE_NONE);
-                    this.core.switchLoop(this.core.LOOP_GAME);
+                    this.core.switchLoop(this.core.LOOP_GAME_LOAD);
                     return(false);
                 }
                 

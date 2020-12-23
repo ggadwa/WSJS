@@ -92,14 +92,14 @@ export default class DialogMultiplayerClass extends DialogBaseClass
         if (buttonId==='localGame') {
             this.saveDialogControls();
             this.core.game.setMultiplayerMode(this.core.game.MULTIPLAYER_MODE_LOCAL);
-            this.core.switchLoop(this.core.LOOP_GAME);
+            this.core.switchLoop(this.core.LOOP_GAME_LOAD);
             return(false);
         }
         
         if (buttonId==='joinGame') {
             this.saveDialogControls();
             this.core.game.setMultiplayerMode(this.core.game.MULTIPLAYER_MODE_JOIN);
-            this.core.switchLoop(this.core.LOOP_GAME);
+            this.core.switchLoop(this.core.LOOP_GAME_LOAD);
             return(false);
         }
         

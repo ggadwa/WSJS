@@ -13,6 +13,7 @@ import RectClass from '../utility/rect.js';
 import PlaneClass from '../utility/plane.js';
 import ColorClass from '../utility/color.js';
 import Matrix4Class from '../utility/matrix4.js';
+import GameLoadClass from '../game/game_load.js';
 import GameClass from '../game/game.js';
 import DeveloperClass from '../developer/developer.js';
 import InputClass from '../main/input.js';
@@ -38,8 +39,9 @@ export default class CoreClass
         this.LOOP_DIALOG_MULTIPLAYER=2;
         this.LOOP_DIALOG_DEVELOPER=3;
         this.LOOP_DIALOG_PROMPT=4;
-        this.LOOP_GAME=5;
-        this.LOOP_DEVELOPER=6;
+        this.LOOP_GAME_LOAD=5;
+        this.LOOP_GAME=6;
+        this.LOOP_DEVELOPER=7;
         
             // gl options
             
@@ -118,6 +120,7 @@ export default class CoreClass
         this.dialogMultiplayer=null;
         this.dialogDeveloper=null;
         this.dialogPrompt=null;
+        this.gameLoad=null;
         this.game=null;
         this.developer=null;
         
@@ -268,6 +271,9 @@ export default class CoreClass
         
             // main game class
             
+        this.gameLoad=new GameLoadClass(this,data);
+        this.gameLoad.initialize();
+            
         this.game=new GameClass(this,data);
         if (!(await this.game.initialize())) return;
         
@@ -305,6 +311,7 @@ export default class CoreClass
     {
         this.developer.release();
         this.game.release();
+        this.gameLoad.release();
         this.title.release();
         this.dialogSetting.release();
         this.dialogMultiplayer.release();
@@ -467,7 +474,6 @@ export default class CoreClass
         
     fullscreenChange(event)
     {
-        
         if ((document.fullscreenElement===null) || (document.webkitFullscreenElement===null)) this.pauseLoop();
     }
     
@@ -502,13 +508,17 @@ export default class CoreClass
                 this.dialogPrompt.startLoop();
                 break;
                 
+            case this.LOOP_GAME_LOAD:
+                this.game.setMapName(null);
+                this.gameLoad.startLoop();
+                break;
+                
             case this.LOOP_GAME:
-                if ((this.previousLoop===this.LOOP_DIALOG_SETTING) || (this.previousLoop===this.LOOP_DEVELOPER)) {         // if this is coming from setting dialog or developer to game, then it's a resume instead of a start
-                    this.game.resumeLoop();
+                if (this.previousLoop===this.LOOP_GAME_LOAD) {
+                    this.game.startLoop();
                 }
                 else {
-                    this.game.setMapName(null);
-                    this.game.startLoop();
+                    this.game.resumeLoop();
                 }
                 break;
                 
@@ -575,6 +585,9 @@ export default class CoreClass
             case this.LOOP_DIALOG_PROMPT:
                 this.dialogPrompt.resumeLoop();
                 break;
+            case this.LOOP_GAME_LOAD:
+                this.gameLoad.resumeLoop();
+                break;
             case this.LOOP_GAME:
                 this.game.resumeLoop();
                 break;
@@ -638,8 +651,12 @@ function mainLoop(timestamp)
         case core.LOOP_DIALOG_PROMPT:
             core.dialogPrompt.loop();
             break;
+        case core.LOOP_GAME_LOAD:
+            core.gameLoad.loop();
+            if (core.gameLoad.inError) return;      // game load has lots of awaits some errors can come in anywhere, this flags them
+            break;
         case core.LOOP_GAME:
-            if (!core.game.inLoading) core.game.loop();
+            core.game.loop();
             break;
         case core.LOOP_DEVELOPER:
             core.developer.loop();
