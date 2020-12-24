@@ -18,14 +18,19 @@ export default class GameLoadClass
         this.LOAD_STAGE_MAP_PATH=3;
         this.LOAD_STAGE_MAP_COLLISION_GEOMETRY=4;
         this.LOAD_STAGE_MAP_SHADOWMAP=5;
-        this.LOAD_STAGE_MODEL=6;
-        this.LOAD_STAGE_SOUND=7;
-        this.LOAD_STAGE_MUSIC=8;
-        this.LOAD_STAGE_ENTITIES=9;
-        this.LOAD_STAGE_FINALIZE=10;
+        this.LOAD_STAGE_MAP_SHADOWMAP_BITMAP=6;
+        this.LOAD_STAGE_MODEL=7;
+        this.LOAD_STAGE_SOUND=8;
+        this.LOAD_STAGE_MUSIC=9;
+        this.LOAD_STAGE_ENTITIES=10;
+        this.LOAD_STAGE_FINALIZE=11;
         
         this.loadStage=0;
         this.loadStageIndex=0;
+        this.loadStageBitmapList=null;
+        this.loadStageModelList=null;
+        this.loadStageSoundList=null;
+        this.loadStageMusicList=null;
         this.statusStr='';
         
         this.inError=false;
@@ -109,15 +114,43 @@ export default class GameLoadClass
         
         this.setLoadStatus('Loading Map');
         
+        this.loadStageBitmapList=[];
+        
         this.loadStage=this.LOAD_STAGE_AWAIT;           // we are awaiting this, so we need to pause the loop until the await returns
-        if (!(await game.map.loadMap())) {
+        if (!(await game.map.loadMap(this.loadStageBitmapList))) {
             this.inError=true;
             return;
         }
         
-        //this.loadStage=this.LOAD_STAGE_MAP_BITMAP;
-        this.loadStage=this.LOAD_STAGE_MAP_PATH;
+        this.loadStage=this.LOAD_STAGE_MAP_BITMAP;
         this.loadStageIndex=0;
+    }
+    
+    async stageMapBitmap()
+    {
+        let bitmap;
+        
+            // done with bitmaps?
+            
+        if (this.loadStageIndex>=this.loadStageBitmapList.length) {
+            this.loadStage=this.LOAD_STAGE_MAP_PATH;
+            this.loadStageIndex=0;
+            return;
+        }
+        
+            // next bitmap
+
+        bitmap=this.loadStageBitmapList[this.loadStageIndex];
+        this.setLoadStatus('Loading Bitmap: '+bitmap.colorURL);
+        
+        this.loadStage=this.LOAD_STAGE_AWAIT;           // we are awaiting this, so we need to pause the loop until the await returns
+        if (!(await bitmap.load())) {
+            this.inError=true;
+            return;
+        }
+        
+        this.loadStage=this.LOAD_STAGE_MAP_BITMAP;
+        this.loadStageIndex++;
     }
     
     async stageMapPath()
@@ -148,50 +181,128 @@ export default class GameLoadClass
     
     async stageMapShadowmap()
     {
+        let game=this.core.game;
+        
         this.setLoadStatus('Loading Shadowmaps');
         
         let shadowmapLoad=new ShadowmapLoadClass(this.core);
         
+        this.loadStageBitmapList=[];
+        
         this.loadStage=this.LOAD_STAGE_AWAIT;           // we are awaiting this, so we need to pause the loop until the await returns
-        if (!(await shadowmapLoad.load())) {
+        if (!(await shadowmapLoad.load(this.loadStageBitmapList))) {
             this.inError=true;
             return;
         }
 
-        this.loadStage=this.LOAD_STAGE_MODEL;
+            // if we have a shadowmap, load the bitmaps
+            // else go directly to the models
+            
+        this.loadStage=(game.map.hasShadowmap)?this.LOAD_STAGE_MAP_SHADOWMAP_BITMAP:this.LOAD_STAGE_MODEL;
         this.loadStageIndex=0;
+    }
+    
+    async stageMapShadowmapBitmap()
+    {
+        let bitmap;
+        
+            // done with bitmaps?
+            
+        if (this.loadStageIndex>=this.loadStageBitmapList.length) {
+            this.loadStage=this.LOAD_STAGE_MODEL;
+            this.loadStageIndex=0;
+            return;
+        }
+        
+            // next bitmap
+
+        bitmap=this.loadStageBitmapList[this.loadStageIndex];
+        this.setLoadStatus('Loading Bitmap: '+bitmap.colorURL);
+        
+        this.loadStage=this.LOAD_STAGE_AWAIT;           // we are awaiting this, so we need to pause the loop until the await returns
+        if (!(await bitmap.load())) {
+            this.inError=true;
+            return;
+        }
+        
+        this.loadStage=this.LOAD_STAGE_MAP_SHADOWMAP_BITMAP;
+        this.loadStageIndex++;
     }
     
     async stageModel()
     {
+        let name,model;
         let game=this.core.game;
         
-        this.setLoadStatus('Loading Models');
+            // if this is the first model we hit,
+            // then we need to construct the list first
+            
+        if (this.loadStageIndex===0) {
+            game.map.modelList.buildModelList();
+            this.loadStageModelList=Array.from(game.map.modelList.models.keys());
+        }
+        
+            // are we out of models?
+            
+        if (this.loadStageIndex>=this.loadStageModelList.length) {
+            this.loadStage=this.LOAD_STAGE_SOUND;
+            this.loadStageIndex=0;
+            return;
+        }
+        
+            // load a model
+            
+        name=this.loadStageModelList[this.loadStageIndex];
+        model=game.map.modelList.models.get(name);
+        
+        this.setLoadStatus('Loading Model: '+name);
 
         this.loadStage=this.LOAD_STAGE_AWAIT;           // we are awaiting this, so we need to pause the loop until the await returns
-        if (!(await game.map.modelList.loadAllModels())) {
+        if (!(await model.load())) {
+            this.inError=true;
+            return;
+        }
+        
+        this.loadStage=this.LOAD_STAGE_MODEL;
+        this.loadStageIndex++;
+    }
+    
+    async stageSound()
+    {
+        let name,sound;
+        let game=this.core.game;
+        
+            // if this is the first sound we hit,
+            // then we need to construct the list first
+            
+        if (this.loadStageIndex===0) {
+            game.map.soundList.buildSoundList();
+            this.loadStageSoundList=Array.from(game.map.soundList.sounds.keys());
+        }
+        
+            // are we out of sounds?
+            
+        if (this.loadStageIndex>=this.loadStageSoundList.length) {
+            this.loadStage=this.LOAD_STAGE_MUSIC;
+            this.loadStageIndex=0;
+            return;
+        }
+        
+            // load a sound
+            
+        name=this.loadStageSoundList[this.loadStageIndex];
+        sound=game.map.soundList.sounds.get(name);
+
+        this.setLoadStatus('Loading Sound: '+name);
+
+        this.loadStage=this.LOAD_STAGE_AWAIT;           // we are awaiting this, so we need to pause the loop until the await returns
+        if (!(await sound.load())) {
             this.inError=true;
             return;
         }
         
         this.loadStage=this.LOAD_STAGE_SOUND;
-        this.loadStageIndex=0;
-    }
-    
-    async stageSound()
-    {
-        let game=this.core.game;
-        
-        this.setLoadStatus('Loading Sound');
-
-        this.loadStage=this.LOAD_STAGE_AWAIT;           // we are awaiting this, so we need to pause the loop until the await returns
-        if (!(await game.map.soundList.loadAllSounds()))  {
-            this.inError=true;
-            return;
-        }
-    
-        this.loadStage=this.LOAD_STAGE_MUSIC;
-        this.loadStageIndex=0;
+        this.loadStageIndex++;
     }
     
     async stageMusic()
@@ -325,6 +436,7 @@ export default class GameLoadClass
                     await this.stageMap();
                     break;
                 case this.LOAD_STAGE_MAP_BITMAP:
+                    await this.stageMapBitmap();
                     break;
                 case this.LOAD_STAGE_MAP_PATH:
                     await this.stageMapPath();
@@ -334,6 +446,9 @@ export default class GameLoadClass
                     break;
                 case this.LOAD_STAGE_MAP_SHADOWMAP:
                     await this.stageMapShadowmap();
+                    break;
+                case this.LOAD_STAGE_MAP_SHADOWMAP_BITMAP:
+                    await this.stageMapShadowmapBitmap();
                     break;
                 case this.LOAD_STAGE_MODEL:
                     await this.stageModel();

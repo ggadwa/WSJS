@@ -50,11 +50,10 @@ export default class MapModelListClass
         // loading
         //
         
-    async loadAllModels()
+    buildModelList()
     {
         let entity,jsonEntity;
         let name,model,modelSet;
-        let success,promises;
         let game=this.core.game;
         
             // look through all the entities and get
@@ -67,31 +66,13 @@ export default class MapModelListClass
             if (jsonEntity!==null) game.addJsonObjectToLoadSet(modelSet,entity.data,null,false,['model'],jsonEntity);
         }
         
-            // now build into a promise list
+            // now build the model map
             
-        promises=[];
-        
         for (name of modelSet) {
             model=new ModelClass(this.core,{"name":name});
             model.initialize();
-            promises.push(model.load());
-            
             this.models.set(name,model);
         }
-
-            // and await them all
-            
-        success=true;
-        
-        await Promise.all(promises)
-            .then
-                (
-                    (values)=>{
-                        success=!values.includes(false);
-                    },
-                );
-
-        return(success);
     }
     
 }

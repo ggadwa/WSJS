@@ -34,6 +34,7 @@ export default class ImportGLTFClass
         
         this.jsonData=null;
         this.binData=null;
+        this.bitmapCache=null;
         
         Object.seal(this);
     }
@@ -606,7 +607,7 @@ export default class ImportGLTFClass
         // decode materials
         //
     
-    findMaterialForMesh(meshNode,primitiveNode,bitmapCache)
+    findMaterialForMesh(meshNode,primitiveNode)
     {
         let bitmap,uri;
         let baseColorTexture,metallicRoughnessTexture,emissiveTexture;
@@ -691,18 +692,18 @@ export default class ImportGLTFClass
             // add to list to be loaded later
             
         if (colorURL!==null) {
-            bitmap=bitmapCache.get(colorURL);
+            bitmap=this.bitmapCache.get(colorURL);
             if (bitmap===undefined) {
                 bitmap=new BitmapPBRClass(this.core,colorURL,normalURL,metallicRoughnessURL,emissiveURL,emissiveFactor,scale);
-                bitmapCache.set(colorURL,bitmap);
+                this.bitmapCache.set(colorURL,bitmap);
             }
         }
         else {
             if (colorBase!==null) {
-                bitmap=bitmapCache.get(materialNode.name);
+                bitmap=this.bitmapCache.get(materialNode.name);
                 if (bitmap===undefined) {
                     bitmap=new BitmapColorClass(this.core,materialNode.name,colorBase);
-                    bitmapCache.set(materialNode.name,bitmap);
+                    this.bitmapCache.set(materialNode.name,bitmap);
                 }
             }
             else {
@@ -921,7 +922,7 @@ export default class ImportGLTFClass
         // decode meshes
         //
         
-    decodeMesh(map,meshList,skeleton,bitmapCache)
+    decodeMesh(map,meshList,skeleton)
     {
         let n,k,t,meshesNode,meshNode,primitiveNode;
         let vertexArray,normalArray,tangentArray,uvArray,indexArray;
@@ -966,7 +967,7 @@ export default class ImportGLTFClass
                 
                     // create or get bitmap
                     
-                bitmap=this.findMaterialForMesh(meshNode,primitiveNode,bitmapCache);
+                bitmap=this.findMaterialForMesh(meshNode,primitiveNode);
                 if (bitmap===null) return(false);
                 
                     // get all the arrays
@@ -1254,8 +1255,10 @@ export default class ImportGLTFClass
         // main importer
         //
         
-    async import(map,meshList,skeleton,bitmapCache)
+    async import(map,meshList,skeleton,loadBitmapList)
     {
+        let bitmap;
+        
         this.jsonData=null;
         this.binData=null;
         
@@ -1299,11 +1302,19 @@ export default class ImportGLTFClass
             if (!this.decodeMapInformational(map)) return(false);
         }
         
-        if (!this.decodeMesh(map,meshList,skeleton,bitmapCache)) return(false);
+        this.bitmapCache=new Map();
+        
+        if (!this.decodeMesh(map,meshList,skeleton)) return(false);
         
         if (skeleton!==null) {
             if (!this.decodeAnimations(skeleton)) return(false);
         }
+        
+            // put the bitmap cache into a loading list
+            
+        for (bitmap of this.bitmapCache.values()) {
+            loadBitmapList.push(bitmap);
+        } 
         
         return(true);
     }

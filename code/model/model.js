@@ -50,7 +50,7 @@ export default class ModelClass
         
     async load()
     {
-        let importGLTF,bitmapCache,bitmap;
+        let importGLTF,bitmapList,bitmap;
         
             // no import settings, nothing to load
             
@@ -59,14 +59,14 @@ export default class ModelClass
             // the model
             
         importGLTF=new ImportGLTFClass(this.core,this.json.name);
-        bitmapCache=new Map();
-        if (!(await importGLTF.import(null,this.meshList,this.skeleton,bitmapCache))) return(false);
+        bitmapList=[];
+        if (!(await importGLTF.import(null,this.meshList,this.skeleton,bitmapList))) return(false);
 
         this.setupBuffers();
         
             // bitmaps
             
-        for (bitmap of bitmapCache.values()) {
+        for (bitmap of bitmapList) {
             if (!(await bitmap.load())) return(false);
         }
         

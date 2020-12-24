@@ -1,8 +1,5 @@
----> this.game.setMapName(null); needed?  in core
+
 ---> eventually don't need timer stuff in game load loop
----> map bitmaps separately
----> shadowmaps separately
----> models separately
 ---> sounds separately
 
 - get rid of animation index in modelentityalter (only ever have one track)

@@ -653,7 +653,18 @@ function mainLoop(timestamp)
             break;
         case core.LOOP_GAME_LOAD:
             core.gameLoad.loop();
-            if (core.gameLoad.inError) return;      // game load has lots of awaits some errors can come in anywhere, this flags them
+            if (core.gameLoad.inError) {      // game load has lots of awaits some errors can come in anywhere, this flags them and we break out
+                if (!core.debugNoFullScreen) {
+                    if (core.canvas.exitFullscreen===undefined) {
+                        core.canvas.webkitExitFullscreen();
+                    }
+                    else {
+                        core.canvas.exitFullscreen();
+                    }
+                }
+                core.input.release();
+                return;
+            }
             break;
         case core.LOOP_GAME:
             core.game.loop();

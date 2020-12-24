@@ -44,12 +44,11 @@ export default class MapSoundListClass
         // loading
         //
    
-    async loadAllSounds()
+    buildSoundList()
     {
         let soundSet,name,sound;
         let mesh,move,liquid;
         let entity,jsonEntity;
-        let success,promises;
         let game=this.core.game;
         let map=game.map;
         
@@ -82,33 +81,13 @@ export default class MapSoundListClass
             if (jsonEntity!==null) game.addJsonObjectToLoadSet(soundSet,entity.data,"sounds",false,['name'],jsonEntity);
         }
         
-            // load the sounds
+            // build the sound map
             
-        promises=[];
-        
         for (name of soundSet) {
             sound=new SoundClass(this.core,name);
             sound.initialize();
-            promises.push(sound.load());
-            
             this.sounds.set(name,sound);
         }
-
-            // and await them all
-            
-        success=true;
-        
-        await Promise.all(promises)
-            .then
-                (
-                    (values)=>{
-                        success=!values.includes(false);
-                    },
-                );
-                
-        if (!success) return(false);
-
-        return(true);
     }
         
         //

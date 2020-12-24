@@ -27,7 +27,7 @@ export default class ShadowmapLoadClass
         }
     }
 
-    async load()
+    async load(loadBitmapList)
     {
         let n,k,nMesh,mesh,offset;
         let runCount,vertexCount,uvCount;
@@ -110,7 +110,7 @@ export default class ShadowmapLoadClass
                 bitmap=bitmaps.get(bitmapIdx);
                 if (bitmap===undefined) {
                     bitmap=new BitmapShadowmapClass(this.core,('shadowmaps/'+map.name+'/shadowmap_'+bitmapIdx+'.png'));
-                    if (!(await bitmap.load())) return(false);
+                    loadBitmapList.push(bitmap);        // list for game_load so we can load bitmaps between animation requests
                     bitmaps.set(bitmapIdx,bitmap);      // internal list so we can keep track of bitmaps we loaded
                 }
                 
