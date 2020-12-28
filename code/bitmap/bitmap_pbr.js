@@ -232,6 +232,9 @@ export default class BitmapPBRClass extends BitmapClass
         }
         else {
             gl.uniform1i(shader.hasMaskUniform,0);
+            
+            gl.activeTexture(gl.TEXTURE4);
+            gl.bindTexture(gl.TEXTURE_2D,this.colorTexture);        // you have to bind something or OS X complains across all browsers (probably metal)
         }
         
             // emissive
@@ -244,6 +247,9 @@ export default class BitmapPBRClass extends BitmapClass
         }
         else {
             gl.uniform1i(shader.hasEmissiveUniform,0);
+            
+            gl.activeTexture(gl.TEXTURE3);
+            gl.bindTexture(gl.TEXTURE_2D,this.colorTexture);
         }
         
             // metallic-roughness
@@ -256,6 +262,9 @@ export default class BitmapPBRClass extends BitmapClass
         }
         else {
             gl.uniform1i(shader.hasMetallicRoughnessUniform,0);
+            
+            gl.activeTexture(gl.TEXTURE2);
+            gl.bindTexture(gl.TEXTURE_2D,this.colorTexture);
         }
 
             // normal
@@ -268,6 +277,9 @@ export default class BitmapPBRClass extends BitmapClass
         }
         else {
             gl.uniform1i(shader.hasNormalUniform,0);
+            
+            gl.activeTexture(gl.TEXTURE1);
+            gl.bindTexture(gl.TEXTURE_2D,this.colorTexture);
         }
 
             // the color
