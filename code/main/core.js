@@ -57,14 +57,13 @@ export default class CoreClass
         };
         
             // text statics
-            
-        this.TEXT_TEXTURE_WIDTH=512;
-        this.TEXT_TEXTURE_HEIGHT=512;
+        
+        this.TEXT_TEXTURE_WIDTH=1024;
+        this.TEXT_TEXTURE_HEIGHT=1024;
         this.TEXT_CHAR_PER_ROW=10;
-        this.TEXT_CHAR_WIDTH=50;
-        this.TEXT_CHAR_HEIGHT=50;
-        this.TEXT_FONT_NAME='Arial';
-        this.TEXT_FONT_SIZE=48;
+        this.TEXT_CHAR_WIDTH=100;
+        this.TEXT_CHAR_HEIGHT=100;
+        this.TEXT_FONT_SIZE=96;
         
         this.TEXT_ALIGN_LEFT=0;
         this.TEXT_ALIGN_CENTER=1;
@@ -340,11 +339,12 @@ export default class CoreClass
         
     createFontTexture()
     {
-        let x,y,yAdd,cIdx,charStr,ch;
+        let x,y,xAdd,yAdd,cIdx,charStr,ch;
         let fontCanvas,ctx;
         let gl=this.gl;
         
-            // create the text bitmap
+            // create a canvas to draw the
+            // font into
 
         fontCanvas=document.createElement('canvas');
         fontCanvas.width=this.TEXT_TEXTURE_WIDTH;
@@ -359,24 +359,32 @@ export default class CoreClass
 
             // draw the text
 
-        ctx.font=(this.TEXT_FONT_SIZE+'px ')+this.TEXT_FONT_NAME;
+        ctx.font=(this.TEXT_FONT_SIZE+'px ')+this.json.title.font;
         ctx.textAlign='left';
         ctx.textBaseline='middle';
         ctx.fillStyle='#FFFFFF';
 
-        yAdd=Math.trunc(this.TEXT_CHAR_HEIGHT/2);
+        xAdd=Math.trunc((this.TEXT_CHAR_WIDTH-this.TEXT_FONT_SIZE)*0.5);
+        yAdd=Math.trunc(this.TEXT_CHAR_HEIGHT*0.5);
 
         for (ch=32;ch!==127;ch++) {
             cIdx=ch-32;
             x=(cIdx%this.TEXT_CHAR_PER_ROW)*this.TEXT_CHAR_WIDTH;
             y=Math.trunc(cIdx/this.TEXT_CHAR_PER_ROW)*this.TEXT_CHAR_HEIGHT;
-            y+=yAdd;
 
             charStr=String.fromCharCode(ch);
             this.fontCharWidths[cIdx]=((ctx.measureText(charStr).width+4)/this.TEXT_CHAR_WIDTH);
             if (this.fontCharWidths[cIdx]>1.0) this.fontCharWidths[cIdx]=1.0;
+            
+            ctx.save();
+            
+            ctx.beginPath();                // we clip so crazy characters don't put little bits into other character boxes
+            ctx.rect(x,y,this.TEXT_CHAR_WIDTH,this.TEXT_CHAR_HEIGHT);
+            ctx.clip();
 
-            ctx.fillText(charStr,(x+2),(y-1));
+            ctx.fillText(charStr,(x+xAdd),(y+yAdd));
+            
+            ctx.restore();
 
             x+=this.TEXT_CHAR_WIDTH;
         }

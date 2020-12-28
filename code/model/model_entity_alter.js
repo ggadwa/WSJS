@@ -54,8 +54,7 @@ export default class ModelEntityAlterClass
         
             // animations
             
-        this.currentAnimationIdx=-1;
-        this.currentAnimationStartFrame=0;
+        this.currentAnimationStartFrame=-1;     // -1 = no animation
         this.currentAnimationEndFrame=0;
         this.currentAnimationStartTimestamp=0;
         this.currentAnimationLoopStartTick=0;
@@ -64,8 +63,7 @@ export default class ModelEntityAlterClass
         
         this.queuedAnimationStop=false;
         
-        this.queuedAnimationIdx=-1;
-        this.queuedAnimationStartFrame=0;
+        this.queuedAnimationStartFrame=-1;      // -1 = no animation
         this.queuedAnimationEndFrame=0;
         this.queuedAnimationStartTimestamp=0;
         this.queuedAnimationLoopStartTick=0;
@@ -318,7 +316,7 @@ export default class ModelEntityAlterClass
         let n,tick;
         let animation,channels,channel,node;
         
-        animation=this.entity.model.skeleton.animations[this.currentAnimationIdx];
+        animation=this.entity.model.skeleton.animation;
         channels=animation.channels;
         
             // the global animation tick
@@ -363,8 +361,8 @@ export default class ModelEntityAlterClass
             // for no pose, just get the very first animation
             // and stick to that pose
             
-        if (this.entity.model.skeleton.animations.length===0) return;
-        channels=this.entity.model.skeleton.animations[0].channels;
+        if (this.entity.model.skeleton.animation===null) return;
+        channels=this.entity.model.skeleton.animation.channels;
         
             // each channel changes one node over time
             
@@ -398,16 +396,15 @@ export default class ModelEntityAlterClass
             // setup nodes to pose and check to see
             // if queue is being popped
             
-        if (this.currentAnimationIdx!==-1) {
-            if (this.queuedAnimationIdx!==-1) {
+        if (this.currentAnimationStartFrame!==-1) {
+            if (this.queuedAnimationStartFrame!==-1) {
                 if (this.core.game.timestamp>=this.queuedAnimationStartTimestamp) {
-                    this.currentAnimationIdx=this.queuedAnimationIdx;
                     this.currentAnimationStartFrame=this.queuedAnimationStartFrame;
                     this.currentAnimationEndFrame=this.queuedAnimationEndFrame;
                     this.currentAnimationStartTimestamp=this.queuedAnimationStartTimestamp;
                     this.currentAnimationLoopStartTick=this.queuedAnimationLoopStartTick;
                     this.currentAnimationLoopEndTick=this.queuedAnimationLoopEndTick;
-                    this.queuedAnimationIdx=-1;
+                    this.queuedAnimationStartFrame=-1;
                 }
             }
             
@@ -441,16 +438,13 @@ export default class ModelEntityAlterClass
     {
         let fps=1000/this.frameRate;
         
-        this.currentAnimationIdx=0; // (name===null)?0:this.entity.model.skeleton.findAnimationIndex(name);  -- currently every model I have has a single animation track
-        //if (this.currentAnimationIdx===-1) return(false);
-        
         this.currentAnimationStartTimestamp=this.core.game.timestamp;
         this.currentAnimationStartFrame=animationFrames[0];
         this.currentAnimationEndFrame=animationFrames[1];
         this.currentAnimationLoopStartTick=Math.trunc(animationFrames[0]*fps);
         this.currentAnimationLoopEndTick=Math.trunc(animationFrames[1]*fps);
         
-        this.queuedAnimationIdx=-1;          // a start erased any queued animations
+        this.queuedAnimationStartFrame=-1;          // a start erases any queued animations
         this.queuedAnimationStop=false;
         
         return(true);
@@ -491,9 +485,6 @@ export default class ModelEntityAlterClass
         
             // queue up
 
-        this.queuedAnimationIdx=0; // (name===null)?0:this.entity.model.skeleton.findAnimationIndex(name);
-        //if (this.queuedAnimationIdx===-1) return(false);
-        
         this.queuedAnimationStartTimestamp=this.core.game.timestamp+len;
         this.queuedAnimationStartFrame=animationFrames[0];
         this.queuedAnimationEndFrame=animationFrames[1];
@@ -505,12 +496,11 @@ export default class ModelEntityAlterClass
     
     interuptAnimationChunkInFrames(animationFrames)
     {
-        let oldIdx,oldStartFrame,oldEndFrame;
+        let oldStartFrame,oldEndFrame;
         let oldStartTick,oldEndTick,len;
         
             // current animation comes back when this is finished
             
-        oldIdx=this.currentAnimationIdx;
         oldStartFrame=this.currentAnimationStartFrame;
         oldEndFrame=this.currentAnimationEndFrame;
         oldStartTick=this.currentAnimationLoopStartTick;
@@ -522,11 +512,10 @@ export default class ModelEntityAlterClass
         
             // re-queue old one
             
-        if (oldIdx!==-1) {
+        if (oldStartFrame!==-1) {
             len=this.currentAnimationLoopEndTick-this.currentAnimationLoopStartTick;
             len-=Math.trunc((this.core.game.timestamp-this.currentAnimationStartTimestamp)%len);
         
-            this.queuedAnimationIdx=oldIdx;
             this.queuedAnimationStartTimestamp=this.core.game.timestamp+len;
             this.queuedAnimationStartFrame=oldStartFrame;
             this.queuedAnimationEndFrame=oldEndFrame;
@@ -537,12 +526,12 @@ export default class ModelEntityAlterClass
     
     isAnimationRunning()
     {
-        return(this.currentAnimationIdx!==-1);
+        return(this.currentAnimationStartFrame!==-1);
     }
     
     isAnimationQueued()
     {
-        return(this.queuedAnimationIdx!==-1);
+        return(this.queuedAnimationStartFrame!==-1);
     }
     
     getAnimationTickCount(animationFrames)

@@ -147,6 +147,7 @@ export default class EntityKartBaseClass extends EntityClass
         this.rigidAngle=new PointClass(0,0,0);
         this.rigidGotoAngle=new PointClass(0,0,0);
         this.drawAngle=new PointClass(0,0,0);
+        this.fireAngle=new PointClass(0,0,0);
         
             // some static nodes
             
@@ -526,7 +527,9 @@ export default class EntityKartBaseClass extends EntityClass
         
         if (fire) {
             if (this.currentWeaponIdx!==-1) {
-                this.weapons[this.currentWeaponIdx].firePrimary(this.position,this.drawAngle);
+                this.fireAngle.setFromPoint(this.drawAngle);
+                this.fireAngle.x=-this.fireAngle.z;      // translate rigid body to fire position
+                this.weapons[this.currentWeaponIdx].firePrimary(this.position,this.fireAngle);
              }
         }
         

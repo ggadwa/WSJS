@@ -49,13 +49,13 @@ export default class DialogBaseClass
         
             // controls
             
-        for (control of this.controls) {
+        for (control of this.controls.values()) {
             control.release();
         }
         
             // buttons
             
-        for (button of this.buttons) {
+        for (button of this.buttons.values()) {
             button.release();
         }
     }

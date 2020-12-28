@@ -93,13 +93,13 @@ export default class EffectCacheClass
     {
         let bitmap,sound;
         
-        jsons.clear();
+        this.jsons.clear();
         
-        for (bitmap of this.bitmaps) {
+        for (bitmap of this.bitmaps.values()) {
             bitmap.release();
         }
         
-        for (sound of this.sounds) {
+        for (sound of this.sounds.values()) {
             sound.release();
         }
     }

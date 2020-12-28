@@ -1,19 +1,15 @@
+- need dial UI for kart
 
----> eventually don't need timer stuff in game load loop
----> sounds separately
 
-- get rid of animation index in modelentityalter (only ever have one track)
+- menu by keys
 
---> gamepad support
---> runMultiplayerSyncError redo all this
+- gamepad support
+- runMultiplayerSyncError redo all this
 
 - kart = weird bug with laps near goal line
 - kart = going backwards
 - fps = pulses need to be in json
 
-
-DEVELOPER
-  - work on developer path split
 
 PHYSICS
   - fix wacky bumping (if you bump but can't move fully, than completely stop motion -- check stairs)
@@ -33,12 +29,9 @@ NETWORKING
     - predictions
     - need open system for passing message (like firing weapons, etc)
 
-OPTIMIZATIONS
-    - only load models from entities that are in level
-    - only load sounds from entities that are in level
-
 GENERATOR
-    - make stand alone application (java?)
+    - make stand alone application (java - obj first?)
+    - delete bitmap_generated from engine
     - the random color scheme
     - lights
        - regular

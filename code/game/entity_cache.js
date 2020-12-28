@@ -46,7 +46,7 @@ export default class EntityCacheClass
     
     release()
     {
-        jsons.clear();
+        this.jsons.clear();
     }
     
         //

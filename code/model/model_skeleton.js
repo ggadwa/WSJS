@@ -20,9 +20,9 @@ export default class ModelSkeletonClass
 
         this.skins=[];
         
-            // animations
+            // the single animation track
             
-        this.animations=[];
+        this.animation=null;
         
             // the root node, right now we consider
             // that there is only one root node in the skeleton
@@ -56,17 +56,6 @@ export default class ModelSkeletonClass
         
         for (n=0;n!==nNode;n++) {
             if (this.nodes[n].name===name) return(n);
-        }
-        
-        return(-1);
-    }
-    
-    findAnimationIndex(name)
-    {
-        let n;
-        
-        for (n=0;n!==this.animations.length;n++) {
-            if (this.animations[n].name===name) return(n);
         }
         
         return(-1);

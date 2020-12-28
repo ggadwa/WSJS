@@ -1186,62 +1186,63 @@ export default class ImportGLTFClass
         
     decodeAnimations(skeleton)
     {
-        let n,k,t,isVec4;
+        let k,t,isVec4;
         let animations,channels,animateNode,channelNode,samplerNode;
         let animation,channel,pose;
         let timeArray,vectorArray,vIdx;
         
             // decode the animations
+            // NOTE we only deal with a single animations
+            // most models I've seen have animations on a single track
+            // separated by frames, so we just do it this way
         
         animations=this.jsonData.animations;
         if (animations===undefined) return(true);
         
-        for (n=0;n!==animations.length;n++) {
-            animateNode=animations[n];
-            
-                // new animation
-                
-            animation=new ModelAnimationClass(animateNode.name);
-            skeleton.animations.push(animation);
-            
-                // channels
-                
-            channels=animateNode.channels;
-            
-            for (k=0;k!==channels.length;k++) {
-                channelNode=channels[k];
-                
-                    // currently only handling translation, rotation,
-                    // and scale
-                    
-                if ((channelNode.target.path!=='translation') && (channelNode.target.path!=='rotation') && (channelNode.target.path!=='scale')) continue;
-                    
-                channel=new ModelAnimationChannelClass(channelNode.target.node,channelNode.target.path);
-                
-                    // read in the samplier
-                    
-                samplerNode=animateNode.samplers[channelNode.sampler];
-                    
-                isVec4=(channel.trsType===channel.TRS_TYPE_ROTATION);
-                timeArray=this.decodeBuffer(samplerNode.input,1);
-                vectorArray=this.decodeBuffer(samplerNode.output,(isVec4?4:3));
-                
-                for (t=0;t!==timeArray.length;t++) {
-                    if (isVec4) {
-                        vIdx=t*4;
-                        pose=new ModelAnimationChannelPoseClass(Math.trunc(timeArray[t]*1000),vectorArray.slice(vIdx,(vIdx+4)));
-                    }
-                    else {
-                        vIdx=t*3;
-                        pose=new ModelAnimationChannelPoseClass(Math.trunc(timeArray[t]*1000),vectorArray.slice(vIdx,(vIdx+3)));
-                    }
-                    channel.poses.push(pose);
+            // new animation
+
+        animateNode=animations[0];
+        
+        animation=new ModelAnimationClass(animateNode.name);
+        skeleton.animation=animation;
+
+            // channels
+
+        channels=animateNode.channels;
+
+        for (k=0;k!==channels.length;k++) {
+            channelNode=channels[k];
+
+                // currently only handling translation, rotation,
+                // and scale
+
+            if ((channelNode.target.path!=='translation') && (channelNode.target.path!=='rotation') && (channelNode.target.path!=='scale')) continue;
+
+            channel=new ModelAnimationChannelClass(channelNode.target.node,channelNode.target.path);
+
+                // read in the samplier
+
+            samplerNode=animateNode.samplers[channelNode.sampler];
+
+            isVec4=(channel.trsType===channel.TRS_TYPE_ROTATION);
+            timeArray=this.decodeBuffer(samplerNode.input,1);
+            vectorArray=this.decodeBuffer(samplerNode.output,(isVec4?4:3));
+
+            for (t=0;t!==timeArray.length;t++) {
+                if (isVec4) {
+                    vIdx=t*4;
+                    pose=new ModelAnimationChannelPoseClass(Math.trunc(timeArray[t]*1000),vectorArray.slice(vIdx,(vIdx+4)));
                 }
-                
-                    // add to animation
-                    
-                animation.channels.push(channel);
+                else {
+                    vIdx=t*3;
+                    pose=new ModelAnimationChannelPoseClass(Math.trunc(timeArray[t]*1000),vectorArray.slice(vIdx,(vIdx+3)));
+                }
+                channel.poses.push(pose);
             }
+
+                // add to animation
+
+            animation.channels.push(channel);
             
                 // finally calculate length of animation
                 

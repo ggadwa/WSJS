@@ -1,5 +1,6 @@
 import ColorClass from '../utility/color.js';
 import TextClass from '../main/text.js';
+import MenuClass from '../main/menu.js';
 import SoundClass from '../sound/sound.js';
 import BitmapInterfaceClass from '../bitmap/bitmap_interface.js';
 import DialogButtonClass from '../dialog/dialog_button.js';
@@ -11,18 +12,20 @@ export default class TitleClass
         this.core=core;
         this.data=data;
         
+        this.PLAY_MENU_ID=0;
+        this.MULTIPLAYER_MENU_ID=1;
+        this.SETUP_MENU_ID=2;
+        this.QUIT_MENU_ID=3;
+        
         this.timestamp=0;
         this.lastSystemTimestamp=0;
         this.lastRunTimestamp=0;
         this.lastDrawTimestamp=0;
         
         this.clickDown=false;
-        
         this.clickSound=null;
         
-        this.playButton=null;
-        this.multiplayerButton=null;
-        this.setupButton=null;
+        this.menu=null;
         
         Object.seal(this);
     }
@@ -33,6 +36,8 @@ export default class TitleClass
     
     async initialize()
     {
+        let items=[];
+        
             // click audio
             // will share with dialogs
             
@@ -40,35 +45,22 @@ export default class TitleClass
         this.clickSound.initialize();
         if (!(await this.clickSound.load())) return(false);
         
-            // buttons
-            
-        this.playButton=new DialogButtonClass(this.core,this.core.json.title.playButton.x,this.core.json.title.playButton.y,this.core.json.title.playButton.width,this.core.json.title.playButton.height,this.core.json.title.playButton.title);
-        if (!this.playButton.initialize()) return(false);
+            // the menu
         
-        if (this.core,this.core.json.title.multiplayerButton.show) {
-            this.multiplayerButton=new DialogButtonClass(this.core,this.core.json.title.multiplayerButton.x,this.core.json.title.multiplayerButton.y,this.core.json.title.multiplayerButton.width,this.core.json.title.multiplayerButton.height,this.core.json.title.multiplayerButton.title);
-            if (!this.multiplayerButton.initialize()) return(false);
-        }
-        else {
-            this.multiplayerButton=null;
-        }
+        if (this.core.json.title.playButton.show) items.push([this.PLAY_MENU_ID,this.core.json.title.playButton.title]);
+        if (this.core.json.title.multiplayerButton.show) items.push([this.MULTIPLAYER_MENU_ID,this.core.json.title.multiplayerButton.title]);
+        if (this.core.json.title.setupButton.show) items.push([this.SETUP_MENU_ID,this.core.json.title.setupButton.title]);
+        if (this.core.json.title.quitButton.show) items.push([this.QUIT_MENU_ID,this.core.json.title.quitButton.title]);
         
-        if (this.core,this.core.json.title.setupButton.show) {
-            this.setupButton=new DialogButtonClass(this.core,this.core.json.title.setupButton.x,this.core.json.title.setupButton.y,this.core.json.title.setupButton.width,this.core.json.title.setupButton.height,this.core.json.title.setupButton.title);
-            if (!this.setupButton.initialize()) return(false);
-        }
-        else {
-            this.setupButton=null;
-        }
+        this.menu=new MenuClass(this.core,items);
+        if (!this.menu.initialize()) return(false);
         
         return(true);
     }
     
     release()
     {
-        this.playButton.release();
-        if (this.mulmultiplayerButton!==null) this.multiplayerButton.release();
-        if (this.setupButton!==null) this.setupButton.release();
+        this.menu.release();
     }
     
         //
@@ -86,28 +78,28 @@ export default class TitleClass
             if (this.clickDown) {
                 this.clickDown=false;
                 
-                if (this.playButton.cursorInButton()) {
+                if (this.menu.cursorInItem(this.PLAY_MENU_ID)) {
                     this.core.audio.soundStartUI(this.clickSound);
                     this.core.game.setMultiplayerMode(this.core.game.MULTIPLAYER_MODE_NONE);
                     this.core.switchLoop(this.core.LOOP_GAME_LOAD);
                     return(false);
                 }
-                
-                if (this.multiplayerButton!==null) {
-                    if (this.multiplayerButton.cursorInButton()) {
-                        this.core.audio.soundStartUI(this.clickSound);
-                        this.core.switchLoop(this.core.LOOP_DIALOG_MULTIPLAYER);
-                        return(false);
-                    }
+                if (this.menu.cursorInItem(this.MULTIPLAYER_MENU_ID)) {
+                    this.core.audio.soundStartUI(this.clickSound);
+                    this.core.switchLoop(this.core.LOOP_DIALOG_MULTIPLAYER);
+                    return(false);
                 }
-                
-                if (this.setupButton!==null) {
-                    if (this.setupButton.cursorInButton()) {
-                        this.core.audio.soundStartUI(this.clickSound);
-                        this.core.switchLoop(this.core.LOOP_DIALOG_SETTING);
-                        return(false);
-                    }
+                if (this.menu.cursorInItem(this.SETUP_MENU_ID)) {
+                    this.core.audio.soundStartUI(this.clickSound);
+                    this.core.switchLoop(this.core.LOOP_DIALOG_SETTING);
+                    return(false);
                 }
+                if (this.menu.cursorInItem(this.QUIT_MENU_ID)) {
+                    this.core.release();
+                    window.location.assign(window.location.href);       // easiest way to quit
+                    return(false);
+                }
+
             }
         }
         
@@ -137,11 +129,9 @@ export default class TitleClass
          
         this.core.background.draw(false);
                     
-            // buttons
-            
-        this.playButton.draw();
-        if (this.multiplayerButton!==null) this.multiplayerButton.draw();
-        if (this.setupButton!==null) this.setupButton.draw();
+            // menu
+        
+        this.menu.draw();
         
             // cursor
         

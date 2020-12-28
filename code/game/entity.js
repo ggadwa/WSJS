@@ -776,7 +776,7 @@ export default class EntityClass
     
     getUpdateNetworkData(msgType,remoteId)
     {
-        let buffer=new ArrayBuffer(63);
+        let buffer=new ArrayBuffer(59);
         let dataView=new DataView(buffer);
         
         dataView.setInt16(0,mstType);
@@ -793,11 +793,10 @@ export default class EntityClass
         dataView.setFloat32(36,this.modelEntityAlter.scale.y);
         dataView.setFloat32(40,this.modelEntityAlter.scale.z);
         dataView.setInt32(44,this.modelEntityAlter.getUpdateNetworkShowData());
-        dataView.setInt16(48,this.modelEntityAlter.currentAnimationIdx);
-        dataView.setInt32(50,this.modelEntityAlter.currentAnimationStartTimestamp);
-        dataView.setInt32(54,this.modelEntityAlter.currentAnimationLoopStartTick);
-        dataView.setInt32(58,this.modelEntityAlter.currentAnimationLoopEndTick);
-        dataView.setInt8(62,(this.modelEntityAlter.queuedAnimationStop?0:1));
+        dataView.setInt32(48,this.modelEntityAlter.currentAnimationStartTimestamp);
+        dataView.setInt32(52,this.modelEntityAlter.currentAnimationLoopStartTick);
+        dataView.setInt32(54,this.modelEntityAlter.currentAnimationLoopEndTick);
+        dataView.setInt8(58,(this.modelEntityAlter.queuedAnimationStop?0:1));
         
         return(buffer);
     }
@@ -836,11 +835,10 @@ export default class EntityClass
             
         this.modelEntityAlter.putUpdateNetworkShowData(dataView.getInt32(44));
         
-        this.modelEntityAlter.currentAnimationIdx=dataView.getInt16(48);
-        this.modelEntityAlter.currentAnimationStartTimestamp=dataView.getInt32(50);
-        this.modelEntityAlter.currentAnimationLoopStartTick=dataView.getInt32(54);
-        this.modelEntityAlter.currentAnimationLoopEndTick=dataView.getInt32(58);
-        this.modelEntityAlter.queuedAnimationStop=(dataView.getInt8(62)!==0);
+        this.modelEntityAlter.currentAnimationStartTimestamp=dataView.getInt32(48);
+        this.modelEntityAlter.currentAnimationLoopStartTick=dataView.getInt32(52);
+        this.modelEntityAlter.currentAnimationLoopEndTick=dataView.getInt32(54);
+        this.modelEntityAlter.queuedAnimationStop=(dataView.getInt8(58)!==0);
        
             // mark as having a remote update
             // this is so we only do one remote update

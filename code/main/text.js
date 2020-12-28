@@ -68,10 +68,10 @@ export default class TextClass
     }
     
         //
-        // string lengths
+        // string length and boxes
         //
         
-    getStringDrawWidth(charWid,str)
+    getStringDrawWidth()
     {
         let n,cIdx,len;
         let fontCharWidths=this.core.fontCharWidths;
@@ -80,15 +80,34 @@ export default class TextClass
             // figure out the size
             // and alignment
 
-        len=str.length;
+        len=this.str.length;
         if (len===0) return(0);
         
         for (n=0;n!==len;n++) {
-            cIdx=str.charCodeAt(n)-32;
-            wid+=Math.trunc(charWid*fontCharWidths[cIdx]);
+            cIdx=this.str.charCodeAt(n)-32;
+            wid+=Math.trunc(this.fontSize*fontCharWidths[cIdx]);
         }
         
         return(wid);
+    }
+    
+    getStringDrawBox(rect)
+    {
+        let x,wid;
+        
+        x=this.x;
+        wid=this.getStringDrawWidth();
+        
+        switch (this.align) {
+            case this.core.TEXT_ALIGN_CENTER:
+                x-=Math.trunc(wid*0.5);
+                break;
+            case this.core.TEXT_ALIGN_RIGHT:
+                x-=wid;
+                break;
+        }
+        
+        rect.setFromValues(x,(this.y-this.fontSize),(x+wid),this.y);
     }
 
         //
@@ -119,10 +138,10 @@ export default class TextClass
 
         switch (this.align) {
             case this.core.TEXT_ALIGN_CENTER:
-                x-=Math.trunc(this.getStringDrawWidth(this.fontSize,this.str)*0.5);
+                x-=Math.trunc(this.getStringDrawWidth()*0.5);
                 break;
             case this.core.TEXT_ALIGN_RIGHT:
-                x-=this.getStringDrawWidth(this.fontSize,this.str);
+                x-=this.getStringDrawWidth();
                 break;
         }
 
@@ -218,6 +237,8 @@ export default class TextClass
     
     draw()
     {
+        let shadowOffset;
+        
         if (!this.show) return;
         
             // check for temporary time out
@@ -230,7 +251,10 @@ export default class TextClass
             }
         }
         
-        this.drawSingle(1,1,this.fontShadowColor);
+        shadowOffset=Math.trunc(this.fontSize*0.05);
+        if (shadowOffset<1) shadowOffset=1;
+        
+        this.drawSingle(shadowOffset,shadowOffset,this.fontShadowColor);
         this.drawSingle(0,0,null);
     }
 

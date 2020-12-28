@@ -199,8 +199,6 @@ export default class EntityPlatformPlayerClass extends EntityClass
         
         super.run();
         
-        if (this.core.game.freezePlayer) return;
-        
             // interface updates
             
         if (this.interfaceCollectItem!==null) this.core.game.overlay.setCount(this.interfaceCollectItem,this.collectItemCount);
@@ -210,6 +208,10 @@ export default class EntityPlatformPlayerClass extends EntityClass
                 this.core.game.overlay.showElement(this.interfaceHealthBitmapList[n],((n+1)===this.health));
             }
         }
+        
+            // freezes
+            
+        if (this.core.game.freezePlayer) return;
         
             // dead, can only fall
             

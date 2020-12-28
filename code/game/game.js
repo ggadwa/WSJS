@@ -155,7 +155,7 @@ export default class GameClass
     {
         let sequence;
         
-        for (sequence of this.sequences) {
+        for (sequence of this.sequences.values()) {
             sequence.release();
         }
         
