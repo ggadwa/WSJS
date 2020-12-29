@@ -3,6 +3,7 @@ import RectClass from '../utility/rect.js';
 import ColorClass from '../utility/color.js';
 import ElementClass from '../game/element.js';
 import CountClass from '../game/count.js';
+import DialClass from '../game/dial.js';
 import TextClass from '../main/text.js';
 import LiquidTintClass from '../game/liquid_tint.js';
 import HitOverlayClass from '../game/hit_overlay.js';
@@ -38,6 +39,7 @@ export default class GameOverlayClass
 
         this.elements=new Map();
         this.counts=new Map();
+        this.dials=new Map();
         this.texts=new Map();
         
         this.fpsText=null;
@@ -84,6 +86,7 @@ export default class GameOverlayClass
             
         this.elements.clear();
         this.counts.clear();
+        this.dials.clear();
         this.texts.clear();
             
         if (!(await this.addJsonInterfaceObject(this.core.json.interface))) return(false);
@@ -130,9 +133,9 @@ export default class GameOverlayClass
     
     release()
     {
-        let element,count,text;
+        let element,count,dial,text;
         
-            // release all elements, counts, and texts
+            // release all elements, counts, dials and texts
             
         for (element of this.elements.values()) {
             element.release();
@@ -140,6 +143,10 @@ export default class GameOverlayClass
         
         for (count of this.counts.values()) {
             count.release();
+        }
+        
+        for (dial of this.dials.values()) {
+            dial.release();
         }
         
         for (text of this.texts.values()) {
@@ -266,6 +273,59 @@ export default class GameOverlayClass
     }
     
         //
+        // interface dials
+        //
+    
+    async addDial(id,backgroundColorURL,foregroundColorURL,needleColorURL,width,height,positionMode,positionOffset,developer)
+    {
+        let dial;
+        let rect=new RectClass(positionOffset.x,positionOffset.y,(positionOffset.x+width),(positionOffset.y+height));
+        
+        switch (positionMode) {
+            case this.POSITION_MODE_TOP_RIGHT:
+                rect.move(this.core.canvas.width,0);
+                break;
+            case this.POSITION_MODE_BOTTOM_LEFT:
+                rect.move(0,this.core.canvas.height);
+                break;
+            case this.POSITION_MODE_BOTTOM_RIGHT:
+                rect.move(this.core.canvas.width,this.core.canvas.height);
+                break;
+            case this.POSITION_MODE_MIDDLE:
+                rect.move(Math.trunc(this.core.canvas.width*0.5),Math.trunc(this.core.canvas.height*0.5));
+                break;
+        }
+            
+        dial=new DialClass(this.core,backgroundColorURL,foregroundColorURL,needleColorURL,rect,developer);
+        if (!(await dial.initialize())) return(false);
+        this.dials.set(id,dial);
+        
+        return(true);
+    }
+    
+    showDial(id,show)
+    {
+        let dial=this.dials.get(id);
+        if (dial===undefined) {
+            console.log('Interface dial ID does not exist: '+id);
+            return;
+        }
+        
+        dial.show=show;
+    }
+    
+    setDial(id,value)
+    {
+        let dial=this.dials.get(id);
+        if (dial===undefined) {
+            console.log('Interface dial ID does not exist: '+id);
+            return;
+        }
+        
+        dial.value=value;
+    }
+    
+        //
         // interface texts
         //
         
@@ -340,7 +400,7 @@ export default class GameOverlayClass
         
     async addJsonInterfaceObject(jsonInterface)
     {
-        let element,count,text;
+        let element,count,dial,text;
         let positionMode,align;
         
         if (jsonInterface===undefined) return(true);
@@ -360,6 +420,15 @@ export default class GameOverlayClass
 
                 if (!await (this.addCount(count.id,count.bitmap,count.count,count.width,count.height,positionMode,count.positionOffset,count.addOffset,new ColorClass(count.onColor.r,count.onColor.g,count.onColor.b),count.onAlpha,new ColorClass(count.offColor.r,count.offColor.g,count.offColor.b),count.offAlpha,false))) return(false);
                 this.showCount(count.id,count.show);
+            }
+        }
+        
+        if (jsonInterface.dials!==undefined) {
+            for (dial of jsonInterface.dials) {
+                positionMode=this.POSITION_MODE_LIST.indexOf(dial.positionMode);
+
+                if (!await (this.addDial(dial.id,dial.backgroundBitmap,dial.foregroundBitmap,dial.needleBitmap,dial.width,dial.height,positionMode,dial.positionOffset,false))) return(false);
+                this.showDial(dial.id,dial.show);
             }
         }
         
@@ -788,7 +857,7 @@ export default class GameOverlayClass
 
     draw()
     {
-        let key,element,count,text;
+        let key,element,count,dial,text;
         let fpsStr,idx;
         let gl=this.core.gl;
             
@@ -816,6 +885,10 @@ export default class GameOverlayClass
 
             for ([key,count] of this.counts) {
                 count.draw();
+            }
+            
+            for ([key,dial] of this.dials) {
+                dial.draw();
             }
 
                 // touch controls

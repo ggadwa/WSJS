@@ -15,6 +15,10 @@ export default class EntityKartPlayerClass extends EntityKartBaseClass
         this.thirdPersonCameraLookAngle=null;
 
         this.interfaceSpeedItem=null;
+        this.interfacePlaceItem=null;
+        this.interfaceLapItem=null;
+        this.interfaceSpeedGauge=null;
+        this.interfaceSpeedGaugeMax=0;
         
         this.lapCount=0;
         this.runningPath=false;
@@ -32,6 +36,10 @@ export default class EntityKartPlayerClass extends EntityKartBaseClass
         this.thirdPersonCameraLookAngle=new PointClass(this.json.config.thirdPersonCameraLookAngle.x,this.json.config.thirdPersonCameraLookAngle.y,this.json.config.thirdPersonCameraLookAngle.z);
         
         this.interfaceSpeedItem=this.core.game.lookupValue(this.json.config.interfaceSpeedItem,this.data,null);
+        this.interfacePlaceItem=this.core.game.lookupValue(this.json.config.interfacePlaceItem,this.data,null);
+        this.interfaceLapItem=this.core.game.lookupValue(this.json.config.interfaceLapItem,this.data,null);
+        this.interfaceSpeedGauge=this.core.game.lookupValue(this.json.config.interfaceSpeedGauge,this.data,null);
+        this.interfaceSpeedGaugeMax=this.core.game.lookupValue(this.json.config.interfaceSpeedGaugeMax,this.data,1);
         
         this.lapCount=this.core.game.lookupValue(this.json.config.lapCount,this.data,3);
         
@@ -63,18 +71,16 @@ export default class EntityKartPlayerClass extends EntityKartBaseClass
     
     run()
     {
-        let x,turnAdd,ang,fire;
+        let x,speed,turnAdd,ang,fire;
         let forward,reverse,drifting,brake,jump;
         let textLap;
         let input=this.core.input;
         let overlay=this.core.game.overlay;
         let setup=this.core.setup;
         
-        if (this.core.game.freezePlayer) return;
-        
-            // interface updates
+            // player freeze
             
-        if (this.interfaceSpeedItem!==null) this.core.game.overlay.setCount(this.interfaceSpeedItem,this.speedItemCount);
+        if (this.core.game.freezePlayer) return;
         
             // are we running a path (we already won/lost)
             
@@ -128,18 +134,26 @@ export default class EntityKartPlayerClass extends EntityKartBaseClass
             
         this.calculatePlaces();
         
-            // update the UI
+            // update the place/lap
             
         textLap=(this.lap===-1)?1:(this.lap+1);
             
-        this.core.game.overlay.updateText('place',(this.place+1));
-        this.core.game.overlay.updateText('lap',(textLap+'/3'));
-        this.core.game.overlay.updateText('speed',this.movement.z);      // testing
+        if (this.interfacePlaceItem!==null) this.core.game.overlay.updateText(this.interfacePlaceItem,(this.place+1));
+        if (this.interfaceLapItem!==null) this.core.game.overlay.updateText(this.interfaceLapItem,(textLap+'/3'));
         
         if ((this.place!==this.previousPlace) || (this.lap!==this.previousLap)) {
             if ((this.previousPlace!==-1) && (this.previousLap!==-1)) this.core.game.overlay.pulseElement('lap_background',500,10);
             this.previousPlace=this.place;
             this.previousLap=this.lap;
+        }
+            
+        if (this.interfaceSpeedItem!==null) this.core.game.overlay.setCount(this.interfaceSpeedItem,this.speedItemCount);
+        
+        if (this.interfaceSpeedGauge!==null) {
+            speed=this.rotMovement.lengthXZ()/this.interfaceSpeedGaugeMax;
+            if (speed<0) speed=0;
+            if (speed>this.interfaceSpeedGaugeMax) speed=this.interfaceSpeedGaugeMax;
+            this.core.game.overlay.setDial(this.interfaceSpeedGauge,speed);
         }
         
             // win or lose

@@ -1,6 +1,3 @@
-- need dial UI for kart
-
-
 - menu by keys
 
 - gamepad support
@@ -23,14 +20,12 @@ MISC
 
 NETWORKING
     - multiplayer needs a complete rebuild
-    - entities need boxes passed (radius/height) --> TEST
     - need map_sync message (timestamp + map movements - round robin out to first player) todo partially implemented
-    - need to transmit show/hide meshes --> TEST
     - predictions
     - need open system for passing message (like firing weapons, etc)
 
 GENERATOR
-    - make stand alone application (java - obj first?)
+    - make stand alone application (java - obj format first?)
     - delete bitmap_generated from engine
     - the random color scheme
     - lights
