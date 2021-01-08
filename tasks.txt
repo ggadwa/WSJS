@@ -1,3 +1,22 @@
+
+- full screen flag (remove static)
+- shadowmap flag
+
+- menu to left?
+- fix bad grenade bounces, floats up when hits somebody
+- current mouse settings on PC should be default
+- profile chrome/safari
+- add flags for AI no move/AI no fire
+- platform - add cloud to drop down area, add spikes
+- platform - can't jump up to higher area first
+- platform - add second map?
+
+
+kart
+  - bump the track
+
+
+
 - menu by keys
 
 - gamepad support
@@ -7,7 +26,7 @@
 - kart = going backwards
 - fps = pulses need to be in json
 
-
+    
 PHYSICS
   - fix wacky bumping (if you bump but can't move fully, than completely stop motion -- check stairs)
 

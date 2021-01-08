@@ -76,6 +76,7 @@ export default class MeshClass
 
         this.noCollisions=false;
         this.simpleCollisions=false;
+        this.bump=false;
         
         this.collisionWallTrigs=[];
         this.collisionFloorTrigs=[];

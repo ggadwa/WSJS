@@ -1095,6 +1095,7 @@ export default class ImportGLTFClass
                 materialNode=this.jsonData.materials[primitiveNode.material];
                 if (this.getCustomProperty(materialNode,meshNode,'wsjsNoCollision')!==null) mesh.noCollisions=true;
                 if (this.getCustomProperty(materialNode,meshNode,'wsjsSimpleCollision')!==null) mesh.simpleCollisions=true;
+                if (this.getCustomProperty(materialNode,meshNode,'wsjsBump')!==null) mesh.bump=true;
                 
                 if (map!==null) {
                     informResult=this.decodeMapMeshInformational(map,materialNode,meshNode,mesh,n);

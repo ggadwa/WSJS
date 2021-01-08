@@ -392,9 +392,11 @@ export default class CollisionClass
                             
                         bumpY=-1;
 
-                        if ((collisionTrig.yBound.max-this.entityTestPnt.y)<=map.bumpHeight) {
-                            bumpY=collisionTrig.yBound.max;
-                            entity.collideWallMeshIdx=-1;
+                        if (mesh.bump) {
+                            if ((collisionTrig.yBound.max-this.entityTestPnt.y)<=map.bumpHeight) {
+                                bumpY=collisionTrig.yBound.max;
+                                entity.collideWallMeshIdx=-1;
+                            }
                         }
                     }
                 }
@@ -433,7 +435,9 @@ export default class CollisionClass
                         // can we bump?
                     
                     bumpY=-1;
-                    if ((entityTopY-this.entityTestPnt.y)<=map.bumpHeight) bumpY=entityTopY;
+                    if (checkEntity.canBeClimbed) {
+                        if ((entityTopY-this.entityTestPnt.y)<=map.bumpHeight) bumpY=entityTopY;
+                    }
                     
                         // can we push?
                         

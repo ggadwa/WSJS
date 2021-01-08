@@ -10,6 +10,7 @@ Name                        Description
 ----                        -----------
 wsjsNoCollision             Mesh has no collision (value ignored)
 wsjsSimpleCollision         Mesh has simple box collision
+wsjsBump                    Mesh can be bumped
 
 wsjsMap                     Misc map settings
                                 {

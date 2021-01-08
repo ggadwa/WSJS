@@ -62,6 +62,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.angleYProjectileRange=5;
         this.angleYMeleeRange=15;
         this.jumpWaitTick=0;
+        this.jumpWaitTickRandomAdd=0;
         this.nextJumpTick=0;
         this.jumpHeight=0;
         this.nextDamageTick=0;
@@ -165,6 +166,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.damageSpeedFactor=this.core.game.lookupValue(this.json.config.damageSpeedFactor,this.data,0);
         this.slideMoveTick=this.core.game.lookupValue(this.json.config.slideMoveTick,this.data,0);
         this.jumpWaitTick=this.core.game.lookupValue(this.json.config.jumpWaitTick,this.data,0);
+        this.jumpWaitTickRandomAdd=this.core.game.lookupValue(this.json.config.jumpWaitTickRandomAdd,this.data,0);
         this.jumpHeight=this.core.game.lookupValue(this.json.config.jumpHeight,this.data,0);
         this.canBump=this.core.game.lookupValue(this.json.config.canBump,this.data,true);
         this.canSlide=this.core.game.lookupValue(this.json.config.canSlide,this.data,true);
@@ -322,7 +324,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         if (resetTimers) {
             this.nextProjectileTick=this.core.game.timestamp+this.projectileWaitTick;
             this.nextMeleeTick=this.core.game.timestamp+this.meleeWaitTick;
-            this.nextJumpTick=this.core.game.timestamp+this.jumpWaitTick;
+            this.nextJumpTick=this.core.game.timestamp+(this.jumpWaitTick+Math.trunc(Math.random()*this.jumpWaitTickRandomAdd));
         }
         
         if (this.stalkByPath) {
@@ -439,6 +441,8 @@ export default class EntityFPSMonsterClass extends EntityClass
         if (this.noSelfDamage) {
             if (fromEntity===this) return;
         }
+        
+        console.info(this.name+'='+damage);
         
             // the damage and death
             
@@ -597,10 +601,12 @@ export default class EntityFPSMonsterClass extends EntityClass
         
             // if to far away from player,
             // go into idle
-            
-        if (distToPlayer>this.idleDistance) {
-            this.goIdle();
-            return;
+        
+        if (this.idleDistance!==-1) {    
+            if (distToPlayer>this.idleDistance) {
+                this.goIdle();
+                return;
+            }
         }
         
             // damage speed changes
@@ -652,7 +658,7 @@ export default class EntityFPSMonsterClass extends EntityClass
             
         if (this.jumpHeight!==0) {
             if (this.core.game.timestamp>this.nextJumpTick) {
-                this.nextJumpTick=this.core.game.timestamp+this.jumpWaitTick;
+                this.nextJumpTick=this.core.game.timestamp+(this.jumpWaitTick+Math.trunc(Math.random()*this.jumpWaitTickRandomAdd));
                 this.jump();
             }
         }

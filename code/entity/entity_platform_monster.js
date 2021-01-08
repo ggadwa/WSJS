@@ -13,6 +13,7 @@ export default class EntityPlatformMonsterClass extends EntityClass
         this.initialWalkDirection=0;
         this.jumpHeight=0;
         this.jumpWaitTick=0;
+        this.jumpWaitTickRandomAdd=0;
         
         this.stompable=false;
         this.stompBounceHeight=0;
@@ -72,6 +73,7 @@ export default class EntityPlatformMonsterClass extends EntityClass
         this.turnSpeed=this.core.game.lookupValue(this.json.config.turnSpeed,this.data,20);
         this.jumpHeight=this.core.game.lookupValue(this.json.config.jumpHeight,this.data,0);
         this.jumpWaitTick=this.core.game.lookupValue(this.json.config.jumpWaitTick,this.data,0);
+        this.jumpWaitTickRandomAdd=this.core.game.lookupValue(this.json.config.jumpWaitTickRandomAdd,this.data,0);
         
         this.stompable=this.core.game.lookupValue(this.json.config.stompable,this.data,false);
         this.stompBounceHeight=this.core.game.lookupValue(this.json.config.stompBounceHeight,this.data,0);
@@ -217,13 +219,13 @@ export default class EntityPlatformMonsterClass extends EntityClass
         if (this.jumpHeight!==0) {
             if ((this.standOnMeshIdx!==-1) || (this.standOnEntity!==null)) {
                 if (this.core.game.timestamp>this.nextJumpTick) {
-                    this.nextJumpTick=this.core.game.timestamp+this.jumpWaitTick;
+                    this.nextJumpTick=this.core.game.timestamp+(this.jumpWaitTick+Math.trunc(Math.random()*this.jumpWaitTickRandomAdd));
 
                     this.movement.y=this.jumpHeight;
                 }
             }
             else {
-                this.nextJumpTick=this.core.game.timestamp+this.jumpWaitTick;
+                this.nextJumpTick=this.core.game.timestamp+(this.jumpWaitTick+Math.trunc(Math.random()*this.jumpWaitTickRandomAdd));
             }
         }
         

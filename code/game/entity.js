@@ -57,6 +57,7 @@ export default class EntityClass
         this.gravity=this.core.game.map.gravityMinValue;
         
         this.passThrough=false;
+        this.canBeClimbed=false;    // can be bumped up over
         this.touchEntity=null;
         this.hitEntity=null;
         this.hitPoint=new PointClass(0,0,0);
