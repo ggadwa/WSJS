@@ -26,9 +26,10 @@ export default class DialogSettingClass extends DialogBaseClass
         
             // profile controls
             
-        if (!this.addDialogControl(this,'headProfile',this.CONTROL_TYPE_HEADER,'Profile',null)) return(false);
-        if (!this.addDialogControl(this,'name',this.CONTROL_TYPE_TEXT,'Name:',null)) return(false);
+        if (!this.addDialogControl(this,'headVideo',this.CONTROL_TYPE_HEADER,'Video',null)) return(false);
         if (!this.addDialogControl(this,'showFPS',this.CONTROL_TYPE_CHECKBOX,'Show FPS:',null)) return(false);
+        if (!this.addDialogControl(this,'fullScreen',this.CONTROL_TYPE_CHECKBOX,'Full Screen (requires restart):',null)) return(false);
+        if (!this.addDialogControl(this,'shadowmaps',this.CONTROL_TYPE_CHECKBOX,'Use Shadow Maps:',null)) return(false);
         
             // controls
             
@@ -76,13 +77,14 @@ export default class DialogSettingClass extends DialogBaseClass
     {
             // open header and no selected text
             
-        this.currentOpenHeaderControl=this.controls.get('headProfile');
+        this.currentOpenHeaderControl=this.controls.get('headVideo');
         this.currentTextInputControl=null;
         
             // the values
 
-        this.setDialogControl('name',this.core.setup.name);
         this.setDialogControl('showFPS',this.core.setup.showFPS);
+        this.setDialogControl('fullScreen',this.core.setup.fullScreen);
+        this.setDialogControl('shadowmaps',this.core.setup.shadowmaps);
         
         if (!this.core.input.hasTouch) {
             this.setDialogControl('mouseXSensitivity',Math.trunc(this.core.setup.mouseXSensitivity*100));
@@ -113,8 +115,9 @@ export default class DialogSettingClass extends DialogBaseClass
     
     saveDialogControls()
     {
-        this.core.setup.name=this.getDialogControl('name');
         this.core.setup.showFPS=this.getDialogControl('showFPS');
+        this.core.setup.fullScreen=this.getDialogControl('fullScreen');
+        this.core.setup.shadowmaps=this.getDialogControl('shadowmaps');
         
         if (!this.core.input.hasTouch) {
             this.core.setup.mouseXSensitivity=this.getDialogControl('mouseXSensitivity')/100;

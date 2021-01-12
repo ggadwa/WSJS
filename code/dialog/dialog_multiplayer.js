@@ -28,7 +28,6 @@ export default class DialogMultiplayerClass extends DialogBaseClass
             
         if (!this.addDialogControl(this,'headProfile',this.CONTROL_TYPE_HEADER,'Profile',null)) return(false);
         if (!this.addDialogControl(this,'name',this.CONTROL_TYPE_TEXT,'Name:',null)) return(false);
-        if (!this.addDialogControl(this,'showFPS',this.CONTROL_TYPE_CHECKBOX,'Show FPS:',null)) return(false);
         
             // multiplayer controls
             
@@ -55,7 +54,6 @@ export default class DialogMultiplayerClass extends DialogBaseClass
             // the values
 
         this.setDialogControl('name',this.core.setup.name);
-        this.setDialogControl('showFPS',this.core.setup.showFPS);
         
         this.setDialogControl('localMap',this.core.setup.localMap);
         this.setDialogControl('botCount',this.core.setup.botCount);
@@ -66,7 +64,6 @@ export default class DialogMultiplayerClass extends DialogBaseClass
     saveDialogControls()
     {
         this.core.setup.name=this.getDialogControl('name');
-        this.core.setup.showFPS=this.getDialogControl('showFPS');
         
         this.core.setup.localMap=this.getDialogControl('localMap');
         this.core.setup.botCount=this.getDialogControl('botCount');

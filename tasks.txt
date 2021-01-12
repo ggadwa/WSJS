@@ -1,19 +1,15 @@
 
-- full screen flag (remove static)
-- shadowmap flag
+- full screen needs to be dynamic
 
 - menu to left?
 - fix bad grenade bounces, floats up when hits somebody
-- current mouse settings on PC should be default
 - profile chrome/safari
-- add flags for AI no move/AI no fire
-- platform - add cloud to drop down area, add spikes
-- platform - can't jump up to higher area first
-- platform - add second map?
+
+- kart - if nobody around, can switch lanes at halfway and after finish line
+       - maybe do lanes in a different way
 
 
-kart
-  - bump the track
+- transfer over new shadowmaps
 
 
 

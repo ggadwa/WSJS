@@ -37,6 +37,8 @@ export default class SetupClass
         this.touchStickRightYAcceleration=2;
         
         this.snapLook=false;
+        this.fullScreen=false;
+        this.shadowmaps=true;
 
         this.soundVolume=0.3;
         this.musicVolume=0.5;

@@ -790,7 +790,7 @@ export default class GameClass
         this.map.background.draw();
         this.map.sky.draw();
         this.map.meshList.drawMap();
-        if (this.map.hasShadowmap) this.map.meshList.drawMapShadow();
+        if ((this.map.hasShadowmap) && (this.core.setup.shadowmaps)) this.map.meshList.drawMapShadow();
         
             // draw any non held entities
             

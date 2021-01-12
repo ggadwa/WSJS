@@ -29,7 +29,6 @@ export default class CoreClass
     {
             // some testing flags
             
-        this.debugNoFullScreen=true;
         this.debugForceTouch=false;
 
             // loop types
@@ -85,9 +84,10 @@ export default class CoreClass
             // the opengl context
 
         this.canvas=null;
-        this.canvasClick=null;
-        
         this.gl=null;
+        
+        this.canvasClick=null;
+        this.sessionFullScreen=false;
         
             // the audio and input
             
@@ -178,7 +178,7 @@ export default class CoreClass
             // get the input here because it needs to
             // happen after an interactive click
             
-        if (!this.debugNoFullScreen) {
+        if (this.sessionFullScreen) {
             if (this.canvas.requestFullscreen===undefined) {
                 this.canvas.webkitRequestFullscreen();
             }
@@ -303,6 +303,11 @@ export default class CoreClass
         this.setup=new SetupClass();
         this.setup.load(this);
         
+            // remember the full screen setting
+            // requires a restart to change
+            
+        this.sessionFullScreen=this.setup.fullScreen;
+        
         return(true);
     }
 
@@ -323,7 +328,7 @@ export default class CoreClass
         this.audio.release();
         this.input.release();
         
-        if (!this.debugNoFullScreen) {
+        if (this.sessionFullScreen) {
             if (this.canvas.exitFullscreen===undefined) {
                 this.canvas.webkitExitFullscreen();
             }
@@ -610,7 +615,7 @@ export default class CoreClass
         
             // enter full screen and pointer lock
             
-        if (!this.debugNoFullScreen) {
+        if (this.sessionFullScreen) {
             if (this.canvas.requestFullscreen===undefined) {
                 this.canvas.webkitRequestFullscreen();
             }
@@ -662,7 +667,7 @@ function mainLoop(timestamp)
         case core.LOOP_GAME_LOAD:
             core.gameLoad.loop();
             if (core.gameLoad.inError) {      // game load has lots of awaits some errors can come in anywhere, this flags them and we break out
-                if (!core.debugNoFullScreen) {
+                if (core.fullScreen) {
                     if (core.canvas.exitFullscreen===undefined) {
                         core.canvas.webkitExitFullscreen();
                     }
