@@ -152,6 +152,11 @@ export default class CoreClass
         
     async run(data)
     {
+            // the user settings
+            
+        this.setup=new SetupClass();
+        this.setup.load();
+        
             // clear html
             
         document.body.innerHTML='';
@@ -173,6 +178,13 @@ export default class CoreClass
         this.canvas.addEventListener('contextmenu',function(event) { event.preventDefault(); });
         
         document.body.appendChild(this.canvas);
+        
+            // remember the full screen setting
+            // because of the complications in changing this,
+            // we require a restart so the startup setting
+            // is used regardless of changes
+            
+        this.sessionFullScreen=this.setup.fullScreen;
         
             // we go into full screen and/or
             // get the input here because it needs to
@@ -297,16 +309,6 @@ export default class CoreClass
             
         this.developer=new DeveloperClass(this);
         if (!(await this.developer.initialize())) return(false);
-        
-            // the project user setup
-            
-        this.setup=new SetupClass();
-        this.setup.load(this);
-        
-            // remember the full screen setting
-            // requires a restart to change
-            
-        this.sessionFullScreen=this.setup.fullScreen;
         
         return(true);
     }

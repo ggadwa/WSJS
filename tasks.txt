@@ -1,6 +1,4 @@
 
-- full screen needs to be dynamic
-
 - menu to left?
 - fix bad grenade bounces, floats up when hits somebody
 - profile chrome/safari

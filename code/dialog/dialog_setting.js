@@ -145,7 +145,7 @@ export default class DialogSettingClass extends DialogBaseClass
         this.core.setup.musicVolume=this.getDialogControl('musicVolume')/100;
         this.core.setup.musicOn=this.getDialogControl('musicOn');
         
-        this.core.setup.save(this.core);
+        this.core.setup.save();
     }
     
         //

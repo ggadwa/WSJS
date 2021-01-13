@@ -70,7 +70,7 @@ export default class DialogMultiplayerClass extends DialogBaseClass
         this.core.setup.botSkill=this.getDialogControl('botSkill');
         this.core.setup.serverURL=this.getDialogControl('serverURL');
         
-        this.core.setup.save(this.core);
+        this.core.setup.save();
     }
     
         //

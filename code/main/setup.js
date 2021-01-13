@@ -47,14 +47,20 @@ export default class SetupClass
         this.skipShadowMapNormals=false;
     }
     
-    load(core)  // core has to be passed in other JSON is circular
+    getStorageName()
     {
-        let jsonStr=window.localStorage.getItem(core.json.name+'_setup');
+        let paths=window.location.pathname.split('/');
+        return(paths[1]+'_setup');
+    }
+    
+    load()
+    {
+        let jsonStr=window.localStorage.getItem(this.getStorageName());
         if (jsonStr!==null) Object.assign(this,JSON.parse(jsonStr));
     }
     
-    save(core)
+    save()
     {
-        window.localStorage.setItem((core.json.name+'_setup'),JSON.stringify(this));
+        window.localStorage.setItem(this.getStorageName(),JSON.stringify(this));
     }
 }

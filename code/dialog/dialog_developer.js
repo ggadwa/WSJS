@@ -53,7 +53,7 @@ export default class DialogDeveloperClass extends DialogBaseClass
     {
         this.core.setup.skipShadowMapNormals=this.getDialogControl('skipShadowMapNormals');
         
-        this.core.setup.save(this.core);
+        this.core.setup.save();
     }
     
         //
