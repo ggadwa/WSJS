@@ -1,10 +1,10 @@
 
-- menu to left?
-- fix bad grenade bounces, floats up when hits somebody
+- menu select change noise
 - profile chrome/safari
 
 - kart - if nobody around, can switch lanes at halfway and after finish line
        - maybe do lanes in a different way
+       - big explosions, particles with no random
 
 
 - transfer over new shadowmaps

@@ -408,6 +408,12 @@ export default class PointClass
         this.z*=f;
     }
     
+    scaleXZ(f)
+    {
+        this.x*=f;
+        this.z*=f;
+    }
+    
     scaleFromPoint(pnt,scale)
     {
         this.x=((this.x-pnt.x)*scale.x)+pnt.x;

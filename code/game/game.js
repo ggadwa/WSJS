@@ -531,6 +531,11 @@ export default class GameClass
     startSequence(name)
     {
         this.currentSequence=this.sequences.get(name);
+        if (this.currentSequence===null) {
+            console.log('Unknown sequence: '+name);
+            return;
+        }
+        
         this.currentSequence.start();
     }
     

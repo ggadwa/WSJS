@@ -23,6 +23,7 @@ export default class EntityProjectileClass extends EntityClass
         this.canRoll=false;
         this.rollDeceleration=0;
         this.bounceFactor=0;
+        this.reflectFactor=0;
         this.trackList=null;
         this.trackMaxAngle=0;
         this.trackSpeed=0;
@@ -71,6 +72,8 @@ export default class EntityProjectileClass extends EntityClass
         this.canRoll=this.core.game.lookupValue(this.json.config.canRoll,this.data,false);
         this.rollDeceleration=this.core.game.lookupValue(this.json.config.rollDeceleration,this.data,0);
         this.bounceFactor=this.core.game.lookupValue(this.json.config.bounceFactor,this.data,0);
+        this.reflectFactor=this.core.game.lookupValue(this.json.config.reflectFactor,this.data,0);
+        this.canBeClimbed=this.core.game.lookupValue(this.json.config.canBeClimbed,this.data,false);
         
         this.trackList=(this.json.config.trackList===undefined)?null:this.json.config.trackList;
         this.trackMaxAngle=this.core.game.lookupValue(this.json.config.trackMaxAngle,this.data,360);
@@ -190,7 +193,7 @@ export default class EntityProjectileClass extends EntityClass
         this.combinedMotion.setFromAddPoint(this.motion,this.trackMotion);
         
         if (!this.stopped) this.moveInMapXZ(this.combinedMotion,false,false);
-        this.moveInMapY(this.combinedMotion,1.0,this.floats);
+        this.motion.y=this.moveInMapY(this.combinedMotion,1.0,this.floats);
        
             // hitting floor
             // we can either start rolling, stop, or finish
@@ -239,10 +242,13 @@ export default class EntityProjectileClass extends EntityClass
             // hitting wall
 
         if (this.collideWallMeshIdx!==-1) {
+            
             if (this.stopOnHit) {
                 this.finish();
                 return;
             }
+            
+            if (this.stopped) return;
             
             this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.reflectSound);
             
@@ -250,10 +256,19 @@ export default class EntityProjectileClass extends EntityClass
             
             if (this.canReflect) {
                 this.wallReflect(this.motion);
+                this.motion.scaleXZ(this.reflectFactor);
+                this.motion.trunc();
+                
+                if ((Math.abs(this.motion.x)+Math.abs(this.motion.z))<1) {
+                    this.motion.x=0;
+                    this.motion.z=0;
+                    this.stopped=true;
+                }
             }
             else {
                 this.motion.setFromValues(0,0,0);
             }
+            
             return;
         }
         
@@ -267,13 +282,24 @@ export default class EntityProjectileClass extends EntityClass
                 return;
             }
             
-            if (!this.stopped) {
-                this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.reflectSound);
+            if (this.stopped) return;
+            
+            this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.reflectSound);
 
-                this.position.setFromPoint(this.savePoint);
-                this.motion.x=0;
-                this.motion.z=0;
-                
+            this.position.setFromPoint(this.savePoint);
+
+            if (this.canReflect) {
+                this.motion.scaleXZ(-this.reflectFactor);   // always go directly back
+                this.motion.trunc();
+
+                if ((Math.abs(this.motion.x)+Math.abs(this.motion.z))<1) {
+                    this.motion.x=0;
+                    this.motion.z=0;
+                    this.stopped=true;
+                }
+            }
+            else {
+                this.motion.setFromValues(0,0,0);
                 this.stopped=true;
             }
 

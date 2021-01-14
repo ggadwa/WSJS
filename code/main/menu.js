@@ -15,6 +15,13 @@ export default class MenuClass
         this.color=new ColorClass(this.core.json.title.menu.color.r,this.core.json.title.menu.color.g,this.core.json.title.menu.color.b);
         this.highlightColor=new ColorClass(this.core.json.title.menu.highlightColor.r,this.core.json.title.menu.highlightColor.g,this.core.json.title.menu.highlightColor.b);
         
+        this.alignX=0;
+        if (this.core.json.title.menu.alignX==='left') this.alignX=-1;
+        if (this.core.json.title.menu.alignX==='right') this.alignX=1;
+        this.alignY=0;
+        if (this.core.json.title.menu.alignY==='top') this.alignY=-1;
+        if (this.core.json.title.menu.alignY==='bottom') this.alignY=1;
+        
         this.rect=new RectClass(0,0,0,0);
         
         Object.seal(this);
@@ -26,15 +33,46 @@ export default class MenuClass
     
     async initialize()
     {
-        let n,y,high,itemCount,text;
+        let n,x,y,high,margin,align,itemCount,text;
         let textSize=this.core.json.title.menu.textSize;
         
         itemCount=this.items.length;
-        high=textSize+Math.trunc(textSize*0.1);
-        y=(Math.trunc(this.core.canvas.height*0.5)-Math.trunc((high*itemCount)*0.5))+textSize;
+        margin=Math.trunc(textSize*0.1)
+        high=textSize+margin;
         
-        for (n=0;n!==this.items.length;n++) {    
-            text=new TextClass(this.core,this.items[n][1],Math.trunc(this.core.canvas.width*0.5),y,textSize,this.core.TEXT_ALIGN_CENTER,this.color,1,false);
+            // the alignment
+            
+        switch (this.alignX) {
+            case -1:
+                x=margin;
+                align=this.core.TEXT_ALIGN_LEFT;
+                break;
+            case 0:
+                x=Math.trunc(this.core.canvas.width*0.5);
+                align=this.core.TEXT_ALIGN_CENTER;
+                break;
+            case 1:
+                x=this.core.canvas.width-margin;
+                align=this.core.TEXT_ALIGN_RIGHT;
+                break;
+        }
+        
+        switch (this.alignY) {
+            case -1:
+                y=high+margin;
+                break;
+            case 0:
+                y=(Math.trunc(this.core.canvas.height*0.5)-Math.trunc((high*itemCount)*0.5))+textSize;
+                break;
+            case 1:
+                y=this.core.canvas.height-((high*(itemCount-1))+margin);
+                break;
+        }
+        
+            // the items
+        
+        for (n=0;n!==itemCount;n++) {    
+            text=new TextClass(this.core,this.items[n][1],x,y,textSize,align,this.color,1,false);
             text.initialize();
             this.texts.push(text);
             

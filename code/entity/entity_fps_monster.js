@@ -442,8 +442,6 @@ export default class EntityFPSMonsterClass extends EntityClass
             if (fromEntity===this) return;
         }
         
-        console.info(this.name+'='+damage);
-        
             // the damage and death
             
         this.health-=damage;
