@@ -20,7 +20,7 @@ export default class EffectCacheClass
     {
         let name,json;
         let resp,url;
-        let billboard,particle,bitmap;
+        let billboard,particle,globe,bitmap;
         let sound;
         
             // cache all items used for effects
@@ -70,7 +70,18 @@ export default class EffectCacheClass
                     this.bitmaps.set(name,bitmap);
                 }
             }
-                        
+            
+            if (json.globes!==undefined) {
+                for (globe of json.globes) {
+                    name=globe.bitmap;
+                    if (this.bitmaps.has(name)) continue;
+                    
+                    bitmap=new BitmapEffectClass(this.core,name);
+                    if (!(await bitmap.load())) return(false);
+                    this.bitmaps.set(name,bitmap);
+                }
+            }
+                       
                 // cache all sounds
                 
             if (json.sounds!==undefined) {

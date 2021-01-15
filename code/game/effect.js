@@ -2,6 +2,7 @@ import PointClass from '../utility/point.js';
 import ColorClass from '../utility/color.js';
 import BoundClass from '../utility/bound.js';
 import LightClass from '../light/light.js';
+import GlobeClass from '../utility/globe.js';
 
 class EffectChunkClass
 {
@@ -40,6 +41,12 @@ class EffectChunkClass
         this.particleCount=0;
         this.drawPoints=[];
         this.motionPoints=[];
+        
+            // globes
+            
+        this.radius=0;
+        this.uAdd=0;
+        this.vAdd=0;
         
             // waves
             
@@ -105,6 +112,7 @@ export default class EffectClass
     {
         this.CHUNK_BILLBOARD=0;
         this.CHUNK_PARTICLE=1;
+        this.CHUNK_GLOBE=2;
         
         this.core=core;
         this.spawnedBy=spawnedBy;
@@ -145,6 +153,8 @@ export default class EffectClass
         this.motionPoint=new PointClass(0,0,0);
         
         this.light=null;
+        
+        this.globe=new GlobeClass();            // this object contains vertexes and uvs for a globe
     }
     
     lookupValue(value)
@@ -154,11 +164,11 @@ export default class EffectClass
     
     initialize()
     {
-        let n,indexes,chunk,billboard,particle,bitmap;
+        let n,indexes,chunk,billboard,particle,globe,bitmap;
         let name,mode,drawMode,grid,gridPeriod,gridOffset;
         let wave,waveRandomStart,wavePeriod,waveSize;
         let pmx,pmy,pmz,dx,dy,dz,motionPoints,dist;
-        let vertexCount,indexCount;
+        let vertexCount,indexCount,globeVertexCount;
         let elementIdx,iIdx;
         let gl=this.core.gl;
         
@@ -185,6 +195,8 @@ export default class EffectClass
         indexCount=0;
         
         this.chunks=[];
+        
+            // billboard chunks
         
         if (this.json.billboards!==undefined) {
             
@@ -228,6 +240,8 @@ export default class EffectClass
                 indexCount+=6;
             }
         }
+        
+            // particle chunks
         
         if (this.json.particles!==undefined) {
             
@@ -281,6 +295,41 @@ export default class EffectClass
                     
                 vertexCount+=(particle.count*4);
                 indexCount+=(particle.count*6);
+            }
+        }
+        
+            // globe chunks
+        
+        if (this.json.globes!==undefined) {
+            
+            for (globe of this.json.globes) {
+                
+                    // setup the chunk
+
+                mode=this.lookupValue(globe.mode);
+                drawMode=this.DRAW_MODE_LIST.indexOf(mode);
+                if (drawMode===-1) {
+                    console.log(`Unknown effect draw mode: ${mode}`);
+                    return(false);
+                }
+                
+                
+                name=this.lookupValue(globe.bitmap);
+                bitmap=this.core.game.effectCache.getBitmap(name);
+                if (bitmap===undefined) {
+                    console.log(`Unknown effect bitmap: ${name}`);
+                    return(false);
+                }
+                
+                globeVertexCount=Math.trunc(this.globe.vertexes.length/3);
+                chunk=new EffectChunkClass(this.CHUNK_GLOBE,bitmap,globeVertexCount,drawMode,globe.frames);
+                
+                this.chunks.push(chunk);
+                    
+                    // count quads
+                    
+                vertexCount+=globeVertexCount;
+                indexCount+=globeVertexCount;
             }
         }
 
@@ -337,6 +386,12 @@ export default class EffectClass
                             indexes[iIdx++]=elementIdx+2;
                             indexes[iIdx++]=elementIdx+3;
                             elementIdx+=4;
+                        }
+                        break;
+                        
+                    case this.CHUNK_GLOBE:
+                        for (n=0;n!==chunk.indexCount;n++) {
+                            indexes[iIdx++]=elementIdx++;
                         }
                         break;
                 }
@@ -460,6 +515,25 @@ export default class EffectClass
 
         this.uvs[this.uvIdx++]=u;
         this.uvs[this.uvIdx++]=v+chunk.vSize;
+    }
+    
+    addGlobeToVertexList(chunk)
+    {
+        let n,radius,vIdx,uvIdx;
+        
+        vIdx=0;
+        uvIdx=0;
+        
+        radius=chunk.radius*0.5;
+
+        for (n=0;n!==chunk.indexCount;n++) {
+            this.vertexes[this.vertexIdx++]=this.position.x+(radius*this.globe.vertexes[vIdx++]);
+            this.vertexes[this.vertexIdx++]=this.position.y+(radius*this.globe.vertexes[vIdx++]);
+            this.vertexes[this.vertexIdx++]=this.position.z+(radius*this.globe.vertexes[vIdx++]);
+
+            this.uvs[this.uvIdx++]=this.globe.uvs[uvIdx++]+chunk.uAdd;
+            this.uvs[this.uvIdx++]=this.globe.uvs[uvIdx++]+chunk.vAdd;
+        }
     }
     
         //
@@ -626,6 +700,9 @@ export default class EffectClass
         if (startFrame.width!==undefined) chunk.width=startFrame.width+Math.trunc((endFrame.width-startFrame.width)*f);
         if (startFrame.height!==undefined) chunk.height=startFrame.height+Math.trunc((endFrame.height-startFrame.height)*f);
         if (startFrame.rotate!==undefined) chunk.rotate=startFrame.rotate+((endFrame.rotate-startFrame.rotate)*f);
+        if (startFrame.radius!==undefined) chunk.radius=startFrame.radius+((endFrame.radius-startFrame.radius)*f);
+        if (startFrame.uAdd!==undefined) chunk.uAdd=startFrame.uAdd+((endFrame.uAdd-startFrame.uAdd)*f);
+        if (startFrame.vAdd!==undefined) chunk.vAdd=startFrame.vAdd+((endFrame.vAdd-startFrame.vAdd)*f);
         
         chunk.alpha=startFrame.alpha+((endFrame.alpha-startFrame.alpha)*f);
         chunk.color.r=startFrame.color.r+((endFrame.color.r-startFrame.color.r)*f);
@@ -739,6 +816,10 @@ export default class EffectClass
                     for (n=0;n!==chunk.particleCount;n++) {
                         this.addQuadToVertexList(chunk,chunk.drawPoints[n]);
                     }
+                    break;
+                    
+                case this.CHUNK_GLOBE:
+                    this.addGlobeToVertexList(chunk);
                     break;
             }
         }

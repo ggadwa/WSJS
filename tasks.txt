@@ -2,10 +2,7 @@
 - menu select change noise
 - profile chrome/safari
 
-- kart - if nobody around, can switch lanes at halfway and after finish line
-       - maybe do lanes in a different way
-       - big explosions, particles with no random
-
+- kart - gl error on effects
 
 - transfer over new shadowmaps
 
