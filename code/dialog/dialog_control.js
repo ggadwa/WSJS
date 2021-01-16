@@ -460,7 +460,8 @@ export default class DialogControlClass
         this.value=hx;
         
         this.dialog.currentTextInputControl=null;
-        return(false);
+        
+        return(true);
     }
         
     drawRange(y)

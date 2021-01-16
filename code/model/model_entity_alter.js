@@ -313,11 +313,10 @@ export default class ModelEntityAlterClass
     
     setupNodesToPose()
     {
-        let n,tick;
-        let animation,channels,channel,node;
+        let tick;
+        let animation,channel,node;
         
         animation=this.entity.model.skeleton.animation;
-        channels=animation.channels;
         
             // the global animation tick
             
@@ -329,8 +328,7 @@ export default class ModelEntityAlterClass
         
             // each channel changes one node over time
             
-        for (n=0;n!==channels.length;n++) {
-            channel=channels[n];
+        for (channel of animation.channels) {
             node=this.nodes[channel.nodeIdx];
             
                 // calculate the pose
@@ -341,13 +339,13 @@ export default class ModelEntityAlterClass
             
             switch (channel.trsType) {
                 case channel.TRS_TYPE_TRANSLATION:
-                    node.poseTranslation.setFromValues(this.currentAnimationData[0],this.currentAnimationData[1],this.currentAnimationData[2]);
+                    node.poseTranslation.setFromArray(this.currentAnimationData);
                     break;
                 case channel.TRS_TYPE_ROTATION:
-                    node.poseRotation.setFromValues(this.currentAnimationData[0],this.currentAnimationData[1],this.currentAnimationData[2],this.currentAnimationData[3]);
+                    node.poseRotation.setFromArray(this.currentAnimationData);
                     break;
                 case channel.TRS_TYPE_SCALE:
-                    node.poseScale.setFromValues(this.currentAnimationData[0],this.currentAnimationData[1],this.currentAnimationData[2]);
+                    node.poseScale.setFromArray(this.currentAnimationData);
                     break;
             }
         }

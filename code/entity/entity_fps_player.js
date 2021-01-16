@@ -780,7 +780,8 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.modelEntityAlter.scale.setFromPoint(this.scale);
         this.modelEntityAlter.inCameraSpace=false;
 
-        return(!this.core.game.camera.isFirstPerson());
+        if (this.core.game.camera.isFirstPerson()) return(false);
+        return(this.modelEntityAlter.boundBoxInFrustum());
     }
 }
 

@@ -1,8 +1,12 @@
 
-- menu select change noise
+
 - profile chrome/safari
 
-- kart - gl error on effects
+- fix slow animation routines (if possible)
+- make bob & larry versions
+- make in core.json a section for characters -- has name, model & changes section (.addHealth etc)
+- picker for new models in multiplayer
+
 
 - transfer over new shadowmaps
 

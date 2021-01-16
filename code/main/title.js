@@ -24,6 +24,7 @@ export default class TitleClass
         
         this.clickDown=false;
         this.clickSound=null;
+        this.selectSound=null;
         
         this.menu=null;
         
@@ -38,12 +39,16 @@ export default class TitleClass
     {
         let items=[];
         
-            // click audio
+            // audio
             // will share with dialogs
             
         this.clickSound=new SoundClass(this.core,this.core.json.title.clickSound);
         this.clickSound.initialize();
         if (!(await this.clickSound.load())) return(false);
+        
+        this.selectSound=new SoundClass(this.core,this.core.json.title.selectSound);
+        this.selectSound.initialize();
+        if (!(await this.selectSound.load())) return(false);
         
             // the menu
         
@@ -60,6 +65,8 @@ export default class TitleClass
     
     release()
     {
+        this.clickSound.release();
+        this.selectSound.release();
         this.menu.release();
     }
     

@@ -173,7 +173,7 @@ export default class EffectClass
         let gl=this.core.gl;
         
         this.startTimestamp=this.core.game.timestamp;
-        
+       
             // get the named json
             
         this.json=this.core.game.effectCache.getJson(this.jsonName);
@@ -181,7 +181,7 @@ export default class EffectClass
             console.log(`Unknown effect: ${this.jsonName}`);
             return(false);
         }
-        
+
             // lights
             
         if (this.json.light!==undefined) {
@@ -414,7 +414,7 @@ export default class EffectClass
         }
         
         if (this.json.damage!==undefined) this.core.game.map.entityList.damageForRadius(this.spawnedBy,this.position,this.json.damage.distance,this.json.damage.damage);
-       
+
         return(true);
     }
     

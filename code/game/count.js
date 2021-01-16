@@ -114,6 +114,7 @@ export default class CountClass
     
     draw()
     {
+        let drawCount;
         let shader=this.core.shaderList.interfaceShader;
         let gl=this.core.gl;
         
@@ -136,9 +137,15 @@ export default class CountClass
         
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
         
+            // in case count goes over or under max
+            
+        drawCount=this.count;
+        if (drawCount<0) drawCount=0;
+        if (drawCount>this.maxCount) drawCount=this.maxCount;
+        
             // draw the quads
             
-        if (this.count>0) {
+        if (drawCount>0) {
             if (this.onColor===null) {
                 gl.uniform4f(shader.colorUniform,1,1,1,this.onAlpha);
             }
@@ -146,9 +153,9 @@ export default class CountClass
                 gl.uniform4f(shader.colorUniform,this.onColor.r,this.onColor.g,this.onColor.b,this.onAlpha);
             }
         
-            gl.drawElements(gl.TRIANGLES,(this.count*6),gl.UNSIGNED_SHORT,0);
+            gl.drawElements(gl.TRIANGLES,(drawCount*6),gl.UNSIGNED_SHORT,0);
         }
-        if ((this.count<this.maxCount) && (this.offAlpha>0)) {
+        if ((drawCount<this.maxCount) && (this.offAlpha>0)) {
             if (this.onColor===null) {
                 gl.uniform4f(shader.colorUniform,1,1,1,this.offAlpha);
             }
@@ -156,7 +163,7 @@ export default class CountClass
                 gl.uniform4f(shader.colorUniform,this.offColor.r,this.offColor.g,this.offColor.b,this.offAlpha);
             }
         
-            gl.drawElements(gl.TRIANGLES,((this.maxCount-this.count)*6),gl.UNSIGNED_SHORT,((this.count*6)*2));
+            gl.drawElements(gl.TRIANGLES,((this.maxCount-drawCount)*6),gl.UNSIGNED_SHORT,((drawCount*6)*2));
         }
 
             // remove the buffers

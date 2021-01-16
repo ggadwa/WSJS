@@ -139,7 +139,7 @@ export default class EntityProjectileClass extends EntityClass
         
     run()
     {
-        let trackEntity;
+        let y,trackEntity;
         
         super.run();
         
@@ -168,7 +168,13 @@ export default class EntityProjectileClass extends EntityClass
             trackEntity=this.core.game.map.entityList.findClosestWithMaxAngle(this.position,this.angle,this.trackList,this.trackMaxAngle);
             if ((trackEntity!==null) && (trackEntity!==this.spawnedBy)) {
                 this.trackMotion.x=Math.sign(trackEntity.position.x-this.position.x)*this.trackSpeed;
-                this.trackMotion.y=Math.sign(trackEntity.position.y-this.position.y)*this.trackSpeed;
+                if (this.followsFloor) {
+                    this.trackMotion.y=0;
+                }
+                else {
+                    y=trackEntity.position.y+Math.trunc(trackEntity.height);
+                    this.trackMotion.y=Math.sign(y-this.position.y)*this.trackSpeed;
+                }
                 this.trackMotion.z=Math.sign(trackEntity.position.z-this.position.z)*this.trackSpeed;
             }
         }
@@ -193,8 +199,10 @@ export default class EntityProjectileClass extends EntityClass
         this.combinedMotion.setFromAddPoint(this.motion,this.trackMotion);
         
         if (!this.stopped) this.moveInMapXZ(this.combinedMotion,false,false);
-        this.motion.y=this.moveInMapY(this.combinedMotion,1.0,this.floats);
+        y=this.moveInMapY(this.combinedMotion,1.0,this.floats);
        
+        if (!this.floats) this.motion.y=y;
+        
             // hitting floor
             // we can either start rolling, stop, or finish
 
@@ -358,7 +366,7 @@ export default class EntityProjectileClass extends EntityClass
         this.modelEntityAlter.scale.setFromPoint(this.scale);
         this.modelEntityAlter.inCameraSpace=false;
 
-        return(true);
+        return(this.modelEntityAlter.boundBoxInFrustum());
     }
 }
 

@@ -201,14 +201,14 @@ export default class DialogBaseClass
             if (control.controlType===this.CONTROL_TYPE_HEADER) {
                 show=(this.currentOpenHeaderControl===control);
                 if (control.click()) {
-                    this.core.audio.soundStartUI(this.core.title.clickSound);
+                    this.core.audio.soundStartUI(this.core.title.selectSound);
                     return(null);
                 }
             }
             else {
                 if (show) {
                     if (control.click()) {
-                        this.core.audio.soundStartUI(this.core.title.clickSound);
+                        this.core.audio.soundStartUI(this.core.title.selectSound);
                         return(null);
                     }
                 }

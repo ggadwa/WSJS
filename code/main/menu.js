@@ -24,6 +24,8 @@ export default class MenuClass
         
         this.rect=new RectClass(0,0,0,0);
         
+        this.currentSelectIndex=-1;
+        
         Object.seal(this);
     }
     
@@ -81,6 +83,8 @@ export default class MenuClass
             y+=high;
         }
         
+        this.currentSelectIndex=-1;
+        
         return(true);
     }
     
@@ -123,11 +127,15 @@ export default class MenuClass
         
     draw()
     {
-        let n,text;
+        let n,text,selectIdx;
         let textSize=this.core.json.title.menu.textSize;
         let highlightTextSize=this.core.json.title.menu.highlightTextSize;
             
+            // draw the list
+            
         this.core.shaderList.textShader.drawStart();
+        
+        selectIdx=-1;
         
         for (n=0;n!==this.texts.length;n++) {
             text=this.texts[n];
@@ -135,6 +143,7 @@ export default class MenuClass
             if (this.cursorInItemForIndex(n)) {
                 text.fontSize=highlightTextSize;
                 text.color=this.highlightColor;
+                selectIdx=n;
             }
             else {
                 text.fontSize=textSize;
@@ -145,6 +154,16 @@ export default class MenuClass
         }
         
         this.core.shaderList.textShader.drawEnd();
+        
+            // noise is select changes
+            
+        if (selectIdx!==-1) {
+            if (selectIdx!==this.currentSelectIndex) {
+                this.core.audio.soundStartUI(this.core.title.selectSound);
+            }
+        }
+        
+        this.currentSelectIndex=selectIdx;
     }
     
 }

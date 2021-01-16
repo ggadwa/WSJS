@@ -742,7 +742,7 @@ export default class EntityFPSBotClass extends EntityClass
         this.modelEntityAlter.scale.setFromPoint(this.scale);
         this.modelEntityAlter.inCameraSpace=false;
 
-        return(true);
+        return(this.modelEntityAlter.boundBoxInFrustum());
     }
 }
 

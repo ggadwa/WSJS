@@ -34,6 +34,14 @@ export default class QuaternionClass
         this.w=quat.w;
     }
     
+    setFromArray(arr)
+    {
+        this.x=arr[0];
+        this.y=arr[1];
+        this.z=arr[2];
+        this.w=arr[3];
+    }
+    
     setFromVectorAndAngle(x,y,z,ang)
     {
         let rd=ang*(Math.PI/180.0);

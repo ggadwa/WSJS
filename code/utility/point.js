@@ -23,6 +23,13 @@ export default class PointClass
         this.z=pnt.z;
     }
     
+    setFromArray(arr)
+    {
+        this.x=arr[0];
+        this.y=arr[1];
+        this.z=arr[2];
+    }
+    
     setFromAddPoint(pt1,pt2)
     {
         this.x=pt1.x+pt2.x;
