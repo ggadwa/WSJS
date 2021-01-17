@@ -16,26 +16,52 @@ export default class DialogMultiplayerClass extends DialogBaseClass
     
     initialize()
     {
+        let x,y,y2,xAdd;
+        
         if (!super.initialize()) return(false);
+        
+            // tabs
+            
+        this.addDialogTab('profile','Profile',false);
+        this.addDialogTab('server','Server',true);
+        this.addDialogTab('bot','Bots',false);
         
             // dialog buttons
             
-        if (!this.addDialogButton('cancel',0.755,0.93,0.1,0.05,'Cancel',false)) return(false);
-        if (!this.addDialogButton('localGame',0.01,0.93,0.125,0.05,'Local Game',false)) return(false);
-        if (!this.addDialogButton('joinGame',0.865,0.93,0.125,0.05,'Join Game',true)) return(false);
+        this.addDialogButton('cancel',0.755,0.93,0.1,0.05,'Cancel',false);
+        this.addDialogButton('localGame',0.01,0.93,0.125,0.05,'Local Game',false);
+        this.addDialogButton('joinGame',0.865,0.93,0.125,0.05,'Join Game',true);
         
             // profile controls
             
-        if (!this.addDialogControl(this,'headProfile',this.CONTROL_TYPE_HEADER,'Profile',null)) return(false);
-        if (!this.addDialogControl(this,'name',this.CONTROL_TYPE_TEXT,'Name:',null)) return(false);
+        x=Math.trunc(this.core.canvas.width*0.5);
+        y=this.DIALOG_CONTROL_TOP_MARGIN;
+        y+=this.addDialogControlText(this,'profile','name',x,y,'Name:');
+        y+=this.addDialogControlCharacterPicker(this,'profile','character',(x+5),y);
         
-            // multiplayer controls
+            // server controls
             
-        if (!this.addDialogControl(this,'headMultiplayer',this.CONTROL_TYPE_HEADER,'Multiplayer',null)) return(false);
-        if (!this.addDialogControl(this,'localMap',this.CONTROL_TYPE_LIST,'Local Map:',this.core.json.multiplayerMaps)) return(false);
-        if (!this.addDialogControl(this,'botCount',this.CONTROL_TYPE_LIST,'Bot Count:',[0,1,2,3,4,5,6,7,8,9])) return(false);
-        if (!this.addDialogControl(this,'botSkill',this.CONTROL_TYPE_LIST,'Bot Skill:',['Easy','Moderate','Normal','Skilled','Hard'])) return(false);
-        if (!this.addDialogControl(this,'serverURL',this.CONTROL_TYPE_TEXT,'Server URL:',null)) return(false);
+        y=this.DIALOG_CONTROL_TOP_MARGIN;
+        y+=this.addDialogControlList(this,'server','localMap',x,y,'Local Map:',this.core.json.multiplayerMaps);
+        y+=this.addDialogControlText(this,'server','serverURL',x,y,'Server URL:');
+        
+            // bot controls
+            
+        xAdd=Math.trunc(this.core.canvas.width/5);
+        x=Math.trunc(xAdd*0.25);
+        y=this.DIALOG_CONTROL_TOP_MARGIN;
+        
+        y2=y+this.addDialogControlCharacterPicker(this,'bot','bot0',x,y);
+        this.addDialogControlCharacterPicker(this,'bot','bot1',(x+xAdd),y);
+        this.addDialogControlCharacterPicker(this,'bot','bot2',(x+(xAdd*2)),y);
+        this.addDialogControlCharacterPicker(this,'bot','bot3',(x+(xAdd*3)),y);
+        this.addDialogControlCharacterPicker(this,'bot','bot4',(x+(xAdd*4)),y);
+        
+        this.addDialogControlCharacterPicker(this,'bot','bot5',x,y2);
+        this.addDialogControlCharacterPicker(this,'bot','bot6',(x+xAdd),y2);
+        this.addDialogControlCharacterPicker(this,'bot','bot7',(x+(xAdd*2)),y2);
+        this.addDialogControlCharacterPicker(this,'bot','bot8',(x+(xAdd*3)),y2);
+        this.addDialogControlCharacterPicker(this,'bot','bot9',(x+(xAdd*4)),y2);
         
         return(true);
     }
@@ -46,9 +72,8 @@ export default class DialogMultiplayerClass extends DialogBaseClass
         
     loadDialogControls()
     {
-            // open header and no selected text
+            // no selected text
             
-        this.currentOpenHeaderControl=this.controls.get('headMultiplayer');
         this.currentTextInputControl=null;
         
             // the values
@@ -56,8 +81,8 @@ export default class DialogMultiplayerClass extends DialogBaseClass
         this.setDialogControl('name',this.core.setup.name);
         
         this.setDialogControl('localMap',this.core.setup.localMap);
-        this.setDialogControl('botCount',this.core.setup.botCount);
-        this.setDialogControl('botSkill',this.core.setup.botSkill);
+        //this.setDialogControl('botCount',this.core.setup.botCount);
+        //this.setDialogControl('botSkill',this.core.setup.botSkill);
         this.setDialogControl('serverURL',this.core.setup.serverURL);
     }
     
@@ -66,8 +91,8 @@ export default class DialogMultiplayerClass extends DialogBaseClass
         this.core.setup.name=this.getDialogControl('name');
         
         this.core.setup.localMap=this.getDialogControl('localMap');
-        this.core.setup.botCount=this.getDialogControl('botCount');
-        this.core.setup.botSkill=this.getDialogControl('botSkill');
+        //this.core.setup.botCount=this.getDialogControl('botCount');
+        //this.core.setup.botSkill=this.getDialogControl('botSkill');
         this.core.setup.serverURL=this.getDialogControl('serverURL');
         
         this.core.setup.save();

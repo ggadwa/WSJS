@@ -19,17 +19,24 @@ export default class DialogPromptClass extends DialogBaseClass
     
     initialize()
     {
+        let x,y;
+        
         if (!super.initialize()) return(false);
+        
+            // tabs
+            
+        this.addDialogTab('prompt','Prompt',true);
         
             // dialog buttons
             
-        if (!this.addDialogButton('cancel',0.78,0.93,0.1,0.05,'Cancel',false)) return(false);
-        if (!this.addDialogButton('ok',0.89,0.93,0.1,0.05,'Ok',true)) return(false);
+        this.addDialogButton('cancel',0.78,0.93,0.1,0.05,'Cancel',false);
+        this.addDialogButton('ok',0.89,0.93,0.1,0.05,'Ok',true);
         
             // prompt controls
             
-        if (!this.addDialogControl(this,'headPrompt',this.CONTROL_TYPE_HEADER,'',null)) return(false);
-        if (!this.addDialogControl(this,'promptValue',this.CONTROL_TYPE_TEXT,'',null)) return(false);
+        x=Math.trunc(this.core.canvas.width*0.5);
+        y=this.DIALOG_CONTROL_TOP_MARGIN;
+        y+=this.addDialogControlText(this,'prompt','promptValue',x,y,'');
         
         return(true);
     }
@@ -40,8 +47,6 @@ export default class DialogPromptClass extends DialogBaseClass
         
     loadDialogControls()
     {
-        this.currentOpenHeaderControl=this.controls.get('headPrompt');
-        
             // only a single text value, which is always selected
 
         this.setDialogControl('promptValue',this.valueObj[this.valuePropName]);
@@ -59,7 +64,7 @@ export default class DialogPromptClass extends DialogBaseClass
         
     setup(title,valueTitle,valueObj,valuePropName)
     {
-        this.controls.get('headPrompt').titleText.str=title;
+        this.tabs.get('prompt').text.str=title;
         this.controls.get('promptValue').titleText.str=valueTitle+':';
         this.valueObj=valueObj;
         this.valuePropName=valuePropName;

@@ -1,6 +1,11 @@
 import SetupClass from '../main/setup.js';
+import DialogTabClass from '../dialog/dialog_tab.js';
 import DialogButtonClass from '../dialog/dialog_button.js';
-import DialogControlClass from '../dialog/dialog_control.js';
+import DialogControlTextClass from '../dialog/dialog_control_text.js';
+import DialogControlCheckboxClass from '../dialog/dialog_control_checkbox.js';
+import DialogControlRangeClass from '../dialog/dialog_control_range.js';
+import DialogControlListClass from '../dialog/dialog_control_list.js';
+import DialogControlCharacterPickerClass from '../dialog/dialog_control_character_picker.js';
 
 export default class DialogBaseClass
 {
@@ -8,24 +13,22 @@ export default class DialogBaseClass
     {
         this.core=core;
         
-        this.CONTROL_TYPE_HEADER=0;
-        this.CONTROL_TYPE_TEXT=1;
-        this.CONTROL_TYPE_CHECKBOX=2;
-        this.CONTROL_TYPE_RANGE=3;
-        this.CONTROL_TYPE_LIST=4;
+        this.DIALOG_CONTROL_TOP_MARGIN=50;
+        this.DIALOG_CONTROL_MARGIN=5;
         
         this.timestamp=0;
         this.lastSystemTimestamp=0;
         this.lastRunTimestamp=0;
         this.lastDrawTimestamp=0;
                 
+        this.tabs=new Map();
         this.controls=new Map();
         this.buttons=new Map();
         
         this.clickDown=false;
+        this.selectedTabId=null;
         this.defButtonId=null;
         
-        this.currentOpenHeaderControl=null;     // current open header in dialog
         this.currentTextInputControl=null;      // current text input in dialog
         
         // no seal, base class
@@ -37,15 +40,26 @@ export default class DialogBaseClass
     
     initialize()
     {
+        this.tabs.clear();
         this.controls.clear();
         this.buttons.clear();
+        
+        this.clickDown=false;
+        this.selectedTabId=null;
+        this.defButtonId=null;
         
         return(true);
     }
     
     release()
     {
-        let control,button;
+        let tab,control,button;
+        
+            // tabs
+            
+        for (tab of this.tabs.values()) {
+            tab.release();
+        }
         
             // controls
             
@@ -61,18 +75,77 @@ export default class DialogBaseClass
     }
     
         //
+        // dialog tabs
+        //
+        
+    addDialogTab(id,title,selectedTab)
+    {
+        let tab;
+        
+        tab=new DialogTabClass(this.core,this.tabs.size,title);
+        tab.initialize();
+        this.tabs.set(id,tab);
+        
+        if (selectedTab) this.selectedTabId=id;
+    }
+    
+        //
         // dialog controls
         //
         
-    addDialogControl(dialog,id,controlType,title,list)
+    addDialogControlText(dialog,tabId,id,x,y,title)
     {
-        let control;
+        let control,high;
         
-        control=new DialogControlClass(this.core,dialog,controlType,title,list);
-        if (!control.initialize()) return(false);
+        control=new DialogControlTextClass(this.core,dialog,tabId,x,y,title);
+        high=control.initialize();
         this.controls.set(id,control);
         
-        return(true);
+        return(high+this.DIALOG_CONTROL_MARGIN);
+    }
+    
+    addDialogControlCheckbox(dialog,tabId,id,x,y,title)
+    {
+        let control,high;
+        
+        control=new DialogControlCheckboxClass(this.core,dialog,tabId,x,y,title);
+        high=control.initialize();
+        this.controls.set(id,control);
+        
+        return(high+this.DIALOG_CONTROL_MARGIN);
+    }
+    
+    addDialogControlRange(dialog,tabId,id,x,y,title)
+    {
+        let control,high;
+        
+        control=new DialogControlRangeClass(this.core,dialog,tabId,x,y,title);
+        high=control.initialize();
+        this.controls.set(id,control);
+        
+        return(high+this.DIALOG_CONTROL_MARGIN);
+    }
+    
+    addDialogControlList(dialog,tabId,id,x,y,title,list)
+    {
+        let control,high;
+        
+        control=new DialogControlListClass(this.core,dialog,tabId,x,y,title,list);
+        high=control.initialize();
+        this.controls.set(id,control);
+        
+        return(high+this.DIALOG_CONTROL_MARGIN);
+    }
+    
+    addDialogControlCharacterPicker(dialog,tabId,id,x,y)
+    {
+        let control,high;
+        
+        control=new DialogControlCharacterPickerClass(this.core,dialog,tabId,x,y);
+        high=control.initialize();
+        this.controls.set(id,control);
+        
+        return(high+this.DIALOG_CONTROL_MARGIN);
     }
     
     setDialogControl(id,value)
@@ -102,12 +175,10 @@ export default class DialogBaseClass
         let button;
         
         button=new DialogButtonClass(this.core,x,y,wid,high,title);
-        if (!button.initialize()) return(false);
+        button.initialize();
         this.buttons.set(id,button);
         
         if (defButton) this.defButtonId=id;
-        
-        return(true);
     }
     
     setDialogButtonShow(id,show)
@@ -157,10 +228,10 @@ export default class DialogBaseClass
         
     runInternal()
     {
-        let key,control,button,show;
+        let key,tab,control,button,show;
         
             // keyboard
-        
+            
         if (this.currentTextInputControl!==null) {
             key=this.core.input.keyGetLastRaw();
             if (key!==null) {
@@ -192,26 +263,27 @@ export default class DialogBaseClass
         
         if (!this.clickDown) return(null);
         this.clickDown=false;
+
+            // tabs
+
+        for ([key,tab] of this.tabs) {
+            if (tab.cursorInTab()) {
+                this.core.audio.soundStartUI(this.core.title.clickSound);
+                this.selectedTabId=key;
+                return(null);
+            }
+        }
         
             // controls
 
         show=false;
 
         for ([key,control] of this.controls) {
-            if (control.controlType===this.CONTROL_TYPE_HEADER) {
-                show=(this.currentOpenHeaderControl===control);
-                if (control.click()) {
-                    this.core.audio.soundStartUI(this.core.title.selectSound);
-                    return(null);
-                }
-            }
-            else {
-                if (show) {
-                    if (control.click()) {
-                        this.core.audio.soundStartUI(this.core.title.selectSound);
-                        return(null);
-                    }
-                }
+            if (control.tabId!==this.selectedTabId) continue;
+            
+            if (control.click()) {
+                this.core.audio.soundStartUI(this.core.title.selectSound);
+                return(null);
             }
         }
 
@@ -233,7 +305,7 @@ export default class DialogBaseClass
         
     draw()
     {
-        let y,key,control,button,show;
+        let key,tab,control,button,show;
         let gl=this.core.gl;
         
         this.core.orthoMatrix.setOrthoMatrix(this.core.canvas.width,this.core.canvas.height,-1.0,1.0);
@@ -250,23 +322,23 @@ export default class DialogBaseClass
             // background
          
         this.core.background.draw(true);
+        
+            // tabs
+            
+        for ([key,tab] of this.tabs) {
+            tab.draw(key===this.selectedTabId);
+        }
                     
             // controls
-            
-        y=5;
-
+   
         show=false;
 
         for ([key,control] of this.controls) {
-            if (control.controlType===this.CONTROL_TYPE_HEADER) {
-                show=(this.currentOpenHeaderControl===control);
-                y=control.draw(y);
-            }
-            else {
-                if (show) y=control.draw(y);
-            }
+            if (control.tabId===this.selectedTabId) control.draw();
         }
-        
+       
+            // buttons
+            
         for ([key,button] of this.buttons) {
             button.draw();
         }

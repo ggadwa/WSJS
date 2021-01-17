@@ -1,16 +1,20 @@
 
 
 - profile chrome/safari
-
 - fix slow animation routines (if possible)
-- make bob & larry versions
-- make in core.json a section for characters -- has name, model & changes section (.addHealth etc)
-- picker for new models in multiplayer
+
+- dialog
+   - going into game breaks keyboard control
+   - implement character pickers
+
+- multiplayer
+   - get rid of skill
+   - make multiple characters
+   - make in core.json a section for characters -- has name, model & changes section (.addHealth etc)
 
 
-- transfer over new shadowmaps
 
-
+- transfer over new shadowmaps to mac for later upload
 
 - menu by keys
 
@@ -20,10 +24,6 @@
 - kart = weird bug with laps near goal line
 - kart = going backwards
 - fps = pulses need to be in json
-
-    
-PHYSICS
-  - fix wacky bumping (if you bump but can't move fully, than completely stop motion -- check stairs)
 
 BOTS
    - run away if no ammo?

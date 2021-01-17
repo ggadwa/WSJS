@@ -16,55 +16,64 @@ export default class DialogSettingClass extends DialogBaseClass
     
     initialize()
     {
+        let x,y;
+        
         if (!super.initialize()) return(false);
+        
+            // tabs
+            
+        this.addDialogTab('video','Video',true);
+        this.addDialogTab('control','Controls',false);
+        this.addDialogTab('sound','Sounds',false);
         
             // dialog buttons
             
-        if (!this.addDialogButton('cancel',0.78,0.93,0.1,0.05,'Cancel',false)) return(false);
-        if (!this.addDialogButton('ok',0.89,0.93,0.1,0.05,'Ok',true)) return(false);
-        if (!this.addDialogButton('quit',0.01,0.93,0.125,0.05,'Quit to Title',false)) return(false);
+        this.addDialogButton('cancel',0.78,0.93,0.1,0.05,'Cancel',false);
+        this.addDialogButton('ok',0.89,0.93,0.1,0.05,'Ok',true);
+        this.addDialogButton('quit',0.01,0.93,0.125,0.05,'Quit to Title',false);
         
-            // profile controls
+            // video
             
-        if (!this.addDialogControl(this,'headVideo',this.CONTROL_TYPE_HEADER,'Video',null)) return(false);
-        if (!this.addDialogControl(this,'showFPS',this.CONTROL_TYPE_CHECKBOX,'Show FPS:',null)) return(false);
-        if (!this.addDialogControl(this,'fullScreen',this.CONTROL_TYPE_CHECKBOX,'Full Screen (requires restart):',null)) return(false);
-        if (!this.addDialogControl(this,'shadowmaps',this.CONTROL_TYPE_CHECKBOX,'Use Shadow Maps:',null)) return(false);
+        x=Math.trunc(this.core.canvas.width*0.5);
+        y=this.DIALOG_CONTROL_TOP_MARGIN;
+            
+        y+=this.addDialogControlCheckbox(this,'video','showFPS',x,y,'Show FPS:');
+        y+=this.addDialogControlCheckbox(this,'video','fullScreen',x,y,'Full Screen (requires restart):');
+        y+=this.addDialogControlCheckbox(this,'video','shadowmaps',x,y,'Use Shadow Maps:');
         
             // controls
             
+        y=this.DIALOG_CONTROL_TOP_MARGIN;
+            
         if (!this.core.input.hasTouch) {
-            if (!this.addDialogControl(this,'headMouse',this.CONTROL_TYPE_HEADER,'Mouse Controls',null)) return(false);
-
-            if (!this.addDialogControl(this,'mouseXSensitivity',this.CONTROL_TYPE_RANGE,'Mouse X Sensitivity:',null)) return(false);
-            if (!this.addDialogControl(this,'mouseXAcceleration',this.CONTROL_TYPE_RANGE,'Mouse X Acceleration:',null)) return(false);
-            if (!this.addDialogControl(this,'mouseXInvert',this.CONTROL_TYPE_CHECKBOX,'Invert Mouse X:',null)) return(false);
-            if (!this.addDialogControl(this,'mouseYSensitivity',this.CONTROL_TYPE_RANGE,'Mouse Y Sensitivity:',null)) return(false);
-            if (!this.addDialogControl(this,'mouseYAcceleration',this.CONTROL_TYPE_RANGE,'Mouse Y Acceleration:',null)) return(false);
-            if (!this.addDialogControl(this,'mouseYInvert',this.CONTROL_TYPE_CHECKBOX,'Invert Mouse Y:',null)) return(false);
+            y+=this.addDialogControlRange(this,'control','mouseXSensitivity',x,y,'Mouse X Sensitivity:');
+            y+=this.addDialogControlRange(this,'control','mouseXAcceleration',x,y,'Mouse X Acceleration:');
+            y+=this.addDialogControlCheckbox(this,'control','mouseXInvert',x,y,'Invert Mouse X:');
+            y+=this.addDialogControlRange(this,'control','mouseYSensitivity',x,y,'Mouse Y Sensitivity:');
+            y+=this.addDialogControlRange(this,'control','mouseYAcceleration',x,y,'Mouse Y Acceleration:');
+            y+=this.addDialogControlCheckbox(this,'control','mouseYInvert',x,y,'Invert Mouse Y:');
         }
         else {
-            if (!this.addDialogControl(this,'headTouch',this.CONTROL_TYPE_HEADER,'Touch Controls',null)) return(false);
-        
-            if (!this.addDialogControl(this,'touchStickLeftXDeadZone',this.CONTROL_TYPE_RANGE,'Left Touch Stick X Dead Zone:',null)) return(false);
-            if (!this.addDialogControl(this,'touchStickLeftXAcceleration',this.CONTROL_TYPE_RANGE,'Left Touch Stick X Acceleration:',null)) return(false);
-            if (!this.addDialogControl(this,'touchStickLeftYDeadZone',this.CONTROL_TYPE_RANGE,'Left Touch Stick Y Dead Zone:',null)) return(false);
-            if (!this.addDialogControl(this,'touchStickLeftYAcceleration',this.CONTROL_TYPE_RANGE,'Left Touch Stick Y Acceleration:',null)) return(false);
+            y+=this.addDialogControlRange(this,'control','touchStickLeftXDeadZone',x,y,'Left Touch Stick X Dead Zone:');
+            y+=this.addDialogControlRange(this,'control','touchStickLeftXAcceleration',x,y,'Left Touch Stick X Acceleration:');
+            y+=this.addDialogControlRange(this,'control','touchStickLeftYDeadZone',x,y,'Left Touch Stick Y Dead Zone:');
+            y+=this.addDialogControlRange(this,'control','touchStickLeftYAcceleration',x,y,'Left Touch Stick Y Acceleration:');
 
-            if (!this.addDialogControl(this,'touchStickRightXDeadZone',this.CONTROL_TYPE_RANGE,'Right Touch Stick X Dead Zone:',null)) return(false);
-            if (!this.addDialogControl(this,'touchStickRightXAcceleration',this.CONTROL_TYPE_RANGE,'Right Touch Stick X Acceleration:',null)) return(false);
-            if (!this.addDialogControl(this,'touchStickRightYDeadZone',this.CONTROL_TYPE_RANGE,'Right Touch Stick Y Dead Zone:',null)) return(false);
-            if (!this.addDialogControl(this,'touchStickRightYAcceleration',this.CONTROL_TYPE_RANGE,'Right Touch Stick Y Acceleration:',null)) return(false);
+            y+=this.addDialogControlRange(this,'control','touchStickRightXDeadZone',x,y,'Right Touch Stick X Dead Zone:');
+            y+=this.addDialogControlRange(this,'control','touchStickRightXAcceleration',x,y,'Right Touch Stick X Acceleration:');
+            y+=this.addDialogControlRange(this,'control','touchStickRightYDeadZone',x,y,'Right Touch Stick Y Dead Zone:');
+            y+=this.addDialogControlRange(this,'control','touchStickRightYAcceleration',x,y,'Right Touch Stick Y Acceleration:');
 
-            if (!this.addDialogControl(this,'snapLook',this.CONTROL_TYPE_CHECKBOX,'Snap Look:',null)) return(false);
+            y+=this.addDialogControlCheckbox(this,'control','snapLook',x,y,'Snap Look:',null);
         }
         
             // sound controls
             
-        if (!this.addDialogControl(this,'headSound',this.CONTROL_TYPE_HEADER,'Sound',null)) return(false);
-        if (!this.addDialogControl(this,'soundVolume',this.CONTROL_TYPE_RANGE,'Sound Volume:',null)) return(false);
-        if (!this.addDialogControl(this,'musicVolume',this.CONTROL_TYPE_RANGE,'Music Volume:',null)) return(false);
-        if (!this.addDialogControl(this,'musicOn',this.CONTROL_TYPE_CHECKBOX,'Music:',null)) return(false);
+        y=this.DIALOG_CONTROL_TOP_MARGIN;
+            
+        y+=this.addDialogControlRange(this,'sound','soundVolume',x,y,'Sound Volume:');
+        y+=this.addDialogControlRange(this,'sound','musicVolume',x,y,'Music Volume:');
+        y+=this.addDialogControlCheckbox(this,'sound','musicOn',x,y,'Music:');
         
         return(true);
     }
@@ -75,9 +84,8 @@ export default class DialogSettingClass extends DialogBaseClass
         
     loadDialogControls()
     {
-            // open header and no selected text
+            // no selected text
             
-        this.currentOpenHeaderControl=this.controls.get('headVideo');
         this.currentTextInputControl=null;
         
             // the values

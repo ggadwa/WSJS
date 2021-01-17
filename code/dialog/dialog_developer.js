@@ -16,19 +16,26 @@ export default class DialogDeveloperClass extends DialogBaseClass
     
     initialize()
     {
+        let x,y;
+        
         if (!super.initialize()) return(false);
+        
+            // tabs
+            
+        this.addDialogTab('developer','Developer',true);
         
             // dialog buttons
             
-        if (!this.addDialogButton('cancel',0.78,0.93,0.1,0.05,'Cancel',false)) return(false);
-        if (!this.addDialogButton('ok',0.89,0.93,0.1,0.05,'Ok',true)) return(false);
-        if (!this.addDialogButton('pathHints',0.01,0.93,0.2,0.05,'Build Path Hints',false)) return(false);
-        if (!this.addDialogButton('shadowMaps',0.22,0.93,0.2,0.05,'Build Shadow Maps',false)) return(false);
+        this.addDialogButton('cancel',0.78,0.93,0.1,0.05,'Cancel',false);
+        this.addDialogButton('ok',0.89,0.93,0.1,0.05,'Ok',true);
+        this.addDialogButton('pathHints',0.01,0.93,0.2,0.05,'Build Path Hints',false);
+        this.addDialogButton('shadowMaps',0.22,0.93,0.2,0.05,'Build Shadow Maps',false);
         
             // developer controls
             
-        if (!this.addDialogControl(this,'headDeveloper',this.CONTROL_TYPE_HEADER,'Developer',null)) return(false);
-        if (!this.addDialogControl(this,'skipShadowMapNormals',this.CONTROL_TYPE_CHECKBOX,'Skip Normals on Shadowmap Build:',null)) return(false);
+        x=Math.trunc(this.core.canvas.width*0.5);
+        y=this.DIALOG_CONTROL_TOP_MARGIN;
+        y+=this.addDialogControlCheckbox(this,'developer','skipShadowMapNormals',x,y,'Skip Normals on Shadowmap Build:');
         
         return(true);
     }
@@ -39,9 +46,8 @@ export default class DialogDeveloperClass extends DialogBaseClass
         
     loadDialogControls()
     {
-            // open header and no selected text
-            
-        this.currentOpenHeaderControl=this.controls.get('headDeveloper');
+            // no selected text
+
         this.currentTextInputControl=null;
         
             // the values
