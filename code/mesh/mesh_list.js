@@ -74,6 +74,18 @@ export default class MeshListClass
 
         return(-1);
     }
+    
+    findNext(name,startIdx)
+    {
+        let n;
+        let nMesh=this.meshes.length;
+
+        for (n=startIdx;n<nMesh;n++) {
+            if (this.meshes[n].name===name) return(n);
+        }
+
+        return(-1);
+    }
 
     delete(name)
     {

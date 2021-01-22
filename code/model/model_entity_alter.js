@@ -108,8 +108,15 @@ export default class ModelEntityAlterClass
         
     show(name,show)
     {
-        let meshIdx=this.entity.model.meshList.find(name);
-        if ((meshIdx!==-1) && (meshIdx<this.MAX_SHOW_HIDE_MESH_COUNT)) this.meshHideList[meshIdx]=show?0:1;
+        let meshIdx=0;
+        
+        while (true) {
+            meshIdx=this.entity.model.meshList.findNext(name,meshIdx);      // not meshes can have multiple ones with the same name, so find them all
+            if ((meshIdx===-1) || (meshIdx>=this.MAX_SHOW_HIDE_MESH_COUNT)) break;
+            this.meshHideList[meshIdx]=show?0:1;
+            
+            meshIdx++;
+        }
     }
     
     getUpdateNetworkShowData()
