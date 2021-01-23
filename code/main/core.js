@@ -13,6 +13,7 @@ import RectClass from '../utility/rect.js';
 import PlaneClass from '../utility/plane.js';
 import ColorClass from '../utility/color.js';
 import Matrix4Class from '../utility/matrix4.js';
+import CharacterListClass from '../main/character_list.js';
 import GameLoadClass from '../game/game_load.js';
 import GameClass from '../game/game.js';
 import DeveloperClass from '../developer/developer.js';
@@ -102,6 +103,10 @@ export default class CoreClass
             // the core.json
             
         this.json=null;
+        
+            // characters
+            
+        this.characterList=null;
         
             // title/dialog common interfaces
             
@@ -280,6 +285,11 @@ export default class CoreClass
         this.shaderList=new ShaderListClass(this);
         this.shaderList.initialize();
         
+            // characters
+            
+        this.characterList=new CharacterListClass(this);
+        if (!(await this.characterList.initialize())) return;
+        
             // main game class
             
         this.gameLoad=new GameLoadClass(this,data);
@@ -323,6 +333,7 @@ export default class CoreClass
         this.dialogMultiplayer.release();
         this.dialogDeveloper.release();
         this.dialogPrompt.release();
+        this.characterList.release();
         this.shaderList.release();
         this.cursor.release();
         this.background.release();

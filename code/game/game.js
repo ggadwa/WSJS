@@ -429,7 +429,7 @@ export default class GameClass
             this.currentMapName=this.lookupValue(this.core.json.startMap,this.data);
         }
         else {
-            this.currentMapName=this.core.json.multiplayerMaps[this.core.setup.localMap];
+            this.currentMapName=this.core.json.multiplayerMaps[this.core.setup.multiplayerLocalMap];
         }
     }
     

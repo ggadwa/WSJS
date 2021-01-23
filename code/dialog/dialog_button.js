@@ -96,7 +96,6 @@ export default class DialogButtonClass
         
     cursorInButton()
     {
-        if (!this.show) return(false);
         return((this.core.cursor.x>=this.lft) && (this.core.cursor.x<this.rgt) && (this.core.cursor.y>=this.top) && (this.core.cursor.y<this.bot));
     }
     
@@ -108,8 +107,6 @@ export default class DialogButtonClass
     {
         let shader=this.core.shaderList.colorShader;
         let gl=this.core.gl;
-        
-        if (!this.show) return;
         
         shader.drawStart();
             

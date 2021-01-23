@@ -172,20 +172,20 @@ export default class DialogSettingClass extends DialogBaseClass
         
     run()
     {
-        let buttonId=super.runInternal();
+        let id=super.runInternal();
 
-        if (buttonId==='cancel') {
+        if (id==='cancel') {
             this.core.switchLoop(this.core.previousLoop);
             return(false);
         }
 
-        if (buttonId==='ok') {
+        if (id==='ok') {
             this.saveDialogControls();
             this.core.switchLoop(this.core.previousLoop);
             return(false);
         }
         
-        if (buttonId==='quit') {
+        if (id==='quit') {
             this.core.game.exitGame=true;
             this.core.switchLoop(this.core.previousLoop);
             return(false);

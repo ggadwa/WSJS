@@ -199,7 +199,7 @@ export default class MapEntityListClass
         let entity,entityCount;
             
             // add any bots if it's a local multiplayer game
-            
+            /*
         if (this.core.game.multiplayerMode===this.core.game.MULTIPLAYER_MODE_LOCAL) {
             for (n=0;n!==this.core.setup.botCount;n++) {
                 nameIdx=n%this.core.json.bot.names.length;
@@ -207,7 +207,7 @@ export default class MapEntityListClass
                 if (this.addFromMap(this.core.json.bot.json,this.core.json.bot.names[nameIdx],new PointClass(0,0,0),new PointClass(0,0,0),null,true)===null) return(false);
             }
         }
-
+*/
             // initialize everything
             
         this.entityPlayerIdx=-1;

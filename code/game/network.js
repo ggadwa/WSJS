@@ -52,7 +52,7 @@ export default class NetworkClass
         
             // now connect
             
-        this.socket=new WebSocket('ws://'+this.core.setup.serverURL+':'+this.PORT);
+        this.socket=new WebSocket('ws://'+this.core.setup.multiplayerServerURL+':'+this.PORT);
         this.socket.addEventListener('open',this.open.bind(this));
         this.socket.addEventListener('close',this.close.bind(this));
         this.socket.addEventListener('message',this.message.bind(this));
@@ -133,7 +133,7 @@ export default class NetworkClass
         let dataView=new DataView(msg);
         
         dataView.setInt16(0,this.MESSAGE_TYPE_ENTITY_LOGON_REQUEST);
-        this.setStringInDataView(dataView,2,this.core.setup.name,this.USER_NAME_LENGTH);
+        this.setStringInDataView(dataView,2,this.core.setup.multiplayerName,this.USER_NAME_LENGTH);
         
         this.socket.send(msg);
     }

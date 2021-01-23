@@ -7,9 +7,6 @@ export default class DialogControlClass extends DialogControlBaseClass
     {
         super(core,dialog,tabId,x,y,null);
         
-        this.PICKER_WIDTH=128;
-        this.PICKER_HEIGHT=128;
-        
         this.colorArray=new Float32Array(16);
         
         this.vertexBuffer=null;
@@ -35,8 +32,8 @@ export default class DialogControlClass extends DialogControlBaseClass
             
         vertexArray[0]=vertexArray[6]=this.x;
         vertexArray[1]=vertexArray[3]=this.y;
-        vertexArray[2]=vertexArray[4]=this.x+this.PICKER_WIDTH;
-        vertexArray[5]=vertexArray[7]=this.y+this.PICKER_HEIGHT;
+        vertexArray[2]=vertexArray[4]=this.x+this.dialog.PICKER_SIZE;
+        vertexArray[5]=vertexArray[7]=this.y+this.dialog.PICKER_SIZE;
             
         this.vertexBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
@@ -95,7 +92,7 @@ export default class DialogControlClass extends DialogControlBaseClass
                 
     click()
     {
-        if ((this.core.cursor.x<this.x) || (this.core.cursor.x>(this.x+this.PICKER_WIDTH)) || (this.core.cursor.y<this.y) || (this.core.cursor.y>(this.y+this.PICKER_HEIGHT))) return(false);
+        if ((this.core.cursor.x<this.x) || (this.core.cursor.x>(this.x+this.dialog.PICKER_SIZE)) || (this.core.cursor.y<this.y) || (this.core.cursor.y>(this.y+this.dialog.PICKER_SIZE))) return(false);
         
         this.dialog.currentTextInputControl=this;
         this.core.input.keyClearLastRaw();
@@ -110,7 +107,7 @@ export default class DialogControlClass extends DialogControlBaseClass
         
             // no character fill
             
-        if (this.y<100) {
+        if (this.value==='') {
             shader=this.core.shaderList.colorShader;
             
             shader.drawStart();
@@ -153,7 +150,7 @@ export default class DialogControlClass extends DialogControlBaseClass
         
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
             
-            this.core.cursor.cursorBitmap.attach();
+            this.core.characterList.get(this.value).bitmap.attach();
             gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_SHORT,0);
             
             gl.bindBuffer(gl.ARRAY_BUFFER,null);

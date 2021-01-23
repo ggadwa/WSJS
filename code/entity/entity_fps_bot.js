@@ -110,12 +110,46 @@ export default class EntityFPSBotClass extends EntityClass
     initialize()
     {
         let n,weaponBlock,weaponEntity;
-        let skill;
         
         if (!super.initialize()) return(false);
         
-            // regular config
-            
+        this.healthInitialCount=this.core.game.lookupValue(this.json.config.healthInitialCount,this.data,0);
+        this.healthMaxCount=this.core.game.lookupValue(this.json.config.healthMaxCount,this.data,0);
+        this.armorInitialCount=this.core.game.lookupValue(this.json.config.armorInitialCount,this.data,0);
+        this.armorMaxCount=this.core.game.lookupValue(this.json.config.armorMaxCount,this.data,0);
+        
+        this.maxTurnSpeed=this.core.game.lookupValue(this.json.config.maxTurnSpeed,this.data,0);
+        
+        this.forwardAcceleration=this.core.game.lookupValue(this.json.config.forwardAcceleration,this.data,0);
+        this.forwardDeceleration=this.core.game.lookupValue(this.json.config.forwardDeceleration,this.data,0);
+        this.forwardMaxSpeed=this.core.game.lookupValue(this.json.config.forwardMaxSpeed,this.data,0);
+        this.backwardAcceleration=this.core.game.lookupValue(this.json.config.backwardAcceleration,this.data,0);
+        this.backwardDeceleration=this.core.game.lookupValue(this.json.config.backwardDeceleration,this.data,0);
+        this.backwardMaxSpeed=this.core.game.lookupValue(this.json.config.backwardMaxSpeed,this.data,0);
+        this.sideAcceleration=this.core.game.lookupValue(this.json.config.sideAcceleration,this.data,0);
+        this.sideDeceleration=this.core.game.lookupValue(this.json.config.sideDeceleration,this.data,0);
+        this.sideMaxSpeed=this.core.game.lookupValue(this.json.config.sideMaxSpeed,this.data,0);
+        this.swimAcceleration=this.core.game.lookupValue(this.json.config.swimAcceleration,this.data,0);
+        this.swimDeceleration=this.core.game.lookupValue(this.json.config.swimDeceleration,this.data,0);
+        this.swimMaxSpeed=this.core.game.lookupValue(this.json.config.swimMaxSpeed,this.data,0);
+        this.flyAcceleration=this.core.game.lookupValue(this.json.config.flyAcceleration,this.data,0);
+        this.flyDeceleration=this.core.game.lookupValue(this.json.config.flyDeceleration,this.data,0);
+        this.flyMaxSpeed=this.core.game.lookupValue(this.json.config.flyMaxSpeed,this.data,0);
+
+        this.jumpHeight=this.core.game.lookupValue(this.json.config.jumpHeight,this.data,0);
+        this.jumpWaterHeight=this.core.game.lookupValue(this.json.config.jumpWaterHeight,this.data,0);
+        this.damageFlinchWaitTick=this.core.game.lookupValue(this.json.config.damageFlinchWaitTick,this.data,0);
+        this.fallDamageMinDistance=this.core.game.lookupValue(this.json.config.fallDamageMinDistance,this.data,0);
+        this.fallDamagePercentage=this.core.game.lookupValue(this.json.config.fallDamagePercentage,this.data,0);
+        this.respawnWaitTick=this.core.game.lookupValue(this.json.config.respawnWaitTick,this.data,0);
+        
+        this.seekNodeDistanceSlop=this.core.game.lookupValue(this.json.config.seekNodeDistanceSlop,this.data,0);
+        this.seekNodeAngleSlop=this.core.game.lookupValue(this.json.config.seekNodeAngleSlop,this.data,0);
+        this.targetScanYRange=this.core.game.lookupValue(this.json.config.targetScanYRange,this.data,0);
+        this.targetForgetDistance=this.core.game.lookupValue(this.json.config.targetForgetDistance,this.data,0);
+        this.targetFireYRange=this.core.game.lookupValue(this.json.config.targetFireYRange,this.data,0);
+        this.targetFireSlop=this.core.game.lookupValue(this.json.config.targetFireSlop,this.data,0);
+        
         this.idleAnimation=this.core.game.lookupAnimationValue(this.json.animations.idleAnimation);
         this.waitAnimation=this.core.game.lookupAnimationValue(this.json.animations.waitAnimation);
         this.runAnimation=this.core.game.lookupAnimationValue(this.json.animations.runAnimation);
@@ -123,47 +157,6 @@ export default class EntityFPSBotClass extends EntityClass
         
         this.hurtSound=this.core.game.lookupSoundValue(this.json.sounds.hurtSound);
         this.dieSound=this.core.game.lookupSoundValue(this.json.sounds.dieSound);
-
-            // skill based config
-            
-        skill=this.json.config.skills[this.core.setup.botSkill];
-        
-        this.healthInitialCount=this.core.game.lookupValue(skill.healthInitialCount,this.data,0);
-        this.healthMaxCount=this.core.game.lookupValue(skill.healthMaxCount,this.data,0);
-        this.armorInitialCount=this.core.game.lookupValue(skill.armorInitialCount,this.data,0);
-        this.armorMaxCount=this.core.game.lookupValue(skill.armorMaxCount,this.data,0);
-        
-        this.maxTurnSpeed=this.core.game.lookupValue(skill.maxTurnSpeed,this.data,0);
-        
-        this.forwardAcceleration=this.core.game.lookupValue(skill.forwardAcceleration,this.data,0);
-        this.forwardDeceleration=this.core.game.lookupValue(skill.forwardDeceleration,this.data,0);
-        this.forwardMaxSpeed=this.core.game.lookupValue(skill.forwardMaxSpeed,this.data,0);
-        this.backwardAcceleration=this.core.game.lookupValue(skill.backwardAcceleration,this.data,0);
-        this.backwardDeceleration=this.core.game.lookupValue(skill.backwardDeceleration,this.data,0);
-        this.backwardMaxSpeed=this.core.game.lookupValue(skill.backwardMaxSpeed,this.data,0);
-        this.sideAcceleration=this.core.game.lookupValue(skill.sideAcceleration,this.data,0);
-        this.sideDeceleration=this.core.game.lookupValue(skill.sideDeceleration,this.data,0);
-        this.sideMaxSpeed=this.core.game.lookupValue(skill.sideMaxSpeed,this.data,0);
-        this.swimAcceleration=this.core.game.lookupValue(skill.swimAcceleration,this.data,0);
-        this.swimDeceleration=this.core.game.lookupValue(skill.swimDeceleration,this.data,0);
-        this.swimMaxSpeed=this.core.game.lookupValue(skill.swimMaxSpeed,this.data,0);
-        this.flyAcceleration=this.core.game.lookupValue(skill.flyAcceleration,this.data,0);
-        this.flyDeceleration=this.core.game.lookupValue(skill.flyDeceleration,this.data,0);
-        this.flyMaxSpeed=this.core.game.lookupValue(skill.flyMaxSpeed,this.data,0);
-
-        this.jumpHeight=this.core.game.lookupValue(skill.jumpHeight,this.data,0);
-        this.jumpWaterHeight=this.core.game.lookupValue(skill.jumpWaterHeight,this.data,0);
-        this.damageFlinchWaitTick=this.core.game.lookupValue(skill.damageFlinchWaitTick,this.data,0);
-        this.fallDamageMinDistance=this.core.game.lookupValue(skill.fallDamageMinDistance,this.data,0);
-        this.fallDamagePercentage=this.core.game.lookupValue(skill.fallDamagePercentage,this.data,0);
-        this.respawnWaitTick=this.core.game.lookupValue(skill.respawnWaitTick,this.data,0);
-        
-        this.seekNodeDistanceSlop=this.core.game.lookupValue(skill.seekNodeDistanceSlop,this.data,0);
-        this.seekNodeAngleSlop=this.core.game.lookupValue(skill.seekNodeAngleSlop,this.data,0);
-        this.targetScanYRange=this.core.game.lookupValue(skill.targetScanYRange,this.data,0);
-        this.targetForgetDistance=this.core.game.lookupValue(skill.targetForgetDistance,this.data,0);
-        this.targetFireYRange=this.core.game.lookupValue(skill.targetFireYRange,this.data,0);
-        this.targetFireSlop=this.core.game.lookupValue(skill.targetFireSlop,this.data,0);
         
         this.flying=false;
         

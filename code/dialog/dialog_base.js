@@ -13,8 +13,10 @@ export default class DialogBaseClass
     {
         this.core=core;
         
-        this.DIALOG_CONTROL_TOP_MARGIN=50;
+        this.DIALOG_CONTROL_TOP_MARGIN=55;
         this.DIALOG_CONTROL_MARGIN=5;
+        
+        this.PICKER_SIZE=128;           // needs to be outside so dialogs can calc some stuff
         
         this.timestamp=0;
         this.lastSystemTimestamp=0;
@@ -28,6 +30,10 @@ export default class DialogBaseClass
         this.clickDown=false;
         this.selectedTabId=null;
         this.defButtonId=null;
+        
+        this.pickerMode=false;
+        this.pickerControlId=null;
+        this.pickerControlAllowBlank=false;
         
         this.currentTextInputControl=null;      // current text input in dialog
         
@@ -228,7 +234,7 @@ export default class DialogBaseClass
         
     runInternal()
     {
-        let key,tab,control,button,show;
+        let key,tab,control,button;
         
             // keyboard
             
@@ -266,33 +272,43 @@ export default class DialogBaseClass
 
             // tabs
 
-        for ([key,tab] of this.tabs) {
-            if (tab.cursorInTab()) {
-                this.core.audio.soundStartUI(this.core.title.clickSound);
-                this.selectedTabId=key;
-                return(null);
+        if (!this.pickerMode) {
+            for ([key,tab] of this.tabs) {
+                if (tab.cursorInTab()) {
+                    this.core.audio.soundStartUI(this.core.title.clickSound);
+                    this.selectedTabId=key;
+                    return(null);
+                }
             }
         }
         
             // controls
 
-        show=false;
-
         for ([key,control] of this.controls) {
-            if (control.tabId!==this.selectedTabId) continue;
+            if (!this.pickerMode) {
+                if (control.tabId===null) continue;
+                if (control.tabId!==this.selectedTabId) continue;
+            }
+            else {
+                if (control.tabId!==null) continue;
+            }
             
             if (control.click()) {
                 this.core.audio.soundStartUI(this.core.title.selectSound);
-                return(null);
+                return(key);
             }
         }
 
             // buttons
 
-        for ([key,button] of this.buttons) {
-            if (button.cursorInButton()) {
-                this.core.audio.soundStartUI(this.core.title.clickSound);
-                return(key);
+        if (!this.pickerMode) {
+            for ([key,button] of this.buttons) {
+                if (!button.show) continue;
+
+                if (button.cursorInButton()) {
+                    this.core.audio.soundStartUI(this.core.title.clickSound);
+                    return(key);
+                }
             }
         }
         
@@ -305,7 +321,7 @@ export default class DialogBaseClass
         
     draw()
     {
-        let key,tab,control,button,show;
+        let key,tab,control,button;
         let gl=this.core.gl;
         
         this.core.orthoMatrix.setOrthoMatrix(this.core.canvas.width,this.core.canvas.height,-1.0,1.0);
@@ -324,23 +340,33 @@ export default class DialogBaseClass
         this.core.background.draw(true);
         
             // tabs
-            
-        for ([key,tab] of this.tabs) {
-            tab.draw(key===this.selectedTabId);
+         
+        if (!this.pickerMode) {
+            for ([key,tab] of this.tabs) {
+                tab.draw(key===this.selectedTabId);
+            }
         }
-                    
+        
             // controls
    
-        show=false;
-
         for ([key,control] of this.controls) {
-            if (control.tabId===this.selectedTabId) control.draw();
+            if (!this.pickerMode) {
+                if (control.tabId===null) continue;
+                if (control.tabId!==this.selectedTabId) continue;
+            }
+            else {
+                if (control.tabId!==null) continue;
+            }
+            
+            control.draw();
         }
        
             // buttons
             
-        for ([key,button] of this.buttons) {
-            button.draw();
+        if (!this.pickerMode) {
+            for ([key,button] of this.buttons) {
+                if (button.show) button.draw();
+            }
         }
         
             // cursor

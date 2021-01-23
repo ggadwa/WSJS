@@ -1,16 +1,35 @@
+- dialog
+   - going into game breaks keyboard control
+   - keyboard input is SLOW and misses keys
 
+- figure out stuck spider
 
 - profile chrome/safari
 - fix slow animation routines (if possible)
 
-- dialog
-   - going into game breaks keyboard control
-   - implement character pickers
 
 - multiplayer
-   - get rid of skill
+   - initializeMapEntities needs rework
    - make multiple characters
-   - make in core.json a section for characters -- has name, model & changes section (.addHealth etc)
+   - make in core.json a section for characters -- use data to replace health
+   - need a bot/player json for multiplayerList (rename to character?)
+
+
+al - easy (simple slow speed, turn radius, bad slop and view angles)
+bob - all rounder
+Dan - skilled (moderate with better aim)
+Greg - more skilled
+Jack - speedy (fast, half health)
+Larry - tank (slow but double health)
+Mike - expert
+
+            {"name":"Al","bitmap":"textures/player_al.png","json":"bot","data":{"healthMax":50}},
+            {"name":"Bob","bitmap":"textures/player_bob.png","json":"bot","data":{"healthMax":50}},
+            {"name":"Dan","bitmap":"textures/player_dan.png","json":"bot","data":{"healthMax":50}},
+            {"name":"Greg","bitmap":"textures/player_greg.png","json":"bot","data":{"healthMax":50}},
+            {"name":"Jack","bitmap":"textures/player_jack.png","json":"bot","data":{"healthMax":50}},
+            {"name":"Larry","bitmap":"textures/player_larry.png","json":"bot","data":{"healthMax":50}},
+            {"name":"Mike","bitmap":"textures/player_mike.png","json":"bot","data":{"healthMax":50}}
 
 
 

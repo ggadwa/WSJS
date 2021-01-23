@@ -68,27 +68,27 @@ export default class DialogDeveloperClass extends DialogBaseClass
         
     run()
     {
-         let buttonId=super.runInternal();
+         let id=super.runInternal();
 
-        if (buttonId==='cancel') {
+        if (id==='cancel') {
             this.core.switchLoop(this.core.previousLoop);
             return(false);
         }
 
-        if (buttonId==='ok') {
+        if (id==='ok') {
             this.saveDialogControls();
             this.core.switchLoop(this.core.previousLoop);
             return(false);
         }
         
-        if (buttonId==='pathHints') {
+        if (id==='pathHints') {
             this.saveDialogControls();
             this.core.developer.developerBuilders.buildPathHints();
             this.core.switchLoop(this.core.previousLoop);
             return(false);
         }
 
-        if (buttonId==='shadowMaps') {
+        if (id==='shadowMaps') {
             this.saveDialogControls();
             this.core.developer.developerBuilders.buildShadowmap(this.core.setup.skipShadowMapNormals);
             this.core.switchLoop(this.core.previousLoop);

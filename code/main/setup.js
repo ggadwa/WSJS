@@ -2,22 +2,7 @@ export default class SetupClass
 {
     constructor()
     {
-        this.BOT_SKILL_EASY=0;
-        this.BOT_SKILL_MODERATE=1;
-        this.BOT_SKILL_NORMAL=2;
-        this.BOT_SKILL_SKILLED=3;
-        this.BOT_SKILL_HARD=4;
-        
-        this.name='Player';
-
         this.showFPS=false;
-
-        this.localMap=0;
-        this.botCount=5;
-        this.botSkill=this.BOT_SKILL_NORMAL;
-
-        this.serverURL='127.0.0.1';
-        this.savedServerURLList=['127.0.0.1'];
 
         this.mouseXSensitivity=0.3;
         this.mouseXAcceleration=0.4;
@@ -43,6 +28,13 @@ export default class SetupClass
         this.soundVolume=0.3;
         this.musicVolume=0.5;
         this.musicOn=true;
+        
+        this.multiplayerName='Player';
+        this.multiplayerCharacter='';
+        this.multiplayerLocalMap=0;
+        this.multiplayerServerURL='127.0.0.1';
+        this.multiplayerSavedServerURLList=['127.0.0.1'];
+        this.multiplayerBotCharacters=['','','','','','','','','',''];
         
         this.skipShadowMapNormals=false;
     }

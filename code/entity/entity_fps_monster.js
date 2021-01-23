@@ -45,6 +45,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.projectileData=null;
         this.projectileRequiresSight=true;
         this.noSelfDamage=false;
+        this.hitAnimationPercentage=1.0;
         this.maxTurnSpeed=0;
         this.forwardAcceleration=0;
         this.forwardDeceleration=0;
@@ -152,6 +153,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.projectileData=this.json.config.projectileData;
         this.projectileRequiresSight=this.core.game.lookupValue(this.json.config.projectileRequiresSight,this.data,0);
         this.noSelfDamage=this.core.game.lookupValue(this.json.config.noSelfDamage,this.data,false);
+        this.hitAnimationPercentage=this.core.game.lookupValue(this.json.config.hitAnimationPercentage,this.data,1.0);
         
         this.maxTurnSpeed=this.core.game.lookupValue(this.json.config.maxTurnSpeed,this.data,0);
         this.forwardAcceleration=this.core.game.lookupValue(this.json.config.forwardAcceleration,this.data,0);
@@ -349,12 +351,15 @@ export default class EntityFPSMonsterClass extends EntityClass
             
         if (this.state===this.STATE_HURT) return;
         
-            // go into hurt state
+            // go into hurt state if percentage
+            // is OK
             
-        this.state=this.STATE_HURT;
-        
-        this.modelEntityAlter.startAnimationChunkInFrames(this.hitAnimation);
-        this.animationFinishTick=this.core.game.timestamp+this.modelEntityAlter.getAnimationTickCount(this.hitAnimation);
+        if (Math.random()<this.hitAnimationPercentage) {
+            this.state=this.STATE_HURT;
+
+            this.modelEntityAlter.startAnimationChunkInFrames(this.hitAnimation);
+            this.animationFinishTick=this.core.game.timestamp+this.modelEntityAlter.getAnimationTickCount(this.hitAnimation);
+        }
     }
     
     goMelee(distToPlayer)
