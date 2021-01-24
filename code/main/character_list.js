@@ -33,7 +33,7 @@ export default class CharacterListClass
     {
         let character;
         
-        for (character of this.characters) {
+        for (character of this.characters.values()) {
             character.release();
         }
         

@@ -313,6 +313,7 @@ export default class DeveloperClass
             selNodeIdx=this.getSelectNode();
             if (selNodeIdx===-1) return(true);
             
+            this.core.input.keyClearLastRaw();
             this.core.dialogPrompt.setup('Node Key','Node Key (blank for none)',path.nodes[selNodeIdx],'key');
             this.core.switchLoop(this.core.LOOP_DIALOG_PROMPT);
            

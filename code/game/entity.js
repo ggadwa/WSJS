@@ -241,18 +241,7 @@ export default class EntityClass
         dist=this.position.distance(entity.position);
         if (dist<shakeDistance) this.core.game.startCameraShake(shakeTick,Math.trunc((shakeMaxShift*dist)/shakeDistance));
     }
-    
-    /**
-     * Override this to setup a tinting color for the screen.
-     * Return false if not tint.
-     * 
-     * @param {ColorClass} tintColor 
-     */
-    getScreenTint(tintColor)
-    {
-        return(false);
-    }
-    
+        
         //
         // path utilities
         //
@@ -608,9 +597,6 @@ export default class EntityClass
     
         //
         // pushing
-        // you can override entityPush to do special things when
-        // touched by another entity, currently, returning FALSE means
-        // it can't be pushed
         //
         
     meshPush(mesh,movePnt,rotateAng)

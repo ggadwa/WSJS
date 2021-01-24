@@ -364,10 +364,6 @@ export default class GameLoadClass
             // set the listener to this entity
             
         game.core.audio.setListenerToEntity(game.map.entityList.getPlayer());
-
-            // start the input
-
-        game.core.input.initialize(game.map.entityList.getPlayer());
         
             // ready all the entities
             
@@ -417,7 +413,7 @@ export default class GameLoadClass
         
     async loop()
     {
-        const DRAW_MILLISECONDS=32;
+        const DRAW_MILLISECONDS=64;
 
         let systemTick;
         

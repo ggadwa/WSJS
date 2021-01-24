@@ -60,13 +60,14 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.slideMoveTick=0;
         this.canBump=true;
         this.canSlide=true;
+        this.canBePushed=false;
         this.angleYProjectileRange=5;
         this.angleYMeleeRange=15;
         this.jumpWaitTick=0;
         this.jumpWaitTickRandomAdd=0;
         this.nextJumpTick=0;
         this.jumpHeight=0;
-        this.nextDamageTick=0;
+        this.nextDamageTick=0;        
         
         this.idlePath=null;
         this.stalkByPath=false;
@@ -121,6 +122,7 @@ export default class EntityFPSMonsterClass extends EntityClass
 
         this.movement=new PointClass(0,0,0);
         this.sideMovement=new PointClass(0,0,0);
+        this.pushMovement=new PointClass(0,0,0);
         this.rotMovement=new PointClass(0,0,0);
         this.origPosition=new PointClass(0,0,0);
         
@@ -172,6 +174,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.jumpHeight=this.core.game.lookupValue(this.json.config.jumpHeight,this.data,0);
         this.canBump=this.core.game.lookupValue(this.json.config.canBump,this.data,true);
         this.canSlide=this.core.game.lookupValue(this.json.config.canSlide,this.data,true);
+        this.canBePushed=this.core.game.lookupValue(this.json.config.canBePushed,this.data,false);
         this.angleYProjectileRange=this.core.game.lookupValue(this.json.config.angleYProjectileRange,this.data,0);
         this.angleYMeleeRange=this.core.game.lookupValue(this.json.config.angleYMeleeRange,this.data,0);
         
@@ -221,6 +224,8 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.movementFreezeNextTick=0;
         this.animationFinishTick=0;
         this.noiseFinishTick=0;
+        
+        this.pushMovement.setFromValues(0,0,0);
             
             // start proper state
             
@@ -476,6 +481,19 @@ export default class EntityFPSMonsterClass extends EntityClass
     }
     
         //
+        // pushing
+        //
+        
+    entityPush(entity,movePnt)
+    {
+        if (!this.canBePushed) return(false);
+        if (this.weight>entity.weight) return(false);
+        
+        this.pushMovement.setFromPoint(movePnt);
+        return(true);
+    }
+    
+        //
         // jumping and sliding around
         //
         
@@ -534,9 +552,25 @@ export default class EntityFPSMonsterClass extends EntityClass
         }
     }
         
-    runWakeUp(gravityFactor)
+    runWakeUp(player,gravityFactor)
     {
-            // waking up can only fall
+        let speedFactor;
+        
+            // hurt can only turn and fall
+            
+        speedFactor=((this.startHealth-this.health)*this.damageSpeedFactor)/this.startHealth;
+        
+        if (this.stalkByPath) {
+            if (this.nextNodeIdx===this.playerNodeIdx) {
+                this.turnYTowardsEntity(player,(this.maxTurnSpeed+Math.trunc(this.maxTurnSpeed*speedFactor)));
+            }
+            else {
+                this.turnYTowardsNode(this.nextNodeIdx,(this.maxTurnSpeed+Math.trunc(this.maxTurnSpeed*speedFactor)));
+            }
+        }
+        else {
+            this.turnYTowardsEntity(player,(this.maxTurnSpeed+Math.trunc(this.maxTurnSpeed*speedFactor)));
+        }
             
         this.rotMovement.setFromValues(0,0,0);
         this.moveInMapY(this.rotMovement,gravityFactor,false);
@@ -599,7 +633,7 @@ export default class EntityFPSMonsterClass extends EntityClass
     
     runStalk(player,distToPlayer,gravityFactor)
     {
-        let angleDif,pauseMoveForward,node;
+        let angleDif,pauseMoveForward;
         let speedFactor,maxForwardSpeed,maxReverseSpeed,maxSideSpeed;
         
             // if to far away from player,
@@ -681,6 +715,7 @@ export default class EntityFPSMonsterClass extends EntityClass
 
                 this.rotMovement.setFromPoint(this.movement);
                 this.rotMovement.rotateY(null,this.angle.y);
+                this.rotMovement.addPoint(this.pushMovement);
 
                 this.origPosition.setFromPoint(this.position);
 
@@ -690,7 +725,7 @@ export default class EntityFPSMonsterClass extends EntityClass
                     // if we hit a wall, try a random slide left or right
                     // while backing up a bit
 
-                if (this.collideWallMeshIdx!==-1) {    
+                if (this.collideWallMeshIdx!==-1) {
                     this.position.setFromPoint(this.origPosition);
 
                     this.slideDirection=this.findSlideDirection(player);
@@ -700,17 +735,19 @@ export default class EntityFPSMonsterClass extends EntityClass
             }
             
                 // in slide
+                // stop slide if it slams into a wall immediately
                 
             else {
                 this.sideMovement.moveZWithAcceleration(false,true,this.forwardAcceleration,this.forwardDeceleration,maxForwardSpeed,this.reverseAcceleration,this.reverseDeceleration,maxReverseSpeed); 
                 this.sideMovement.moveXWithAcceleration((this.slideDirection<0),(this.slideDirection>0),this.sideAcceleration,this.sideDeceleration,maxSideSpeed,this.sideAcceleration,this.sideDeceleration,maxSideSpeed);
                 this.rotMovement.setFromPoint(this.sideMovement);
                 this.rotMovement.rotateY(null,this.angle.y);
+                this.rotMovement.addPoint(this.pushMovement);
                 
                 this.sideMovement.y=this.moveInMapY(this.rotMovement,gravityFactor,false);
                 this.moveInMapXZ(this.rotMovement,this.canBump,this.canSlide);
                
-                if (this.core.game.timestamp>this.slideNextTick) {
+                if ((this.core.game.timestamp>this.slideNextTick) || (this.collideWallMeshIdx!==-1)) {
                     this.slideNextTick=0;
                     this.movement.y=this.sideMovement.y;
                 }
@@ -720,6 +757,10 @@ export default class EntityFPSMonsterClass extends EntityClass
             this.rotMovement.setFromValues(0,0,0);
             this.movement.y=this.moveInMapY(this.rotMovement,gravityFactor,false);
         }
+        
+            // end any push
+            
+        this.pushMovement.setFromValues(0,0,0);
         
             // animation changes
             
@@ -736,9 +777,25 @@ export default class EntityFPSMonsterClass extends EntityClass
         if (Math.abs(angleDif)<=this.angleYMeleeRange) this.goMelee(distToPlayer);
     }
     
-    runHurt(gravityFactor)
+    runHurt(player,gravityFactor)
     {
-            // hurt can only fall
+        let speedFactor;
+        
+            // hurt can only turn and fall
+            
+        speedFactor=((this.startHealth-this.health)*this.damageSpeedFactor)/this.startHealth;
+        
+        if (this.stalkByPath) {
+            if (this.nextNodeIdx===this.playerNodeIdx) {
+                this.turnYTowardsEntity(player,(this.maxTurnSpeed+Math.trunc(this.maxTurnSpeed*speedFactor)));
+            }
+            else {
+                this.turnYTowardsNode(this.nextNodeIdx,(this.maxTurnSpeed+Math.trunc(this.maxTurnSpeed*speedFactor)));
+            }
+        }
+        else {
+            this.turnYTowardsEntity(player,(this.maxTurnSpeed+Math.trunc(this.maxTurnSpeed*speedFactor)));
+        }
             
         this.rotMovement.setFromValues(0,0,0);
         this.moveInMapY(this.rotMovement,gravityFactor,false);
@@ -862,7 +919,7 @@ export default class EntityFPSMonsterClass extends EntityClass
                 this.runAsleep(distToPlayer,gravityFactor);
                 return;
             case this.STATE_WAKING_UP:
-                this.runWakeUp(gravityFactor);
+                this.runWakeUp(player,gravityFactor);
                 return;
             case this.STATE_IDLE:
                 this.runIdle(distToPlayer,gravityFactor);
@@ -871,7 +928,7 @@ export default class EntityFPSMonsterClass extends EntityClass
                 this.runStalk(player,distToPlayer,gravityFactor);
                 return;
             case this.STATE_HURT:
-                this.runHurt(gravityFactor);
+                this.runHurt(player,gravityFactor);
                 return;
             case this.STATE_MELEE:
                 this.runMelee(player,gravityFactor);

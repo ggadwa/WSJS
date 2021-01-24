@@ -210,8 +210,8 @@ export default class TitleClass
         
     loop()
     {
-        const RUN_MILLISECONDS=32;
-        const DRAW_MILLISECONDS=32;
+        const RUN_MILLISECONDS=16;
+        const DRAW_MILLISECONDS=16;
         const BAIL_MILLISECONDS=5000;
 
         let systemTick;

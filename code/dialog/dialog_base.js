@@ -18,6 +18,10 @@ export default class DialogBaseClass
         
         this.PICKER_SIZE=128;           // needs to be outside so dialogs can calc some stuff
         
+        this.MAX_TEXT_LENGTH=32;
+        
+        this.LEGAL_TEXT_CHARACTERS=' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890._-/';
+        
         this.timestamp=0;
         this.lastSystemTimestamp=0;
         this.lastRunTimestamp=0;
@@ -235,12 +239,19 @@ export default class DialogBaseClass
     runInternal()
     {
         let key,tab,control,button;
+        let hadKey;
         
             // keyboard
             
         if (this.currentTextInputControl!==null) {
-            key=this.core.input.keyGetLastRaw();
-            if (key!==null) {
+            
+            hadKey=false;
+            
+            while (true) {
+                key=this.core.input.keyGetLastRaw();
+                if (key===null) break;
+                
+                hadKey=true;
 
                 if (key.toLowerCase()==='enter') return(this.defButtonId);   // enter key can exit dialog
                 
@@ -248,16 +259,18 @@ export default class DialogBaseClass
                     if (this.currentTextInputControl.value.length>0) {
                         this.currentTextInputControl.value=this.currentTextInputControl.value.substring(0,(this.currentTextInputControl.value.length-1));
                     }
-                    return(null);
+                    continue;
                 }
-
-                if (key.length>1) return(null);
-
-                if (((key>='a') && (key<='z')) || ((key>='A') && (key<='Z')) || ((key>='0') && (key<='9'))) {
-                    this.currentTextInputControl.value+=key;
-                    return(null);
+                
+                if (key.length===1) {
+                    if (this.LEGAL_TEXT_CHARACTERS.indexOf(key)!==-1) {
+                        this.currentTextInputControl.value+=key;
+                        if (this.currentTextInputControl.value.length>this.MAX_TEXT_LENGTH) this.currentTextInputControl.value=this.currentTextInputControl.value.substring(0,this.MAX_TEXT_LENGTH);
+                    }
                 }
             }
+            
+            if (hadKey) return(null);
         }
 
             // mouse clicking
@@ -277,6 +290,7 @@ export default class DialogBaseClass
                 if (tab.cursorInTab()) {
                     this.core.audio.soundStartUI(this.core.title.clickSound);
                     this.selectedTabId=key;
+                    this.currentTextInputControl=null;
                     return(null);
                 }
             }
@@ -306,6 +320,7 @@ export default class DialogBaseClass
                 if (!button.show) continue;
 
                 if (button.cursorInButton()) {
+                    this.currentTextInputControl=null;
                     this.core.audio.soundStartUI(this.core.title.clickSound);
                     return(key);
                 }
@@ -383,8 +398,8 @@ export default class DialogBaseClass
         
     loop()
     {
-        const RUN_MILLISECONDS=32;
-        const DRAW_MILLISECONDS=32;
+        const RUN_MILLISECONDS=16;
+        const DRAW_MILLISECONDS=16;
         const BAIL_MILLISECONDS=5000;
 
         let systemTick,runTick;

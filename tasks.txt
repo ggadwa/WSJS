@@ -1,8 +1,10 @@
-- dialog
-   - going into game breaks keyboard control
-   - keyboard input is SLOW and misses keys
 
-- figure out stuck spider
+
+- random spawn spots by flag on nodes (moveToRandomNode)
+- prompt dialog needs to be node dialog
+
+
+- clean up entity
 
 - profile chrome/safari
 - fix slow animation routines (if possible)
@@ -13,23 +15,23 @@
    - make multiple characters
    - make in core.json a section for characters -- use data to replace health
    - need a bot/player json for multiplayerList (rename to character?)
+   - make sure network game times out with proper error
 
+al - -speed -health -armor -aim -fov
+bob - +speed -armor
+Dan - +speed -aim -fov
+Greg - -speed +health
+Jack - +health +armor -aim
+Larry - +aim
+Mike - -speed -health +aim +fov
 
-al - easy (simple slow speed, turn radius, bad slop and view angles)
-bob - all rounder
-Dan - skilled (moderate with better aim)
-Greg - more skilled
-Jack - speedy (fast, half health)
-Larry - tank (slow but double health)
-Mike - expert
-
-            {"name":"Al","bitmap":"textures/player_al.png","json":"bot","data":{"healthMax":50}},
-            {"name":"Bob","bitmap":"textures/player_bob.png","json":"bot","data":{"healthMax":50}},
-            {"name":"Dan","bitmap":"textures/player_dan.png","json":"bot","data":{"healthMax":50}},
-            {"name":"Greg","bitmap":"textures/player_greg.png","json":"bot","data":{"healthMax":50}},
-            {"name":"Jack","bitmap":"textures/player_jack.png","json":"bot","data":{"healthMax":50}},
-            {"name":"Larry","bitmap":"textures/player_larry.png","json":"bot","data":{"healthMax":50}},
-            {"name":"Mike","bitmap":"textures/player_mike.png","json":"bot","data":{"healthMax":50}}
+            {"name":"Al","bitmap":"textures/character_al.png","json":"bot","data":{"healthMax":50}},
+            {"name":"Bob","bitmap":"textures/character_bob.png","json":"bot","data":{"healthMax":50}},
+            {"name":"Dan","bitmap":"textures/character_dan.png","json":"bot","data":{"healthMax":50}},
+            {"name":"Greg","bitmap":"textures/character_greg.png","json":"bot","data":{"healthMax":50}},
+            {"name":"Jack","bitmap":"textures/character_jack.png","json":"bot","data":{"healthMax":50}},
+            {"name":"Larry","bitmap":"textures/character_larry.png","json":"bot","data":{"healthMax":50}},
+            {"name":"Mike","bitmap":"textures/character_mike.png","json":"bot","data":{"healthMax":50}}
 
 
 
