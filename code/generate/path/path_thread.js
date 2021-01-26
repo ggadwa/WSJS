@@ -179,6 +179,7 @@ class PathGeneratorClass
         if (key==='pathHints') return(new Array(...value));
         if (key==='pathHintCounts') return(undefined);
         if ((key==='key') && (value===null)) return(undefined);
+        if ((key==='spawn') && (value===false)) return(undefined);
         if ((key==='data') && (value===null)) return(undefined);
         return(value);
     }

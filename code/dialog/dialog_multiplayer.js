@@ -31,7 +31,7 @@ export default class DialogMultiplayerClass extends DialogBaseClass
             
         this.addDialogButton('cancel',0.755,0.93,0.1,0.05,'Cancel',false);
         this.addDialogButton('localGame',0.01,0.93,0.125,0.05,'Local Game',false);
-        this.addDialogButton('joinGame',0.865,0.93,0.125,0.05,'Join Game',true);
+        this.addDialogButton('joinGame',0.865,0.93,0.125,0.05,'Join Network Game',true);
         
             // profile controls
             
@@ -43,8 +43,8 @@ export default class DialogMultiplayerClass extends DialogBaseClass
             // server controls
             
         y=this.DIALOG_CONTROL_TOP_MARGIN;
-        y+=this.addDialogControlList(this,'server','localMap',x,y,'Local Map:',this.core.json.multiplayerMaps);
-        y+=this.addDialogControlText(this,'server','serverURL',x,y,'Server URL:');
+        y+=this.addDialogControlText(this,'server','serverURL',x,y,'Network Server URL:');
+        y+=this.addDialogControlList(this,'server','localMap',x,y,'Local Game Map:',this.core.json.multiplayerMaps);
         
             // bot controls
 

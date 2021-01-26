@@ -1,14 +1,13 @@
 import DialogBaseClass from '../dialog/dialog_base.js';
 import SetupClass from '../main/setup.js';
 
-export default class DialogPromptClass extends DialogBaseClass
+export default class DialogNodeClass extends DialogBaseClass
 {
     constructor(core)
     {
         super(core);
         
-        this.valueObj=null;
-        this.valuePropName=null;
+        this.node=null;
         
         Object.seal(this);
     }
@@ -25,18 +24,20 @@ export default class DialogPromptClass extends DialogBaseClass
         
             // tabs
             
-        this.addDialogTab('prompt','Prompt',true);
+        this.addDialogTab('node','Node',true);
         
             // dialog buttons
             
         this.addDialogButton('cancel',0.78,0.93,0.1,0.05,'Cancel',false);
         this.addDialogButton('ok',0.89,0.93,0.1,0.05,'Ok',true);
         
-            // prompt controls
+            // node controls
             
         x=Math.trunc(this.core.canvas.width*0.5);
         y=this.DIALOG_CONTROL_TOP_MARGIN;
-        y+=this.addDialogControlText(this,'prompt','promptValue',x,y,'');
+        
+        y+=this.addDialogControlText(this,'node','key',x,y,'Key (blank for none):');
+        this.addDialogControlCheckbox(this,'node','spawn',x,y,'Allows spawns:');
         
         return(true);
     }
@@ -47,27 +48,27 @@ export default class DialogPromptClass extends DialogBaseClass
         
     loadDialogControls()
     {
-            // only a single text value, which is always selected
-
-        this.setDialogControl('promptValue',this.valueObj[this.valuePropName]);
-        this.currentTextInputControl=this.controls.get('promptValue');
+        this.setDialogControl('key',this.node.key);
+        this.setDialogControl('spawn',this.node.spawn);
+        
+        this.currentTextInputControl=this.controls.get('key');
     }
     
     saveDialogControls()
     {
-        this.valueObj[this.valuePropName]=this.getDialogControl('promptValue');
+        this.node.key=this.getDialogControl('key');
+        if (this.node.key.length===0) this.node.key=null;
+        
+        this.node.spawn=this.getDialogControl('spawn');
     }
     
         //
         // setup
         //
         
-    setup(title,valueTitle,valueObj,valuePropName)
+    setup(node)
     {
-        this.tabs.get('prompt').text.str=title;
-        this.controls.get('promptValue').titleText.str=valueTitle+':';
-        this.valueObj=valueObj;
-        this.valuePropName=valuePropName;
+        this.node=node;
     }
     
         //

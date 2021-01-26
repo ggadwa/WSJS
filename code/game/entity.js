@@ -164,11 +164,6 @@ export default class EntityClass
         // entity utilities
         //
         
-    getPlayerEntity()
-    {
-        return(this.core.game.map.entityList.getPlayer());
-    }
-    
     addEntity(jsonName,name,position,angle,data,spawnedBy,heldBy,show)
     {
         return(this.core.game.map.entityList.addDynamic(jsonName,name,position,angle,data,spawnedBy,heldBy,show));
@@ -236,7 +231,7 @@ export default class EntityClass
             // shake only registers if close enough
             // to camera object
             
-        entity=this.getPlayerEntity();
+        entity=this.core.game.map.entityList.getPlayer();
         
         dist=this.position.distance(entity.position);
         if (dist<shakeDistance) this.core.game.startCameraShake(shakeTick,Math.trunc((shakeMaxShift*dist)/shakeDistance));
@@ -345,22 +340,30 @@ export default class EntityClass
         this.position.setFromPoint(this.core.game.map.path.nodes[nodeIdx].position);
     }
     
-    moveToRandomNode(avoidTelefrag)
+    moveToRandomSpawnNode(avoidTelefrag)
     {
         let node;
-        let nodes=this.core.game.map.path.nodes;
         let idx,origIdx,hitEntity;
+        let nodes=this.core.game.map.path.nodes;
+        let spawnNodes=this.core.game.map.path.spawnNodes;
+        
+            // sanity check
+            
+        if (spawnNodes.length===0) {
+            console.info('there are no spawn nodes - please add some nodes with the spawn flag set to true');
+            return;
+        }
         
             // random node
             
-        idx=Math.trunc(nodes.length*Math.random());
+        idx=Math.trunc(spawnNodes.length*Math.random());
 
             // check for collisions
             
         origIdx=idx;
         
         while (true) {
-            node=nodes[idx];
+            node=nodes[spawnNodes[idx]];
             
                 // set the position
                 
@@ -384,7 +387,7 @@ export default class EntityClass
                 // find a different spot
                 
             idx++;
-            if (idx>=nodes.length) idx=0;
+            if (idx>=spawnNodes.length) idx=0;
             
             if (idx===origIdx) return;      // ran out of spots, nothing we can do
         }
@@ -846,31 +849,18 @@ export default class EntityClass
     {
     }
     
-    /**
-     * Override to deal with final entity setup.  This is the first call
-     * before the main game starts running, after everything has been prepared
-     * and loaded.
-     */
+        //
+        // some overrides
+        //
+    
     ready()
     {
     }
     
-    /**
-     * The main entity run function, called during the physics loop.
-     * It is guarenteed to be called 60 times a second (about, actually
-     * every 16 milliseconds.)
-     */    
     run()
     {
     }
     
-    /**
-     * Override this to deal with the entity taking damage.
-     * 
-     * @param {EntityClass} fromEntity The entity dealing the damage
-     * @param {number} damage Amount of damage
-     * @param {PointClass} hitPoint The hit position (in world space)
-     */    
     damage(fromEntity,damage,hitPoint)
     {
     }
@@ -879,25 +869,10 @@ export default class EntityClass
     {
     }
     
-    /**
-     * Override this if you want to make some alterations to bones after
-     * the animation has been calculated.  Use the setModelBoneXXX methods
-     * to alter bones.
-     */    
     animatedBoneSetup()
     {
     }
     
-    /**
-     * Override this if you want to change how a model is setup
-     * or positioned in the scene.  The default is just to
-     * position the model the same as the entity's position and
-     * angle.  Use setModelDrawPosition([PointClass],[PointClass],[PointClass],inCameraSpace)
-     * inside this method to change how entity model draws.
-     * Return TRUE to draw the model, FALSE to not draw
-     * 
-     * @returns {boolean} TRUE to draw the model
-     */    
     drawSetup()
     {
         return(false);

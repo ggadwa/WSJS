@@ -28,7 +28,7 @@ export default class DialogDeveloperClass extends DialogBaseClass
             
         this.addDialogButton('cancel',0.78,0.93,0.1,0.05,'Cancel',false);
         this.addDialogButton('ok',0.89,0.93,0.1,0.05,'Ok',true);
-        this.addDialogButton('pathHints',0.01,0.93,0.2,0.05,'Build Path Hints',false);
+        this.addDialogButton('pathHints',0.01,0.93,0.2,0.05,'Save Path & Build Hints',false);
         this.addDialogButton('shadowMaps',0.22,0.93,0.2,0.05,'Build Shadow Maps',false);
         
             // developer controls

@@ -1,20 +1,16 @@
 
 
-- random spawn spots by flag on nodes (moveToRandomNode)
-- prompt dialog needs to be node dialog
-
-
-- clean up entity
+- better map picker
 
 - profile chrome/safari
 - fix slow animation routines (if possible)
 
 
 - multiplayer
+   - multiplayer player picks different json
    - initializeMapEntities needs rework
    - make multiple characters
    - make in core.json a section for characters -- use data to replace health
-   - need a bot/player json for multiplayerList (rename to character?)
    - make sure network game times out with proper error
 
 al - -speed -health -armor -aim -fov
@@ -24,14 +20,6 @@ Greg - -speed +health
 Jack - +health +armor -aim
 Larry - +aim
 Mike - -speed -health +aim +fov
-
-            {"name":"Al","bitmap":"textures/character_al.png","json":"bot","data":{"healthMax":50}},
-            {"name":"Bob","bitmap":"textures/character_bob.png","json":"bot","data":{"healthMax":50}},
-            {"name":"Dan","bitmap":"textures/character_dan.png","json":"bot","data":{"healthMax":50}},
-            {"name":"Greg","bitmap":"textures/character_greg.png","json":"bot","data":{"healthMax":50}},
-            {"name":"Jack","bitmap":"textures/character_jack.png","json":"bot","data":{"healthMax":50}},
-            {"name":"Larry","bitmap":"textures/character_larry.png","json":"bot","data":{"healthMax":50}},
-            {"name":"Mike","bitmap":"textures/character_mike.png","json":"bot","data":{"healthMax":50}}
 
 
 

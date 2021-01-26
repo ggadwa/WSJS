@@ -234,9 +234,9 @@ export default class EntityFPSBotClass extends EntityClass
             
         this.currentTargetYScan=Math.trunc(this.targetScanYRange*0.5);
         
-            // move to random node
+            // move to random spawn node
             
-        this.moveToRandomNode(false);
+        this.moveToRandomSpawnNode(false);
 
             // get seek node
             

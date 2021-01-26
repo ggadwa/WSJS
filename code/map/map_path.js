@@ -14,6 +14,7 @@ export default class MapPathClass
         
         this.nodes=[];
         this.keyNodes=[];
+        this.spawnNodes=[];
         
             // some path editor values
 
@@ -30,13 +31,16 @@ export default class MapPathClass
     {
         let n,node;
 
-            // and build a list of key nodes
+            // and build a list of key and
+            // spawn nodes
         
         this.keyNodes=[];
+        this.spawnNodes=[];
         
         for (n=0;n!==this.nodes.length;n++) {
             node=this.nodes[n];
             if (node.key!==null) this.keyNodes.push(n);
+            if (node.spawn) this.spawnNodes.push(n);
         }
     }
     
@@ -86,7 +90,7 @@ export default class MapPathClass
         for (n=0;n!==paths.length;n++) {
             pathDef=paths[n];
 
-            pathNode=new MapPathNodeClass(map.path.nodes.length,new PointClass(pathDef.position.x,pathDef.position.y,pathDef.position.z),pathDef.links,pathDef.key,new Int16Array(pathDef.pathHints),pathDef.data);
+            pathNode=new MapPathNodeClass(map.path.nodes.length,new PointClass(pathDef.position.x,pathDef.position.y,pathDef.position.z),pathDef.links,pathDef.key,pathDef.spawn,new Int16Array(pathDef.pathHints),pathDef.data);
             map.path.nodes.push(pathNode);
         }
 
@@ -238,6 +242,14 @@ export default class MapPathClass
             
         gl.depthFunc(gl.LEQUAL);
         
+            // overdraw for spawn nodes
+            
+        gl.uniform3f(shader.colorUniform,0.9,0.0,1.0);
+        
+        for (n=0;n!==nNode;n++) {
+            if (this.nodes[n].spawn) gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_SHORT,((n*6)*2));
+        }
+        
             // overdraw for key nodes
             
         gl.uniform3f(shader.colorUniform,0.0,1.0,0.0);
@@ -245,6 +257,7 @@ export default class MapPathClass
         for (n=0;n!==nNode;n++) {
             if (this.nodes[n].key!==null) gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_SHORT,((n*6)*2));
         }
+        
             // and overdraw for selected nodes
             
         selNodeIdx=this.core.developer.getSelectNode();

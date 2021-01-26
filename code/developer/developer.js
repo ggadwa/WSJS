@@ -201,7 +201,7 @@ export default class DeveloperClass
             }
             
             nodeIdx=path.nodes.length;
-            path.nodes.push(new MapPathNodeClass(nodeIdx,rayEndPoint.copy(),[path.editorSplitStartNodeIdx,path.editorSplitEndNodeIdx],null,null,null));
+            path.nodes.push(new MapPathNodeClass(nodeIdx,rayEndPoint.copy(),[path.editorSplitStartNodeIdx,path.editorSplitEndNodeIdx],null,false,null,null));
             
             links=path.nodes[path.editorSplitStartNodeIdx].links;
             links[links.indexOf(path.editorSplitEndNodeIdx)]=selNodeIdx;
@@ -252,7 +252,7 @@ export default class DeveloperClass
                 path.nodes[selNodeIdx].links.push(nodeIdx);
             }
             
-            path.nodes.push(new MapPathNodeClass(nodeIdx,rayEndPoint.copy(),links,null,null,null));
+            path.nodes.push(new MapPathNodeClass(nodeIdx,rayEndPoint.copy(),links,null,false,null,null));
             
             this.selectItemType=this.SELECT_ITEM_NODE;
             this.selectItemIndex=nodeIdx;
@@ -314,8 +314,8 @@ export default class DeveloperClass
             if (selNodeIdx===-1) return(true);
             
             this.core.input.keyClearLastRaw();
-            this.core.dialogPrompt.setup('Node Key','Node Key (blank for none)',path.nodes[selNodeIdx],'key');
-            this.core.switchLoop(this.core.LOOP_DIALOG_PROMPT);
+            this.core.dialogNode.setup(path.nodes[selNodeIdx]);
+            this.core.switchLoop(this.core.LOOP_DIALOG_NODE);
            
            return(false);       // going into dialog, exit out of loop
         }

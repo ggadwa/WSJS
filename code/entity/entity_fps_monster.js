@@ -906,7 +906,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         
             // distance to player
             
-        player=this.getPlayerEntity();
+        player=this.core.game.map.entityList.getPlayer();
         distToPlayer=this.position.distance(player.position);
         
             // run the state

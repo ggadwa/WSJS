@@ -309,12 +309,12 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.inStandingAnimation=true;
         this.setCurrentAnimation();
         
-            // move to random node
+            // move to random spawn node
             // if multiplayer
             
         this.telefragTriggerEntity=null;
             
-        if (this.core.game.multiplayerMode!==this.core.game.MULTIPLAYER_MODE_NONE) this.moveToRandomNode(false);
+        if (this.core.game.multiplayerMode!==this.core.game.MULTIPLAYER_MODE_NONE) this.moveToRandomSpawnNode(false);
         
             // turn off any score display
             

@@ -4,7 +4,7 @@ import TitleClass from '../main/title.js';
 import DialogSettingClass from '../dialog/dialog_setting.js';
 import DialogMultiplayerClass from '../dialog/dialog_multiplayer.js';
 import DialogDeveloperClass from '../dialog/dialog_developer.js';
-import DialogPromptClass from '../dialog/dialog_prompt.js';
+import DialogNodeClass from '../dialog/dialog_node.js';
 import MapClass from '../map/map.js';
 import ShaderListClass from '../shader/shader_list.js';
 import AudioClass from '../sound/audio.js';
@@ -38,7 +38,7 @@ export default class CoreClass
         this.LOOP_DIALOG_SETTING=1;
         this.LOOP_DIALOG_MULTIPLAYER=2;
         this.LOOP_DIALOG_DEVELOPER=3;
-        this.LOOP_DIALOG_PROMPT=4;
+        this.LOOP_DIALOG_NODE=4;
         this.LOOP_GAME_LOAD=5;
         this.LOOP_GAME=6;
         this.LOOP_DEVELOPER=7;
@@ -123,7 +123,7 @@ export default class CoreClass
         this.dialogSetting=null;
         this.dialogMultiplayer=null;
         this.dialogDeveloper=null;
-        this.dialogPrompt=null;
+        this.dialogNode=null;
         this.gameLoad=null;
         this.game=null;
         this.developer=null;
@@ -312,8 +312,8 @@ export default class CoreClass
         this.dialogDeveloper=new DialogDeveloperClass(this,data);
         if (!this.dialogDeveloper.initialize()) return;
         
-        this.dialogPrompt=new DialogPromptClass(this,data);
-        if (!this.dialogPrompt.initialize()) return;
+        this.dialogNode=new DialogNodeClass(this,data);
+        if (!this.dialogNode.initialize()) return;
         
             // developer
             
@@ -332,7 +332,7 @@ export default class CoreClass
         this.dialogSetting.release();
         this.dialogMultiplayer.release();
         this.dialogDeveloper.release();
-        this.dialogPrompt.release();
+        this.dialogNode.release();
         this.characterList.release();
         this.shaderList.release();
         this.cursor.release();
@@ -530,8 +530,8 @@ export default class CoreClass
                 this.dialogDeveloper.startLoop();
                 break;
                 
-            case this.LOOP_DIALOG_PROMPT:
-                this.dialogPrompt.startLoop();
+            case this.LOOP_DIALOG_NODE:
+                this.dialogNode.startLoop();
                 break;
                 
             case this.LOOP_GAME_LOAD:
@@ -549,7 +549,7 @@ export default class CoreClass
                 break;
                 
             case this.LOOP_DEVELOPER:
-                if ((this.previousLoop===this.LOOP_DIALOG_DEVELOPER) || (this.previousLoop===this.LOOP_DIALOG_PROMPT)) {    // if this is coming from developer dialog to developer, then it's a resume instead of a start
+                if ((this.previousLoop===this.LOOP_DIALOG_DEVELOPER) || (this.previousLoop===this.LOOP_DIALOG_NODE)) {    // if this is coming from developer dialog to developer, then it's a resume instead of a start
                     this.developer.resumeLoop();
                 }
                 else {
@@ -608,8 +608,8 @@ export default class CoreClass
             case this.LOOP_DIALOG_DEVELOPER:
                 this.dialogDeveloper.resumeLoop();
                 break;
-            case this.LOOP_DIALOG_PROMPT:
-                this.dialogPrompt.resumeLoop();
+            case this.LOOP_DIALOG_NODE:
+                this.dialogNode.resumeLoop();
                 break;
             case this.LOOP_GAME_LOAD:
                 this.gameLoad.resumeLoop();
@@ -674,8 +674,8 @@ function mainLoop(timestamp)
         case core.LOOP_DIALOG_DEVELOPER:
             core.dialogDeveloper.loop();
             break;
-        case core.LOOP_DIALOG_PROMPT:
-            core.dialogPrompt.loop();
+        case core.LOOP_DIALOG_NODE:
+            core.dialogNode.loop();
             break;
         case core.LOOP_GAME_LOAD:
             core.gameLoad.loop();
