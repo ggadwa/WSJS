@@ -29,6 +29,8 @@ export default class DialogControlClass extends DialogControlBaseClass
         this.titleText=null;
         this.valueTexts=null;
         
+        this.listScrollIndex=0;
+        
         Object.seal(this);
     }
     
@@ -111,32 +113,51 @@ export default class DialogControlClass extends DialogControlBaseClass
         
     click()
     {
+        let idx,y,lft,rgt,top,bot;
+        
+        if ((this.core.cursor.x<this.x) || (this.core.cursor.x>((this.x+(this.TITLE_MARGIN*2))+this.LIST_INPUT_WIDTH)) || (this.core.cursor.y<this.y) || (this.core.cursor.y>(this.y+this.LIST_INPUT_HEIGHT))) return(false);
+        
+        rgt=((this.x+this.TITLE_MARGIN)+this.LIST_INPUT_WIDTH)-this.LIST_ARROW_MARGIN;
+        lft=rgt-this.LIST_ARROW_WIDTH;
+        
+             // up
+             
+        top=this.y+this.LIST_ARROW_MARGIN;
+        bot=top+this.LIST_ARROW_WIDTH;
+            
+        if ((this.core.cursor.x>=lft) && (this.core.cursor.x<rgt) && (this.core.cursor.y>=top) && (this.core.cursor.y<bot)) {
+            if (this.listScrollIndex>0) this.listScrollIndex-=this.LIST_INPUT_PER_VIEW_ITEM_COUNT;
+            
+            this.dialog.currentTextInputControl=null;
+            return(true);
+        }
+
             // down
             
-        if ((this.core.cursor.x>=(this.x+(this.TITLE_MARGIN*2))) && (this.core.cursor.x<((this.x+(this.TITLE_MARGIN*2))+this.LIST_ARROW_WIDTH)) && (this.core.cursor.y>=this.y) && (this.core.cursor.y<(this.y+this.CONTROL_HEIGHT))) {
-            this.value--;
-            if (this.value<0) this.value=0;
+        bot=(this.y+this.LIST_INPUT_HEIGHT)-this.LIST_ARROW_MARGIN;    
+        top=bot-this.LIST_ARROW_WIDTH;
+            
+        if ((this.core.cursor.x>=lft) && (this.core.cursor.x<rgt) && (this.core.cursor.y>=top) && (this.core.cursor.y<bot)) {
+            if ((this.listScrollIndex+this.LIST_INPUT_PER_VIEW_ITEM_COUNT)<this.list.length) this.listScrollIndex+=this.LIST_INPUT_PER_VIEW_ITEM_COUNT;
             
             this.dialog.currentTextInputControl=null;
             return(true);
         }
         
-             // up
+            // item
             
-        if ((this.core.cursor.x>=((this.x+this.LIST_INPUT_WIDTH)-this.LIST_ARROW_WIDTH)) && (this.core.cursor.x<(this.x+this.LIST_INPUT_WIDTH)) && (this.core.cursor.y>=this.y) && (this.core.cursor.y<(this.y+this.CONTROL_HEIGHT))) {
-            this.value++;
-            if (this.value>=this.list.length) this.value=this.list.length-1;
-            
-            this.dialog.currentTextInputControl=null;
-            return(true);
-        }
+        y=Math.trunc((this.core.cursor.y-this.y)/this.CONTROL_HEIGHT);
+        idx=this.listScrollIndex+y;
+        
+        if (idx>=this.list.length) return(false);
+        this.value=this.list[idx];
        
-        return(false);
+        return(true);
     }
 
     draw()
     {
-        let n,lft,rgt,top,bot,mx;
+        let n,y,lft,rgt,top,bot,mx,idx;
         let shader=this.core.shaderList.colorShader;
         let gl=this.core.gl;
         
@@ -178,7 +199,70 @@ export default class DialogControlClass extends DialogControlBaseClass
         
         gl.drawArrays(gl.LINE_LOOP,0,4);
         
+            // the highlight
+            
+        idx=this.listScrollIndex;
+            
+        for (n=0;n!==this.LIST_INPUT_PER_VIEW_ITEM_COUNT;n++) {
+            if (idx<this.list.length) {
+                if (this.list[idx]===this.value) {
+                    y=this.y+((n*this.CONTROL_HEIGHT)+1);
+                    this.vertexArray[0]=this.vertexArray[6]=this.x+this.TITLE_MARGIN;
+                    this.vertexArray[1]=this.vertexArray[3]=y;
+                    this.vertexArray[2]=this.vertexArray[4]=((this.x+this.TITLE_MARGIN)+this.LIST_INPUT_WIDTH)-1;
+                    this.vertexArray[5]=this.vertexArray[7]=y+(this.CONTROL_HEIGHT-1);
+
+                    gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
+                    gl.bufferSubData(gl.ARRAY_BUFFER,0,this.vertexArray);
+                    
+                    this.colorArray[0]=this.colorArray[4]=this.widgetBottomColor.r;
+                    this.colorArray[1]=this.colorArray[5]=this.widgetBottomColor.g;
+                    this.colorArray[2]=this.colorArray[6]=this.widgetBottomColor.b;
+                    this.colorArray[3]=this.colorArray[7]=1;
+
+                    this.colorArray[8]=this.colorArray[12]=this.widgetTopColor.r;
+                    this.colorArray[9]=this.colorArray[13]=this.widgetTopColor.g
+                    this.colorArray[10]=this.colorArray[14]=this.widgetTopColor.b;
+                    this.colorArray[11]=this.colorArray[15]=1;
+                    
+                    gl.bindBuffer(gl.ARRAY_BUFFER,this.colorBuffer);
+                    gl.bufferSubData(gl.ARRAY_BUFFER,0,this.colorArray);
+
+                    gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_SHORT,0);
+                   
+                    break;
+                }
+            }
+            
+            idx++;
+        }
+        
+            // remove the buffers
+
+        gl.bindBuffer(gl.ARRAY_BUFFER,null);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
+        
+        shader.drawEnd();
+        
+            // the title and value text
+            
+        idx=this.listScrollIndex;
+            
+        this.core.shaderList.textShader.drawStart();
+        
+        this.titleText.draw();
+        for (n=0;n!==this.LIST_INPUT_PER_VIEW_ITEM_COUNT;n++) {
+            this.valueTexts[n].str=(idx<this.list.length)?this.list[idx]:'';
+            this.valueTexts[n].draw();
+            
+            idx++;
+        }
+        
+        this.core.shaderList.textShader.drawStart();
+        
             // arrow left and right
+            
+        shader.drawStart();
             
         rgt=((this.x+this.TITLE_MARGIN)+this.LIST_INPUT_WIDTH)-this.LIST_ARROW_MARGIN;
         lft=rgt-this.LIST_ARROW_WIDTH;
@@ -198,6 +282,7 @@ export default class DialogControlClass extends DialogControlBaseClass
         
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
         gl.bufferSubData(gl.ARRAY_BUFFER,0,this.vertexArray);
+        gl.vertexAttribPointer(shader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
         
         this.colorArray[0]=this.colorArray[4]=this.colorArray[8]=this.widgetBottomColor.r;
         this.colorArray[1]=this.colorArray[5]=this.colorArray[9]=this.widgetBottomColor.g;
@@ -206,6 +291,9 @@ export default class DialogControlClass extends DialogControlBaseClass
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.colorBuffer);
         gl.bufferSubData(gl.ARRAY_BUFFER,0,this.colorArray);
+        gl.vertexAttribPointer(shader.vertexColorAttribute,4,gl.FLOAT,false,0,0);
+        
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
         
         gl.drawElements(gl.TRIANGLES,3,gl.UNSIGNED_SHORT,0);
         
@@ -258,18 +346,5 @@ export default class DialogControlClass extends DialogControlBaseClass
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
         
         shader.drawEnd();
-        
-            // the title and value text
-            
-        //this.valueText.str=''+this.list[this.value];
-            
-        this.core.shaderList.textShader.drawStart();
-        
-        this.titleText.draw();
-        for (n=0;n!==this.LIST_INPUT_PER_VIEW_ITEM_COUNT;n++) {
-            this.valueTexts[n].draw();
-        }
-        
-        this.core.shaderList.textShader.drawStart();
     }
 }

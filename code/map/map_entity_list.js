@@ -193,24 +193,43 @@ export default class MapEntityListClass
         // load map entities
         //
         
-    initializeMapEntities()
+    addDynamicMultiplayerEntities()
     {
-        let n,nameIdx;
-        let entity,entityCount;
-            
-            // add any bots if it's a local multiplayer game
-            /*
+        let n,character;
+        
+            // if a local multiplayer game, add bots
+        
         if (this.core.game.multiplayerMode===this.core.game.MULTIPLAYER_MODE_LOCAL) {
-            for (n=0;n!==this.core.setup.botCount;n++) {
-                nameIdx=n%this.core.json.bot.names.length;
-                
-                if (this.addFromMap(this.core.json.bot.json,this.core.json.bot.names[nameIdx],new PointClass(0,0,0),new PointClass(0,0,0),null,true)===null) return(false);
+            for (n=0;n!==10;n++) {
+                if (this.core.setup.multiplayerBotCharacters[n]!=='') {
+                    character=this.core.characterList.get(this.core.setup.multiplayerBotCharacters[n]);
+                    if (this.addFromMap(character.botJsonName,character.name,new PointClass(0,0,0),new PointClass(0,0,0),character.data,true)===null) return(false);
+                }
             }
         }
-*/
-            // initialize everything
+            
+            // if a multiplayer game, we need to add player
+            // we add these after the bots so local games don't
+            // telefrag right off the bat
+            
+        if (this.core.game.multiplayerMode!==this.core.game.MULTIPLAYER_MODE_NONE) {
+            character=this.core.characterList.get(this.core.json.config.multiplayerDefaultCharacter);
+            if (this.addFromMap(character.playerJsonName,this.core.setup.multiplayerName,new PointClass(0,0,0),new PointClass(0,0,0),character.data,true)===null) return(false);
+        }
+        
+        return(true);
+    }
+    
+    initializeMapEntities()
+    {
+        let n;
+        let entity,entityCount,character;
+        
+            // no player found yet
             
         this.entityPlayerIdx=-1;
+
+            // initialize entities
         
         entityCount=this.entities.length;       // dynamic entities can be added in the initialize
         

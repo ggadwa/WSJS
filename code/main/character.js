@@ -9,7 +9,7 @@ export default class CharacterClass
         this.playerJsonName=playerJsonName;
         this.botJsonName=botJsonName;
         this.bitmapName=bitmapName;
-        this.data=data;
+        this.data=(data===undefined)?null:data;
         
         this.bitmap=null;
         

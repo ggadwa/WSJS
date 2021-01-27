@@ -96,7 +96,7 @@ export default class EntityClass
         
     initialize()
     {
-        let n;
+        let n,modelName;
         
             // get the json
             
@@ -106,14 +106,15 @@ export default class EntityClass
             // setup
             
         this.model=null;
+        modelName=this.core.game.lookupValue(this.json.setup.model,this.data,null);
         
-        if ((this.json.setup.model!==null) && (this.json.setup.model!==undefined)) {
+        if (modelName!==null) {
         
                 // cached shared model
-
-            this.model=this.core.game.map.modelList.get(this.json.setup.model);
+                
+            this.model=this.core.game.map.modelList.get(modelName);
             if (this.model===undefined) {
-                console.log('model '+this.json.setup.model+' does not exist, needs to be defined in a entity in the map');
+                console.log('model '+modelName+' does not exist, needs to be defined in a entity in the map');
                 return(false);
             }
 

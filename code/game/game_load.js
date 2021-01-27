@@ -122,6 +122,11 @@ export default class GameLoadClass
             return;
         }
         
+        if (!game.map.entityList.addDynamicMultiplayerEntities()) { // multiplayer maps have dynamic entities not in the glTF file, need to add them here
+            this.inError=true;
+            return;
+        }
+        
         this.loadStage=this.LOAD_STAGE_MAP_BITMAP;
         this.loadStageIndex=0;
     }

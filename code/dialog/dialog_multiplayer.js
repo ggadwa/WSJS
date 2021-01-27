@@ -95,24 +95,27 @@ export default class DialogMultiplayerClass extends DialogBaseClass
     loadDialogControls()
     {
         let n;
-        let multiplayerCharacter;
+        let multiplayerCharacter,multiplayerLocalMap;
         
             // no selected text
             
         this.currentTextInputControl=null;
         
-            // force a multiplayer character for player
+            // force a multiplayer character/map for player
             
         multiplayerCharacter=this.core.setup.multiplayerCharacter;
         if (multiplayerCharacter==='') multiplayerCharacter=this.core.json.config.multiplayerDefaultCharacter;
+        
+        multiplayerLocalMap=this.core.setup.multiplayerLocalMap;
+        if (multiplayerLocalMap==='') multiplayerLocalMap=this.core.json.multiplayerMaps[0];
         
             // the values
 
         this.setDialogControl('name',this.core.setup.multiplayerName);
         this.setDialogControl('character',multiplayerCharacter);
         
-        this.setDialogControl('localMap',this.core.setup.multiplayerLocalMap);
         this.setDialogControl('serverURL',this.core.setup.multiplayerServerURL);
+        this.setDialogControl('localMap',multiplayerLocalMap);
         
         for (n=0;n!==10;n++) {
             this.setDialogControl(('bot'+n),this.core.setup.multiplayerBotCharacters[n]);

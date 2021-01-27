@@ -31,7 +31,7 @@ export default class SetupClass
         
         this.multiplayerName='Player';
         this.multiplayerCharacter='';
-        this.multiplayerLocalMap=0;
+        this.multiplayerLocalMap='';
         this.multiplayerServerURL='127.0.0.1';
         this.multiplayerSavedServerURLList=['127.0.0.1'];
         this.multiplayerBotCharacters=['','','','','','','','','',''];
