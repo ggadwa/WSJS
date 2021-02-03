@@ -1,7 +1,6 @@
-
-nbproject/private/private.xml
-/nbproject/private/
+/build/
+/dist/
+/output/
+/target/
 .DS_Store
-/demo/
-/demo_kart/
-/demo_platformer/
+/projects/
