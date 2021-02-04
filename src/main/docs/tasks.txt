@@ -1,5 +1,3 @@
-
-
 - profile chrome/safari
 - fix slow animation routines (if possible)
 
