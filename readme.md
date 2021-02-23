@@ -39,7 +39,7 @@ You can now hit the project in a webbrowser by navigating to: localhost/projects
 
 ## Running Locally (Just playing)
 
-TODO -- will require a native-wrapped app
+TODO -- will require a native-wrapped app or how to run the java app
 
 ## Running on WebHost
 
@@ -47,15 +47,13 @@ You can also run it directly on a regular http server.  You will not have multip
 single player games and no special software is required.
 
 Clone this (WSJS) repository into a directory on your local machine, for this example we will say the directory is WSJS.
-One your webhost (for this example, the root directory of your webhost) move over the contents of WSJS/src/main/resources/public
+One your webhost (for this example, the root directory of your webhost) move over the contents of WSJS/src/main/resources/code
 into your webhost.  Create a projects folder on the root of your webhost.  Next, clone any of the demo projects into a
 folder on your local machine and copy that directory into the projects folder.  The directory structure on your webhost
 should resemble:
 
 public_html (your webhost root)
   code
-  developer
-  shaders
   projects
     demo
 	  effects

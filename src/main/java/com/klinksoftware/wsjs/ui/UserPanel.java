@@ -1,6 +1,5 @@
 package com.klinksoftware.wsjs.ui;
 
-import com.klinksoftware.wsjs.main.*;
 import com.klinksoftware.wsjs.websockets.*;
 
 import java.awt.*;
@@ -25,15 +24,17 @@ public class UserPanel extends JList
     
     public void update()
     {
+        /*
         int         n;
         ArrayList<WebSocketClient>  clients;
         
-        clients=WSServer.getClientList();
+        clients=App.getClientList();
         
         listModel.removeAllElements();
         
         for (n=0;n!=clients.size();n++) {
             listModel.addElement(clients.get(n).getUserName());
         }
+*/
     }
 }

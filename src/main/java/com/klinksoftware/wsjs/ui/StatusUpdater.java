@@ -1,10 +1,16 @@
 package com.klinksoftware.wsjs.ui;
 
-import com.klinksoftware.wsjs.main.*;
+import com.klinksoftware.wsjs.application.App;
 
 public class StatusUpdater extends Thread
 {
+    private App             app;
     private boolean         shutdown;
+    
+    public StatusUpdater(App app)
+    {
+        this.app=app;
+    }
     
     public void shutdown()
     {
@@ -18,7 +24,7 @@ public class StatusUpdater extends Thread
         
         while (!shutdown) {
             
-            WSServer.getAppWindow().updateStatus();
+            app.updateStatus();
             
             
                 // wait for a bit

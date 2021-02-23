@@ -1,26 +1,45 @@
 - profile chrome/safari
 - fix slow animation routines (if possible)
 
-- multiplayer
-   - make in core.json a section for characters -- use data to replace health
-   - make sure network game times out with proper error
-
-al - -speed -health -armor -aim -fov
-bob - +speed -armor
-Dan - +speed -aim -fov
-Greg - -speed +health
-Jack - +health +armor -aim
-Larry - +aim
-Mike - -speed -health +aim +fov
+- test public html implementation
 
 
+- need to be able to start multiplayer without nodes (start at 0,0,0)
+- animations by object {startFrame: endFrame: hideMesh:[{frame: name: }], showMesh: [{frame: name: }]}
 
-- transfer over new shadowmaps to mac for later upload
+- rework multiplayer
+
+- idle/walking weapon animation
+- raise/lower weapons
+- give weapons clips
+- better positioning for m16
+
+1) Beretta_activate: 1 – 25 fr.,
+2) Beretta_change_weapon: 26 – 76 fr.,
+
+3) Beretta_idile_staing: 77 – 127 fr.,
+
+4) Beretta_fire: 128 – 143 fr.,
+5) Beretta_fire (gun empty): 144 – 159 fr.,
+
+6) Beretta_reload: 160 – 225 fr.,
+
+7) Beretta_walking: 226 – 262 fr.,
+8) beretta_run: 263 – 285 fr.,
+9) beretta_run_sprint: 286 – 304 fr.,
+
+10) Beretta_deactivate: 305 – 330 fr.,
+
+
+rifle: reload 120-240 (mag 181-225)
+rilfe: walk 240-270
+
+
 
 - menu by keys
 
 - gamepad support
-- runMultiplayerSyncError redo all this
+
 
 - kart = weird bug with laps near goal line
 - kart = going backwards

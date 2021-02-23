@@ -1,6 +1,6 @@
 package com.klinksoftware.wsjs.ui;
 
-import com.klinksoftware.wsjs.main.*;
+import com.klinksoftware.wsjs.application.App;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -15,6 +15,8 @@ public class AppWindow implements WindowListener
     public static final int         USER_WIDTH=250;
     public static final int         STATUS_CANVAS_HEIGHT=USER_WIDTH;
     
+    private final App       app;
+    
     private JFrame          frame;
     private JToolBar        toolBar;
     private JLabel          userLabel,logLabel;
@@ -24,6 +26,11 @@ public class AppWindow implements WindowListener
     private StatusCanvas    statusCanvas;
     private StatusUpdater   statusUpdater;
     private Thread          statusThread;
+    
+    public AppWindow(App app)
+    {
+        this.app=app;
+    }
     
         //
         // window events
@@ -37,7 +44,7 @@ public class AppWindow implements WindowListener
     @Override
     public void windowClosing(WindowEvent e)
     {
-        WSServer.stop();
+        app.stop();
     }
 
     @Override
@@ -90,7 +97,7 @@ public class AppWindow implements WindowListener
             // it errors out
         
         try {
-            Desktop.getDesktop().setQuitHandler((event,response) -> WSServer.stop());
+            Desktop.getDesktop().setQuitHandler((event,response) -> app.stop());
             Taskbar.getTaskbar().setIconImage(image);
         }
         catch (Exception e) {}
@@ -217,7 +224,7 @@ public class AppWindow implements WindowListener
         
             // start the status thread
             
-        statusUpdater=new StatusUpdater();
+        statusUpdater=new StatusUpdater(app);
         statusThread=new Thread(statusUpdater,("ws_status_thread"));
         statusThread.start();
     }

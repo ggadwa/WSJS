@@ -1,25 +1,26 @@
 package com.klinksoftware.wsjs.websockets;
 
-import com.klinksoftware.wsjs.main.*;
 
 import java.io.*;
 import java.net.*;
 import java.util.*;
-
+/*
 public class WebSocketListener implements Runnable
 {
     private static final String IP="0.0.0.0";
     private static final int PORT=52419;
     private static final int CONCURRENT_REQUEST=15;
     
+    private final App                   app;
+
     private boolean                     running,inShutdown;
     private ServerSocket                serverSocket;
     
-    public WebSocketListener()
+    public WebSocketListener(App app)
     {
-        running=false;
+        this.app=app;
     }
-    
+
         //
         // misc listener data
         //
@@ -28,7 +29,7 @@ public class WebSocketListener implements Runnable
     {
         int                         n,id;
         boolean                     hit;
-        ArrayList<WebSocketClient>  clients=WSServer.getClientList();
+        ArrayList<WebSocketClient>  clients=App.getClientList();
         
         id=1;
         
@@ -58,7 +59,7 @@ public class WebSocketListener implements Runnable
     
     public void removeClient(WebSocketClient client)
     {
-        ArrayList<WebSocketClient>      clients=WSServer.getClientList();
+        ArrayList<WebSocketClient>      clients=App.getClientList();
         
         synchronized (clients) {
             clients.remove(client);
@@ -73,7 +74,7 @@ public class WebSocketListener implements Runnable
     {
         int                         n,sourceId;
         WebSocketClient             client;
-        ArrayList<WebSocketClient>  clients=WSServer.getClientList();
+        ArrayList<WebSocketClient>  clients=App.getClientList();
         
         sourceId=sourceClient.getId();
         
@@ -88,7 +89,7 @@ public class WebSocketListener implements Runnable
     public void distributeMessageToAllClients(byte[] msg)
     {
         int                         n;
-        ArrayList<WebSocketClient>  clients=WSServer.getClientList();
+        ArrayList<WebSocketClient>  clients=App.getClientList();
         
         synchronized (clients) {
             for (n=0;n!=clients.size();n++) {
@@ -109,12 +110,12 @@ public class WebSocketListener implements Runnable
         InetAddress                 bindAddr;
         Socket                      clientSocket;
         WebSocketClient             client;
-        ArrayList<WebSocketClient>  clients=WSServer.getClientList();
+        ArrayList<WebSocketClient>  clients=App.getClientList();
         Thread                      clientThread;
         
         inShutdown=false;
         
-        WSServer.getAppWindow().log("WSListener starting on port: "+Integer.toString(PORT));
+        app.log("WSListener starting on port: "+Integer.toString(PORT));
         
             // start the server socket
 
@@ -123,14 +124,14 @@ public class WebSocketListener implements Runnable
             serverSocket=new ServerSocket(PORT,CONCURRENT_REQUEST,bindAddr);
         }
         catch (IOException e) {
-            WSServer.getAppWindow().log("Unable to create WS server socket: "+e.getMessage());
+            App.getAppWindow().log("Unable to create WS server socket: "+e.getMessage());
             e.printStackTrace();
             return;
         }
         
         running=true;
         
-        WSServer.getAppWindow().log("WSListener is running");
+        App.getAppWindow().log("WSListener is running");
         
             // accept client connections
             
@@ -150,14 +151,14 @@ public class WebSocketListener implements Runnable
             catch (Exception e)
             {
                 if (!inShutdown) {
-                    WSServer.getAppWindow().log("Error in WSListener accept: "+e.getMessage());
+                    App.getAppWindow().log("Error in WSListener accept: "+e.getMessage());
                     e.printStackTrace();
                 }
                 break;
             }
         }
         
-        WSServer.getAppWindow().log("WSListener shutting down");
+        App.getAppWindow().log("WSListener shutting down");
         
             // shutdown the server
   
@@ -166,7 +167,7 @@ public class WebSocketListener implements Runnable
         }
         catch (Exception e)
         {
-            WSServer.getAppWindow().log("Unable to properly shutdown WSListener socket: "+e.getMessage());
+            App.getAppWindow().log("Unable to properly shutdown WSListener socket: "+e.getMessage());
             e.printStackTrace();
         }
          
@@ -186,3 +187,4 @@ public class WebSocketListener implements Runnable
         running=false;
     }
 }
+*/

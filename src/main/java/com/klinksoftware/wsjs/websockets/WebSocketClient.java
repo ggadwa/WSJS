@@ -1,13 +1,12 @@
 package com.klinksoftware.wsjs.websockets;
 
-import com.klinksoftware.wsjs.main.*;
 
 import java.io.*;
 import java.net.*;
 import java.nio.*;
 import java.security.*;
 import java.util.*;
-
+/*
 public class WebSocketClient implements Runnable
 {
     private static final int MAX_MESSAGE_LENGTH=64*1024;
@@ -152,7 +151,7 @@ public class WebSocketClient implements Runnable
         
             // stats
         
-        WSServer.getAppWindow().addStatusNetworkBytes(readLen);
+        app.addStatusNetworkBytes(readLen);
         
             // decode the message
             
@@ -197,7 +196,7 @@ public class WebSocketClient implements Runnable
         
             // stats
         
-        WSServer.getAppWindow().addStatusNetworkBytes(((dataLen<=125)?2:4)+dataLen);
+        app.addStatusNetworkBytes(((dataLen<=125)?2:4)+dataLen);
     }
     
         //
@@ -233,7 +232,7 @@ public class WebSocketClient implements Runnable
         
                     // stats
         
-        WSServer.getAppWindow().addStatusNetworkBytes(readLen);
+        App.getAppWindow().addStatusNetworkBytes(readLen);
         
             // parse the http transaction, if we
             // don't have a get or it's less than 2 lines,
@@ -286,7 +285,7 @@ public class WebSocketClient implements Runnable
         
             // stats
         
-        WSServer.getAppWindow().addStatusNetworkBytes(bytes.length);
+        App.getAppWindow().addStatusNetworkBytes(bytes.length);
         
         return(true);
     }
@@ -327,7 +326,7 @@ public class WebSocketClient implements Runnable
         
             // add user to the persistant storage
             
-        WSServer.getStorage().addUser(userName);
+        app.addUser(userName);
         
             // reply user id, or a negative
             // number if unable to log on
@@ -366,7 +365,7 @@ public class WebSocketClient implements Runnable
         
             // if no other players, immediately return no sync
             
-        if (WSServer.getClientList().size()<=1) {
+        if (App.getClientList().size()<=1) {
             byteBuf=ByteBuffer.allocate(3);
             byteBuf.putShort(0,MESSAGE_TYPE_MAP_SYNC_REPLY);
             byteBuf.put((byte)0);         // true/false, set to false for no sync (keep current values)
@@ -472,7 +471,7 @@ public class WebSocketClient implements Runnable
         int                         n;
         ByteBuffer                  byteBuf;
         WebSocketClient             client;
-        ArrayList<WebSocketClient>  clients=WSServer.getClientList();
+        ArrayList<WebSocketClient>  clients=App.getClientList();
             
         byteBuf=ByteBuffer.allocate(USER_NAME_LENGTH+4);
         byteBuf.putShort(0,MESSAGE_TYPE_ENTITY_ENTER);
@@ -535,8 +534,8 @@ public class WebSocketClient implements Runnable
                 
             if (!getLogonRequest()) return;
             
-            WSServer.getAppWindow().log("Client connected: "+userName+" (id:"+Integer.toString(id)+")");
-            WSServer.getAppWindow().updateUserList();
+            App.getAppWindow().log("Client connected: "+userName+" (id:"+Integer.toString(id)+")");
+            App.getAppWindow().updateUserList();
             
                 // push other players
                 
@@ -556,7 +555,7 @@ public class WebSocketClient implements Runnable
         }
         catch (IOException e)
         {
-            WSServer.getAppWindow().log("IO exception on client socket");
+            App.getAppWindow().log("IO exception on client socket");
             e.printStackTrace();
         }
         finally {
@@ -567,17 +566,18 @@ public class WebSocketClient implements Runnable
             }
             catch (Exception e2)
             {
-                WSServer.getAppWindow().log("Unable to close client socket");
+                App.getAppWindow().log("Unable to close client socket");
                 e2.printStackTrace();
             }
             
             listener.removeClient(this);
             
             if (userName!=null) {
-                WSServer.getAppWindow().log("Client disconnected: "+userName+" (id:"+Integer.toString(id)+")");
-                WSServer.getAppWindow().updateUserList();
+                App.getAppWindow().log("Client disconnected: "+userName+" (id:"+Integer.toString(id)+")");
+                App.getAppWindow().updateUserList();
             }
         }
     }
     
 }
+*/
