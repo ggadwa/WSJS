@@ -86,6 +86,10 @@ export default class EntityWeaponClass extends EntityClass
         this.FIRE_TYPE_LIST=['hit_scan','projectile'];
         
         this.idleAnimation=null;
+        this.idleWalkAnimation=null;
+        this.raiseAnimation=null;
+        this.lowerAnimation=null;
+        this.reloadAnimation=null;
         
         this.interfaceCrosshair=null;
         
@@ -98,6 +102,8 @@ export default class EntityWeaponClass extends EntityClass
         this.fireYSlop=0;
         
         this.lastFireTimestamp=0;
+        
+        this.inStandIdle=false;
         
         this.handOffset=new PointClass(0,0,0);
         this.handAngle=new PointClass(0,0,0);
@@ -127,7 +133,11 @@ export default class EntityWeaponClass extends EntityClass
     {
         if (!super.initialize()) return(false);
         
-        this.idleAnimation=this.json.animations.idleAnimation;
+        this.idleAnimation=this.core.game.lookupAnimationValue(this.json.animations.idleAnimation);
+        this.idleWalkAnimation=this.core.game.lookupAnimationValue(this.json.animations.idleWalkAnimation);
+        this.raiseAnimation=this.core.game.lookupAnimationValue(this.json.animations.raiseAnimation);
+        this.lowerAnimation=this.core.game.lookupAnimationValue(this.json.animations.lowerAnimation);
+        this.reloadAnimation=this.core.game.lookupAnimationValue(this.json.animations.reloadAnimation);
         
         this.interfaceCrosshair=this.core.game.lookupValue(this.json.config.interfaceCrosshair,this.data);
        
@@ -136,8 +146,6 @@ export default class EntityWeaponClass extends EntityClass
         if (this.model!==null) {
             this.handOffset=new PointClass(this.json.config.handOffset.x,this.json.config.handOffset.y,this.json.config.handOffset.z);
             this.handAngle=new PointClass(this.json.config.handAngle.x,this.json.config.handAngle.y,this.json.config.handAngle.z);
-
-            this.modelEntityAlter.startAnimationChunkInFrames(this.idleAnimation);
         }
         
             // fire setup
@@ -178,6 +186,9 @@ export default class EntityWeaponClass extends EntityClass
         if (this.primary!==null) this.primary.ready();
         if (this.secondary!==null) this.secondary.ready();
         if (this.tertiary!==null) this.tertiary.ready();
+        
+        this.inStandIdle=false
+        if (this.model!==null) this.queueIdleAnimation();
     }
     
         //
@@ -211,6 +222,84 @@ export default class EntityWeaponClass extends EntityClass
             if (this.tertiary.ammo!==0) return(true);
         }
         return(false);
+    }
+    
+        //
+        // animation utilities
+        //
+        
+    queueIdleAnimation()
+    {
+        if (this.model===null) return;
+        
+        if (this.heldBy!==null) {
+            this.inStandIdle=(this.heldBy.movement.length()===0)||(this.idleWalkAnimation===null);
+        }
+        
+        if (this.inStandIdle) {
+            if (this.idleAnimation!==null) this.modelEntityAlter.queueAnimationChunkInFrames(this.idleAnimation);
+        }
+        else {
+            this.modelEntityAlter.queueAnimationChunkInFrames(this.idleWalkAnimation);    
+        }
+    }
+    
+    startIdleAnimation()
+    {
+        if (this.model===null) return;
+        
+        this.inStandIdle=true;
+        if (this.idleAnimation!==null) this.modelEntityAlter.startAnimationChunkInFrames(this.idleAnimation);
+    }
+    
+    setIdleAnimation()
+    {
+        let nextStandIdle;
+        
+        if (this.model===null) return;
+        
+        nextStandIdle=true;
+        
+        if (this.heldBy!==null) {
+            nextStandIdle=(this.heldBy.movement.length()===0)||(this.idleWalkAnimation===null);
+        }
+        
+        if (nextStandIdle===this.inStandIdle) return;
+        
+        this.inStandIdle=nextStandIdle;
+        
+        if (this.inStandIdle) {
+            if (this.idleAnimation!==null) this.modelEntityAlter.startAnimationChunkInFrames(this.idleAnimation);
+        }
+        else {
+            this.modelEntityAlter.startAnimationChunkInFrames(this.idleWalkAnimation);    
+        }
+    }
+    
+    runLowerAnimation()
+    {
+        if (this.model===null) return(0);
+        
+        if (this.lowerAnimation!=null) {
+            this.modelEntityAlter.startAnimationChunkInFrames(this.lowerAnimation);
+            this.queueIdleAnimation();
+            return(this.modelEntityAlter.getAnimationTickCount(this.lowerAnimation));
+        }
+        
+        return(0);
+    }
+    
+    runRaiseAnimation()
+    {
+        if (this.model===null) return;
+        
+        if (this.raiseAnimation!=null) {
+            this.modelEntityAlter.startAnimationChunkInFrames(this.raiseAnimation);
+            this.queueIdleAnimation();
+            return(this.modelEntityAlter.getAnimationTickCount(this.raiseAnimation));
+        }
+        
+        return(0);
     }
     
         //
@@ -313,7 +402,7 @@ export default class EntityWeaponClass extends EntityClass
            
         if (this.model!==null) {
             if (fireAnimation!==null) this.modelEntityAlter.startAnimationChunkInFrames(fire.animation);
-            if (this.idleAnimation!==null) this.modelEntityAlter.queueAnimationChunkInFrames(this.idleAnimation);
+            this.queueIdleAnimation();
         }
         
             // parent animation

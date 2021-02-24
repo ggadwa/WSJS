@@ -1,18 +1,21 @@
-- profile chrome/safari
-- fix slow animation routines (if possible)
+
+
+- implement clips
+
+- turn off m16 at beginning
+- check m16 pickup
 
 - test public html implementation
 
 
 - need to be able to start multiplayer without nodes (start at 0,0,0)
 - animations by object {startFrame: endFrame: hideMesh:[{frame: name: }], showMesh: [{frame: name: }]}
+    - always use "animation" naming
 
+- add back in the websocket code
 - rework multiplayer
 
-- idle/walking weapon animation
-- raise/lower weapons
-- give weapons clips
-- better positioning for m16
+
 
 1) Beretta_activate: 1 – 25 fr.,
 2) Beretta_change_weapon: 26 – 76 fr.,
@@ -31,29 +34,26 @@
 10) Beretta_deactivate: 305 – 330 fr.,
 
 
-rifle: reload 120-240 (mag 181-225)
-rilfe: walk 240-270
+rifle: reload 120-240 (mag 181-225)  [30 fps  150-300  (mag 226-281) ]
+rifle: walk 240-270  [30 fps   300-336]
 
 
+INTERFACE
+  - menu by keys
+  - gamepad support
 
-- menu by keys
-
-- gamepad support
-
-
-- kart = weird bug with laps near goal line
-- kart = going backwards
-- fps = pulses need to be in json
-
-BOTS
-   - run away if no ammo?
+DEMOS
+  - kart: weird bug with laps near goal line
+  - kart: going backwards
+  - fps: pulses need to be in json
+  - fps: bots run away if no ammo?
+  - fps: death messages by game with json setup
 
 MISC
-  - death messages by game with json setup
-  - eventually clean up entity and unnecessary pass through APIs
+  - run some more profiling
+  - eventually clean up entity and unnecessary pass through APIs from old version
 
 NETWORKING
-    - multiplayer needs a complete rebuild
-    - need map_sync message (timestamp + map movements - round robin out to first player) todo partially implemented
-    - predictions
-    - need open system for passing message (like firing weapons, etc)
+  - need map_sync message (timestamp + map movements - round robin out to first player) todo partially implemented
+  - predictions
+  - need open system for passing message (like firing weapons, etc)

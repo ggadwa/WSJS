@@ -359,7 +359,6 @@ public class HTTPClient implements Runnable
         catch (Exception e)
         {
             requestData.setError(404,"Not Found");
-            e.printStackTrace();
             return;
         }
         finally {
@@ -419,7 +418,6 @@ public class HTTPClient implements Runnable
         catch (Exception e)
         {
             requestData.setError(404,"Not Found");
-            e.printStackTrace();
             return;
         }
         finally {
@@ -463,7 +461,6 @@ public class HTTPClient implements Runnable
         catch (Exception e)
         {
             requestData.setError(404,"Not Found");
-            e.printStackTrace();
             return;
         }
         finally {
@@ -490,7 +487,6 @@ public class HTTPClient implements Runnable
         }
         catch (Exception e)
         {
-            e.printStackTrace();
             try { writeError(500,"Internal Server Error"); } catch(Exception e2) {}
             return;
         }
@@ -562,7 +558,6 @@ public class HTTPClient implements Runnable
         catch (Exception e)
         {
             try { writeError(500,"Internal Server Error"); } catch(Exception e2) {}  // if unable to write error back to client, we have to eat it, this happens with broken pipes
-            e.printStackTrace();
         }
         finally {
             try {
