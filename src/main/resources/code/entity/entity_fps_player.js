@@ -217,123 +217,6 @@ export default class EntityFPSPlayerClass extends EntityClass
     }
     
         //
-        // weapon switching and animation
-        //
-        
-    setCarouselWeaponDefault()
-    {
-        let n,weaponEntity,meshName;
-        
-        this.currentCarouselWeaponIdx=this.defaultCarouselWeaponIdx;
-        this.weaponLowerFinishTick=-1;
-        this.weaponRaiseFinishTick=-1;
-        this.weaponClipFinishTick=-1;
-        
-            // show hide weapons
-
-        for (n=0;n!==this.carouselWeapons.length;n++) {
-            weaponEntity=this.carouselWeapons[n];
-            
-            if (n===this.currentCarouselWeaponIdx) {
-                weaponEntity.show=true;
-                
-                this.forceAnimationUpdate=true;
-                this.currentIdleAnimation=weaponEntity.parentIdleAnimation;
-                this.currentRunAnimation=weaponEntity.parentRunAnimation;
-                
-                for (meshName of this.json.weapons[n].meshes) {
-                    this.modelEntityAlter.show(meshName,true);
-                }
-                
-                weaponEntity.startIdleAnimation();
-            }
-            else {
-                weaponEntity.show=false;
-                
-                for (meshName of this.json.weapons[n].meshes) {
-                    this.modelEntityAlter.show(meshName,false);
-                }
-            }
-        }
-    }
-        
-    startCarouselWeaponSwitch(weaponIdx)
-    {
-        let weaponEntity;
-        
-        this.gotoCarouselWeaponIdx=weaponIdx;
-        
-            // lower current weapon
-        
-        if (this.currentCarouselWeaponIdx!==-1) {
-            weaponEntity=this.carouselWeapons[this.currentCarouselWeaponIdx];
-            this.weaponLowerFinishTick=this.core.game.timestamp+weaponEntity.runLowerAnimation();
-        }
-        else {
-            swapCarouselWeaponSwitch();
-        }
-    }
-    
-    swapCarouselWeaponSwitch()
-    {
-        let meshName,weaponEntity;
-        
-            // hide the current weapon
-        
-        if (this.currentCarouselWeaponIdx!==-1) {
-            weaponEntity=this.carouselWeapons[this.currentCarouselWeaponIdx];
-            
-            weaponEntity.show=false;
-                
-            for (meshName of this.json.weapons[this.currentCarouselWeaponIdx].meshes) {
-                this.modelEntityAlter.show(meshName,false);
-            }
-        }
-        
-        this.weaponLowerFinishTick=-1;
-        
-            // start the raise
-            
-        this.currentCarouselWeaponIdx=this.gotoCarouselWeaponIdx;
-        weaponEntity=this.carouselWeapons[this.currentCarouselWeaponIdx];
-                
-        weaponEntity.show=true;
-
-        this.forceAnimationUpdate=true;
-        this.currentIdleAnimation=weaponEntity.parentIdleAnimation;
-        this.currentRunAnimation=weaponEntity.parentRunAnimation;
-
-        for (meshName of this.json.weapons[this.currentCarouselWeaponIdx].meshes) {
-            this.modelEntityAlter.show(meshName,true);
-        }
-
-        this.weaponRaiseFinishTick=this.core.game.timestamp+weaponEntity.runRaiseAnimation();
-    }
-    
-    endCarouselWeaponSwitch()
-    {
-        this.weaponRaiseFinishTick=-1;
-    }
-    
-    setCurrentAnimation()
-    {
-        if ((this.movement.x!==0) || (this.movement.z!==0)) {
-            if ((this.inStandingAnimation) || (this.forceAnimationUpdate)) {
-                this.modelEntityAlter.startAnimationChunkInFrames(this.currentRunAnimation);
-            }
-            this.inStandingAnimation=false;
-        }
-        else {
-            if ((!this.inStandingAnimation) || (this.forceAnimationUpdate)) {
-                this.modelEntityAlter.startAnimationChunkInFrames(this.currentIdleAnimation);
-            }
-            this.inStandingAnimation=true;
-        }
-        
-        this.forceAnimationUpdate=false;        
-    }
-    
-        //
         // player ready
         //
         
@@ -387,11 +270,11 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.setCurrentAnimation();
         
             // move to random spawn node
-            // if multiplayer
+            // if multiplayer, if no nodes
+            // yet, just leave spawned at 0,0,0
             
         this.telefragTriggerEntity=null;
-            
-        if (this.core.game.multiplayerMode!==this.core.game.MULTIPLAYER_MODE_NONE) this.moveToRandomSpawnNode(false);
+        if ((this.core.game.multiplayerMode!==this.core.game.MULTIPLAYER_MODE_NONE) && (this.core.game.map.path.spawnNodes.length!==0)) this.moveToRandomSpawnNode(false);
         
             // turn off any score display
             
@@ -562,19 +445,271 @@ export default class EntityFPSPlayerClass extends EntityClass
     {
         this.telefragTriggerEntity=fromEntity;
     }
+    
+        //
+        // animation utilities
+        //
+        
+    setCurrentAnimation()
+    {
+        if ((this.movement.x!==0) || (this.movement.z!==0)) {
+            if ((this.inStandingAnimation) || (this.forceAnimationUpdate)) {
+                this.modelEntityAlter.startAnimationChunkInFrames(this.currentRunAnimation);
+            }
+            this.inStandingAnimation=false;
+        }
+        else {
+            if ((!this.inStandingAnimation) || (this.forceAnimationUpdate)) {
+                this.modelEntityAlter.startAnimationChunkInFrames(this.currentIdleAnimation);
+            }
+            this.inStandingAnimation=true;
+        }
+        
+        this.forceAnimationUpdate=false;        
+    }
 
+        //
+        // weapons
+        //
+        
+    setCarouselWeaponDefault()
+    {
+        let n,weaponEntity,meshName;
+        
+        this.currentCarouselWeaponIdx=this.defaultCarouselWeaponIdx;
+        this.weaponLowerFinishTick=-1;
+        this.weaponRaiseFinishTick=-1;
+        this.weaponClipFinishTick=-1;
+        
+            // show hide weapons
+
+        for (n=0;n!==this.carouselWeapons.length;n++) {
+            weaponEntity=this.carouselWeapons[n];
+            
+            if (n===this.currentCarouselWeaponIdx) {
+                weaponEntity.show=true;
+                
+                this.forceAnimationUpdate=true;
+                this.currentIdleAnimation=weaponEntity.parentIdleAnimation;
+                this.currentRunAnimation=weaponEntity.parentRunAnimation;
+                
+                for (meshName of this.json.weapons[n].meshes) {
+                    this.modelEntityAlter.show(meshName,true);
+                }
+                
+                weaponEntity.startIdleAnimation();
+            }
+            else {
+                weaponEntity.show=false;
+                
+                for (meshName of this.json.weapons[n].meshes) {
+                    this.modelEntityAlter.show(meshName,false);
+                }
+            }
+        }
+    }
+        
+    startCarouselWeaponSwitch(weaponIdx)
+    {
+        let weaponEntity;
+        
+        this.gotoCarouselWeaponIdx=weaponIdx;
+        
+            // lower current weapon
+        
+        if (this.currentCarouselWeaponIdx!==-1) {
+            weaponEntity=this.carouselWeapons[this.currentCarouselWeaponIdx];
+            this.weaponLowerFinishTick=this.core.game.timestamp+weaponEntity.runLowerAnimation();
+        }
+        else {
+            swapCarouselWeaponSwitch();
+        }
+    }
+    
+    swapCarouselWeaponSwitch()
+    {
+        let meshName,weaponEntity;
+        
+            // hide the current weapon
+        
+        if (this.currentCarouselWeaponIdx!==-1) {
+            weaponEntity=this.carouselWeapons[this.currentCarouselWeaponIdx];
+            
+            weaponEntity.show=false;
+                
+            for (meshName of this.json.weapons[this.currentCarouselWeaponIdx].meshes) {
+                this.modelEntityAlter.show(meshName,false);
+            }
+        }
+        
+        this.weaponLowerFinishTick=-1;
+        
+            // start the raise
+            
+        this.currentCarouselWeaponIdx=this.gotoCarouselWeaponIdx;
+        weaponEntity=this.carouselWeapons[this.currentCarouselWeaponIdx];
+                
+        weaponEntity.show=true;
+
+        this.forceAnimationUpdate=true;
+        this.currentIdleAnimation=weaponEntity.parentIdleAnimation;
+        this.currentRunAnimation=weaponEntity.parentRunAnimation;
+
+        for (meshName of this.json.weapons[this.currentCarouselWeaponIdx].meshes) {
+            this.modelEntityAlter.show(meshName,true);
+        }
+
+        this.weaponRaiseFinishTick=this.core.game.timestamp+weaponEntity.runRaiseAnimation();
+    }
+    
+    endCarouselWeaponSwitch()
+    {
+        this.weaponRaiseFinishTick=-1;
+    }
+    
+    runWeaponAnimations()
+    {
+        let weaponCarouselFreeze=false;
+        
+        if (this.weaponLowerFinishTick!==-1) {
+            if (this.weaponLowerFinishTick<=this.core.game.timestamp) {
+                this.swapCarouselWeaponSwitch();
+            }
+            weaponCarouselFreeze=true;
+        }
+        
+        if (this.weaponRaiseFinishTick!==-1) {
+            if (this.weaponRaiseFinishTick<=this.core.game.timestamp) {
+                this.endCarouselWeaponSwitch();
+            }
+            else {
+                weaponCarouselFreeze=true;
+            }
+        }
+
+        if (this.weaponClipFinishTick!==-1) {
+            if (this.weaponClipFinishTick<=this.core.game.timestamp) {
+                this.weaponClipFinishTick=-1;
+            }
+            else {
+                weaponCarouselFreeze=true;
+            }
+        }
+
+        return(weaponCarouselFreeze);
+    }
+    
+    runWeaponCarouselInput(input,overlay)
+    {
+        let n;
+        let switchWeaponIdx,weapChangeDir,startWeaponIdx;
+        
+        switchWeaponIdx=this.currentCarouselWeaponIdx;
+        weapChangeDir=input.mouseWheelRead()+overlay.getTouchSwipeLeftX();
+
+        if (weapChangeDir<0) {
+            startWeaponIdx=switchWeaponIdx;
+
+            while (true) {
+                switchWeaponIdx--;
+                if (switchWeaponIdx<0) switchWeaponIdx=this.carouselWeapons.length-1;
+                if (switchWeaponIdx===startWeaponIdx) break;
+
+                if (this.carouselWeapons[switchWeaponIdx].available) break;
+            }
+        }
+
+        if (weapChangeDir>0) {
+            startWeaponIdx=switchWeaponIdx;
+
+            while (true) {
+                switchWeaponIdx++;
+                if (switchWeaponIdx>(this.carouselWeapons.length-1)) switchWeaponIdx=0;
+                if (switchWeaponIdx===startWeaponIdx) break;
+
+                if (this.carouselWeapons[switchWeaponIdx].available) break;
+            }
+        }
+
+        for (n=0;n<this.carouselWeapons.length;n++) {
+            if (input.isKeyDown(String.fromCharCode(49+n))) {
+                if (this.carouselWeapons[n].available) {
+                    switchWeaponIdx=n;
+                    break;
+                }
+            }
+        }
+
+        if (this.currentCarouselWeaponIdx!==switchWeaponIdx) {
+            this.startCarouselWeaponSwitch(switchWeaponIdx);
+        }
+    }
+    
+    runWeaponFireForType(weapon,fireMethod)
+    {
+        let weaponEntity;
+        
+            // fire wait
+            
+        if (weapon.isFirePaused(fireMethod)) return;
+        
+            // check for clip reload
+            
+        if (weapon.needClipChange(fireMethod)) {
+            weaponEntity=this.carouselWeapons[this.currentCarouselWeaponIdx];
+            this.weaponClipFinishTick=this.core.game.timestamp+weaponEntity.changeClip(fireMethod,this.position);
+            return;
+        }
+        
+            // fire
+         
+        weapon.fire(fireMethod,this.firePosition,this.angle);
+    }
+    
+    runWeaponFiring(input,overlay)
+    {
+        let n,weapon;
+        let firePrimary,fireSecondary,fireTertiary;
+        
+            // carousel firing
+            
+        firePrimary=input.mouseButtonFlags[0]||overlay.isTouchStickRightClick();
+        fireSecondary=input.mouseButtonFlags[1];
+        fireTertiary=input.mouseButtonFlags[2]||(overlay.getTouchSwipeRightY()<0);
+
+        this.firePosition.setFromPoint(this.position);
+        this.firePosition.y+=this.eyeOffset;
+
+        if (this.currentCarouselWeaponIdx!==-1) {
+            weapon=this.carouselWeapons[this.currentCarouselWeaponIdx];
+
+            if (firePrimary) this.runWeaponFireForType(weapon,weapon.FIRE_METHOD_PRIMARY);
+            if (fireSecondary) this.runWeaponFireForType(weapon,weapon.FIRE_METHOD_SECONDARY);
+            if (fireTertiary) this.runWeaponFireForType(weapon,weapon.FIRE_METHOD_TERTIARY);
+        }
+
+            // extra weapon firing
+            
+        for (n=0;n<this.extraWeapons.length;n++) {
+            weapon=this.extraWeapons[n];
+            if (!weapon.available) continue;
+            
+            if (firePrimary) this.runWeaponFireForType(weapon,weapon.FIRE_METHOD_PRIMARY);
+            if (fireSecondary) this.runWeaponFireForType(weapon,weapon.FIRE_METHOD_SECONDARY);
+            if (fireTertiary) this.runWeaponFireForType(weapon,weapon.FIRE_METHOD_TERTIARY);
+        }
+    }
+    
         //
         // run
         //
     
     run()
     {
-        let n,x,y;
+        let x,y;
         let moveForward,moveBackward,moveLeft,moveRight;
         let liquid,liquidIdx,bump,gravityFactor,fallDist;
-        let weapon,firePrimary,fireSecondary,fireTertiary;
-        let turnAdd,lookAdd,startWeaponIdx,switchWeaponIdx,weaponCarouselFreeze;
-        let weapChangeDir,cube;
+        let turnAdd,lookAdd,cube;
         let input=this.core.input;
         let overlay=this.core.game.overlay;
         let setup=this.core.setup;
@@ -665,95 +800,11 @@ export default class EntityFPSPlayerClass extends EntityClass
             }
         }
         
-            // weapon animations
+            // weapons
             
-        weaponCarouselFreeze=false;
-        
-        if (this.weaponLowerFinishTick!==-1) {
-            if (this.weaponLowerFinishTick<=this.core.game.timestamp) {
-                this.swapCarouselWeaponSwitch();
-            }
-            weaponCarouselFreeze=true;
-        }
-        if (this.weaponRaiseFinishTick!==-1) {
-            if (this.weaponRaiseFinishTick<=this.core.game.timestamp) {
-                this.endCarouselWeaponSwitch();
-            }
-            else {
-                weaponCarouselFreeze=true;
-            }
-        }
-        
-            // weapon switching
-            
-        if (!weaponCarouselFreeze) {
-            switchWeaponIdx=this.currentCarouselWeaponIdx;
-            weapChangeDir=input.mouseWheelRead()+overlay.getTouchSwipeLeftX();
-
-            if (weapChangeDir<0) {
-                startWeaponIdx=switchWeaponIdx;
-
-                while (true) {
-                    switchWeaponIdx--;
-                    if (switchWeaponIdx<0) switchWeaponIdx=this.carouselWeapons.length-1;
-                    if (switchWeaponIdx===startWeaponIdx) break;
-
-                    if (this.carouselWeapons[switchWeaponIdx].available) break;
-                }
-            }
-
-            if (weapChangeDir>0) {
-                startWeaponIdx=switchWeaponIdx;
-
-                while (true) {
-                    switchWeaponIdx++;
-                    if (switchWeaponIdx>(this.carouselWeapons.length-1)) switchWeaponIdx=0;
-                    if (switchWeaponIdx===startWeaponIdx) break;
-
-                    if (this.carouselWeapons[switchWeaponIdx].available) break;
-                }
-            }
-
-            for (n=0;n<this.carouselWeapons.length;n++) {
-                if (input.isKeyDown(String.fromCharCode(49+n))) {
-                    if (this.carouselWeapons[n].available) {
-                        switchWeaponIdx=n;
-                        break;
-                    }
-                }
-            }
-
-            if (this.currentCarouselWeaponIdx!==switchWeaponIdx) {
-                this.startCarouselWeaponSwitch(switchWeaponIdx);
-            }
-        }
-        
-            // weapon firing
-            
-        if (!weaponCarouselFreeze) {
-            firePrimary=input.mouseButtonFlags[0]||overlay.isTouchStickRightClick();
-            fireSecondary=input.mouseButtonFlags[1];
-            fireTertiary=input.mouseButtonFlags[2]||(overlay.getTouchSwipeRightY()<0);
-
-            this.firePosition.setFromPoint(this.position);
-            this.firePosition.y+=this.eyeOffset;
-
-            if (this.currentCarouselWeaponIdx!==-1) {
-                weapon=this.carouselWeapons[this.currentCarouselWeaponIdx];
-
-                if (firePrimary) weapon.firePrimary(this.firePosition,this.angle);
-                if (fireSecondary) weapon.fireSecondary(this.firePosition,this.angle);
-                if (fireTertiary) weapon.fireTertiary(this.firePosition,this.angle);
-            }
-        }
-        
-        for (n=0;n<this.extraWeapons.length;n++) {
-            weapon=this.extraWeapons[n];
-            if (weapon.available) {
-                if (firePrimary) weapon.firePrimary(this.firePosition,this.angle);
-                if (fireSecondary) weapon.fireSecondary(this.firePosition,this.angle);
-                if (fireTertiary) weapon.fireTertiary(this.firePosition,this.angle);
-            }
+        if (!this.runWeaponAnimations()) {
+            this.runWeaponCarouselInput(input,overlay);
+            this.runWeaponFiring(input,overlay);
         }
         
             // forward and shift controls

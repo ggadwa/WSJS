@@ -75,8 +75,6 @@ public class HTTPUpload
             if (!file.exists()) file.mkdir();
         }
         
-        System.out.println(mapDirPath);
-        
             // if this is a SBN, then we need to clear
             // the folder because a new set of shadowmaps
             // is coming in

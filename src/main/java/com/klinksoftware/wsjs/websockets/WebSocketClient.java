@@ -1,12 +1,13 @@
 package com.klinksoftware.wsjs.websockets;
 
+import com.klinksoftware.wsjs.application.*;
 
 import java.io.*;
 import java.net.*;
 import java.nio.*;
 import java.security.*;
 import java.util.*;
-/*
+
 public class WebSocketClient implements Runnable
 {
     private static final int MAX_MESSAGE_LENGTH=64*1024;
@@ -25,13 +26,15 @@ public class WebSocketClient implements Runnable
     private boolean                 inShutdown;
     private String                  userName;
     private byte[]                  socketInBytes,socketOutHeaderBytes;
+    private final App               app;
     private final WebSocketListener listener;
     private final Socket            socket;
     private InputStream             in;
     private OutputStream            out;
     
-    public WebSocketClient(WebSocketListener listener,int id,Socket socket)
+    public WebSocketClient(App app,WebSocketListener listener,int id,Socket socket)
     {
+        this.app=app;
         this.listener=listener;
         this.id=id;
         this.socket=socket;
@@ -232,7 +235,7 @@ public class WebSocketClient implements Runnable
         
                     // stats
         
-        App.getAppWindow().addStatusNetworkBytes(readLen);
+        app.addStatusNetworkBytes(readLen);
         
             // parse the http transaction, if we
             // don't have a get or it's less than 2 lines,
@@ -263,8 +266,7 @@ public class WebSocketClient implements Runnable
             acceptKey=Base64.getEncoder().encodeToString(MessageDigest.getInstance("SHA-1").digest((key+"258EAFA5-E914-47DA-95CA-C5AB0DC85B11").getBytes("UTF-8")));
         }
         catch (NoSuchAlgorithmException e) {
-            System.out.println("Unable to exchange keys with client");
-            e.printStackTrace();
+            app.log("Unable to exchange keys with client");
             return(false);
         }
         
@@ -285,7 +287,7 @@ public class WebSocketClient implements Runnable
         
             // stats
         
-        App.getAppWindow().addStatusNetworkBytes(bytes.length);
+        app.addStatusNetworkBytes(bytes.length);
         
         return(true);
     }
@@ -303,8 +305,7 @@ public class WebSocketClient implements Runnable
         }
         catch (Exception e)
         {
-            System.out.println("Unable to read logon message");
-            e.printStackTrace();
+            app.log("Unable to read logon message");
             return(false);
         }
         
@@ -314,7 +315,7 @@ public class WebSocketClient implements Runnable
         byteBuf=ByteBuffer.wrap(bytes);
         
         if (byteBuf.getShort(0)!=MESSAGE_TYPE_ENTITY_LOGON_REQUEST) {
-            System.out.println("Got bad logon message, type was: "+byteBuf.getShort(0));
+            app.log("Got bad logon message, type was: "+byteBuf.getShort(0));
             return(false);
         }
         
@@ -339,8 +340,7 @@ public class WebSocketClient implements Runnable
             writeMessage(byteBuf.array());
         }
         catch (Exception e) {
-            System.out.println("Unable to write logon reply");
-            e.printStackTrace();
+            app.log("Unable to write logon reply");
             return(false);
         }
         
@@ -365,7 +365,7 @@ public class WebSocketClient implements Runnable
         
             // if no other players, immediately return no sync
             
-        if (App.getClientList().size()<=1) {
+        if (app.getClientList().size()<=1) {
             byteBuf=ByteBuffer.allocate(3);
             byteBuf.putShort(0,MESSAGE_TYPE_MAP_SYNC_REPLY);
             byteBuf.put((byte)0);         // true/false, set to false for no sync (keep current values)
@@ -394,8 +394,7 @@ public class WebSocketClient implements Runnable
         {
             if (inShutdown) return(false);          // if in shutdown, we are canceling this thread by closing the socket
             
-            System.out.println("Unable to read message");
-            e.printStackTrace();
+            app.log("Unable to read message");
             return(false);
         }
         
@@ -421,8 +420,7 @@ public class WebSocketClient implements Runnable
             writeMessage(msg);
         }
         catch (Exception e) {
-            System.out.println("Unable to write message");
-            e.printStackTrace();
+            app.log("Unable to write message");
             return(false);
         }
         
@@ -443,8 +441,7 @@ public class WebSocketClient implements Runnable
         }
         catch (Exception e)
         {
-            System.out.println("Unable to send enter message");
-            e.printStackTrace();
+            app.log("Unable to send enter message");
         }
     }
     
@@ -461,8 +458,7 @@ public class WebSocketClient implements Runnable
         }
         catch (Exception e)
         {
-            System.out.println("Unable to send leave message");
-            e.printStackTrace();
+            app.log("Unable to send leave message");
         }
     }
     
@@ -470,15 +466,13 @@ public class WebSocketClient implements Runnable
     {
         int                         n;
         ByteBuffer                  byteBuf;
-        WebSocketClient             client;
-        ArrayList<WebSocketClient>  clients=App.getClientList();
+        ArrayList<WebSocketClient>  clients=app.getClientList();
             
         byteBuf=ByteBuffer.allocate(USER_NAME_LENGTH+4);
         byteBuf.putShort(0,MESSAGE_TYPE_ENTITY_ENTER);
         
         synchronized (clients) {
-            for (n=0;n!=clients.size();n++) {
-                client=clients.get(n);
+            for (WebSocketClient client:clients) {
                 if (client.getId()==id) continue;
                 
                 byteBuf.putShort(2,(short)client.getId());
@@ -489,8 +483,7 @@ public class WebSocketClient implements Runnable
                 }
                 catch (Exception e)
                 {
-                    System.out.println("Unable to send enter message");
-                    e.printStackTrace();
+                    app.log("Unable to send enter message");
                 }
             }
         }
@@ -510,7 +503,6 @@ public class WebSocketClient implements Runnable
             socket.close();
         }
         catch(Exception e) {    // socket already closed, not much to do here
-            e.printStackTrace();
         }
     }
     
@@ -534,8 +526,8 @@ public class WebSocketClient implements Runnable
                 
             if (!getLogonRequest()) return;
             
-            App.getAppWindow().log("Client connected: "+userName+" (id:"+Integer.toString(id)+")");
-            App.getAppWindow().updateUserList();
+            app.log("Client connected: "+userName+" (id:"+Integer.toString(id)+")");
+            app.updateUserList();
             
                 // push other players
                 
@@ -555,8 +547,7 @@ public class WebSocketClient implements Runnable
         }
         catch (IOException e)
         {
-            App.getAppWindow().log("IO exception on client socket");
-            e.printStackTrace();
+            app.log("IO exception on client socket");
         }
         finally {
             if (userName!=null) distributeLeaveMessage();
@@ -566,18 +557,16 @@ public class WebSocketClient implements Runnable
             }
             catch (Exception e2)
             {
-                App.getAppWindow().log("Unable to close client socket");
-                e2.printStackTrace();
+                app.log("Unable to close client socket");
             }
             
             listener.removeClient(this);
             
             if (userName!=null) {
-                App.getAppWindow().log("Client disconnected: "+userName+" (id:"+Integer.toString(id)+")");
-                App.getAppWindow().updateUserList();
+                app.log("Client disconnected: "+userName+" (id:"+Integer.toString(id)+")");
+                app.updateUserList();
             }
         }
     }
     
 }
-*/

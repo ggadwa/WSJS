@@ -198,8 +198,6 @@ export default class MapEntityListClass
         let n,character,name,idx;
         let nameMap;
         
-            // if a local multiplayer game, add bots
-        
         if (this.core.game.multiplayerMode===this.core.game.MULTIPLAYER_MODE_LOCAL) {
             nameMap=new Map();
             

@@ -9,21 +9,19 @@ import java.util.*;
 
 public class App
 {
-    private String                  workingPath,dataPath;
-    private Calendar                startUpTime;
-    private AppWindow               appWindow;
-    private Storage                 storage;
-//    private static final ArrayList<WebSocketClient> clients;
+    private String                      workingPath,dataPath;
+    private Calendar                    startUpTime;
+    private AppWindow                   appWindow;
+    private Storage                     storage;
+    private ArrayList<WebSocketClient>  clients;
     
-    private static final Object     mainLock,httpLock,webSocketLock;
+    private static final Object         mainLock,httpLock,webSocketLock;
     
     static
     {
         mainLock=new Object();
         httpLock=new Object();
         webSocketLock=new Object();
-        
-    //    clients=new ArrayList<>();
     }
     
         //
@@ -55,6 +53,11 @@ public class App
         storage.addUser(userId);
     }
     
+    public void updateUserList()
+    {
+        appWindow.updateUserList(clients);
+    }
+    
     public void updateStatus()
     {
         appWindow.updateStatus();
@@ -65,12 +68,10 @@ public class App
         appWindow.addStatusNetworkBytes(byteCount);
     }
     
-    /*
     public ArrayList<WebSocketClient> getClientList()
     {
         return(clients);
     }
-    */
     
         //
         // build needed paths
@@ -145,7 +146,7 @@ public class App
     public void run()
     {
         HTTPListener            httpListener;
-        //WebSocketListener       webSocketListener;
+        WebSocketListener       webSocketListener;
         Thread                  httpListenerThread,webSocketListenerThread;
 
             // build paths and startup time
@@ -156,6 +157,10 @@ public class App
         
         buildWorkingPath();
         buildDataPath();
+        
+            // the multiplayer clients
+            
+        clients=new ArrayList<>();
         
             // start the window
         
@@ -187,28 +192,21 @@ public class App
             }
         }
         
+            // start the websocket listener, and wait
+            // for a confirmed start
 
-        
-                // start the websocket server on it's own thread
-                // and wait for a confirmed start
-    /*
-            webSocketListener=new WebSocketListener(this);
-            webSocketListenerThread=new Thread(webSocketListener,("ws_listener_thread"));
-            webSocketListenerThread.start();
+        webSocketListener=new WebSocketListener(this);
+        webSocketListenerThread=new Thread(webSocketListener,("ws_listener_thread"));
+        webSocketListenerThread.start();
 
-            synchronized(webSocketLock) {
-                try {
-                    webSocketLock.wait();
-                }
-                catch(InterruptedException e)   // todo -- not sure what case happens here
-                {
-                }
+        synchronized(webSocketLock) {
+            try {
+                webSocketLock.wait();
             }
-                
-
-
-    */
-
+            catch(InterruptedException e)   // todo -- not sure what case happens here
+            {
+            }
+        }
         
             // lock the main thread until it's time to quit
             
@@ -221,18 +219,16 @@ public class App
                 appWindow.log("Main loop got interrupted, bailing: "+e.getMessage());
             }
         }
-
+        
             // shutdown websocket listener
-          /*  
 
         webSocketListener.shutdown();
-        try { webSocketListenerThread.join(); } catch(InterruptedException e) {}       // nothing to do if this is interupted, we are shutting down anyway
-
-        */
+        try { webSocketListenerThread.join(); } catch(InterruptedException e) {}    // nothing to do if this is interupted, we are shutting down anyway
+        
             // shutdown http listener
             
         httpListener.shutdown();
-        try { httpListenerThread.join(); } catch(InterruptedException e) {}       // nothing to do if this is interupted, we are shutting down anyway
+        try { httpListenerThread.join(); } catch(InterruptedException e) {}         // nothing to do if this is interupted, we are shutting down anyway
         
             // shutdown storage, window, and spring
             

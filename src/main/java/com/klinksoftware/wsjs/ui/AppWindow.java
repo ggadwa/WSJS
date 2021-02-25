@@ -1,7 +1,9 @@
 package com.klinksoftware.wsjs.ui;
 
-import com.klinksoftware.wsjs.application.App;
+import com.klinksoftware.wsjs.application.*;
+import com.klinksoftware.wsjs.websockets.*;
 
+import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.net.*;
@@ -18,7 +20,7 @@ public class AppWindow implements WindowListener
     private final App       app;
     
     private JFrame          frame;
-    private JToolBar        toolBar;
+    //private JToolBar        toolBar;
     private JLabel          userLabel,logLabel;
     private JScrollPane     userScrollPane,logScrollPane;
     private LogPanel        logPanel;
@@ -254,9 +256,9 @@ public class AppWindow implements WindowListener
         logPanel.log(str);
     }
     
-    public void updateUserList()
+    public void updateUserList(ArrayList<WebSocketClient> clients)
     {
-        userPanel.update();
+        userPanel.update(clients);
     }
     
     public void addStatusNetworkBytes(int byteCount)

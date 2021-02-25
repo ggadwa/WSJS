@@ -511,6 +511,7 @@ export default class EntityKartBaseClass extends EntityClass
     {
         let maxTurnSpeed,speed,rate;
         let smokeAngle,burstAngle;
+        let weapon;
         
             // spinning
             
@@ -527,9 +528,10 @@ export default class EntityKartBaseClass extends EntityClass
         
         if (fire) {
             if (this.currentWeaponIdx!==-1) {
+                weapon=this.weapons[this.currentWeaponIdx];
                 this.fireAngle.setFromPoint(this.drawAngle);
                 this.fireAngle.x=-this.fireAngle.z;      // translate rigid body to fire position
-                this.weapons[this.currentWeaponIdx].firePrimary(this.position,this.fireAngle);
+                weapon.fire(weapon.FIRE_METHOD_PRIMARY,this.position,this.fireAngle);
              }
         }
         

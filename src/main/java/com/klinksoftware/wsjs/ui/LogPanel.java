@@ -37,6 +37,5 @@ public class LogPanel extends JTextArea
         setCaretPosition(getDocument().getLength());
 
         System.out.println(str);            // always write logs to standard out, just in case
-        
     }
 }

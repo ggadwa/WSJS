@@ -61,7 +61,6 @@ public class HTTPListener implements Runnable
         catch (IOException e) {
             app.log("Unable to create http server socket: "+e.getMessage());
             app.triggerHTTPStartUpFinished();
-            e.printStackTrace();
             return;
         }
         
@@ -85,7 +84,6 @@ public class HTTPListener implements Runnable
             {
                 if (!inShutdown) {
                     app.log("Error in HTTP listener accept: "+e.getMessage());
-                    e.printStackTrace();
                 }
                 break;
             }
@@ -111,7 +109,6 @@ public class HTTPListener implements Runnable
         catch (Exception e)
         {
             app.log("Unable to properly shutdown HTTP listener socket: "+e.getMessage());
-            e.printStackTrace();
         }
         
         running=false;

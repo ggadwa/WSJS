@@ -236,13 +236,18 @@ export default class EntityFPSBotClass extends EntityClass
         
             // move to random spawn node
             
-        this.moveToRandomSpawnNode(false);
+        if (this.core.game.map.path.spawnNodes.length!==0) this.moveToRandomSpawnNode(false);
 
             // get seek node
             
-        this.goalNodeIdx=this.getRandomKeyNodeIndex();      // path to some random key node
-        this.nextNodeIdx=this.nextNodeInPath(this.findNearestPathNode(-1),this.goalNodeIdx);    // we always spawn on a node, so next node is node in path to goal node
-
+        if (this.core.game.map.path.keyNodes.length!==0) {
+            this.goalNodeIdx=this.getRandomKeyNodeIndex();      // path to some random key node
+            this.nextNodeIdx=this.nextNodeInPath(this.findNearestPathNode(-1),this.goalNodeIdx);    // we always spawn on a node, so next node is node in path to goal node
+        }
+        else {
+            this.nextNodeIdx=-1;
+        }
+        
         this.pausedTriggerName=null;
         this.targetEntity=null;
         this.lastTargetAngleDif=360;
@@ -255,7 +260,7 @@ export default class EntityFPSBotClass extends EntityClass
             // turn the bot directly towards the node
             // they are heading to when starting
             
-        this.turnYTowardsNode(this.nextNodeIdx,360);
+        if (this.nextNodeIdx!==-1) this.turnYTowardsNode(this.nextNodeIdx,360);
 
             // start animation
             
@@ -483,14 +488,15 @@ export default class EntityFPSBotClass extends EntityClass
         for (weapon of this.extraWeapons) {
             if (weapon.hasAnyAmmo()) {
                 if ((dist>weapon.botFireRange.min) && (dist<weapon.botFireRange.max)) {
-                    if (weapon.fireAny(this.firePosition,this.drawAngle)) return;
+                    if (weapon.fire(weapon.FIRE_METHOD_ANY,this.firePosition,this.drawAngle)) return;
                 }
             }
         }
            
             // otherwise shot the held weapon
             
-        weapon=this.carouselWeapons[this.currentCarouselWeaponIdx].fireAny(this.firePosition,this.drawAngle);
+        weapon=this.carouselWeapons[this.currentCarouselWeaponIdx];
+        weapon.fire(weapon.FIRE_METHOD_ANY,this.firePosition,this.drawAngle);
     }
     
         //

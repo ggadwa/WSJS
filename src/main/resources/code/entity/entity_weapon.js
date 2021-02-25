@@ -9,10 +9,13 @@ class EntityWeaponFireClass
         this.core=core;
         this.weapon=weapon;
         
-        this.ammo=0;
         this.ammoInitialCount=this.core.game.lookupValue(fireObj.ammoInitialCount,weapon.data,0);
         this.ammoMaxCount=this.core.game.lookupValue(fireObj.ammoMaxCount,weapon.data,0);
         this.ammoRegenerateTick=this.core.game.lookupValue(fireObj.ammoRegenerateTick,weapon.data,-1);
+        this.ammoClipSize=this.core.game.lookupValue(fireObj.ammoClipSize,weapon.data,-1);
+        
+        this.ammo=0;
+        this.ammoClip=0;
         
         this.interfaceAmmoIcon=this.core.game.lookupValue(fireObj.interfaceAmmoIcon,weapon.data,null);
         this.interfaceAmmoText=this.core.game.lookupValue(fireObj.interfaceAmmoText,weapon.data,null);
@@ -39,6 +42,7 @@ class EntityWeaponFireClass
     ready()
     {
         this.ammo=this.ammoInitialCount;
+        this.ammoClip=this.ammoClipSize;
         
         this.lastFireTimestamp=0;
         this.lastRegenerateTimestamp=this.core.game.timestamp+this.ammoRegenerateTick;
@@ -84,6 +88,11 @@ export default class EntityWeaponClass extends EntityClass
         this.FIRE_TYPE_PROJECTILE=1;
         
         this.FIRE_TYPE_LIST=['hit_scan','projectile'];
+        
+        this.FIRE_METHOD_ANY=-1;
+        this.FIRE_METHOD_PRIMARY=0;
+        this.FIRE_METHOD_SECONDARY=1;
+        this.FIRE_METHOD_TERTIARY=2;
         
         this.idleAnimation=null;
         this.idleWalkAnimation=null;
@@ -138,6 +147,8 @@ export default class EntityWeaponClass extends EntityClass
         this.raiseAnimation=this.core.game.lookupAnimationValue(this.json.animations.raiseAnimation);
         this.lowerAnimation=this.core.game.lookupAnimationValue(this.json.animations.lowerAnimation);
         this.reloadAnimation=this.core.game.lookupAnimationValue(this.json.animations.reloadAnimation);
+        
+        this.reloadSound=this.core.game.lookupSoundValue(this.json.sounds.reloadSound);
         
         this.interfaceCrosshair=this.core.game.lookupValue(this.json.config.interfaceCrosshair,this.data);
        
@@ -302,6 +313,19 @@ export default class EntityWeaponClass extends EntityClass
         return(0);
     }
     
+    runReloadAnimation()
+    {
+        if (this.model===null) return;
+        
+        if (this.reloadAnimation!=null) {
+            this.modelEntityAlter.startAnimationChunkInFrames(this.reloadAnimation);
+            this.queueIdleAnimation();
+            return(this.modelEntityAlter.getAnimationTickCount(this.reloadAnimation));
+        }
+        
+        return(0);
+    }
+    
         //
         // hit scans
         //
@@ -381,19 +405,35 @@ export default class EntityWeaponClass extends EntityClass
     }
     
         //
-        // fire for type
+        // firing
         //
         
+    isFirePaused(fireMethod)
+    {
+        switch (fireMethod) {
+            case this.FIRE_METHOD_PRIMARY:
+                if (this.primary===null) return(false);
+                return((this.primary.lastFireTimestamp+this.primary.waitTick)>this.core.game.timestamp);
+            case this.FIRE_METHOD_SECONDARY:
+                if (this.secondary===null) return(false);
+                return((this.secondary.lastFireTimestamp+this.secondary.waitTick)>this.core.game.timestamp);
+            case this.FIRE_METHOD_TERTIARY:
+                if (this.tertiary===null) return(false);
+                return((this.tertiary.lastFireTimestamp+this.tertiary.waitTick)>this.core.game.timestamp);
+        }
+        
+        return(false);
+    }
+    
     fireForType(parentEntity,fire,fireAnimation,fireAnimationFreezeMovement,firePosition,fireAngle)
     {
-        if (fire.ammo===0) return;
-        
         if ((fire.lastFireTimestamp+fire.waitTick)>this.core.game.timestamp) return;
         fire.lastFireTimestamp=this.core.game.timestamp;
         
             // fire
             
         fire.ammo--;
+        if (fire.ammoClipSize!==-1) fire.ammoClip--;
         fire.resetRegenerateAmmo();
         
         this.core.audio.soundStartGameFromList(this.core.game.map.soundList,firePosition,fire.fireSound);
@@ -435,49 +475,92 @@ export default class EntityWeaponClass extends EntityClass
         }
     }
     
-        //
-        // firing
-        //
-        
-    firePrimary(firePosition,fireAngle)
+    fire(fireMethod,firePosition,fireAngle)
     {
-        if (this.primary!==null) this.fireForType(this.heldBy,this.primary,this.parentPrimaryFireRunAnimation,this.parentPrimaryFireFreezeMovement,firePosition,fireAngle);
-    }
-    
-    fireSecondary(firePosition,fireAngle)
-    {
-        if (this.secondary!==null) this.fireForType(this.heldBy,this.secondary,this.parentSecondaryFireRunAnimation,this.parentSecondaryFireFreezeMovement,firePosition,fireAngle);
-    }
-    
-    fireTertiary(firePosition,fireAngle)
-    {
-        if (this.tertiary!==null) this.fireForType(this.heldBy,this.tertiary,this.parentTertiaryFireRunAnimation,this.parentTertiaryFireFreezeMovement,firePosition,fireAngle);
-    }
-    
-    fireAny(firePosition,fireAngle)
-    {
-        if (this.primary!==null) {
-            if (this.primary.ammo!==0) {
-                this.firePrimary(firePosition,fireAngle);
-                return(true);
+            // primary
+            
+        if ((fireMethod===this.FIRE_METHOD_PRIMARY) || (fireMethod===this.FIRE_METHOD_ANY)) {
+            if (this.primary!==null) {
+                if (this.primary.ammo!==0) {
+                    this.fireForType(this.heldBy,this.primary,this.parentPrimaryFireRunAnimation,this.parentPrimaryFireFreezeMovement,firePosition,fireAngle);
+                    return(true);
+                }
             }
+            if (fireMethod!==this.FIRE_METHOD_ANY) return(false);
         }
         
-        if (this.secondary!==null) {
-            if (this.secondary.ammo!==0) {
-                this.fireSecondary(firePosition,fireAngle);
-                return(true);
+            // secondary
+            
+        if ((fireMethod===this.FIRE_METHOD_SECONDARY) || (fireMethod===this.FIRE_METHOD_ANY)) {
+            if (this.secondary!==null) {
+                if (this.secondary.ammo!==0) {
+                    this.fireForType(this.heldBy,this.secondary,this.parentSecondaryFireRunAnimation,this.parentSecondaryFireFreezeMovement,firePosition,fireAngle);
+                    return(true);
+                }
             }
+            if (fireMethod!==this.FIRE_METHOD_ANY) return(false);
         }
         
-        if (this.tertiary!==null) {
-            if (this.tertiary.ammo!==0) {
-                this.fireTertiary(firePosition,fireAngle);
-                return(true);
+            // tertiary
+            
+        if ((fireMethod===this.FIRE_METHOD_TERTIARY) || (fireMethod===this.FIRE_METHOD_ANY)) {
+            if (this.tertiary!==null) {
+                if (this.tertiary.ammo!==0) {
+                    this.fireForType(this.heldBy,this.tertiary,this.parentTertiaryFireRunAnimation,this.parentTertiaryFireFreezeMovement,firePosition,fireAngle);
+                    return(true);
+                }
             }
+            if (fireMethod!==this.FIRE_METHOD_ANY) return(false);
         }
         
         return(false);
+    }
+    
+        //
+        // clip changes
+        //
+     
+    needClipChangeForType(fire)
+    {
+        if (fire===null) return(false);
+        if ((fire.ammo===0) || (fire.ammoClipSize===-1)) return(false);
+        return(fire.ammoClip===0);
+    }
+    
+    needClipChange(fireMethod)
+    {
+        switch(fireMethod) {
+            case this.FIRE_METHOD_PRIMARY:
+                return(this.needClipChangeForType(this.primary));
+            case this.FIRE_METHOD_SECONDARY:
+                return(this.needClipChangeForType(this.secondary));
+            case this.FIRE_METHOD_TERTIARY:
+                return(this.needClipChangeForType(this.tertiary));
+        }
+        
+        return(false);
+    }
+    
+    changeClip(fireMethod,position)
+    {
+            // update the clip
+            
+        switch(fireMethod) {
+            case this.FIRE_METHOD_PRIMARY:
+                this.primary.ammoClip=this.primary.ammoClipSize;
+                break;
+            case this.FIRE_METHOD_SECONDARY:
+                this.secondary.ammoClip=this.secondary.ammoClipSize;
+                break;
+            case this.FIRE_METHOD_TERTIARY:
+                this.tertiary.ammoClip=this.tertiary.ammoClipSize;
+                break;
+        }
+        
+            // play sound and animation
+            
+        this.core.audio.soundStartGameFromList(this.core.game.map.soundList,position,this.reloadSound);
+        return(this.runReloadAnimation());
     }
     
         //
