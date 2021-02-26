@@ -23,7 +23,7 @@ public class WebSocketClient implements Runnable
     private static final short MESSAGE_TYPE_ENTITY_CUSTOM=7;
     
     private final int               id;
-    private boolean                 inShutdown;
+    private boolean                 synched,inShutdown;
     private String                  userName;
     private byte[]                  socketInBytes,socketOutHeaderBytes;
     private final App               app;
@@ -40,6 +40,7 @@ public class WebSocketClient implements Runnable
         this.socket=socket;
         
         userName=null;
+        synched=false;              // this is for the state after a logon but before the first sync
         inShutdown=false;
         
         socketInBytes=new byte[MAX_MESSAGE_LENGTH];       // preallocate to reduce GC
@@ -54,6 +55,11 @@ public class WebSocketClient implements Runnable
     public String getUserName()
     {
         return(userName);
+    }
+    
+    public boolean isSynched()
+    {
+        return(synched);
     }
     
         //

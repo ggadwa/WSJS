@@ -1,12 +1,18 @@
 
 - need clip show/hide
-- need clip change sound effects
 - turn off m16 at beginning
 - check m16 pickup
 
 - test public html implementation
 
 - rework multiplayer
+   - storage and clients to project (fix updateUserList)
+   * WSJS gathers project information from json
+   - logon needs to have project name
+   - clients need to be in a paused state until final synch message
+   - logon returns map name dual_castles
+   - don't enter other players until synch is OK
+   - call sync at very end (move stuff in stageNetworkConnectOK)
 
 
 But when you are playing "reload" animation in frame 18 (frame 178 of all animation timeline) you need to show it up and in the same time to hide

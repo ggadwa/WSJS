@@ -120,33 +120,25 @@ export default class GameLoadClass
     
     stageNetworkConnectOK()
     {
-        this.loadStage=this.LOAD_STAGE_MAP;
-            this.loadStageIndex=0;
-            
-        
-        // supergumba -- do more stuff here
+        this.loadStage=this.LOAD_STAGE_AWAIT;
+        thia.core.game.network.sync(this.runMultiplayerSyncOK.bind(this),this.runMultiplayerSyncError.bind(this));     // return here, callback from connection or error
+    }
     
-          /*
-    this.network.sync(this.runMultiplayerSyncOK.bind(this),this.runMultiplayerSyncError.bind(this));     // return here, callback from connection or error
+    stageNetworkConnectError(errStr)
+    {
+        this.core.dialogError.setup('Network error: '+this.core.setup.multiplayerServerURL,errStr);
+        this.core.switchLoop(this.core.LOOP_DIALOG_ERROR);
+    }
     
     runMultiplayerSyncOK()
     {
-        initDone();
+        this.loadStage=this.LOAD_STAGE_MAP;
+        this.loadStageIndex=0;
     }
     
-    runMultiplayerSyncError()
+    runMultiplayerSyncError(errStr)
     {
-        alert(this.network.lastErrorMessage);  // this all needs to be redone
-        this.network.disconnect();
-    }
-
-         */
-        
-    }
-    
-    stageNetworkConnectError()
-    {
-        this.core.dialogError.setup('Unable to connect to '+this.core.setup.multiplayerServerURL);
+        this.core.dialogError.setup('Network error: '+this.core.setup.multiplayerServerURL,errStr);
         this.core.switchLoop(this.core.LOOP_DIALOG_ERROR);
     }
     
@@ -156,6 +148,7 @@ export default class GameLoadClass
         
         this.setLoadStatus('Loading Map');
         
+        console.log(game.currentMapName);
         game.map=new MapClass(this.core,game.currentMapName);
         if (!game.map.initialize()) return;
         

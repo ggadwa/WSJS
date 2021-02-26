@@ -8,7 +8,8 @@ export default class NetworkClass
 {
     constructor(core)
     {
-        this.PORT=52419;
+        //this.PORT=52419;
+        this.PORT=52418;
         
         this.MESSAGE_TYPE_ENTITY_ENTER=0;
         this.MESSAGE_TYPE_ENTITY_LEAVE=1;
@@ -35,18 +36,19 @@ export default class NetworkClass
         this.syncOKCallback=null;
         this.syncErrorCallback=null;
         this.inSyncWait=false;
-            
-        this.lastErrorMessage=null;
         
         Object.seal(this);
     }
+    
+        //
+        // connect and disconnect from multiplayer server
+        //
     
     connect(okCallback,errorCallback)
     {
         this.connectOKCallback=okCallback;
         this.connectErrorCallback=errorCallback;
         this.inConnectWait=true;
-        this.lastErrorMessage=null;
         
         this.queue=[];
         
@@ -68,17 +70,23 @@ export default class NetworkClass
     }
     
         //
-        // sync -- this makes sure that our time is equivalent to
-        // server time, which is got by bounching a message to the first player
-        // in the list (who is considered real time.)
+        // this is the initial sync.  The first player in list is considered
+        // the master player, and his time and map are 
         //
         
     sync(okCallback,errorCallback)
     {
+        let buffer=new ArrayBuffer(4);
+        let dataView=new DataView(buffer);
+        
         this.syncOKCallback=okCallback;
         this.syncErrorCallback=errorCallback;
+        this.inSyncWait=true;
         
-        this.syncOKCallback();      // TODO -- implement
+        dataView.setInt16(0,this.MESSAGE_TYPE_MAP_SYNC_REQUEST);
+        dataView.setInt16(2,this.id);
+        
+        this.socket.send(buffer);
     }
     
         //
@@ -140,7 +148,6 @@ export default class NetworkClass
     
     close(event)
     {
-        
     }
     
     async message(event)
@@ -148,26 +155,24 @@ export default class NetworkClass
         let buffer=await (new Response(event.data).arrayBuffer());
         let dataView;
         
-            // if we are waiting for a connect ok,
-            // then look for the specific reply message,
-            // otherwise it's an error.  If the id is negative
-            // we weren't authorized to logon
+            // special case of waiting for connection
             
         if (this.inConnectWait) {
-            this.inConnectWait=false;
             
                 // ignore any spurious no logon replies
                 
             dataView=new DataView(buffer);
             if (dataView.getInt16(0)!==this.MESSAGE_TYPE_ENTITY_LOGON_REPLY) return;
             
+                // got the connection
+                
+            this.inConnectWait=false;
+            
                 // negative ids are errors
-                // todo: probably some specific errors here based on negative id
                 
             this.id=dataView.getInt16(2);
             if (this.id<0) {
-                this.lastErrorMessage='Network error: logon not allowed';
-                this.connectErrorCallback();
+                this.connectErrorCallback("Invalid Logon");
                 return;
             }
 
@@ -177,7 +182,25 @@ export default class NetworkClass
             return;
         }
         
-            // drop in queue
+            // special case of waiting for sync
+            
+        if (this.inSyncWait) {
+            
+                // ignore any spurious no logon replies
+                
+            dataView=new DataView(buffer);
+            if (dataView.getInt16(0)!==this.MESSAGE_TYPE_MAP_SYNC_REPLY) return;
+            
+                // got the connection
+                
+            this.inSyncWait=false;
+            
+            
+            this.syncOKCallback();
+            return;
+        }
+        
+            // otherwise drop message in queue
             
         this.queue.push(buffer);
     }
@@ -188,7 +211,6 @@ export default class NetworkClass
             // sadly, these errors give no information, forcing
             // users to check console
 
-        this.lastErrorMessage='Network error: Check the console for more info';
         this.disconnect();
         
             // if we hit a bad status while
@@ -196,7 +218,7 @@ export default class NetworkClass
 
         if (this.inConnectWait) {
             this.inConnectWait=false;
-            this.connectErrorCallback();
+            this.connectErrorCallback("Unable to connect, check console for more info");
         }
     }
     

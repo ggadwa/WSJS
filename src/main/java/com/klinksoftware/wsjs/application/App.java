@@ -9,9 +9,10 @@ import java.util.*;
 
 public class App
 {
-    private String                      workingPath,dataPath;
+    private String                      workingPath,projectPath,dataPath;
     private Calendar                    startUpTime;
     private AppWindow                   appWindow;
+    private ProjectList                 projectList;
     private Storage                     storage;
     private ArrayList<WebSocketClient>  clients;
     
@@ -68,6 +69,11 @@ public class App
         appWindow.addStatusNetworkBytes(byteCount);
     }
     
+    public ProjectList getProjectList()
+    {
+        return(projectList);
+    }
+    
     public ArrayList<WebSocketClient> getClientList()
     {
         return(clients);
@@ -81,6 +87,11 @@ public class App
     {
         workingPath=(new File("")).getAbsolutePath();
         if ((workingPath.endsWith("\\")) || (workingPath.endsWith("/"))) workingPath=workingPath.substring(0,(workingPath.length()-1));
+    }
+    
+    private void buildProjectPath()
+    {
+        projectPath=workingPath+File.separator+"projects";
     }
     
     private void buildDataPath()
@@ -156,7 +167,13 @@ public class App
         startUpTime=Calendar.getInstance();
         
         buildWorkingPath();
+        buildProjectPath();
         buildDataPath();
+        
+            // build the project list
+            
+        projectList=new ProjectList(this);
+        projectList.build(projectPath);
         
             // the multiplayer clients
             
@@ -169,6 +186,7 @@ public class App
         
         appWindow.log("Starting");
         appWindow.log("Working path: "+workingPath);
+        appWindow.log("Project path: "+projectPath);
         appWindow.log("Data path: "+dataPath);
        
             // start the persistent data storage

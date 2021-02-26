@@ -122,9 +122,10 @@ public class StatusCanvas extends Canvas
         
         drawChart(g2D,Color.red,"Network %,.1fK",wid,mid,high,(((float)maxNetworkByteCount)/1024.0f),netValues);
         
-            // the line
+            // the lines
             
         g2D.setColor(Color.black);
+        g2D.drawLine(0,0,0,high);
         g2D.drawLine(0,mid,wid,mid);
         
             // flip the buffer

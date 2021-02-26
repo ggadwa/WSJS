@@ -7,7 +7,8 @@ export default class DialogErrorClass extends DialogBaseClass
     {
         super(core);
         
-        this.errorStr=null;
+        this.errorTitle=null;
+        this.errorDescription=null;
         
         Object.seal(this);
     }
@@ -35,7 +36,8 @@ export default class DialogErrorClass extends DialogBaseClass
         x=Math.trunc(this.core.canvas.width*0.5);
         y=Math.trunc(this.core.canvas.height*0.5);
         
-        this.addDialogControlStatic(this,'error','errorStr',x,y);
+        y+=this.addDialogControlStatic(this,'error','errorTitle',x,y);
+        this.addDialogControlStatic(this,'error','errorDescription',x,y);
         
         return(true);
     }
@@ -46,16 +48,18 @@ export default class DialogErrorClass extends DialogBaseClass
         
     loadDialogControls()
     {
-        this.setDialogControl('errorStr',this.errorStr);
+        this.setDialogControl('errorTitle',this.errorTitle);
+        this.setDialogControl('errorDescription',this.errorDescription);
     }
     
         //
         // setup
         //
         
-    setup(errorStr)
+    setup(errorTitle,errorDescription)
     {
-        this.errorStr=errorStr;
+        this.errorTitle=errorTitle;
+        this.errorDescription=errorDescription;
     }
     
         //
