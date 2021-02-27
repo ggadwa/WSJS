@@ -19,7 +19,7 @@ export default class SequenceEntityClass
         this.originalPosition=new PointClass(0,0,0);
         this.originalAngle=new PointClass(0,0,0);
         this.originalScale=new PointClass(0,0,0);
-        this.originalAnimationFrames=[0,0];
+        this.originalAnimation=null;
         
         this.effectPosition=new PointClass(0,0,0);
         
@@ -55,7 +55,7 @@ export default class SequenceEntityClass
         this.originalAngle.setFromPoint(this.entity.angle);
         this.originalScale.setFromPoint(this.entity.scale);
         
-        this.entity.modelEntityAlter.getAnimationCurrentFrames(this.originalAnimationFrames);
+        this.originalAnimation=this.entity.modelEntityAlter.getCurrentAnimation();
         
         this.currentFrameIdx=-1;
         
@@ -68,7 +68,7 @@ export default class SequenceEntityClass
         this.entity.angle.setFromPoint(this.originalAngle);
         this.entity.scale.setFromPoint(this.originalScale);
         
-        this.entity.modelEntityAlter.startAnimationChunkInFrames(this.originalAnimationFrames);
+        this.entity.modelEntityAlter.startAnimationChunkInFrames(this.originalAnimation);
     }
     
     run(tick)

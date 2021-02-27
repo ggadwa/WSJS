@@ -16,7 +16,7 @@ export default class EntityDecorationClass extends EntityClass
     {
         if (!super.initialize()) return(false);
         
-        this.idleAnimation=this.json.animations.idleAnimation;
+        this.idleAnimation=this.core.game.lookupAnimationValue(this.json.animations.idleAnimation);
         
         return(true);
     }

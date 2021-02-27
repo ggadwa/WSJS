@@ -54,8 +54,7 @@ export default class ModelEntityAlterClass
         
             // animations
             
-        this.currentAnimationStartFrame=-1;     // -1 = no animation
-        this.currentAnimationEndFrame=0;
+        this.currentAnimation=null;
         this.currentAnimationStartTimestamp=0;
         this.currentAnimationLoopStartTick=0;
         this.currentAnimationLoopEndTick=0;
@@ -63,11 +62,8 @@ export default class ModelEntityAlterClass
         
         this.queuedAnimationStop=false;
         
-        this.queuedAnimationStartFrame=-1;      // -1 = no animation
-        this.queuedAnimationEndFrame=0;
+        this.queuedAnimation=null;
         this.queuedAnimationStartTimestamp=0;
-        this.queuedAnimationLoopStartTick=0;
-        this.queuedAnimationLoopEndTick=0;
         
             // globals to stop GC
             
@@ -397,24 +393,33 @@ export default class ModelEntityAlterClass
     
     runAnimation()
     {
-            // if we are running an animation, then
-            // setup nodes to pose and check to see
-            // if queue is being popped
+        let fps;
+        
+            // running an animation
             
-        if (this.currentAnimationStartFrame!==-1) {
-            if (this.queuedAnimationStartFrame!==-1) {
+        if (this.currentAnimation!==null) {
+            
+                // check to see if it's time to
+                // swap in a queued animation
+                
+            if (this.queuedAnimation!==null) {
                 if (this.core.game.timestamp>=this.queuedAnimationStartTimestamp) {
-                    this.currentAnimationStartFrame=this.queuedAnimationStartFrame;
-                    this.currentAnimationEndFrame=this.queuedAnimationEndFrame;
+                    this.currentAnimation=this.queuedAnimation;
                     this.currentAnimationStartTimestamp=this.queuedAnimationStartTimestamp;
-                    this.currentAnimationLoopStartTick=this.queuedAnimationLoopStartTick;
-                    this.currentAnimationLoopEndTick=this.queuedAnimationLoopEndTick;
-                    this.queuedAnimationStartFrame=-1;
+                    fps=1000/this.frameRate;
+                    this.currentAnimationLoopStartTick=Math.trunc(this.queuedAnimation.startFrame*fps);
+                    this.currentAnimationLoopEndTick=Math.trunc(this.queuedAnimation.endFrame*fps);
+                    this.queuedAnimation=null;
                 }
             }
             
+                // setup nodes to current pose
+            
             this.setupNodesToPose();
         }
+        
+            // no animation, setup the no pose
+            
         else {
             this.setupNoPoseNodes();
         }
@@ -439,32 +444,31 @@ export default class ModelEntityAlterClass
         // setting up animations
         //
     
-    startAnimationChunkInFrames(animationFrames)
+    startAnimationChunkInFrames(animation)
     {
         let fps=1000/this.frameRate;
         
+        this.currentAnimation=animation;
         this.currentAnimationStartTimestamp=this.core.game.timestamp;
-        this.currentAnimationStartFrame=animationFrames[0];
-        this.currentAnimationEndFrame=animationFrames[1];
-        this.currentAnimationLoopStartTick=Math.trunc(animationFrames[0]*fps);
-        this.currentAnimationLoopEndTick=Math.trunc(animationFrames[1]*fps);
+        this.currentAnimationLoopStartTick=Math.trunc(animation.startFrame*fps);
+        this.currentAnimationLoopEndTick=Math.trunc(animation.endFrame*fps);
         
-        this.queuedAnimationStartFrame=-1;          // a start erases any queued animations
+        this.queuedAnimation=null;              // a start erases any queued animations
         this.queuedAnimationStop=false;
         
         return(true);
     }
     
-    continueAnimationChunkInFrames(animationFrames)
+    continueAnimationChunkInFrames(animation)
     {
             // if no animation, just start it
             
-        if (this.currentAnatimationIdx===-1) return(this.startAnimationChunkInFrames(animationFrames));
+        if (this.currentAnimation===null) return(this.startAnimationChunkInFrames(animation));
         
             // otherwise only start if animation
             // is not already playing
             
-        if ((animationFrames[0]!==this.currentAnimationStartFrame) || (animationFrames[1]!==this.currentAnimationEndFrame)) return(this.startAnimationChunkInFrames(animationFrames));
+        if ((animation.startFrame!==this.currentAnimation.startFrame) || (animation.endFrame!==this.currentAnimation.endFrame)) return(this.startAnimationChunkInFrames(animation));
         
         return(true);
     }
@@ -474,14 +478,13 @@ export default class ModelEntityAlterClass
         this.queuedAnimationStop=true;
     }
     
-    queueAnimationChunkInFrames(animationFrames)
+    queueAnimationChunkInFrames(animation)
     {
         let len;
-        let fps=1000/this.frameRate;
         
             // if no animation, queue becomes a start
             
-        if (this.currentAnatimationIdx===-1) return(this.startAnimationChunkInFrames(animationFrames));
+        if (this.currentAnimation===null) return(this.startAnimationChunkInFrames(animation));
         
             // find when this animation ends
             
@@ -490,69 +493,58 @@ export default class ModelEntityAlterClass
         
             // queue up
 
+        this.queuedAnimation=animation;
         this.queuedAnimationStartTimestamp=this.core.game.timestamp+len;
-        this.queuedAnimationStartFrame=animationFrames[0];
-        this.queuedAnimationEndFrame=animationFrames[1];
-        this.queuedAnimationLoopStartTick=Math.trunc(animationFrames[0]*fps);
-        this.queuedAnimationLoopEndTick=Math.trunc(animationFrames[1]*fps);
         
         return(true);
     }
     
-    interuptAnimationChunkInFrames(animationFrames)
+    interuptAnimationChunkInFrames(animation)
     {
-        let oldStartFrame,oldEndFrame;
-        let oldStartTick,oldEndTick,len;
+        let oldAnimation,len;
         
             // current animation comes back when this is finished
             
-        oldStartFrame=this.currentAnimationStartFrame;
-        oldEndFrame=this.currentAnimationEndFrame;
-        oldStartTick=this.currentAnimationLoopStartTick;
-        oldEndTick=this.currentAnimationLoopEndTick;
+        oldAnimation=this.currentAnimation;
         
             // start new one
             
-        this.startAnimationChunkInFrames(animationFrames);
+        this.startAnimationChunkInFrames(animation);
         
             // re-queue old one
             
-        if (oldStartFrame!==-1) {
+        if (oldAnimation!==null) {
             len=this.currentAnimationLoopEndTick-this.currentAnimationLoopStartTick;
             len-=Math.trunc((this.core.game.timestamp-this.currentAnimationStartTimestamp)%len);
         
+            this.queuedAnimation=oldAnimation;
             this.queuedAnimationStartTimestamp=this.core.game.timestamp+len;
-            this.queuedAnimationStartFrame=oldStartFrame;
-            this.queuedAnimationEndFrame=oldEndFrame;
-            this.queuedAnimationLoopStartTick=oldStartTick;
-            this.queuedAnimationLoopEndTick=oldEndTick;
         }
     }
     
     isAnimationRunning()
     {
-        return(this.currentAnimationStartFrame!==-1);
+        return(this.currentAnimation!==null);
     }
     
     isAnimationQueued()
     {
-        return(this.queuedAnimationStartFrame!==-1);
+        return(this.queuedAnimation!==null);
     }
     
-    getAnimationTickCount(animationFrames)
+    getAnimationTickCount(animation)
     {
-        return(Math.trunc((animationFrames[1]-animationFrames[0])*(1000/this.frameRate)));
+        return(Math.trunc((animation.endFrame-animation.startFrame)*(1000/this.frameRate)));
     }
     
-    getAnimationFinishTimestampFromFrame(frameIdx,animationFrames)
+    getAnimationFinishTimestampFromFrame(frameIdx,animation)
     {
-        return(this.core.game.timestamp+Math.trunc(((frameIdx-animationFrames[0])/this.frameRate)*1000));
+        return(this.core.game.timestamp+Math.trunc(((frameIdx-animation.startFrame)/this.frameRate)*1000));
     }
     
-    getAnimationCurrentFrames(frameArr)
+    getCurrentAnimation()
     {
-        frameArr[0]=this.currentAnimationStartFrame;
-        frameArr[1]=this.currentAnimationEndFrame;
+        return(this.currentAnimation);
     }
     
         //

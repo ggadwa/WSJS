@@ -3,14 +3,17 @@
 - turn off m16 at beginning
 - check m16 pickup
 
+- maybe go to new animation standard
+  - sequence animations are bad
+  - add actionFrame -- replace all the hit/die/sound etc frames
+  - hide/show meshes in animation
+
 - test public html implementation
 
 - rework multiplayer
-   - storage and clients to project (fix updateUserList)
-   * WSJS gathers project information from json
-   - logon needs to have project name
+   - add http and ws network monitors (get rid of memory)
+   - logon needs to have project name, pass back game & map name
    - clients need to be in a paused state until final synch message
-   - logon returns map name dual_castles
    - don't enter other players until synch is OK
    - call sync at very end (move stuff in stageNetworkConnectOK)
 

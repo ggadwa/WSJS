@@ -10,23 +10,24 @@ import java.util.*;
 
 public class WebSocketClient implements Runnable
 {
-    private static final int MAX_MESSAGE_LENGTH=64*1024;
-    private static final int USER_NAME_LENGTH=32;
+    public static final int MAX_MESSAGE_LENGTH=64*1024;
+    public static final int USER_NAME_LENGTH=32;
     
-    private static final short MESSAGE_TYPE_ENTITY_ENTER=0;
-    private static final short MESSAGE_TYPE_ENTITY_LEAVE=1;
-    private static final short MESSAGE_TYPE_ENTITY_LOGON_REQUEST=2;
-    private static final short MESSAGE_TYPE_ENTITY_LOGON_REPLY=3;
-    private static final short MESSAGE_TYPE_MAP_SYNC_REQUEST=4;
-    private static final short MESSAGE_TYPE_MAP_SYNC_REPLY=5;
-    private static final short MESSAGE_TYPE_ENTITY_UPDATE=6;
-    private static final short MESSAGE_TYPE_ENTITY_CUSTOM=7;
+    public static final short MESSAGE_TYPE_ENTITY_ENTER=0;
+    public static final short MESSAGE_TYPE_ENTITY_LEAVE=1;
+    public static final short MESSAGE_TYPE_ENTITY_LOGON_REQUEST=2;
+    public static final short MESSAGE_TYPE_ENTITY_LOGON_REPLY=3;
+    public static final short MESSAGE_TYPE_MAP_SYNC_REQUEST=4;
+    public static final short MESSAGE_TYPE_MAP_SYNC_REPLY=5;
+    public static final short MESSAGE_TYPE_ENTITY_UPDATE=6;
+    public static final short MESSAGE_TYPE_ENTITY_CUSTOM=7;
     
     private final int               id;
     private boolean                 synched,inShutdown;
     private String                  userName;
     private byte[]                  socketInBytes,socketOutHeaderBytes;
     private final App               app;
+    private Project                 project;
     private final WebSocketListener listener;
     private final Socket            socket;
     private InputStream             in;
@@ -35,6 +36,7 @@ public class WebSocketClient implements Runnable
     public WebSocketClient(App app,WebSocketListener listener,int id,Socket socket)
     {
         this.app=app;
+        this.project=null;              // no project attached yet
         this.listener=listener;
         this.id=id;
         this.socket=socket;
@@ -66,7 +68,7 @@ public class WebSocketClient implements Runnable
         // utilities
         //
     
-    private String getStringFromByteBuffer(ByteBuffer byteBuf,int offset,int bufferLen)
+    public String getStringFromByteBuffer(ByteBuffer byteBuf,int offset,int bufferLen)
     {
         int             n;
         byte            b;
@@ -84,7 +86,7 @@ public class WebSocketClient implements Runnable
         return(strBuild.toString());
     }
     
-    private void putStringInByteBuffer(ByteBuffer byteBuf,int offset,String str,int bufferLen)
+    public void putStringInByteBuffer(ByteBuffer byteBuf,int offset,String str,int bufferLen)
     {
         int     n,len;
         
@@ -331,10 +333,6 @@ public class WebSocketClient implements Runnable
         
             // TODO -- AUTHORIZATION and duplicate names
         
-            // add user to the persistant storage
-            
-        app.addUser(userName);
-        
             // reply user id, or a negative
             // number if unable to log on
          
@@ -369,15 +367,10 @@ public class WebSocketClient implements Runnable
     {
         ByteBuffer      byteBuf;
         
-            // if no other players, immediately return no sync
-            
-        if (app.getClientList().size()<=1) {
-            byteBuf=ByteBuffer.allocate(3);
-            byteBuf.putShort(0,MESSAGE_TYPE_MAP_SYNC_REPLY);
-            byteBuf.put((byte)0);         // true/false, set to false for no sync (keep current values)
-            sendMessage(byteBuf.array());
-        }
-        
+        byteBuf=ByteBuffer.allocate(3);
+        byteBuf.putShort(0,MESSAGE_TYPE_MAP_SYNC_REPLY);
+        byteBuf.put((byte)0);         // true/false, set to false for no sync (keep current values)
+        sendMessage(byteBuf.array());
     }
     
         //
@@ -415,7 +408,7 @@ public class WebSocketClient implements Runnable
         
             // pass message to other clients
         
-        listener.distributeMessageToOtherClients(this,bytes);
+        project.distributeMessageToOtherClients(this,bytes);
         
         return(true);
     }
@@ -443,7 +436,7 @@ public class WebSocketClient implements Runnable
             byteBuf.putShort(2,(short)id);
             putStringInByteBuffer(byteBuf,4,userName,USER_NAME_LENGTH);
 
-            listener.distributeMessageToOtherClients(this,byteBuf.array());    
+            project.distributeMessageToOtherClients(this,byteBuf.array());    
         }
         catch (Exception e)
         {
@@ -460,38 +453,11 @@ public class WebSocketClient implements Runnable
             byteBuf.putShort(0,MESSAGE_TYPE_ENTITY_LEAVE);
             byteBuf.putShort(2,(short)id);
 
-            listener.distributeMessageToOtherClients(this,byteBuf.array());    
+            project.distributeMessageToOtherClients(this,byteBuf.array());    
         }
         catch (Exception e)
         {
             app.log("Unable to send leave message");
-        }
-    }
-    
-    private void sendCurrentPlayerListToSelf()
-    {
-        int                         n;
-        ByteBuffer                  byteBuf;
-        ArrayList<WebSocketClient>  clients=app.getClientList();
-            
-        byteBuf=ByteBuffer.allocate(USER_NAME_LENGTH+4);
-        byteBuf.putShort(0,MESSAGE_TYPE_ENTITY_ENTER);
-        
-        synchronized (clients) {
-            for (WebSocketClient client:clients) {
-                if (client.getId()==id) continue;
-                
-                byteBuf.putShort(2,(short)client.getId());
-                putStringInByteBuffer(byteBuf,4,client.getUserName(),USER_NAME_LENGTH);
-                
-                try {
-                    this.sendMessage(byteBuf.array());
-                }
-                catch (Exception e)
-                {
-                    app.log("Unable to send enter message");
-                }
-            }
         }
     }
     
@@ -532,12 +498,17 @@ public class WebSocketClient implements Runnable
                 
             if (!getLogonRequest()) return;
             
-            app.log("Client connected: "+userName+" (id:"+Integer.toString(id)+")");
-            app.updateUserList();
+                // if a good log on, we add to the clients
+                // for that project
+            
+            project.addClient(this);
+                
+            app.log("Client connected: "+project.getName()+"."+userName+" (id:"+Integer.toString(id)+")");
+            app.updateUsers();
             
                 // push other players
                 
-            sendCurrentPlayerListToSelf();
+            project.sendCurrentPlayerListToSelf(this);
             
                 // distribute enter to other players
                 
@@ -566,11 +537,11 @@ public class WebSocketClient implements Runnable
                 app.log("Unable to close client socket");
             }
             
-            listener.removeClient(this);
+            project.removeClient(this);
             
             if (userName!=null) {
-                app.log("Client disconnected: "+userName+" (id:"+Integer.toString(id)+")");
-                app.updateUserList();
+                app.log("Client disconnected: "+project.getName()+"."+userName+" (id:"+Integer.toString(id)+")");
+                app.updateUsers();
             }
         }
     }

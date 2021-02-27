@@ -2,143 +2,71 @@ package com.klinksoftware.wsjs.application;
 
 import java.io.*;
 import java.util.*;
+import com.fasterxml.jackson.core.type.*;
+import com.fasterxml.jackson.databind.*;
 
 public class Storage
 {
-    private static final String STORAGE_FILE_NAME="wsjs_db.dat";
+    private final String                            dbPath;
+    private final App                               app;
+    private final Project                           project;
+    private Map<String,HashMap<String,Object>>      db;
     
-    private App                                         app;
-    private HashMap<String,HashMap<String,Object>>      db;
+    private static final ObjectMapper objectMapper=new ObjectMapper();
     
-    public Storage(App app)
+    public Storage(App app,Project project)
     {
         this.app=app;
+        this.project=project;
+        
+        dbPath=app.getDataPath()+File.separator+"wsjs_"+project.getName()+"_db.json";
     }
     
-    public String getPath(String name)
+    public void load() throws Exception
     {
-        return(app.getDataPath()+File.separator+name);
-    }
-    
-    public Object load(String name)
-    {
-        byte[]                  bytes;
-        Object                  obj;
         File                    file;
-        FileInputStream         fileIn;
-        ByteArrayInputStream    byteIn;
-        ObjectInputStream       objIn;
         
             // is there a file to pick up?
             
-        file=new File(getPath(name));
-        if (!file.exists()) return(null);
+        file=new File(dbPath);
+        if (!file.exists()) throw new Exception("File does not exist");
         
-            // load in the data
-            
-        fileIn=null;
+            // translate the db to json
         
-        try {
-            fileIn=new FileInputStream(file);
-            bytes=new byte[(int)file.length()];
-            fileIn.read(bytes);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            return(null);
-        }
-        finally {
-            if (fileIn==null) try { fileIn.close(); } catch(Exception e2) {}        // can eat this, we are either done or shutting down from error
-        }
-        
-            // convert it back to the hashmap
-        
-        byteIn=new ByteArrayInputStream(bytes);
-        
-        try {
-            objIn=new ObjectInputStream(byteIn);
-            obj=objIn.readObject();
-            objIn.close();
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-            return(null);
-        }
-        
-        return(obj);
+        db=objectMapper.readValue(file,new TypeReference<Map<String,HashMap<String,Object>>>(){});
     }
     
-    public boolean save(String name,Object obj)
+    public void save() throws Exception
     {
-        byte[]                  bytes;
-        FileOutputStream        fileOut;
-        ByteArrayOutputStream   byteOut;
-        ObjectOutput            objOut;
+        File                    file;
         
-            // convert storage to byte array
+        file=new File(dbPath);
         
-        objOut=null;
-        byteOut=new ByteArrayOutputStream();
-
-        try {
-            objOut=new ObjectOutputStream(byteOut);
-            objOut.writeObject(obj);
-            objOut.flush();
-            objOut.close();
-            objOut=null;        // for finally block
+            // covert to file
             
-            bytes=byteOut.toByteArray();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            return(false);
-        }
-        finally {
-            if (objOut!=null) try { objOut.close(); } catch(Exception e2) {}
-            try { byteOut.close(); } catch(Exception e2) {}
-        }
-        
-            // write users out to disk
-        
-        fileOut=null;
-        
-        try {
-            fileOut=new FileOutputStream(getPath(name));
-            fileOut.write(bytes);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            return(false);
-        }
-        finally {
-            if (fileOut!=null) try { fileOut.close(); } catch(Exception e2) {}
-        }
-        
-        return(true);
+        objectMapper.writeValue(file,db);
     }
     
     public void start()
     {
-        db=(HashMap<String,HashMap<String,Object>>)load(STORAGE_FILE_NAME);
-        if (db==null) {
-            app.log("No saved or unable to load persistant storage, starting with empty: "+getPath(STORAGE_FILE_NAME));
-            db=new HashMap<>();
+        try {
+            load();
+            app.log("Read persistant storage from disk: "+dbPath);
         }
-        else {
-            app.log("Read persistant storage from disk: "+getPath(STORAGE_FILE_NAME));
+        catch (Exception e) {
+            app.log("Unable to load persistant storage, starting with empty: "+dbPath+" ("+e.getMessage()+")");
+            db=new HashMap<>();
         }
     }
     
     public void stop()
     {
-        if (save(STORAGE_FILE_NAME,db)) {
-            app.log("Wrote persistant storage to disk: "+getPath(STORAGE_FILE_NAME));
+        try {
+            save();
+            app.log("Wrote persistant storage to disk: "+dbPath);
         }
-        else {
-            app.log("Unable to write persistant storage to disk: "+getPath(STORAGE_FILE_NAME));
+        catch (Exception e) {
+            app.log("Unable to write persistant storage to disk: "+dbPath+" ("+e.getMessage()+")");
         }        
     }
     

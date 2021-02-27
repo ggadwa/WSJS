@@ -400,18 +400,28 @@ public class AppWindow implements WindowListener
         logPanel.log(str);
     }
     
-    public void updateUserList(ArrayList<WebSocketClient> clients)
+    public void updateGames()
     {
-        //userPanel.update(clients);
+        gamePanel.update(app.getProjectList().get((String)projectCombo.getSelectedItem()));
     }
     
-    public void addStatusNetworkBytes(int byteCount)
+    public void updateMaps()
     {
-        statusCanvas.addStatusNetworkBytes(byteCount);
+        mapPanel.update(app.getProjectList().get((String)projectCombo.getSelectedItem()));
+    }
+    
+    public void updateUsers()
+    {
+        userPanel.update(app.getProjectList().get((String)projectCombo.getSelectedItem()));
     }
     
     public void updateStatus()
     {
         statusCanvas.repaint();
+    }
+    
+    public void addStatusNetworkBytes(int byteCount)
+    {
+        statusCanvas.addStatusNetworkBytes(byteCount);
     }
 }

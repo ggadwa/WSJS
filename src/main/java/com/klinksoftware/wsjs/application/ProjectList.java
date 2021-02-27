@@ -15,11 +15,16 @@ public class ProjectList
         projects=new TreeMap<>();
     }
     
-    public void build(String projectPath)
+        //
+        // build the list of projects and start/stop list
+        // we do this separately so appwindow can be initiated and
+        // log can be started
+        //
+    
+    public void scanForProjects(String projectPath)
     {
         String          name;
         File            projectDir;
-        Project         project;
         
         projectDir=new File(projectPath);
         
@@ -27,11 +32,27 @@ public class ProjectList
             if (!file.isDirectory()) continue;
             
             name=file.getName();
-            
-            project=new Project(name,file.getAbsolutePath());
-            if (project.load(app)) projects.put(name,project);
+            projects.put(name,new Project(app,name,file.getAbsolutePath()));
         }
     }
+    
+    public void start()
+    {
+        for (Project project:projects.values()) {
+            project.start();
+        }
+    }
+    
+    public void stop()
+    {
+        for (Project project:projects.values()) {
+            project.stop();
+        }
+    }
+
+        //
+        // getters
+        //
     
     public String[] getListAsStringArray()
     {
@@ -41,5 +62,10 @@ public class ProjectList
     public Project get(String name)
     {
         return(projects.get(name));
+    }
+    
+    public Collection<Project> getProjects()
+    {
+        return(projects.values());
     }
 }

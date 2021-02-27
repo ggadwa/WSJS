@@ -13,8 +13,6 @@ public class App
     private Calendar                    startUpTime;
     private AppWindow                   appWindow;
     private ProjectList                 projectList;
-    private Storage                     storage;
-    private ArrayList<WebSocketClient>  clients;
     
     private static final Object         mainLock,httpLock,webSocketLock;
     
@@ -49,14 +47,9 @@ public class App
         appWindow.log(str);
     }
     
-    public void addUser(String userId)
+    public void updateUsers()
     {
-        storage.addUser(userId);
-    }
-    
-    public void updateUserList()
-    {
-        appWindow.updateUserList(clients);
+        appWindow.updateUsers();
     }
     
     public void updateStatus()
@@ -72,11 +65,6 @@ public class App
     public ProjectList getProjectList()
     {
         return(projectList);
-    }
-    
-    public ArrayList<WebSocketClient> getClientList()
-    {
-        return(clients);
     }
     
         //
@@ -173,11 +161,7 @@ public class App
             // build the project list
             
         projectList=new ProjectList(this);
-        projectList.build(projectPath);
-        
-            // the multiplayer clients
-            
-        clients=new ArrayList<>();
+        projectList.scanForProjects(projectPath);
         
             // start the window
         
@@ -188,17 +172,18 @@ public class App
         appWindow.log("Working path: "+workingPath);
         appWindow.log("Project path: "+projectPath);
         appWindow.log("Data path: "+dataPath);
-       
-            // start the persistent data storage
-           
-        storage=new Storage(this);
-        storage.start();
+        
+            // start the projects
+            
+        projectList.start();
+        appWindow.updateGames();
+        appWindow.updateMaps();
         
             // start the http listener, and wait
             // for a confirmed start
         
         httpListener=new HTTPListener(this);
-        httpListenerThread=new Thread(httpListener,("http_listener_thread"));
+        httpListenerThread=new Thread(httpListener,"http_listener_thread");
         httpListenerThread.start();
         
         synchronized(httpLock) {
@@ -214,7 +199,7 @@ public class App
             // for a confirmed start
 
         webSocketListener=new WebSocketListener(this);
-        webSocketListenerThread=new Thread(webSocketListener,("ws_listener_thread"));
+        webSocketListenerThread=new Thread(webSocketListener,"ws_listener_thread");
         webSocketListenerThread.start();
 
         synchronized(webSocketLock) {
@@ -248,9 +233,9 @@ public class App
         httpListener.shutdown();
         try { httpListenerThread.join(); } catch(InterruptedException e) {}         // nothing to do if this is interupted, we are shutting down anyway
         
-            // shutdown storage, window, and spring
+            // shutdown projects and window
             
-        storage.stop();
+        projectList.stop();
         
         appWindow.log("Server closed");
         appWindow.stop();
