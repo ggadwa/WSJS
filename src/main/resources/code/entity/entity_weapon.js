@@ -9,17 +9,22 @@ class EntityWeaponFireClass
         this.core=core;
         this.weapon=weapon;
         
-        this.ammoInitialCount=this.core.game.lookupValue(fireObj.ammoInitialCount,weapon.data,0);
-        this.ammoMaxCount=this.core.game.lookupValue(fireObj.ammoMaxCount,weapon.data,0);
+        this.usesClips=this.core.game.lookupValue(fireObj.usesClips,weapon.data,false);
+        this.clipInitialCount=this.core.game.lookupValue(fireObj.clipInitialCount,weapon.data,0);
+        this.clipMaxCount=this.core.game.lookupValue(fireObj.clipMaxCount,weapon.data,0);
+        this.clipSize=this.core.game.lookupValue(fireObj.clipSize,weapon.data,0);
+        this.clipAmmoInitialCount=this.core.game.lookupValue(fireObj.clipAmmoInitialCount,weapon.data,-1);
         this.ammoRegenerateTick=this.core.game.lookupValue(fireObj.ammoRegenerateTick,weapon.data,-1);
-        this.ammoClipSize=this.core.game.lookupValue(fireObj.ammoClipSize,weapon.data,-1);
         
-        this.ammo=0;
-        this.ammoClip=0;
+        this.clipCount=0;
+        this.ammoInClipCount=0;
         
         this.interfaceAmmoIcon=this.core.game.lookupValue(fireObj.interfaceAmmoIcon,weapon.data,null);
         this.interfaceAmmoText=this.core.game.lookupValue(fireObj.interfaceAmmoText,weapon.data,null);
         this.interfaceAmmoCount=this.core.game.lookupValue(fireObj.interfaceAmmoCount,weapon.data,null);
+        this.interfaceClipIcon=this.core.game.lookupValue(fireObj.interfaceClipIcon,weapon.data,null);
+        this.interfaceClipText=this.core.game.lookupValue(fireObj.interfaceClipText,weapon.data,null);
+        this.interfaceClipCount=this.core.game.lookupValue(fireObj.interfaceClipCount,weapon.data,null);
                 
         this.type=weapon.FIRE_TYPE_LIST.indexOf(this.core.game.lookupValue(fireObj.type,weapon.data,null));
         this.waitTick=this.core.game.lookupValue(fireObj.waitTick,weapon.data,0);
@@ -41,25 +46,40 @@ class EntityWeaponFireClass
     
     ready()
     {
-        this.ammo=this.ammoInitialCount;
-        this.ammoClip=this.ammoClipSize;
+        this.clipCount=this.clipInitialCount;
+        this.ammoInClipCount=this.clipAmmoInitialCount;
         
         this.lastFireTimestamp=0;
         this.lastRegenerateTimestamp=this.core.game.timestamp+this.ammoRegenerateTick;
+    }
+    
+    addClip(count)
+    {
+        if ((this.interfaceClipIcon!==null) && (this.weapon.heldBy===this.core.game.map.entityList.getPlayer())) {
+            this.core.game.overlay.pulseElement(this.interfaceClipIcon,500,10);
+        }
+        else {      // if no clip icon, flash the ammo icon if one
+            if ((this.interfaceAmmoIcon!==null) && (this.weapon.heldBy===this.core.game.map.entityList.getPlayer())) this.core.game.overlay.pulseElement(this.interfaceAmmoIcon,500,10);
+        }
+        
+        this.clipCount+=count;
+        if (this.clipCount>this.clipMaxCount) this.clipCount=this.clipMaxCount;
     }
     
     addAmmo(count)
     {
         if ((this.interfaceAmmoIcon!==null) && (this.weapon.heldBy===this.core.game.map.entityList.getPlayer())) this.core.game.overlay.pulseElement(this.interfaceAmmoIcon,500,10);
         
-        this.ammo+=count;
-        if (this.ammo>this.ammoMaxCount) this.ammo=this.ammoMaxCount;
+        this.ammoInClipCount+=count;
+        if (this.ammoInClipCount>this.clipSize) this.ammoInClipCount=this.clipSize;
     }
     
     updateUI()
     {
-        if (this.interfaceAmmoText!==null) this.core.game.overlay.updateText(this.interfaceAmmoText,this.ammo);
-        if (this.interfaceAmmoCount!==null) this.core.game.overlay.setCount(this.interfaceAmmoCount,this.ammo);
+        if (this.interfaceClipText!==null) this.core.game.overlay.updateText(this.interfaceClipText,this.clipCount);
+        if (this.interfaceClipCount!==null) this.core.game.overlay.setCount(this.interfaceClipCount,this.clipCount);
+        if (this.interfaceAmmoText!==null) this.core.game.overlay.updateText(this.interfaceAmmoText,this.ammoInClipCount);
+        if (this.interfaceAmmoCount!==null) this.core.game.overlay.setCount(this.interfaceAmmoCount,this.ammoInClipCount);
     }
     
     resetRegenerateAmmo()
@@ -205,6 +225,21 @@ export default class EntityWeaponClass extends EntityClass
         //
         // ammo
         //
+        
+    addClip(fireMethod,count)
+    {
+        switch (fireMethod) {
+            case 'primary':
+                if (this.primary!==null) this.primary.addClip(count);
+                break;
+            case 'secondary':
+                if (this.secondary!==null) this.secondary.addClip(count);
+                break;
+            case 'tertiary':
+                if (this.tertiary!==null) this.tertiary.addClip(count);
+                break;
+        }
+    }
         
     addAmmo(fireMethod,count)
     {
@@ -432,8 +467,7 @@ export default class EntityWeaponClass extends EntityClass
         
             // fire
             
-        fire.ammo--;
-        if (fire.ammoClipSize!==-1) fire.ammoClip--;
+        fire.ammoInClipCount--;
         fire.resetRegenerateAmmo();
         
         this.core.audio.soundStartGameFromList(this.core.game.map.soundList,firePosition,fire.fireSound);
@@ -481,7 +515,7 @@ export default class EntityWeaponClass extends EntityClass
             
         if ((fireMethod===this.FIRE_METHOD_PRIMARY) || (fireMethod===this.FIRE_METHOD_ANY)) {
             if (this.primary!==null) {
-                if (this.primary.ammo!==0) {
+                if (this.primary.ammoInClipCount!==0) {
                     this.fireForType(this.heldBy,this.primary,this.parentPrimaryFireRunAnimation,this.parentPrimaryFireFreezeMovement,firePosition,fireAngle);
                     return(true);
                 }
@@ -493,7 +527,7 @@ export default class EntityWeaponClass extends EntityClass
             
         if ((fireMethod===this.FIRE_METHOD_SECONDARY) || (fireMethod===this.FIRE_METHOD_ANY)) {
             if (this.secondary!==null) {
-                if (this.secondary.ammo!==0) {
+                if (this.secondary.ammoInClipCount!==0) {
                     this.fireForType(this.heldBy,this.secondary,this.parentSecondaryFireRunAnimation,this.parentSecondaryFireFreezeMovement,firePosition,fireAngle);
                     return(true);
                 }
@@ -505,7 +539,7 @@ export default class EntityWeaponClass extends EntityClass
             
         if ((fireMethod===this.FIRE_METHOD_TERTIARY) || (fireMethod===this.FIRE_METHOD_ANY)) {
             if (this.tertiary!==null) {
-                if (this.tertiary.ammo!==0) {
+                if (this.tertiary.ammoInClipCount!==0) {
                     this.fireForType(this.heldBy,this.tertiary,this.parentTertiaryFireRunAnimation,this.parentTertiaryFireFreezeMovement,firePosition,fireAngle);
                     return(true);
                 }
@@ -523,8 +557,9 @@ export default class EntityWeaponClass extends EntityClass
     needClipChangeForType(fire)
     {
         if (fire===null) return(false);
-        if ((fire.ammo===0) || (fire.ammoClipSize===-1)) return(false);
-        return(fire.ammoClip===0);
+        if (!fire.usesClips) return(false);
+        if (fire.clipCount===0) return(false);
+        return(fire.ammoInClipCount===0);
     }
     
     needClipChange(fireMethod)
@@ -547,13 +582,16 @@ export default class EntityWeaponClass extends EntityClass
             
         switch(fireMethod) {
             case this.FIRE_METHOD_PRIMARY:
-                this.primary.ammoClip=this.primary.ammoClipSize;
+                this.primary.clipCount--;
+                this.primary.ammoInClipCount=this.primary.clipSize;
                 break;
             case this.FIRE_METHOD_SECONDARY:
-                this.secondary.ammoClip=this.secondary.ammoClipSize;
+                this.secondary.clipCount--;
+                this.secondary.ammoInClipCount=this.secondary.clipSize;
                 break;
             case this.FIRE_METHOD_TERTIARY:
-                this.tertiary.ammoClip=this.tertiary.ammoClipSize;
+                this.tertiary.clipCount--;
+                this.tertiary.ammoInClipCount=this.tertiary.clipSize;
                 break;
         }
         

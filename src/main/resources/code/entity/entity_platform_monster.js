@@ -21,7 +21,6 @@ export default class EntityPlatformMonsterClass extends EntityClass
         this.melee=false;
         this.meleeDistance=0;
         this.meleeDamage=0;
-        this.meleeHitFrame=0;
         this.shoveSpeed=0;
         this.shoveFadeFactor=0;
         
@@ -81,7 +80,6 @@ export default class EntityPlatformMonsterClass extends EntityClass
         this.melee=this.core.game.lookupValue(this.json.config.melee,this.data,false);
         this.meleeDistance=this.core.game.lookupValue(this.json.config.meleeDistance,this.data,0);
         this.meleeDamage=this.core.game.lookupValue(this.json.config.meleeDamage,this.data,0);
-        this.meleeHitFrame=this.core.game.lookupValue(this.json.config.meleeHitFrame,this.data,0);
         
         this.shoveSpeed=this.core.game.lookupValue(this.json.config.shoveSpeed,this.data,0);
         this.shoveFadeFactor=this.core.game.lookupValue(this.json.config.shoveFadeFactor,this.data,0.9);
@@ -135,7 +133,7 @@ export default class EntityPlatformMonsterClass extends EntityClass
         this.modelEntityAlter.startAnimationChunkInFrames(this.dieAnimation);
         this.modelEntityAlter.queueAnimationStop();
         
-        this.effectLaunchTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.disappearEffectFrame,this.dieAnimation);
+        this.effectLaunchTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.dieAnimation.actionFrame,this.dieAnimation);
         this.animationFinishTick=this.core.game.timestamp+this.modelEntityAlter.getAnimationTickCount(this.dieAnimation);
         
         this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.dieSound);
@@ -244,7 +242,7 @@ export default class EntityPlatformMonsterClass extends EntityClass
                 this.modelEntityAlter.startAnimationChunkInFrames(this.hitAnimation);
                 this.modelEntityAlter.queueAnimationChunkInFrames(this.walkAnimation);
 
-                this.meleeNextTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.meleeHitFrame,this.hitAnimation);
+                this.meleeNextTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.hitAnimation.actionFrame,this.hitAnimation);
                 this.animationFinishTick=this.core.game.timestamp+this.modelEntityAlter.getAnimationTickCount(this.hitAnimation);
             }
         }

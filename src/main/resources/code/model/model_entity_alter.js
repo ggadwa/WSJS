@@ -107,7 +107,7 @@ export default class ModelEntityAlterClass
         let meshIdx=0;
         
         while (true) {
-            meshIdx=this.entity.model.meshList.findNext(name,meshIdx);      // not meshes can have multiple ones with the same name, so find them all
+            meshIdx=this.entity.model.meshList.findNext(name,meshIdx);      // some meshes can have multiple ones with the same name, so find them all
             if ((meshIdx===-1) || (meshIdx>=this.MAX_SHOW_HIDE_MESH_COUNT)) break;
             this.meshHideList[meshIdx]=show?0:1;
             
@@ -438,6 +438,50 @@ export default class ModelEntityAlterClass
     {
         this.setupNoPoseNodes();
         this.runAnimationNode(this.nodes[this.entity.model.skeleton.rootNodeIdx],null);
+    }
+    
+        //
+        // animation show-hides
+        //
+        
+    runAnimationMeshShowHide()
+    {
+        let mesh,hide,show;
+        let tick,frame;
+        let fps=1000/this.frameRate;
+        
+        if (this.currentAnimation===null) return;
+        
+            // get the frame
+            
+        tick=Math.trunc((this.core.game.timestamp-this.currentAnimationStartTimestamp)%(this.currentAnimationLoopEndTick-this.currentAnimationLoopStartTick));
+        frame=this.currentAnimation.startFrame+Math.trunc(tick/fps);
+        
+        for (mesh of this.currentAnimation.meshes) {
+            
+                // if there is a blank hide ([]) then
+                // we consider the mesh always hidden
+                
+            if (mesh.hide.length===0) {
+                show=false;
+            }
+            
+                // otherwise it's hidden if we are
+                // within the hiding frames
+                
+            else {
+                show=true;
+
+                for (hide of mesh.hide) {
+                    if ((frame>=hide[0]) && (frame<hide[1])) {
+                        show=false;
+                        break;
+                    }
+                }
+            }
+            
+            this.show(mesh.name,show);
+        }
     }
     
         //

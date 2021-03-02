@@ -307,6 +307,9 @@ export default class GameClass
                 case 'addWeapon':
                     if (entity.addWeapon===undefined) return(false);
                     break;
+                case 'addClip':
+                    if (entity.addClip===undefined) return(false);
+                    break;
                 case 'addAmmo':
                     if (entity.addAmmo===undefined) return(false);
                     break;
@@ -354,6 +357,9 @@ export default class GameClass
                     break;
                 case 'addWeapon':
                     if (entity!==null) entity.addWeapon(this.lookupValue(action.weapon,data,''));
+                    break;
+                case 'addClip':
+                    if (entity!==null) entity.addClip(this.lookupValue(action.weapon,data,''),this.lookupValue(action.fireMethod,data,''),this.lookupValue(action.count,data,0));
                     break;
                 case 'addAmmo':
                     if (entity!==null) entity.addAmmo(this.lookupValue(action.weapon,data,''),this.lookupValue(action.fireMethod,data,''),this.lookupValue(action.count,data,0));

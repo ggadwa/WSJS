@@ -1,54 +1,14 @@
 
-- need clip show/hide
 - turn off m16 at beginning
 - check m16 pickup
-
-- maybe go to new animation standard
-  - sequence animations are bad
-  - add actionFrame -- replace all the hit/die/sound etc frames
-  - hide/show meshes in animation
 
 - test public html implementation
 
 - rework multiplayer
-   - add http and ws network monitors (get rid of memory)
    - logon needs to have project name, pass back game & map name
    - clients need to be in a paused state until final synch message
    - don't enter other players until synch is OK
    - call sync at very end (move stuff in stageNetworkConnectOK)
-
-
-But when you are playing "reload" animation in frame 18 (frame 178 of all animation timeline) you need to show it up and in the same time to hide
-magazine which falling down from the gun... Then in frame 31 ( frame 191 of all animation timeline) of this animation you soon hide magazine
-attached to the left hand and show gun magazine.
-
-1) Beretta_activate: 1 – 25 fr.,
-2) Beretta_change_weapon: 26 – 76 fr.,
-3) Beretta_idile_staing: 77 – 127 fr.,
-4) Beretta_fire: 128 – 143 fr.,
-5) Beretta_fire (gun empty): 144 – 159 fr.,
-6) Beretta_reload: 160 – 225 fr.,
-7) Beretta_walking: 226 – 262 fr.,
-8) beretta_run: 263 – 285 fr.,
-9) beretta_run_sprint: 286 – 304 fr.,
-10) Beretta_deactivate: 305 – 330 fr.,
-
-But when you are playing "reload" animation in frame 21 (frame 181 of all animation timeline)
-you need to show it up and in the same time to hide magazine which falling down from the gun...
-Then in frame 65 ( frame 225 of all animation timeline) of this animation you soon hide magazine attached to the left hand and show gun magazine.
- 
-1) M16_activate: 1 – 25 fr.,
-2) M16_change_weapon: 26 – 76 fr.,
-3) M16_idle: 77 – 127 fr.,
-4) M16_fire: 128 – 143 fr.,
-5) M16_fire(rifle_empty): 144 – 159 fr.,
-6) M16_reload: 160 – 300 fr.,
-7) M16_walking: 301 – 337 fr.,
-8) M16_Runing: 338 – 360 fr.,
-9) M16_Runing_sprint: 361 – 379 fr.,
-10) M16_deactivate: 380 – 405 fr.,
-
-
 
 INTERFACE
   - menu by keys

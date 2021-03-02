@@ -902,6 +902,7 @@ export default class EntityClass
 
         if (!this.drawSetup()) return;
         this.modelEntityAlter.runAnimation();
+        this.modelEntityAlter.runAnimationMeshShowHide();
         
             // draw the model
             

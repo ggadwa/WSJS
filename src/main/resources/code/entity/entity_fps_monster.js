@@ -84,10 +84,6 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.projectileAnimation=null;
         this.hitAnimation=null;
         this.dieAnimation=null;
-        this.meleeLeftHitFrame=0;
-        this.meleeRightHitFrame=0;
-        this.projectileFireFrame=0;
-        this.deathFallSoundFrame=0;
         
         this.wakeUpSound=null;
         this.hurtSound=null;
@@ -193,10 +189,6 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.projectileAnimation=this.core.game.lookupAnimationValue(this.json.animations.projectileAnimation);
         this.hitAnimation=this.core.game.lookupAnimationValue(this.json.animations.hitAnimation);
         this.dieAnimation=this.core.game.lookupAnimationValue(this.json.animations.dieAnimation);
-        this.meleeLeftHitFrame=this.core.game.lookupValue(this.json.animations.meleeLeftHitFrame,this.data,0);
-        this.meleeRightHitFrame=this.core.game.lookupValue(this.json.animations.meleeRightHitFrame,this.data,0);
-        this.projectileFireFrame=this.core.game.lookupValue(this.json.animations.projectileFireFrame,this.data,0);
-        this.deathFallSoundFrame=this.core.game.lookupValue(this.json.animations.deathFallSoundFrame,this.data,0);
         
         this.wakeUpSound=this.core.game.lookupSoundValue(this.json.sounds.wakeUpSound);
         this.hurtSound=this.core.game.lookupSoundValue(this.json.sounds.hurtSound);
@@ -375,12 +367,12 @@ export default class EntityFPSMonsterClass extends EntityClass
         
         if (Math.random()<0.5) {
             this.modelEntityAlter.startAnimationChunkInFrames(this.meleeLeftAnimation);
-            this.meleeHitNextTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.meleeLeftHitFrame,this.meleeLeftAnimation);
+            this.meleeHitNextTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.meleeLeftAnimation.actionFrame,this.meleeLeftAnimation);
             this.animationFinishTick=this.core.game.timestamp+this.modelEntityAlter.getAnimationTickCount(this.meleeLeftAnimation);
         }
         else {
             this.modelEntityAlter.startAnimationChunkInFrames(this.meleeRightAnimation);
-            this.meleeHitNextTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.meleeRightHitFrame,this.meleeRightAnimation);
+            this.meleeHitNextTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.meleeRightAnimation.actionFrame,this.meleeRightAnimation);
             this.animationFinishTick=this.core.game.timestamp+this.modelEntityAlter.getAnimationTickCount(this.meleeRightAnimation);
         }
     }
@@ -411,7 +403,7 @@ export default class EntityFPSMonsterClass extends EntityClass
             // projectile animaton
             
         this.modelEntityAlter.startAnimationChunkInFrames(this.projectileAnimation);
-        this.projectileFireNextTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.projectileFireFrame,this.projectileAnimation);
+        this.projectileFireNextTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.projectileAnimation.actionFrame,this.projectileAnimation);
         this.animationFinishTick=this.core.game.timestamp+this.modelEntityAlter.getAnimationTickCount(this.projectileAnimation);
     }
     
@@ -427,7 +419,7 @@ export default class EntityFPSMonsterClass extends EntityClass
 
         this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.deathSound);
 
-        this.fallSoundNextTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.deathFallSoundFrame,this.dieAnimation);
+        this.fallSoundNextTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.dieAnimation.actionFrame,this.dieAnimation);
     }
     
     goDead()

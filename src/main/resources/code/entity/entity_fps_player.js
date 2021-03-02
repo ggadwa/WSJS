@@ -322,12 +322,16 @@ export default class EntityFPSPlayerClass extends EntityClass
         }
     }
     
+    addClip(weaponName,fireMethod,count)
+    {
+        let weapon=this.findWeaponByName(weaponName);
+        if (weapon!==null) weapon.addClip(fireMethod,count);
+    }
+    
     addAmmo(weaponName,fireMethod,count)
     {
         let weapon=this.findWeaponByName(weaponName);
-        if (weapon===null) return;
-        
-        weapon.addAmmo(fireMethod,count);
+        if (weapon!==null) weapon.addAmmo(fireMethod,count);
     }
     
     addHealth(count)
