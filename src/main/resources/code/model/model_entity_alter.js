@@ -58,7 +58,6 @@ export default class ModelEntityAlterClass
         this.currentAnimationStartTimestamp=0;
         this.currentAnimationLoopStartTick=0;
         this.currentAnimationLoopEndTick=0;
-        this.currentAnimationData=new Float32Array(4);
         
         this.queuedAnimationStop=false;
         
@@ -68,7 +67,7 @@ export default class ModelEntityAlterClass
             // globals to stop GC
             
         this.nodeMat=new Matrix4Class();
-
+        
         Object.seal(this);
     }
     
@@ -334,21 +333,17 @@ export default class ModelEntityAlterClass
         for (channel of animation.channels) {
             node=this.nodes[channel.nodeIdx];
             
-                // calculate the pose
-                
-            channel.getPoseDataForTick(tick,this.currentAnimationData);
-            
                 // change the node
             
             switch (channel.trsType) {
                 case channel.TRS_TYPE_TRANSLATION:
-                    node.poseTranslation.setFromArray(this.currentAnimationData);
+                    node.poseTranslation.setFromArray(channel.getPoseDataForTick(tick));
                     break;
                 case channel.TRS_TYPE_ROTATION:
-                    node.poseRotation.setFromArray(this.currentAnimationData);
+                    node.poseRotation.setFromArray(channel.getPoseDataForTick(tick));
                     break;
                 case channel.TRS_TYPE_SCALE:
-                    node.poseScale.setFromArray(this.currentAnimationData);
+                    node.poseScale.setFromArray(channel.getPoseDataForTick(tick));
                     break;
             }
         }
@@ -371,21 +366,17 @@ export default class ModelEntityAlterClass
             channel=channels[n];
             node=this.nodes[channel.nodeIdx];
             
-                // calculate the pose
-                
-            channel.getPoseDataForTick(0,this.currentAnimationData);
-            
                 // change the node
             
             switch (channel.trsType) {
                 case channel.TRS_TYPE_TRANSLATION:
-                    node.poseTranslation.setFromValues(this.currentAnimationData[0],this.currentAnimationData[1],this.currentAnimationData[2]);
+                    node.poseTranslation.setFromArray(channel.getPoseDataForTick(0));
                     break;
                 case channel.TRS_TYPE_ROTATION:
-                    node.poseRotation.setFromValues(this.currentAnimationData[0],this.currentAnimationData[1],this.currentAnimationData[2],this.currentAnimationData[3]);
+                    node.poseRotation.setFromArray(channel.getPoseDataForTick(0));
                     break;
                 case channel.TRS_TYPE_SCALE:
-                    node.poseScale.setFromValues(this.currentAnimationData[0],this.currentAnimationData[1],this.currentAnimationData[2]);
+                    node.poseScale.setFromArray(channel.getPoseDataForTick(0));
                     break;
             }
         }
@@ -451,6 +442,7 @@ export default class ModelEntityAlterClass
         let fps=1000/this.frameRate;
         
         if (this.currentAnimation===null) return;
+        if (this.currentAnimation.meshes===null) return;
         
             // get the frame
             

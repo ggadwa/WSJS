@@ -1,6 +1,7 @@
 
-- turn off m16 at beginning
-- check m16 pickup
+
+- if no pose, just set ONCE
+- allow any [] to be null in json
 
 - test public html implementation
 

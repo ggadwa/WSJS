@@ -29,56 +29,15 @@ export default class ModelAnimationChannelClass
         Object.seal(this);
     }
     
-    getPoseDataForTick(tick,outData)
+    getPoseDataForTick(tick)
     {
-        let n,f;
-        let tickLen,tickOffset;
-        let endPoseIdx;
-        let startPose,endPose;
-        
-            // get poses tick is inbetween
-            
-        endPoseIdx=this.poses.length-1;
+        let n;
         
         for (n=0;n!==this.poses.length;n++) {
-            if (tick<this.poses[n].tick) {
-                endPoseIdx=n;
-                break;
-            }
+            if (tick<this.poses[n].tick) return(this.poses[n].data);
         }
         
-            // supergumba -- tweening is bad here, we need
-            // to figure out why, most like the quanternions don't
-            // linearly interpt right
-        
-            // if we are at end or directly on a pose,
-            // then just pass back the pose
-            
-        //if ((endPoseIdx===0) || (this.poses[endPoseIdx].tick===tick)) {
-            endPose=this.poses[endPoseIdx];
-            
-            for (n=0;n!==endPose.data.length;n++) {
-                outData[n]=endPose.data[n];
-            }
-            
-
-        //}
-        /*
-            // get the tween factor
-            
-        startPose=this.poses[endPoseIdx-1];
-        endPose=this.poses[endPoseIdx];
-        
-        f=0;
-        
-        tickOffset=tick-startPose.tick;
-        tickLen=endPose.tick-startPose.tick;
-        if (tickLen>0) f=tickOffset/tickLen;
-            
-        for (n=0;n!==startPose.data.length;n++) {
-            outData[n]=startPose.data[n]+(f*(endPose.data[n]-startPose.data[n]));
-        }
-         */
+        return(this.poses[this.poses.length-1].data);
     }
     
 }
