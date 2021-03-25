@@ -27,8 +27,12 @@ import SetupClass from '../main/setup.js';
 
 export default class CoreClass
 {
-    constructor()
+    constructor(project)
     {
+            // the project
+
+        this.project=project;
+        
             // some testing flags
             
         this.debugForceTouch=false;

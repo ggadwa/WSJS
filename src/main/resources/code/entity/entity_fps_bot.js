@@ -264,7 +264,7 @@ export default class EntityFPSBotClass extends EntityClass
 
             // start animation
             
-        this.modelEntityAlter.startAnimationChunkInFrames(this.runAnimation);
+        this.startAnimation(this.runAnimation);
     }
     
         //
@@ -276,11 +276,11 @@ export default class EntityFPSBotClass extends EntityClass
         this.respawnTick=this.core.game.timestamp+this.respawnWaitTick;
         this.passThrough=true;
         
-        this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.dieSound);
-        this.modelEntityAlter.startAnimationChunkInFrames(this.dieAnimation);
-        this.modelEntityAlter.queueAnimationStop();
+        this.playSound(this.dieSound);
+        this.startAnimation(this.dieAnimation);
+        this.queueAnimationStop();
 
-        this.core.game.overlay.multiplayerAddScore(fromEntity,this,isTelefrag);
+        this.multiplayerAddScore(fromEntity,this,isTelefrag);
     }
     
     damage(fromEntity,damage,hitPoint)
@@ -411,14 +411,14 @@ export default class EntityFPSBotClass extends EntityClass
                 this.currentRunAnimation=weaponEntity.parentRunAnimation;
                 
                 for (meshName of this.json.weapons[n].meshes) {
-                    this.modelEntityAlter.show(meshName,true);
+                    this.showMesh(meshName,true);
                 }
             }
             else {
                 weaponEntity.show=false;
                 
                 for (meshName of this.json.weapons[n].meshes) {
-                    this.modelEntityAlter.show(meshName,false);
+                    this.showMesh(meshName,false);
                 }
             }
         }
@@ -511,7 +511,9 @@ export default class EntityFPSBotClass extends EntityClass
     {
         let nodeIdx,prevNodeIdx,moveForward;
         let turnDiff,slideLeft,liquid,liquidIdx,gravityFactor,fallDist;
-        let idleAnimation,cube;
+        let idleAnimation;
+        
+        super.run();
         
         if (this.core.game.freezeAI) return;
         
@@ -625,9 +627,9 @@ export default class EntityFPSBotClass extends EntityClass
 
             this.pausedTriggerName=this.isNodeATriggerPauseNode(prevNodeIdx,this.nextNodeIdx);
             if (this.pausedTriggerName!==null) {
-                if (!this.core.game.checkTrigger(this.pausedTriggerName)) {
+                if (!this.checkTrigger(this.pausedTriggerName)) {
                     idleAnimation=this.carouselWeapons[this.currentCarouselWeaponIdx].parentIdleAnimation;
-                    this.modelEntityAlter.startAnimationChunkInFrames(idleAnimation);
+                    this.startAnimation(idleAnimation);
                     return;
                 }
             }
@@ -641,12 +643,12 @@ export default class EntityFPSBotClass extends EntityClass
             // then do nothing until trigger
             
         if (this.pausedTriggerName!==null) {
-            if (!this.core.game.checkTrigger(this.pausedTriggerName)) {
+            if (!this.checkTrigger(this.pausedTriggerName)) {
                 moveForward=false;
             }
             else {
                 this.pausedTriggerName=null;
-                this.modelEntityAlter.startAnimationChunkInFrames(this.waitAnimation);
+                this.startAnimation(this.waitAnimation);
             }
         }
         
@@ -729,23 +731,14 @@ export default class EntityFPSBotClass extends EntityClass
         }
         
         this.stuckPoint.setFromPoint(this.position);
-        
-            // any cube actions
-            
-        cube=this.core.game.map.cubeList.findCubeContainingEntity(this);
-        if (cube!==null) this.core.game.runActions(this,cube.actions,this.data);
     }
     
     drawSetup()
     {
         if (this.model===null) return(false);
         
-        this.modelEntityAlter.position.setFromPoint(this.position);
-        this.modelEntityAlter.angle.setFromPoint(this.drawAngle);
-        this.modelEntityAlter.scale.setFromPoint(this.scale);
-        this.modelEntityAlter.inCameraSpace=false;
-
-        return(this.modelEntityAlter.boundBoxInFrustum());
+        this.setModelDrawAttributes(this.position,this.drawAngle,this.scale,false);
+        return(this.boundBoxInFrustum());
     }
 }
 

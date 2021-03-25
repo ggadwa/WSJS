@@ -108,6 +108,8 @@ export default class EntityKartBotClass extends EntityKartBaseClass
     run()
     {
         let turnAdd,ang,drifting,brake;
+        
+        super.run();
 
             // skip if AI is frozen
             

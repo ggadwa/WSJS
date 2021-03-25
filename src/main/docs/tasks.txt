@@ -1,9 +1,22 @@
 
 
+SCRIPT REDO
+
+     
+     - remove actions
+     - can probably remove primary/secondary/etc from weapons (specific scripts)
+
+
+
+
+
+
+
+
+
 - if no pose, just set ONCE
 - allow any [] to be null in json
 
-- test public html implementation
 
 - rework multiplayer
    - logon needs to have project name, pass back game & map name

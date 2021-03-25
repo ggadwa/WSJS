@@ -122,7 +122,7 @@ export default class EntityPlatformMonsterClass extends EntityClass
         this.movement.setFromValues(0,0,0);
         this.angle.setFromValues(0,90,0);           // monsters don't have the camera so they can use the regular angle
         
-        this.modelEntityAlter.startAnimationChunkInFrames(this.walkAnimation);
+        this.startAnimation(this.walkAnimation);
     }
     
     die()
@@ -130,13 +130,13 @@ export default class EntityPlatformMonsterClass extends EntityClass
         this.dead=true;
         this.passThrough=true;
         
-        this.modelEntityAlter.startAnimationChunkInFrames(this.dieAnimation);
-        this.modelEntityAlter.queueAnimationStop();
+        this.startAnimation(this.dieAnimation);
+        this.queueAnimationStop();
         
-        this.effectLaunchTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.dieAnimation.actionFrame,this.dieAnimation);
-        this.animationFinishTick=this.core.game.timestamp+this.modelEntityAlter.getAnimationTickCount(this.dieAnimation);
+        this.effectLaunchTick=this.getAnimationFinishTimestampFromFrame(this.dieAnimation.actionFrame,this.dieAnimation);
+        this.animationFinishTick=this.core.game.timestamp+this.getAnimationTickCount(this.dieAnimation);
         
-        this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.dieSound);
+        this.playSound(this.dieSound);
     }
     
     isMeleeOK(player)
@@ -189,7 +189,7 @@ export default class EntityPlatformMonsterClass extends EntityClass
             if (this.core.game.timestamp>=this.meleeNextTick) {
                 this.meleeNextTick=0;
                 if (this.isMeleeOK(player)) player.meleeHit(this.meleeDamage,(Math.sign(player.position.x-this.position.x)*this.shoveSpeed),this.shoveFadeFactor);
-                this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.meleeSound);
+                this.playSound(this.meleeSound);
             }
         }
         
@@ -239,11 +239,11 @@ export default class EntityPlatformMonsterClass extends EntityClass
             if (this.isMeleeOK(player)) {
                 this.walkDirection=Math.sign(player.position.x-this.position.x);     // always turn towards player
 
-                this.modelEntityAlter.startAnimationChunkInFrames(this.hitAnimation);
-                this.modelEntityAlter.queueAnimationChunkInFrames(this.walkAnimation);
+                this.startAnimation(this.hitAnimation);
+                this.queueAnimation(this.walkAnimation);
 
-                this.meleeNextTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.hitAnimation.actionFrame,this.hitAnimation);
-                this.animationFinishTick=this.core.game.timestamp+this.modelEntityAlter.getAnimationTickCount(this.hitAnimation);
+                this.meleeNextTick=this.getAnimationFinishTimestampFromFrame(this.hitAnimation.actionFrame,this.hitAnimation);
+                this.animationFinishTick=this.core.game.timestamp+this.getAnimationTickCount(this.hitAnimation);
             }
         }
         
@@ -275,12 +275,8 @@ export default class EntityPlatformMonsterClass extends EntityClass
     {
         if (this.model===null) return(false);
         
-        this.modelEntityAlter.position.setFromPoint(this.position);
-        this.modelEntityAlter.angle.setFromPoint(this.angle);
-        this.modelEntityAlter.scale.setFromPoint(this.scale);
-        this.modelEntityAlter.inCameraSpace=false;
-
-        return(this.modelEntityAlter.boundBoxInFrustum());
+        this.setModelDrawAttributes(this.position,this.angle,this.scale,false);
+        return(this.boundBoxInFrustum());
     }
 }
 

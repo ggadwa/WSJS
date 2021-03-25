@@ -129,19 +129,19 @@ export default class EntityPlatformPlayerClass extends EntityClass
         
         this.collectItemCount=0;
         
-        this.core.game.camera.gotoPlatform(this.platformCameraDistance,this.platformCameraYUpMoveFactor,this.platformCameraYDownMoveFactor);
+        this.cameraGotoPlatform(this.platformCameraDistance,this.platformCameraYUpMoveFactor,this.platformCameraYDownMoveFactor);
         
-        this.modelEntityAlter.startAnimationChunkInFrames(this.idleAnimation);
+        this.startAnimation(this.idleAnimation);
     }
     
     die()
     {
         this.health=0;
         
-        this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.dieSound);
+        this.playSound(this.dieSound);
         
-        this.modelEntityAlter.startAnimationChunkInFrames(this.dieAnimation);
-        this.modelEntityAlter.queueAnimationStop();
+        this.startAnimation(this.dieAnimation);
+        this.queueAnimationStop();
         
         this.core.game.lost(this);
     }
@@ -154,18 +154,18 @@ export default class EntityPlatformPlayerClass extends EntityClass
         
             // hit indicator
             
-        if (this.hitIndicator) this.core.game.overlay.hitOverlay.flash(this.core.game.overlay.hitOverlay.SIDE_ALL,this.hitIndicatorFlashTick);
+        if (this.hitIndicator) this.hitFlashAll(this.hitIndicatorFlashTick);
         
             // take damage
             
         this.health-=damage;
         
         if ((this.interfaceHealthBackground!==null) && (this.interfaceHealthBackgroundPulseSize!==0) && (this.interfaceHealthBackgroundPulseTick!==0)) {
-            this.core.game.overlay.pulseElement(this.interfaceHealthBackground,this.interfaceHealthBackgroundPulseTick,this.interfaceHealthBackgroundPulseSize);
+            this.pulseElement(this.interfaceHealthBackground,this.interfaceHealthBackgroundPulseTick,this.interfaceHealthBackgroundPulseSize);
         }
         
         if (this.health>0) {
-            this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.hurtSound);
+            this.playSound(this.hurtSound);
         }
         else {
             this.die();
@@ -194,18 +194,16 @@ export default class EntityPlatformPlayerClass extends EntityClass
         let n,speed,fallY,x,oldY,cameraDiff;
         let backward,forward;
         let moveKeyDown,runKeyDown;
-        let input=this.core.input;
-        let overlay=this.core.game.overlay;
         
         super.run();
         
             // interface updates
             
-        if (this.interfaceCollectItem!==null) this.core.game.overlay.setCount(this.interfaceCollectItem,this.collectItemCount);
+        if (this.interfaceCollectItem!==null) this.setCount(this.interfaceCollectItem,this.collectItemCount);
         
         if (this.interfaceHealthBitmapList!==null) {
             for (n=0;n!==this.interfaceHealthBitmapList.length;n++) {
-                this.core.game.overlay.showElement(this.interfaceHealthBitmapList[n],((n+1)===this.health));
+                this.showElement(this.interfaceHealthBitmapList[n],((n+1)===this.health));
             }
         }
         
@@ -226,7 +224,7 @@ export default class EntityPlatformPlayerClass extends EntityClass
         runKeyDown=false;
         
         if (this.runSpeed!==0) {
-            if (input.isKeyDown('Shift')) {
+            if (this.isKeyDown('Shift')) {
                 runKeyDown=true;
                 speed=this.runSpeed;
             }
@@ -244,11 +242,11 @@ export default class EntityPlatformPlayerClass extends EntityClass
         else {
             this.movement.x=0;
             
-            forward=input.isKeyDown('d');
-            backward=input.isKeyDown('a');
-            if (input.hasTouch) {
-                if (overlay.isTouchStickLeftOn()) {
-                    x=overlay.getTouchStickLeftX();
+            forward=this.isKeyDown('d');
+            backward=this.isKeyDown('a');
+            if (this.hasTouch) {
+                if (this.isTouchStickLeftOn()) {
+                    x=this.getTouchStickLeftX();
                     if (x!==0) {
                         if (x>0) {
                             forward=true;
@@ -281,11 +279,11 @@ export default class EntityPlatformPlayerClass extends EntityClass
             // jumping
             
         if (this.jumpHeight!==0) {
-            if (((input.isKeyDown(' ')) || (overlay.isTouchStickRightDown())) && ((this.standOnMeshIdx!==-1) || (this.standOnEntity!==null))) {
+            if (((this.isKeyDown(' ')) || (this.isTouchStickRightDown())) && ((this.standOnMeshIdx!==-1) || (this.standOnEntity!==null))) {
                 this.movement.y=this.jumpHeight;
                 this.inJumpCameraPause=this.platformCameraJumpPause;
-                this.modelEntityAlter.startAnimationChunkInFrames(this.jumpAnimation);
-                this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.jumpSound);
+                this.startAnimation(this.jumpAnimation);
+                this.playSound(this.jumpSound);
             }
         }
         
@@ -298,7 +296,7 @@ export default class EntityPlatformPlayerClass extends EntityClass
                 this.inJumpCameraPause=this.platformCameraJumpPause;
                 if (this.standOnEntity.stompBounceHeight!==0) {
                     this.movement.y=this.standOnEntity.stompBounceHeight;
-                    this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.standOnEntity.stompSound);
+                    this.playSound(this.standOnEntity.stompSound);
                 }
             }
         }
@@ -318,26 +316,26 @@ export default class EntityPlatformPlayerClass extends EntityClass
         else {
             if (this.lastFall) {
                 this.lastFall=false;
-                this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.landSound);
+                this.playSound(this.landSound);
             }
         }
         
             // animation changes
             
         if (this.shoveSpeed!==0) {
-            this.modelEntityAlter.continueAnimationChunkInFrames(this.shovedAnimation);
+            this.continueAnimation(this.shovedAnimation);
         }
         else {
             if ((this.movement.y<=0) && (this.standOnMeshIdx===-1)) {
-                this.modelEntityAlter.continueAnimationChunkInFrames(this.fallAnimation);
+                this.continueAnimation(this.fallAnimation);
             }
             else {
                 if (this.movement.y<=0) {
                     if (moveKeyDown) {
-                        this.modelEntityAlter.continueAnimationChunkInFrames(runKeyDown?this.runAnimation:this.walkAnimation);
+                        this.continueAnimation(runKeyDown?this.runAnimation:this.walkAnimation);
                     }
                     else {
-                        this.modelEntityAlter.continueAnimationChunkInFrames(this.idleAnimation);
+                        this.continueAnimation(this.idleAnimation);
                     }
                 }
             }
@@ -366,23 +364,15 @@ export default class EntityPlatformPlayerClass extends EntityClass
             if (this.currentCameraY<this.position.y) this.currentCameraY=this.position.y;
         }
 
-        this.core.game.camera.setPlatformYOffset(this.currentCameraY-this.position.y);
-        
-        
-        let cube=this.core.game.map.cubeList.findCubeContainingEntity(this);
-        if (cube!==null) this.core.game.runActions(this,cube.actions,this.data);
+        this.cameraSetPlatformYOffset(this.currentCameraY-this.position.y);
     }
 
     drawSetup()
     {
         if (this.model===null) return(false);
         
-        this.modelEntityAlter.position.setFromPoint(this.position);
-        this.modelEntityAlter.angle.setFromPoint(this.drawAngle);
-        this.modelEntityAlter.scale.setFromPoint(this.scale);
-        this.modelEntityAlter.inCameraSpace=false;
-
-        return(this.modelEntityAlter.boundBoxInFrustum());
+        this.setModelDrawAttributes(this.position,this.drawAngle,this.scale,false);
+        return(this.boundBoxInFrustum());
     }
 }
 

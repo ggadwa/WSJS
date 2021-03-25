@@ -256,14 +256,14 @@ export default class EntityFPSMonsterClass extends EntityClass
     {
         this.state=this.STATE_HIDDEN;
         
-        this.modelEntityAlter.startAnimationChunkInFrames(this.idleAnimation);
+        this.startAnimation(this.idleAnimation);
     }
     
     goAsleep()
     {
         this.state=this.STATE_ASLEEP;
         
-        this.modelEntityAlter.startAnimationChunkInFrames(this.sleepAnimation);
+        this.startAnimation(this.sleepAnimation);
     }   
         
     goWakeUp(noRecurse)
@@ -274,11 +274,11 @@ export default class EntityFPSMonsterClass extends EntityClass
             
         this.state=this.STATE_WAKING_UP;
         
-        this.modelEntityAlter.startAnimationChunkInFrames(this.wakeUpAnimation);
-        this.animationFinishTick=this.core.game.timestamp+this.modelEntityAlter.getAnimationTickCount(this.wakeUpAnimation);
+        this.startAnimation(this.wakeUpAnimation);
+        this.animationFinishTick=this.core.game.timestamp+this.getAnimationTickCount(this.wakeUpAnimation);
         
-        this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.wakeUpSound);
-        if (this.wakeUpSetTriggerName!==null) this.core.game.setTrigger(this.wakeUpSetTriggerName);
+        this.playSound(this.wakeUpSound);
+        if (this.wakeUpSetTriggerName!==null) this.setTrigger(this.wakeUpSetTriggerName);
         
         if (noRecurse) return;
         
@@ -307,10 +307,10 @@ export default class EntityFPSMonsterClass extends EntityClass
             this.idleGoalNodeIdx=this.findKeyNodeIndex(this.idlePath[this.idlePathIdx]);
             this.nextNodeIdx=this.nextNodeInPath(this.findNearestPathNode(-1),this.idleGoalNodeIdx); 
             
-            this.modelEntityAlter.startAnimationChunkInFrames(this.walkAnimation);
+            this.startAnimation(this.walkAnimation);
         }
         else {
-            this.modelEntityAlter.startAnimationChunkInFrames(this.idleAnimation);
+            this.startAnimation(this.idleAnimation);
         }
     }   
     
@@ -331,7 +331,7 @@ export default class EntityFPSMonsterClass extends EntityClass
             this.nextNodeIdx=this.nextNodeInPath(this.findNearestPathNode(-1),this.playerNodeIdx);  // always assume monster starts on node
         }
         
-        this.modelEntityAlter.startAnimationChunkInFrames(this.walkAnimation);
+        this.startAnimation(this.walkAnimation);
     }
     
     goHurt()
@@ -340,7 +340,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         
         if (this.noiseFinishTick<=this.core.game.timestamp) {
             this.noiseFinishTick=this.core.game.timestamp+this.core.game.map.soundList.getMillisecondDurationJson(this.hurtSound);
-            this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.hurtSound);
+            this.playSound(this.hurtSound);
         }
         
             // if still in hurt, that means the animation
@@ -354,8 +354,8 @@ export default class EntityFPSMonsterClass extends EntityClass
         if (Math.random()<this.hitAnimationPercentage) {
             this.state=this.STATE_HURT;
 
-            this.modelEntityAlter.startAnimationChunkInFrames(this.hitAnimation);
-            this.animationFinishTick=this.core.game.timestamp+this.modelEntityAlter.getAnimationTickCount(this.hitAnimation);
+            this.startAnimation(this.hitAnimation);
+            this.animationFinishTick=this.core.game.timestamp+this.getAnimationTickCount(this.hitAnimation);
         }
     }
     
@@ -366,14 +366,14 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.state=this.STATE_MELEE;
         
         if (Math.random()<0.5) {
-            this.modelEntityAlter.startAnimationChunkInFrames(this.meleeLeftAnimation);
-            this.meleeHitNextTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.meleeLeftAnimation.actionFrame,this.meleeLeftAnimation);
-            this.animationFinishTick=this.core.game.timestamp+this.modelEntityAlter.getAnimationTickCount(this.meleeLeftAnimation);
+            this.startAnimation(this.meleeLeftAnimation);
+            this.meleeHitNextTick=this.getAnimationFinishTimestampFromFrame(this.meleeLeftAnimation.actionFrame,this.meleeLeftAnimation);
+            this.animationFinishTick=this.core.game.timestamp+this.getAnimationTickCount(this.meleeLeftAnimation);
         }
         else {
-            this.modelEntityAlter.startAnimationChunkInFrames(this.meleeRightAnimation);
-            this.meleeHitNextTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.meleeRightAnimation.actionFrame,this.meleeRightAnimation);
-            this.animationFinishTick=this.core.game.timestamp+this.modelEntityAlter.getAnimationTickCount(this.meleeRightAnimation);
+            this.startAnimation(this.meleeRightAnimation);
+            this.meleeHitNextTick=this.getAnimationFinishTimestampFromFrame(this.meleeRightAnimation.actionFrame,this.meleeRightAnimation);
+            this.animationFinishTick=this.core.game.timestamp+this.getAnimationTickCount(this.meleeRightAnimation);
         }
     }
     
@@ -402,9 +402,9 @@ export default class EntityFPSMonsterClass extends EntityClass
 
             // projectile animaton
             
-        this.modelEntityAlter.startAnimationChunkInFrames(this.projectileAnimation);
-        this.projectileFireNextTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.projectileAnimation.actionFrame,this.projectileAnimation);
-        this.animationFinishTick=this.core.game.timestamp+this.modelEntityAlter.getAnimationTickCount(this.projectileAnimation);
+        this.startAnimation(this.projectileAnimation);
+        this.projectileFireNextTick=this.getAnimationFinishTimestampFromFrame(this.projectileAnimation.actionFrame,this.projectileAnimation);
+        this.animationFinishTick=this.core.game.timestamp+this.getAnimationTickCount(this.projectileAnimation);
     }
     
     goDying()
@@ -413,13 +413,13 @@ export default class EntityFPSMonsterClass extends EntityClass
         
         this.passThrough=true;
 
-        this.modelEntityAlter.startAnimationChunkInFrames(this.dieAnimation);
-        this.modelEntityAlter.queueAnimationStop();
-        this.animationFinishTick=this.core.game.timestamp+this.modelEntityAlter.getAnimationTickCount(this.dieAnimation);
+        this.startAnimation(this.dieAnimation);
+        this.queueAnimationStop();
+        this.animationFinishTick=this.core.game.timestamp+this.getAnimationTickCount(this.dieAnimation);
 
-        this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.deathSound);
+        this.playSound(this.deathSound);
 
-        this.fallSoundNextTick=this.modelEntityAlter.getAnimationFinishTimestampFromFrame(this.dieAnimation.actionFrame,this.dieAnimation);
+        this.fallSoundNextTick=this.getAnimationFinishTimestampFromFrame(this.dieAnimation.actionFrame,this.dieAnimation);
     }
     
     goDead()
@@ -427,7 +427,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.state=this.STATE_DEAD;
         
         this.passThrough=true;
-        if (this.deathSetTriggerName!==null) this.core.game.setTrigger(this.deathSetTriggerName);
+        if (this.deathSetTriggerName!==null) this.setTrigger(this.deathSetTriggerName);
     }
     
         //
@@ -494,7 +494,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         this.gravity=this.core.game.map.gravityMinValue;
         this.movement.y=this.jumpHeight;
         
-        this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.wakeUpSound);
+        this.playSound(this.wakeUpSound);
     }
             
     findSlideDirection(player)
@@ -523,7 +523,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         
     runHidden()
     {
-        if (this.core.game.checkTrigger(this.showTriggerName)) {
+        if (this.checkTrigger(this.showTriggerName)) {
             this.show=true;
             this.goWakeUp(false);
         }
@@ -757,10 +757,10 @@ export default class EntityFPSMonsterClass extends EntityClass
             // animation changes
             
         if (pauseMoveForward) {
-            this.modelEntityAlter.continueAnimationChunkInFrames(this.idleAnimation);
+            this.continueAnimation(this.idleAnimation);
         }
         else {
-            this.modelEntityAlter.continueAnimationChunkInFrames(this.walkAnimation);
+            this.continueAnimation(this.walkAnimation);
         }
         
             // projectiles and melee starts
@@ -809,7 +809,7 @@ export default class EntityFPSMonsterClass extends EntityClass
             // the hit itself
             
         if ((this.meleeHitNextTick<=this.core.game.timestamp) && (this.meleeHitNextTick!==0)) {
-            this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.meleeSound);
+            this.playSound(this.meleeSound);
             player.damage(this,this.meleeDamage,this.position);
             
             this.meleeHitNextTick=0;
@@ -856,7 +856,7 @@ export default class EntityFPSMonsterClass extends EntityClass
                
         if (this.fallSound!==null) {
             if ((this.fallSoundNextTick<=this.core.game.timestamp) && (this.fallSoundNextTick!==0)) {
-                this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.fallSound);
+                this.playSound(this.fallSound);
                 this.fallSoundNextTick=0;
             }
         }
@@ -877,6 +877,8 @@ export default class EntityFPSMonsterClass extends EntityClass
     run()
     {
         let player,distToPlayer,liquid,liquidIdx,gravityFactor;
+        
+        super.run();
         
         if (this.core.game.freezeAI) return;
         
@@ -945,11 +947,7 @@ export default class EntityFPSMonsterClass extends EntityClass
     {
         if (this.state===this.STATE_HIDDEN) return(false);
         
-        this.modelEntityAlter.position.setFromPoint(this.position);
-        this.modelEntityAlter.angle.setFromPoint(this.angle);
-        this.modelEntityAlter.scale.setFromPoint(this.scale);
-        this.modelEntityAlter.inCameraSpace=false;
-        
-        return(this.modelEntityAlter.boundBoxInFrustum());
+        this.setModelDrawAttributes(this.position,this.angle,this.scale,false);
+        return(this.boundBoxInFrustum());
     }
 }

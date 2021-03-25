@@ -756,7 +756,7 @@ export default class ImportGLTFClass
     
     decodeMapMeshInformational(map,materialNode,meshNode,mesh,meshIdx)
     {
-        let n,value,obj;
+        let n,value,obj,cubeClass;
         let moveDef,movePoint,moveRotate,rotateOffset;
         let pos,ang;
         
@@ -854,8 +854,14 @@ export default class ImportGLTFClass
         if (value!==null) {
             obj=this.decideMapMeshInformationalParseJSON(meshNode,value);
             if (obj===null) return(this.MESH_INFORMATIONAL_ERROR);
+            
+            cubeClass=this.core.project.mapCube(obj.name);
+            if (cubeClass===null) {
+                console.error('unknown cube name: '+obj.name);
+                return(this.MESH_INFORMATIONAL_ERROR);
+            }
 
-            map.cubeList.add(new MapCubeClass(obj.name,((obj.actions===undefined)?null:obj.actions),mesh.xBound,mesh.yBound,mesh.zBound,((obj.data===undefined)?null:obj.data)));
+            map.cubeList.add(new MapCubeClass(new cubeClass(this.core),mesh.xBound,mesh.yBound,mesh.zBound,obj.data));
             return(this.MESH_INFORMATIONAL_REMOVE);
         }
         

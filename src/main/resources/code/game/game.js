@@ -277,12 +277,12 @@ export default class GameClass
         
     setTrigger(triggerName)
     {
-        if (triggerName!==null) this.triggers.set(triggerName,true);
+        if ((triggerName!==null) && (triggerName!==undefined)) this.triggers.set(triggerName,true);
     }
     
     clearTrigger(triggerName)
     {
-        if (triggerName!==null) this.triggers.set(triggerName,false);
+        if ((triggerName!==null) && (triggerName!==undefined)) this.triggers.set(triggerName,false);
     }
     
     checkTrigger(triggerName)

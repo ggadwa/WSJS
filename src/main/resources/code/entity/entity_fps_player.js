@@ -95,6 +95,7 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.movement=new PointClass(0,0,0);
         this.rotMovement=new PointClass(0,0,0);
         this.firePosition=new PointClass(0,0,0);
+        this.drawAngle=new PointClass(0,0,0);
         
         Object.seal(this);
     }
@@ -229,10 +230,10 @@ export default class EntityFPSPlayerClass extends EntityClass
             // set the camera
             
         if (!this.isThirdPerson) {
-            this.core.game.camera.gotoFirstPerson();
+            this.cameraGotoFirstPerson();
         }
         else {
-            this.core.game.camera.gotoThirdPerson(this.thirdPersonCameraDistance,this.thirdPersonCameraAngle);
+            this.cameraGotoThirdPerson(this.thirdPersonCameraDistance,this.thirdPersonCameraAngle);
         }
         
             // health
@@ -278,7 +279,7 @@ export default class EntityFPSPlayerClass extends EntityClass
         
             // turn off any score display
             
-        this.core.game.overlay.multiplayerShowScores(false);
+        this.multiplayerShowScores(false);
     }
     
         //
@@ -336,7 +337,7 @@ export default class EntityFPSPlayerClass extends EntityClass
     
     addHealth(count)
     {
-        if (this.interfaceHealthIcon!==null) this.core.game.overlay.pulseElement(this.interfaceHealthIcon,500,10);
+        if (this.interfaceHealthIcon!==null) this.pulseElement(this.interfaceHealthIcon,500,10);
         
         this.health+=count;
         if (this.health>this.healthMaxCount) this.health=this.healthMaxCount;
@@ -344,7 +345,7 @@ export default class EntityFPSPlayerClass extends EntityClass
     
     addArmor(count)
     {
-        if (this.interfaceArmorIcon!==null) this.core.game.overlay.pulseElement(this.interfaceArmorIcon,500,10);
+        if (this.interfaceArmorIcon!==null) this.pulseElement(this.interfaceArmorIcon,500,10);
         
         this.armor+=count;
         if (this.armor>this.armorMaxCount) this.armor=this.armorMaxCount;
@@ -359,14 +360,14 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.respawnTick=this.core.game.timestamp+this.respawnWaitTick;
         this.passThrough=true;
         
-        if (this.isTopDownCameraOnDeath) this.core.game.camera.gotoTopDown(this.topDownCameraDistance);
+        if (this.isTopDownCameraOnDeath) this.cameraGotoTopDown(this.topDownCameraDistance);
 
-        this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.dieSound);
-        this.modelEntityAlter.startAnimationChunkInFrames(this.dieAnimation);
-        this.modelEntityAlter.queueAnimationStop();
+        this.playSound(this.dieSound);
+        this.startAnimation(this.dieAnimation);
+        this.queueAnimationStop();
         
-        this.core.game.overlay.multiplayerAddScore(fromEntity,this,isTelefrag);
-        this.core.game.overlay.multiplayerShowScores(true);
+        this.multiplayerAddScore(fromEntity,this,isTelefrag);
+        this.multiplayerShowScores(true);
         
         if (this.core.game.multiplayerMode===this.core.game.MULTIPLAYER_MODE_NONE) this.core.game.lost(this);
     }
@@ -401,18 +402,18 @@ export default class EntityFPSPlayerClass extends EntityClass
                 // get hit spot
 
             if ((y<=-45) && (y>=-135)) {
-                this.core.game.overlay.hitOverlay.flash(this.core.game.overlay.hitOverlay.SIDE_RIGHT,this.hitIndicatorFlashTick);
+                this.hitFlashRight(this.hitIndicatorFlashTick);
             }
             else {
                 if ((y>=45) && (y<=135)) {
-                    this.core.game.overlay.hitOverlay.flash(this.core.game.overlay.hitOverlay.SIDE_LEFT,this.hitIndicatorFlashTick);
+                    this.hitFlashLeft(this.hitIndicatorFlashTick);
                 }
                 else {
                     if ((y>-45) && (y<45)) {
-                        this.core.game.overlay.hitOverlay.flash(this.core.game.overlay.hitOverlay.SIDE_TOP,this.hitIndicatorFlashTick);
+                        this.hitFlashTop(this.hitIndicatorFlashTick);
                     }
                     else {
-                        this.core.game.overlay.hitOverlay.flash(this.core.game.overlay.hitOverlay.SIDE_BOTTOM,this.hitIndicatorFlashTick);
+                        this.hitFlashBottom(this.hitIndicatorFlashTick);
                     }
                 }
             }
@@ -422,12 +423,12 @@ export default class EntityFPSPlayerClass extends EntityClass
             
         this.armor-=damage;
         if (this.armor<0) {
-            if (this.interfaceHealthIcon!==null) this.core.game.overlay.pulseElement(this.interfaceHealthIcon,500,5);
+            if (this.interfaceHealthIcon!==null) this.pulseElement(this.interfaceHealthIcon,500,5);
             this.health+=this.armor;
             this.armor=0;
         }
         else {
-            if (this.interfaceArmorIcon!==null) this.core.game.overlay.pulseElement(this.interfaceArmorIcon,500,5);
+            if (this.interfaceArmorIcon!==null) this.pulseElement(this.interfaceArmorIcon,500,5);
         }
         
             // dead?
@@ -441,7 +442,7 @@ export default class EntityFPSPlayerClass extends EntityClass
             
         if (this.core.game.timestamp>this.nextDamageTick) {
             this.nextDamageTick=this.core.game.timestamp+this.damageFlinchWaitTick;
-            this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.hurtSound);
+            this.playSound(this.hurtSound);
         }
     }
     
@@ -458,13 +459,13 @@ export default class EntityFPSPlayerClass extends EntityClass
     {
         if ((this.movement.x!==0) || (this.movement.z!==0)) {
             if ((this.inStandingAnimation) || (this.forceAnimationUpdate)) {
-                this.modelEntityAlter.startAnimationChunkInFrames(this.currentRunAnimation);
+                this.startAnimation(this.currentRunAnimation);
             }
             this.inStandingAnimation=false;
         }
         else {
             if ((!this.inStandingAnimation) || (this.forceAnimationUpdate)) {
-                this.modelEntityAlter.startAnimationChunkInFrames(this.currentIdleAnimation);
+                this.startAnimation(this.currentIdleAnimation);
             }
             this.inStandingAnimation=true;
         }
@@ -498,7 +499,7 @@ export default class EntityFPSPlayerClass extends EntityClass
                 this.currentRunAnimation=weaponEntity.parentRunAnimation;
                 
                 for (meshName of this.json.weapons[n].meshes) {
-                    this.modelEntityAlter.show(meshName,true);
+                    this.showMesh(meshName,true);
                 }
                 
                 weaponEntity.startIdleAnimation();
@@ -507,7 +508,7 @@ export default class EntityFPSPlayerClass extends EntityClass
                 weaponEntity.show=false;
                 
                 for (meshName of this.json.weapons[n].meshes) {
-                    this.modelEntityAlter.show(meshName,false);
+                    this.showMesh(meshName,false);
                 }
             }
         }
@@ -542,7 +543,7 @@ export default class EntityFPSPlayerClass extends EntityClass
             weaponEntity.show=false;
                 
             for (meshName of this.json.weapons[this.currentCarouselWeaponIdx].meshes) {
-                this.modelEntityAlter.show(meshName,false);
+                this.showMesh(meshName,false);
             }
         }
         
@@ -560,7 +561,7 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.currentRunAnimation=weaponEntity.parentRunAnimation;
 
         for (meshName of this.json.weapons[this.currentCarouselWeaponIdx].meshes) {
-            this.modelEntityAlter.show(meshName,true);
+            this.showMesh(meshName,true);
         }
 
         this.weaponRaiseFinishTick=this.core.game.timestamp+weaponEntity.runRaiseAnimation();
@@ -603,13 +604,13 @@ export default class EntityFPSPlayerClass extends EntityClass
         return(weaponCarouselFreeze);
     }
     
-    runWeaponCarouselInput(input,overlay)
+    runWeaponCarouselInput()
     {
         let n;
         let switchWeaponIdx,weapChangeDir,startWeaponIdx;
         
         switchWeaponIdx=this.currentCarouselWeaponIdx;
-        weapChangeDir=input.mouseWheelRead()+overlay.getTouchSwipeLeftX();
+        weapChangeDir=this.mouseWheelRead()+this.getTouchSwipeLeftX();
 
         if (weapChangeDir<0) {
             startWeaponIdx=switchWeaponIdx;
@@ -636,7 +637,7 @@ export default class EntityFPSPlayerClass extends EntityClass
         }
 
         for (n=0;n<this.carouselWeapons.length;n++) {
-            if (input.isKeyDown(String.fromCharCode(49+n))) {
+            if (this.isKeyDown(String.fromCharCode(49+n))) {
                 if (this.carouselWeapons[n].available) {
                     switchWeaponIdx=n;
                     break;
@@ -670,16 +671,16 @@ export default class EntityFPSPlayerClass extends EntityClass
         weapon.fire(fireMethod,this.firePosition,this.angle);
     }
     
-    runWeaponFiring(input,overlay)
+    runWeaponFiring()
     {
         let n,weapon;
         let firePrimary,fireSecondary,fireTertiary;
         
             // carousel firing
             
-        firePrimary=input.mouseButtonFlags[0]||overlay.isTouchStickRightClick();
-        fireSecondary=input.mouseButtonFlags[1];
-        fireTertiary=input.mouseButtonFlags[2]||(overlay.getTouchSwipeRightY()<0);
+        firePrimary=this.isMouseButtonDown(0)||this.isTouchStickRightClick();
+        fireSecondary=this.isMouseButtonDown(1);
+        fireTertiary=this.isMouseButtonDown(2)||(this.getTouchSwipeRightY()<0);
 
         this.firePosition.setFromPoint(this.position);
         this.firePosition.y+=this.eyeOffset;
@@ -713,10 +714,10 @@ export default class EntityFPSPlayerClass extends EntityClass
         let x,y;
         let moveForward,moveBackward,moveLeft,moveRight;
         let liquid,liquidIdx,bump,gravityFactor,fallDist;
-        let turnAdd,lookAdd,cube;
-        let input=this.core.input;
-        let overlay=this.core.game.overlay;
+        let turnAdd,lookAdd;
         let setup=this.core.setup;
+        
+        super.run();
         
         if (this.core.game.freezePlayer) return;
         
@@ -753,8 +754,8 @@ export default class EntityFPSPlayerClass extends EntityClass
         
             // update any UI
             
-        if (this.interfaceHealthCount!==null) this.core.game.overlay.updateText(this.interfaceHealthCount,this.health);
-        if (this.interfaceArmorCount!==null) this.core.game.overlay.updateText(this.interfaceArmorCount,this.armor);
+        if (this.interfaceHealthCount!==null) this.updateText(this.interfaceHealthCount,this.health);
+        if (this.interfaceArmorCount!==null) this.updateText(this.interfaceArmorCount,this.armor);
         
             // dead
             
@@ -807,25 +808,25 @@ export default class EntityFPSPlayerClass extends EntityClass
             // weapons
             
         if (!this.runWeaponAnimations()) {
-            this.runWeaponCarouselInput(input,overlay);
-            this.runWeaponFiring(input,overlay);
+            this.runWeaponCarouselInput();
+            this.runWeaponFiring();
         }
         
             // forward and shift controls
             
-        x=overlay.getTouchStickLeftX();
-        y=overlay.getTouchStickLeftY();
+        x=this.getTouchStickLeftX();
+        y=this.getTouchStickLeftY();
             
-        moveForward=(input.isKeyDown('w')) || (input.isKeyDown('ArrowUp')) || (y<0);
-        moveBackward=(input.isKeyDown('s')) || (input.isKeyDown('ArrowDown')) || (y>0);
-        moveLeft=input.isKeyDown('a') || (x<0);
-        moveRight=input.isKeyDown('d') || (x>0);
+        moveForward=(this.isKeyDown('w')) || (this.isKeyDown('ArrowUp')) || (y<0);
+        moveBackward=(this.isKeyDown('s')) || (this.isKeyDown('ArrowDown')) || (y>0);
+        moveLeft=this.isKeyDown('a') || (x<0);
+        moveRight=this.isKeyDown('d') || (x>0);
         
             // turning
             
         turnAdd=0;
             
-        x=input.getMouseMoveX();
+        x=this.getMouseMoveX();
         if (x!==0) {
             turnAdd=-(x*setup.mouseXSensitivity);
             turnAdd+=(turnAdd*setup.mouseXAcceleration);
@@ -833,7 +834,7 @@ export default class EntityFPSPlayerClass extends EntityClass
             if (Math.abs(turnAdd)>this.maxTurnSpeed) turnAdd=this.maxTurnSpeed*Math.sign(turnAdd);
         }
         
-        x=overlay.getTouchStickRightX();
+        x=this.getTouchStickRightX();
         turnAdd-=x;
         
         if (turnAdd!==0) {
@@ -846,8 +847,8 @@ export default class EntityFPSPlayerClass extends EntityClass
             
         lookAdd=0;
             
-        if (this.core.game.camera.isFirstPerson()) {
-            y=input.getMouseMoveY();
+        if (this.cameraIsFirstPerson()) {
+            y=this.getMouseMoveY();
             if (y!==0) {
                 lookAdd=y*setup.mouseYSensitivity;
                 lookAdd+=(lookAdd*setup.mouseYAcceleration);
@@ -855,7 +856,7 @@ export default class EntityFPSPlayerClass extends EntityClass
                 if (Math.abs(lookAdd)>this.maxLookSpeed) lookAdd=this.maxLookSpeed*Math.sign(lookAdd);
             }
 
-            y=overlay.getTouchStickRightY();
+            y=this.getTouchStickRightY();
             lookAdd+=y;
 
             if ((setup.snapLook) && (moveForward || moveBackward || moveLeft || moveRight)) {
@@ -877,7 +878,7 @@ export default class EntityFPSPlayerClass extends EntityClass
         
             // jumping
            
-        if (input.isKeyDown(' ')) {
+        if (this.isKeyDown(' ')) {
             if ((this.standOnMeshIdx!==-1) && (!this.lastUnderLiquid)) {
                 this.gravity=this.core.game.map.gravityMinValue;
                 this.movement.y=this.jumpHeight;
@@ -921,24 +922,17 @@ export default class EntityFPSPlayerClass extends EntityClass
                 this.carouselWeapons[this.currentCarouselWeaponIdx].setIdleAnimation();
             }
         }
-        
-            // any cube actions
-            
-        cube=this.core.game.map.cubeList.findCubeContainingEntity(this);
-        if (cube!==null) this.core.game.runActions(this,cube.actions,this.data);
     }
     
     drawSetup()
     {
         if (this.model===null) return(false);
         
-        this.modelEntityAlter.position.setFromPoint(this.position);
-        this.modelEntityAlter.angle.setFromValues(0,this.angle.y,0);
-        this.modelEntityAlter.scale.setFromPoint(this.scale);
-        this.modelEntityAlter.inCameraSpace=false;
+        this.drawAngle.setFromValues(0,this.angle.y,0);
+        this.setModelDrawAttributes(this.position,this.drawAngle,this.scale,false);
 
-        if (this.core.game.camera.isFirstPerson()) return(false);
-        return(this.modelEntityAlter.boundBoxInFrustum());
+        if (this.cameraIsFirstPerson()) return(false);
+        return(this.boundBoxInFrustum());
     }
 }
 

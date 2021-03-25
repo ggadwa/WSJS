@@ -62,6 +62,8 @@ export default class EntityClass
         this.hitEntity=null;
         this.hitPoint=new PointClass(0,0,0);
         
+        this.currentCube=null;
+        
         this.collideWallMeshIdx=-1;
         this.collideWallTrigIdx=-1;         
         this.slideWallMeshIdx=-1;
@@ -179,6 +181,11 @@ export default class EntityClass
     {
         entity.heldBy=this;
     }
+    
+    getPlayer()
+    {
+        return(this.core.game.map.entityList.getPlayer());
+    }
         
     isEntityInRange(entity,dist)
     {
@@ -220,26 +227,9 @@ export default class EntityClass
         
         return(true);
     }
-    
-        //
-        // misc APIs
-        //
-        
-    shakeCamera(shakePosition,shakeDistance,shakeTick,shakeMaxShift)
-    {
-        let entity,dist;
-
-            // shake only registers if close enough
-            // to camera object
-            
-        entity=this.core.game.map.entityList.getPlayer();
-        
-        dist=this.position.distance(entity.position);
-        if (dist<shakeDistance) this.core.game.startCameraShake(shakeTick,Math.trunc((shakeMaxShift*dist)/shakeDistance));
-    }
         
         //
-        // path utilities
+        // node and path utilities
         //
         
     getPathNodeList()
@@ -757,6 +747,306 @@ export default class EntityClass
     }
     
         //
+        // animations
+        //
+        
+    startAnimation(animation)
+    {
+        this.modelEntityAlter.startAnimationChunkInFrames(animation);
+    }
+    
+    queueAnimation(animation)
+    {
+        this.modelEntityAlter.queueAnimationChunkInFrames(animation);
+    }
+    
+    queueAnimationStop()
+    {
+        this.modelEntityAlter.queueAnimationStop();
+    }
+    
+    isAnimationQueued()
+    {
+        return(this.modelEntityAlter.isAnimationQueued());
+    }
+    
+    interuptAnimation(animation)
+    {
+        this.modelEntityAlter.interuptAnimationChunkInFrames(animation);
+    }
+    
+    continueAnimation(animation)
+    {
+        this.modelEntityAlter.continueAnimationChunkInFrames(animation);
+    }
+    
+    getAnimationTickCount(animation)
+    {
+        return(this.modelEntityAlter.getAnimationTickCount(animation));
+    }
+    
+    getAnimationFinishTimestampFromFrame(frame,animation)
+    {
+        return(this.modelEntityAlter.getAnimationFinishTimestampFromFrame(frame,animation));
+    }
+    
+        //
+        // models
+        //
+        
+    setModelDrawAttributes(position,angle,scale,inCameraSpace)
+    {
+        this.modelEntityAlter.position.setFromPoint(position);
+        this.modelEntityAlter.angle.setFromPoint(angle);
+        this.modelEntityAlter.scale.setFromPoint(scale);
+        this.modelEntityAlter.inCameraSpace=inCameraSpace;
+    }
+    
+    boundBoxInFrustum()
+    {
+        return(this.modelEntityAlter.boundBoxInFrustum());
+    }
+    
+        //
+        // camera
+        //
+        
+    cameraGotoFirstPerson()
+    {
+        this.core.game.camera.gotoFirstPerson();
+    }
+    
+    cameraIsFirstPerson()
+    {
+        return(this.core.game.camera.isFirstPerson());
+    }
+    
+    cameraGotoThirdPerson(distance,angle)
+    {
+        this.core.game.camera.gotoThirdPerson(distance,angle);
+    }
+    
+    cameraGotoTopDown(distance)
+    {
+        this.core.game.camera.gotoTopDown(distance);
+    }
+    
+    cameraGotoPlatform(distance,cameraYUpMoveFactor,cameraYDownMoveFactor)
+    {
+        this.core.game.camera.gotoPlatform(distance,cameraYUpMoveFactor,cameraYDownMoveFactor);
+    }
+    
+    cameraSetPlatformYOffset(offset)
+    {
+        this.core.game.camera.setPlatformYOffset(offset);
+    }
+    
+        //
+        // sounds
+        //
+    
+    playSound(sound)
+    {
+        return(this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,sound));
+    }
+    
+    playSoundAtPosition(position,sound)
+    {
+        return(this.core.audio.soundStartGameFromList(this.core.game.map.soundList,position,sound));
+    }
+    
+        //
+        // meshes
+        //
+        
+    showMesh(meshName,show)
+    {
+        this.modelEntityAlter.show(meshName,show);
+    }
+    
+        //
+        // input
+        //
+        
+    isKeyDown(key)
+    {
+        return(this.core.input.isKeyDown(key));
+    }
+    
+    isMouseButtonDown(buttonIdx)
+    {
+        return(this.core.input.mouseButtonFlags[buttonIdx]);
+    }
+    
+    getMouseMoveX()
+    {
+        return(this.core.input.getMouseMoveX());
+    }
+    
+    getMouseMoveY()
+    {
+        return(this.core.input.getMouseMoveY());
+    }
+    
+    mouseWheelRead()
+    {
+        return(this.core.input.mouseWheelRead());
+    }
+    
+    hasTouch()
+    {
+        return(input.hasTouch);
+    }
+    
+    isTouchStickLeftClick()
+    {
+        return(this.core.game.overlay.isTouchStickLeftClick());
+    }
+    
+    isTouchStickRightClick()
+    {
+        return(this.core.game.overlay.isTouchStickRightClick());
+    }
+    
+    getTouchStickLeftX()
+    {
+        return(this.core.game.overlay.getTouchSwipeLeftX());
+    }
+    
+    getTouchStickLeftY()
+    {
+        return(this.core.game.overlay.getTouchSwipeLeftY());
+    }
+    
+    getTouchStickRightX()
+    {
+        return(this.core.game.overlay.getTouchSwipeRightX());
+    }
+    
+    getTouchStickRightY()
+    {
+        return(this.core.game.overlay.getTouchSwipeRightY());
+    }
+    
+    getTouchSwipeLeftX()
+    {
+        return(this.core.game.overlay.getTouchSwipeLeftX());
+    }
+    
+    getTouchSwipeLeftY()
+    {
+        return(this.core.game.overlay.getTouchSwipeLeftY());
+    }
+    
+    getTouchSwipeRightX()
+    {
+        return(this.core.game.overlay.getTouchSwipeRightX());
+    }
+    
+    getTouchSwipeRightY()
+    {
+        return(this.core.game.overlay.getTouchSwipeRightY());
+    }
+    
+    isTouchStickLeftOn()
+    {
+        return(this.core.game.overlay.isTouchStickLeftOn());
+    }
+    
+    isTouchStickLeftDown()
+    {
+        return(this.core.game.overlay.isTouchStickLeftDown());
+    }
+    
+    isTouchStickRightOn()
+    {
+        return(this.core.game.overlay.isTouchStickRightOn());
+    }
+    
+    isTouchStickRightDown()
+    {
+        return(this.core.game.overlay.isTouchStickRightDown());
+    }
+    
+        //
+        // triggers
+        //
+        
+    setTrigger(name)
+    {
+        this.core.game.setTrigger(name);
+    }
+    
+    checkTrigger(name)
+    {
+        return(this.core.game.checkTrigger(name));
+    }
+    
+        //
+        // overlays
+        //
+     
+    showElement(id,show)
+    {
+        this.core.game.overlay.showElement(id,show);
+    }
+    
+    pulseElement(id,tick,expand)
+    {
+        this.core.game.overlay.pulseElement(id,tick,expand);
+    }
+    
+    updateText(id,str)
+    {
+        this.core.game.overlay.updateText(id,str);
+    }
+    
+    setCount(id,count)
+    {
+        this.core.game.overlay.setCount(id,count);
+    }
+    
+    setDial(id,value)
+    {
+        this.core.game.overlay.setDial(id,value);
+    }
+    
+    hitFlashLeft(tick)
+    {
+        this.core.game.overlay.hitOverlay.flash(this.core.game.overlay.hitOverlay.SIDE_LEFT,tick);
+    }
+    
+    hitFlashRight(tick)
+    {
+        this.core.game.overlay.hitOverlay.flash(this.core.game.overlay.hitOverlay.SIDE_RIGHT,tick);
+    }
+    
+    hitFlashTop(tick)
+    {
+        this.core.game.overlay.hitOverlay.flash(this.core.game.overlay.hitOverlay.SIDE_TOP,tick);
+    }
+    
+    hitFlashBottom(tick)
+    {
+        this.core.game.overlay.hitOverlay.flash(this.core.game.overlay.hitOverlay.SIDE_BOTTOM,tick);
+    }
+    
+    hitFlashAll(tick)
+    {
+        this.core.game.overlay.hitOverlay.flash(this.core.game.overlay.hitOverlay.SIDE_ALL,tick);
+    }
+    
+    multiplayerAddScore(fromEntity,entity,isTelefrag)
+    {
+        this.core.game.overlay.multiplayerAddScore(fromEntity,entity,isTelefrag);
+    }
+    
+    multiplayerShowScores(show)
+    {
+        this.core.game.overlay.multiplayerShowScores(show);
+    }
+    
+        //
         // networking utilities
         //
     
@@ -842,24 +1132,35 @@ export default class EntityClass
         this.show=true;
     }
     
-    remoteEntering(name)
-    {
-    }
-    
-    remoteLeaving(name)
-    {
-    }
-    
         //
         // some overrides
         //
     
     ready()
     {
+        this.currentCube=null;      // not currently in a cube
     }
     
     run()
     {
+        let cube;
+        
+            // check cubes
+            
+        cube=this.core.game.map.cubeList.findCubeContainingEntity(this);
+        if (cube!==null) {
+            if (this.currentCube!==cube) {
+                if (this.currentCube!==null) this.currentCube.cube.leave(this);
+                this.currentCube=cube;
+                this.currentCube.cube.enter(this);
+            }
+        }
+        else {
+            if (this.currentCube!==null) {
+                this.currentCube.cube.leave(this);
+                this.currentCube=null;
+            }
+        }
     }
     
     damage(fromEntity,damage,hitPoint)
@@ -867,6 +1168,26 @@ export default class EntityClass
     }
     
     telefrag(fromEntity)
+    {
+    }
+    
+    addClip(weaponName,fireMethod,count)
+    {
+    }
+    
+    addAmmo(weaponName,fireMethod,count)
+    {
+    }
+    
+    addHealth(count)
+    {
+    }
+    
+    remoteEntering(name)
+    {
+    }
+    
+    remoteLeaving(name)
     {
     }
     

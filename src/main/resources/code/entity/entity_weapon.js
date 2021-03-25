@@ -56,10 +56,10 @@ class EntityWeaponFireClass
     addClip(count)
     {
         if ((this.interfaceClipIcon!==null) && (this.weapon.heldBy===this.core.game.map.entityList.getPlayer())) {
-            this.core.game.overlay.pulseElement(this.interfaceClipIcon,500,10);
+            this.pulseElement(this.interfaceClipIcon,500,10);
         }
         else {      // if no clip icon, flash the ammo icon if one
-            if ((this.interfaceAmmoIcon!==null) && (this.weapon.heldBy===this.core.game.map.entityList.getPlayer())) this.core.game.overlay.pulseElement(this.interfaceAmmoIcon,500,10);
+            if ((this.interfaceAmmoIcon!==null) && (this.weapon.heldBy===this.core.game.map.entityList.getPlayer())) this.pulseElement(this.interfaceAmmoIcon,500,10);
         }
         
         this.clipCount+=count;
@@ -68,7 +68,7 @@ class EntityWeaponFireClass
     
     addAmmo(count)
     {
-        if ((this.interfaceAmmoIcon!==null) && (this.weapon.heldBy===this.core.game.map.entityList.getPlayer())) this.core.game.overlay.pulseElement(this.interfaceAmmoIcon,500,10);
+        if ((this.interfaceAmmoIcon!==null) && (this.weapon.heldBy===this.core.game.map.entityList.getPlayer())) this.pulseElement(this.interfaceAmmoIcon,500,10);
         
         this.ammoInClipCount+=count;
         if (this.ammoInClipCount>this.clipSize) this.ammoInClipCount=this.clipSize;
@@ -76,10 +76,10 @@ class EntityWeaponFireClass
     
     updateUI()
     {
-        if (this.interfaceClipText!==null) this.core.game.overlay.updateText(this.interfaceClipText,this.clipCount);
-        if (this.interfaceClipCount!==null) this.core.game.overlay.setCount(this.interfaceClipCount,this.clipCount);
-        if (this.interfaceAmmoText!==null) this.core.game.overlay.updateText(this.interfaceAmmoText,this.ammoInClipCount);
-        if (this.interfaceAmmoCount!==null) this.core.game.overlay.setCount(this.interfaceAmmoCount,this.ammoInClipCount);
+        if (this.interfaceClipText!==null) this.updateText(this.interfaceClipText,this.clipCount);
+        if (this.interfaceClipCount!==null) this.setCount(this.interfaceClipCount,this.clipCount);
+        if (this.interfaceAmmoText!==null) this.updateText(this.interfaceAmmoText,this.ammoInClipCount);
+        if (this.interfaceAmmoCount!==null) this.setCount(this.interfaceAmmoCount,this.ammoInClipCount);
     }
     
     resetRegenerateAmmo()
@@ -283,10 +283,10 @@ export default class EntityWeaponClass extends EntityClass
         }
         
         if (this.inStandIdle) {
-            if (this.idleAnimation!==null) this.modelEntityAlter.queueAnimationChunkInFrames(this.idleAnimation);
+            if (this.idleAnimation!==null) this.queueAnimation(this.idleAnimation);
         }
         else {
-            this.modelEntityAlter.queueAnimationChunkInFrames(this.idleWalkAnimation);    
+            this.queueAnimation(this.idleWalkAnimation);    
         }
     }
     
@@ -295,7 +295,7 @@ export default class EntityWeaponClass extends EntityClass
         if (this.model===null) return;
         
         this.inStandIdle=true;
-        if (this.idleAnimation!==null) this.modelEntityAlter.startAnimationChunkInFrames(this.idleAnimation);
+        if (this.idleAnimation!==null) this.startAnimation(this.idleAnimation);
     }
     
     setIdleAnimation()
@@ -315,10 +315,10 @@ export default class EntityWeaponClass extends EntityClass
         this.inStandIdle=nextStandIdle;
         
         if (this.inStandIdle) {
-            if (this.idleAnimation!==null) this.modelEntityAlter.startAnimationChunkInFrames(this.idleAnimation);
+            if (this.idleAnimation!==null) this.startAnimation(this.idleAnimation);
         }
         else {
-            this.modelEntityAlter.startAnimationChunkInFrames(this.idleWalkAnimation);    
+            this.startAnimation(this.idleWalkAnimation);    
         }
     }
     
@@ -327,9 +327,9 @@ export default class EntityWeaponClass extends EntityClass
         if (this.model===null) return(0);
         
         if (this.lowerAnimation!=null) {
-            this.modelEntityAlter.startAnimationChunkInFrames(this.lowerAnimation);
+            this.startAnimation(this.lowerAnimation);
             this.queueIdleAnimation();
-            return(this.modelEntityAlter.getAnimationTickCount(this.lowerAnimation));
+            return(this.getAnimationTickCount(this.lowerAnimation));
         }
         
         return(0);
@@ -340,9 +340,9 @@ export default class EntityWeaponClass extends EntityClass
         if (this.model===null) return;
         
         if (this.raiseAnimation!=null) {
-            this.modelEntityAlter.startAnimationChunkInFrames(this.raiseAnimation);
+            this.startAnimation(this.raiseAnimation);
             this.queueIdleAnimation();
-            return(this.modelEntityAlter.getAnimationTickCount(this.raiseAnimation));
+            return(this.getAnimationTickCount(this.raiseAnimation));
         }
         
         return(0);
@@ -353,9 +353,9 @@ export default class EntityWeaponClass extends EntityClass
         if (this.model===null) return;
         
         if (this.reloadAnimation!=null) {
-            this.modelEntityAlter.startAnimationChunkInFrames(this.reloadAnimation);
+            this.startAnimation(this.reloadAnimation);
             this.queueIdleAnimation();
-            return(this.modelEntityAlter.getAnimationTickCount(this.reloadAnimation));
+            return(this.getAnimationTickCount(this.reloadAnimation));
         }
         
         return(0);
@@ -470,29 +470,29 @@ export default class EntityWeaponClass extends EntityClass
         fire.ammoInClipCount--;
         fire.resetRegenerateAmmo();
         
-        this.core.audio.soundStartGameFromList(this.core.game.map.soundList,firePosition,fire.fireSound);
+        this.playSoundAtPosition(firePosition,fire.fireSound);
            
            // weapon animation
            
         if (this.model!==null) {
-            if (fireAnimation!==null) this.modelEntityAlter.startAnimationChunkInFrames(fire.animation);
+            if (fireAnimation!==null) this.startAnimation(fire.animation);
             this.queueIdleAnimation();
         }
         
             // parent animation
             
         if (parentEntity.model!==null) {
-            if (!parentEntity.modelEntityAlter.isAnimationQueued()) {   // don't do this if we have a queue, which means another fire is still going on
+            if (!parentEntity.isAnimationQueued()) {   // don't do this if we have a queue, which means another fire is still going on
                 if ((parentEntity.movement.x!==0) || (parentEntity.movement.z!==0)) {
                     if (fireAnimation!==null) {
-                        parentEntity.modelEntityAlter.interuptAnimationChunkInFrames(fireAnimation);
+                        parentEntity.interuptAnimation(fireAnimation);
                         if ((fireAnimationFreezeMovement) && (parentEntity.movementFreezeTick!==undefined)) {
-                            parentEntity.movementFreezeTick=this.core.game.timestamp+parentEntity.modelEntityAlter.getAnimationTickCount(fireAnimation[0],fireAnimation[1]);
+                            parentEntity.movementFreezeTick=this.core.game.timestamp+parentEntity.getAnimationTickCount(fireAnimation[0],fireAnimation[1]);
                         }
                     }
                 }
                 else {
-                    if (this.parentFireIdleAnimation!==null) parentEntity.modelEntityAlter.interuptAnimationChunkInFrames(this.parentFireIdleAnimation);
+                    if (this.parentFireIdleAnimation!==null) parentEntity.interuptAnimation(this.parentFireIdleAnimation);
                 }
             }
         }
@@ -597,7 +597,7 @@ export default class EntityWeaponClass extends EntityClass
         
             // play sound and animation
             
-        this.core.audio.soundStartGameFromList(this.core.game.map.soundList,position,this.reloadSound);
+        this.playSoundAtPosition(position,this.reloadSound);
         return(this.runReloadAnimation());
     }
     
@@ -620,7 +620,7 @@ export default class EntityWeaponClass extends EntityClass
             // update any UI if player
             
         if (parentEntity===this.core.game.map.entityList.getPlayer()) {
-            if (this.interfaceCrosshair!==null) this.core.game.overlay.showElement(this.interfaceCrosshair,((this.show)&&(this.core.game.camera.isFirstPerson())));
+            if (this.interfaceCrosshair!==null) this.showElement(this.interfaceCrosshair,((this.show)&&(this.cameraIsFirstPerson())));
             if (this.primary!==null) this.primary.updateUI();
             if (this.secondary!==null) this.secondary.updateUI();
             if (this.tertiary!==null) this.tertiary.updateUI();
@@ -631,12 +631,9 @@ export default class EntityWeaponClass extends EntityClass
     {
         if (this.model===null) return(false);
         
-        this.modelEntityAlter.position.setFromPoint(this.handOffset);
-        this.modelEntityAlter.angle.setFromPoint(this.handAngle);
-        this.modelEntityAlter.scale.setFromPoint(this.scale);
-        this.modelEntityAlter.inCameraSpace=true;
+        this.setModelDrawAttributes(this.handOffset,this.handAngle,this.scale,true);
         
-        return(this.core.game.camera.isFirstPerson());
+        return(this.cameraIsFirstPerson());
     }
 
 }

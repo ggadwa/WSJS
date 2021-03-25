@@ -8,9 +8,7 @@ import EntityPlatformPlayerClass from '../entity/entity_platform_player.js';
 import EntityPlatformMonsterClass from '../entity/entity_platform_monster.js';
 import EntityWeaponClass from '../entity/entity_weapon.js';
 import EntityProjectileClass from '../entity/entity_projectile.js';
-import EntityContainerClass from '../entity/entity_container.js';
 import EntityPickupClass from '../entity/entity_pickup.js';
-import EntityDecorationClass from '../entity/entity_decoration.js';
 
 //
 // map entity list class
@@ -96,12 +94,8 @@ export default class MapEntityListClass
                 return(EntityWeaponClass);
             case 'projectile':
                 return(EntityProjectileClass);
-            case 'container':
-                return(EntityContainerClass);
             case 'pickup':
                 return(EntityPickupClass);
-            case 'decoration':
-                return(EntityDecorationClass);
         }
         
         console.log('Unknown entity type: '+json.type);
@@ -116,10 +110,17 @@ export default class MapEntityListClass
     {
         let entity,entityClass;
         
-            // get the correct entity class
-            
-        entityClass=this.getEntityClass(jsonName);        
-        if (entityClass===null) return(null);
+        entityClass=this.core.project.mapEntity(jsonName);
+        if (entityClass===null) {
+        
+                // get the correct entity class
+
+            entityClass=this.getEntityClass(jsonName);        
+            if (entityClass===null) return(null);
+        }
+        else {
+            console.info('picked up: '+jsonName);
+        }
         
             // create the entity
             

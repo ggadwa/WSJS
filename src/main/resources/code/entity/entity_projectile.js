@@ -48,6 +48,7 @@ export default class EntityProjectileClass extends EntityClass
         this.trackMotion=new PointClass(0,0,0);
         this.combinedMotion=new PointClass(0,0,0);
         this.savePoint=new PointClass(0,0,0);
+        this.drawPosition=new PointClass(0,0,0);
         this.drawAngle=new PointClass(0,0,0);
         
         Object.seal(this);
@@ -103,7 +104,7 @@ export default class EntityProjectileClass extends EntityClass
         
         this.trackMotion.setFromValues(0,0,0);
         
-        if (this.spawnSound!==null) this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.spawnSound);
+        if (this.spawnSound!==null) this.playSound(this.spawnSound);
         
         this.nextTrailTick=this.core.game.timestamp;
     }
@@ -212,7 +213,7 @@ export default class EntityProjectileClass extends EntityClass
                 return;
             }
             
-            if ((!this.stopped) && (this.bounceSound!==null)) this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.bounceSound);
+            if ((!this.stopped) && (this.bounceSound!==null)) this.playSound(this.bounceSound);
             
             this.position.setFromPoint(this.savePoint);
             if (this.canBounce) this.floorBounce(this.motion);
@@ -241,7 +242,7 @@ export default class EntityProjectileClass extends EntityClass
                 return;
             }
             
-            this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.bounceSound);
+            this.playSound(this.bounceSound);
 
             this.position.setFromPoint(this.savePoint);
             this.motion.y=0;
@@ -258,7 +259,7 @@ export default class EntityProjectileClass extends EntityClass
             
             if (this.stopped) return;
             
-            this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.reflectSound);
+            this.playSound(this.reflectSound);
             
             this.position.setFromPoint(this.savePoint);
             
@@ -292,7 +293,7 @@ export default class EntityProjectileClass extends EntityClass
             
             if (this.stopped) return;
             
-            this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.reflectSound);
+            this.playSound(this.reflectSound);
 
             this.position.setFromPoint(this.savePoint);
 
@@ -348,25 +349,21 @@ export default class EntityProjectileClass extends EntityClass
                 // to be moved up to draw (when need to rotate from
                 // center to roll)
 
-            this.modelEntityAlter.position.setFromPoint(this.position);
-            this.modelEntityAlter.position.y+=Math.trunc(this.height*0.5);
-            
-            this.modelEntityAlter.angle.setFromPoint(this.drawAngle);
+            this.drawPosition.setFromPoint(this.position);
+            this.drawPosition.y+=Math.trunc(this.height*0.5);
         }
         else {
-            this.modelEntityAlter.position.setFromPoint(this.position);
+            this.drawPosition.setFromPoint(this.position);
             if (this.spins) {
-                this.modelEntityAlter.angle.setFromValues(this.angle.x,this.core.game.getPeriodicLinear(this.spinRate,360),this.angle.z);
+                this.drawAngle.setFromValues(this.angle.x,this.core.game.getPeriodicLinear(this.spinRate,360),this.angle.z);
             }
             else {
-                this.modelEntityAlter.angle.setFromPoint(this.angle);
+                this.drawAngle.setFromPoint(this.angle);
             }
         }
         
-        this.modelEntityAlter.scale.setFromPoint(this.scale);
-        this.modelEntityAlter.inCameraSpace=false;
-
-        return(this.modelEntityAlter.boundBoxInFrustum());
+        this.setModelDrawAttributes(this.drawPosition,this.drawAngle,this.scale,false);
+        return(this.boundBoxInFrustum());
     }
 }
 

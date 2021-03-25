@@ -273,7 +273,7 @@ export default class EntityKartBaseClass extends EntityClass
             // engine sound
             
         this.engineSoundRateAirIncrease=0;
-        this.engineSoundPlayIdx=this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.engineSound);
+        this.engineSoundPlayIdx=this.playSound(this.engineSound);
         
             // some specific nodes
             
@@ -291,7 +291,7 @@ export default class EntityKartBaseClass extends EntityClass
 
             // idle animation
             
-        this.modelEntityAlter.startAnimationChunkInFrames(this.idleAnimation);
+        this.startAnimation(this.idleAnimation);
     }
     
         //
@@ -341,7 +341,7 @@ export default class EntityKartBaseClass extends EntityClass
         this.burstSpeed=burstSpeed;
         this.burstEndTimestamp=this.core.game.timestamp+burstLifeTick;
         
-        this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.burstSound);
+        this.playSound(this.burstSound);
     }
     
     addClip(weaponName,fireMethod,count)
@@ -376,7 +376,7 @@ export default class EntityKartBaseClass extends EntityClass
     {
         this.inDrift=true;
         this.driftMovement.setFromPoint(this.rotMovement);
-        this.lastDriftSoundPlayIdx=this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.skidSound);
+        this.lastDriftSoundPlayIdx=this.playSound(this.skidSound);
     }
     
     driftEnd()
@@ -403,7 +403,7 @@ export default class EntityKartBaseClass extends EntityClass
         
         this.movement.z=0;          // clear all forward movement for a bounce
         
-        this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.crashWallSound);
+        this.playSound(this.crashWallSound);
         
             // bounce cost a speed item
             
@@ -424,7 +424,7 @@ export default class EntityKartBaseClass extends EntityClass
         this.bounceReflectMovement.setFromPoint(this.movement);
         this.bounceReflectMovement.rotateY(null,hitEntity.position.angleYTo(this.position));
         
-        this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.crashKartSound);
+        this.playSound(this.crashKartSound);
         
             // reflect cost a speed item
             
@@ -447,7 +447,7 @@ export default class EntityKartBaseClass extends EntityClass
         this.spinOutCount=360;
         this.removeSpeed(1);
         
-        this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.crashWallSound);
+        this.playSound(this.crashWallSound);
     }
     
         //
@@ -629,11 +629,11 @@ export default class EntityKartBaseClass extends EntityClass
             // animations
 
         if (this.spinOutCount!==0) {
-            this.modelEntityAlter.continueAnimationChunkInFrames(this.spinOutAnimation);
+            this.continueAnimation(this.spinOutAnimation);
         }
         else {
             if (this.movement.z===0) {
-                this.modelEntityAlter.continueAnimationChunkInFrames(this.idleAnimation);
+                this.continueAnimation(this.idleAnimation);
             }
             else {
                 if (this.turnCoolDown===0) {
@@ -642,14 +642,14 @@ export default class EntityKartBaseClass extends EntityClass
                 }
                 
                 if (this.turnSmooth>0.1) {
-                    this.modelEntityAlter.continueAnimationChunkInFrames(this.turnLeftAnimation);
+                    this.continueAnimation(this.turnLeftAnimation);
                 }
                 else {
                     if (this.turnSmooth<-0.1) {
-                        this.modelEntityAlter.continueAnimationChunkInFrames(this.turnRightAnimation);
+                        this.continueAnimation(this.turnRightAnimation);
                     }
                     else {
-                        this.modelEntityAlter.continueAnimationChunkInFrames(this.driveAnimation);
+                        this.continueAnimation(this.driveAnimation);
                     }
                 }
                 
@@ -967,11 +967,7 @@ export default class EntityKartBaseClass extends EntityClass
             // and finally just call the regular draw position
             // stuff
             
-        this.modelEntityAlter.position.setFromPoint(this.position);
-        this.modelEntityAlter.angle.setFromPoint(this.drawAngle);
-        this.modelEntityAlter.scale.setFromPoint(this.scale);
-        this.modelEntityAlter.inCameraSpace=false;
-
-        return(this.modelEntityAlter.boundBoxInFrustum());
+        this.setModelDrawAttributes(this.position,this.drawAngle,this.scale,false);
+        return(this.boundBoxInFrustum());
     }
 }

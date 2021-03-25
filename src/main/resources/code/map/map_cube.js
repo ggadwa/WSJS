@@ -4,10 +4,9 @@
 
 export default class MapCubeClass
 {
-    constructor(name,actions,xBound,yBound,zBound,data)
+    constructor(cube,xBound,yBound,zBound,data)
     {
-        this.name=name;
-        this.actions=(actions===undefined)?null:actions;
+        this.cube=cube;
         this.xBound=xBound.copy();
         this.yBound=yBound.copy();
         this.zBound=zBound.copy();

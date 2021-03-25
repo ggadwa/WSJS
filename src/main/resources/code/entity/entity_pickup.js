@@ -48,7 +48,7 @@ export default class EntityPickupClass extends EntityClass
     {
         super.ready();
         
-        if (this.idleAnimation!==null) this.modelEntityAlter.startAnimationChunkInFrames(this.idleAnimation);
+        if (this.idleAnimation!==null) this.startAnimation(this.idleAnimation);
         
         if (this.randomPosition) this.setRandomPosition();
         
@@ -112,7 +112,7 @@ export default class EntityPickupClass extends EntityClass
         this.show=false;
         this.hideStartTick=this.core.game.timestamp;
         
-        this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.pickupSound);
+        this.playSound(this.pickupSound);
         
         this.core.game.runActions(this.touchEntity,this.json.config.actions,this.data);
     }
@@ -121,12 +121,8 @@ export default class EntityPickupClass extends EntityClass
     {
         if (this.model===null) return(false);
         
-        this.modelEntityAlter.position.setFromPoint(this.position);
-        this.modelEntityAlter.angle.setFromPoint(this.angle);
-        this.modelEntityAlter.scale.setFromPoint(this.scale);
-        this.modelEntityAlter.inCameraSpace=false;
-
-        return(this.modelEntityAlter.boundBoxInFrustum());
+        this.setModelDrawAttributes(this.position,this.angle,this.scale,false);
+        return(this.boundBoxInFrustum());
     }
 }
 
