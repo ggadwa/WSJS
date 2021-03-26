@@ -344,28 +344,15 @@ export default class EntityKartBaseClass extends EntityClass
         this.playSound(this.burstSound);
     }
     
-    addClip(weaponName,fireMethod,count)
+    findWeapon(weaponName)
     {
         let weapon;
 
         for (weapon of this.weapons) {
-            if (weapon.name===weaponName) {
-                weapon.addClip(fireMethod,count);
-                return;
-            }
+            if (weapon.name===weaponName) return(weapon);
         }
-    }
-    
-    addAmmo(weaponName,fireMethod,count)
-    {
-        let weapon;
-
-        for (weapon of this.weapons) {
-            if (weapon.name===weaponName) {
-                weapon.addAmmo(fireMethod,count);
-                return;
-            }
-        }
+        
+        return(null);
     }
     
         //

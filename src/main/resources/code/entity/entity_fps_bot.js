@@ -336,18 +336,6 @@ export default class EntityFPSBotClass extends EntityClass
         weapon.available=true;
     }
     
-    addClip(weaponName,fireMethod,count)
-    {
-        let weapon=this.findWeaponByName(weaponName);
-        if (weapon!==null) weapon.addClip(fireMethod,count);
-    }
-    
-    addAmmo(weaponName,fireMethod,count)
-    {
-        let weapon=this.findWeaponByName(weaponName);
-        if (weapon!==null) weapon.addAmmo(fireMethod,count);
-    }
-    
     addHealth(count)
     {
         this.health+=count;

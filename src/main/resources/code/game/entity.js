@@ -182,6 +182,11 @@ export default class EntityClass
         entity.heldBy=this;
     }
     
+    findHeldEntityByName(name)
+    {
+        return(this.core.game.map.findHold(this,name));
+    }
+    
     getPlayer()
     {
         return(this.core.game.map.entityList.getPlayer());
@@ -1171,11 +1176,11 @@ export default class EntityClass
     {
     }
     
-    addClip(weaponName,fireMethod,count)
+    addClip(weaponName,count)
     {
     }
     
-    addAmmo(weaponName,fireMethod,count)
+    addAmmo(weaponName,count)
     {
     }
     

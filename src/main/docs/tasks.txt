@@ -1,10 +1,16 @@
 
 
 SCRIPT REDO
-
+    - need to do weapons next (the primary/etc is messing up entity calls)
      
-     - remove actions
-     - can probably remove primary/secondary/etc from weapons (specific scripts)
+    - remove actions
+    - can probably remove primary/secondary/etc from weapons (specific scripts)
+
+  - find weapon by "find held" and add there in captain_chest
+  - get rid of findweapon ???
+
+  - eventually models and such on entity?
+  - should we get rid of everything in entity and just do it per project entity (probably?)
 
 
 

@@ -2,12 +2,49 @@ import PointClass from '../utility/point.js';
 import BoundClass from '../utility/bound.js';
 import EntityClass from '../game/entity.js';
 
-class EntityWeaponFireClass
+export default class EntityWeaponClass extends EntityClass
 {
-    constructor(core,weapon,fireObj)
+    constructor(core,name,json,position,angle,data,mapSpawn,spawnedBy,heldBy,show)
     {
-        this.core=core;
-        this.weapon=weapon;
+        super(core,name,json,position,angle,data,mapSpawn,spawnedBy,heldBy,show);
+        
+        this.FIRE_TYPE_HIT_SCAN=0;
+        this.FIRE_TYPE_PROJECTILE=1;
+        
+        this.FIRE_TYPE_LIST=['hit_scan','projectile'];
+        
+        this.FIRE_METHOD_ANY=-1;
+        this.FIRE_METHOD_PRIMARY=0;
+        this.FIRE_METHOD_SECONDARY=1;
+        this.FIRE_METHOD_TERTIARY=2;
+        
+        this.idleAnimation=null;
+        this.idleWalkAnimation=null;
+        this.raiseAnimation=null;
+        this.lowerAnimation=null;
+        this.reloadAnimation=null;
+        
+        this.interfaceCrosshair=null;
+        
+        this.initiallyAvailable=false;
+        this.available=false;
+        this.fireYSlop=0;
+        
+        this.lastFireTimestamp=0;
+        
+        this.inStandIdle=false;
+        
+        this.handOffset=new PointClass(0,0,0);
+        this.handAngle=new PointClass(0,0,0);
+        this.fireOffsetAdd=new PointClass(0,0,0);
+        this.fireAngleAdd=new PointClass(0,0,0);
+        this.botFireRange=new BoundClass(0,0);
+        
+        this.parentIdleAnimation=null;
+        this.parentRunAnimation=null; 
+        this.parentFireIdleAnimation=null;
+        this.parentFireRunAnimation=null;
+        this.parentFireFreezeMovement=false;
         
         this.usesClips=this.core.game.lookupValue(fireObj.usesClips,weapon.data,false);
         this.clipInitialCount=this.core.game.lookupValue(fireObj.clipInitialCount,weapon.data,0);
@@ -40,116 +77,7 @@ class EntityWeaponFireClass
         
         this.lastFireTimestamp=0;
         this.lastRegenerateTimestamp=0;
-        
-        Object.seal(this);
-    }
-    
-    ready()
-    {
-        this.clipCount=this.clipInitialCount;
-        this.ammoInClipCount=this.clipAmmoInitialCount;
-        
-        this.lastFireTimestamp=0;
-        this.lastRegenerateTimestamp=this.core.game.timestamp+this.ammoRegenerateTick;
-    }
-    
-    addClip(count)
-    {
-        if ((this.interfaceClipIcon!==null) && (this.weapon.heldBy===this.core.game.map.entityList.getPlayer())) {
-            this.pulseElement(this.interfaceClipIcon,500,10);
-        }
-        else {      // if no clip icon, flash the ammo icon if one
-            if ((this.interfaceAmmoIcon!==null) && (this.weapon.heldBy===this.core.game.map.entityList.getPlayer())) this.pulseElement(this.interfaceAmmoIcon,500,10);
-        }
-        
-        this.clipCount+=count;
-        if (this.clipCount>this.clipMaxCount) this.clipCount=this.clipMaxCount;
-    }
-    
-    addAmmo(count)
-    {
-        if ((this.interfaceAmmoIcon!==null) && (this.weapon.heldBy===this.core.game.map.entityList.getPlayer())) this.pulseElement(this.interfaceAmmoIcon,500,10);
-        
-        this.ammoInClipCount+=count;
-        if (this.ammoInClipCount>this.clipSize) this.ammoInClipCount=this.clipSize;
-    }
-    
-    updateUI()
-    {
-        if (this.interfaceClipText!==null) this.updateText(this.interfaceClipText,this.clipCount);
-        if (this.interfaceClipCount!==null) this.setCount(this.interfaceClipCount,this.clipCount);
-        if (this.interfaceAmmoText!==null) this.updateText(this.interfaceAmmoText,this.ammoInClipCount);
-        if (this.interfaceAmmoCount!==null) this.setCount(this.interfaceAmmoCount,this.ammoInClipCount);
-    }
-    
-    resetRegenerateAmmo()
-    {
-        this.lastRegenerateTimestamp=this.core.game.timestamp+this.ammoRegenerateTick;
-    }
-    
-    regenerateAmmo()
-    {
-        if (this.ammoRegenerateTick!==-1) {
-            if (this.core.game.timestamp>this.lastRegenerateTimestamp) {
-                this.lastRegenerateTimestamp=this.core.game.timestamp+this.ammoRegenerateTick;
-                this.addAmmo(1);
-            }
-        }
-    }
-}
-
-export default class EntityWeaponClass extends EntityClass
-{
-    constructor(core,name,json,position,angle,data,mapSpawn,spawnedBy,heldBy,show)
-    {
-        super(core,name,json,position,angle,data,mapSpawn,spawnedBy,heldBy,show);
-        
-        this.FIRE_TYPE_HIT_SCAN=0;
-        this.FIRE_TYPE_PROJECTILE=1;
-        
-        this.FIRE_TYPE_LIST=['hit_scan','projectile'];
-        
-        this.FIRE_METHOD_ANY=-1;
-        this.FIRE_METHOD_PRIMARY=0;
-        this.FIRE_METHOD_SECONDARY=1;
-        this.FIRE_METHOD_TERTIARY=2;
-        
-        this.idleAnimation=null;
-        this.idleWalkAnimation=null;
-        this.raiseAnimation=null;
-        this.lowerAnimation=null;
-        this.reloadAnimation=null;
-        
-        this.interfaceCrosshair=null;
-        
-        this.primary=null;
-        this.secondary=null;
-        this.tertiary=null;
-        
-        this.initiallyAvailable=false;
-        this.available=false;
-        this.fireYSlop=0;
-        
-        this.lastFireTimestamp=0;
-        
-        this.inStandIdle=false;
-        
-        this.handOffset=new PointClass(0,0,0);
-        this.handAngle=new PointClass(0,0,0);
-        this.fireOffsetAdd=new PointClass(0,0,0);
-        this.fireAngleAdd=new PointClass(0,0,0);
-        this.botFireRange=new BoundClass(0,0);
-        
-        this.parentIdleAnimation=null;
-        this.parentRunAnimation=null; 
-        this.parentFireIdleAnimation=null;
-        this.parentPrimaryFireRunAnimation=null;
-        this.parentPrimaryFireFreezeMovement=false;
-        this.parentSecondaryFireRunAnimation=null;
-        this.parentSecondaryFireFreezeMovement=false;
-        this.parentTertiaryFireRunAnimation=null;
-        this.parentTertiaryFireFreezeMovement=false;
-        
+            
             // pre-allocates
         
         this.firePoint=new PointClass(0,0,0);
@@ -183,11 +111,7 @@ export default class EntityWeaponClass extends EntityClass
         
         this.fireOffsetAdd=new PointClass(this.json.config.fireOffsetAdd.x,this.json.config.fireOffsetAdd.y,this.json.config.fireOffsetAdd.z);
         this.fireAngleAdd=new PointClass(this.json.config.fireAngleAdd.x,this.json.config.fireAngleAdd.y,this.json.config.fireAngleAdd.z);
-            
-        if (this.json.config.primary!==null) this.primary=new EntityWeaponFireClass(this.core,this,this.json.config.primary);
-        if (this.json.config.secondary!==null) this.secondary=new EntityWeaponFireClass(this.core,this,this.json.config.secondary);
-        if (this.json.config.tertiary!==null) this.tertiary=new EntityWeaponFireClass(this.core,this,this.json.config.tertiary);
-        
+                    
             // misc bot setup
             
         this.botFireRange.setFromValues(this.json.config.botFireRange[0],this.json.config.botFireRange[1]);
@@ -198,12 +122,8 @@ export default class EntityWeaponClass extends EntityClass
         this.parentIdleAnimation=null;
         this.parentRunAnimation=null; 
         this.parentFireIdleAnimation=null;
-        this.parentPrimaryFireRunAnimation=null;
-        this.parentPrimaryFireFreezeMovement=false;
-        this.parentSecondaryFireRunAnimation=null;
-        this.parentSecondaryFireFreezeMovement=false;
-        this.parentTertiaryFireRunAnimation=null;
-        this.parentTertiaryFireFreezeMovement=false;
+        this.parentFireRunAnimation=null;
+        this.parentFireFreezeMovement=false;
         
         return(true);    
     }
@@ -214,9 +134,11 @@ export default class EntityWeaponClass extends EntityClass
         
         this.available=this.initiallyAvailable;
         
-        if (this.primary!==null) this.primary.ready();
-        if (this.secondary!==null) this.secondary.ready();
-        if (this.tertiary!==null) this.tertiary.ready();
+        this.clipCount=this.clipInitialCount;
+        this.ammoInClipCount=this.clipAmmoInitialCount;
+        
+        this.lastFireTimestamp=0;
+        this.lastRegenerateTimestamp=this.core.game.timestamp+this.ammoRegenerateTick;
         
         this.inStandIdle=false
         if (this.model!==null) this.queueIdleAnimation();
@@ -226,48 +148,54 @@ export default class EntityWeaponClass extends EntityClass
         // ammo
         //
         
-    addClip(fireMethod,count)
+    addClip(count)
     {
-        switch (fireMethod) {
-            case 'primary':
-                if (this.primary!==null) this.primary.addClip(count);
-                break;
-            case 'secondary':
-                if (this.secondary!==null) this.secondary.addClip(count);
-                break;
-            case 'tertiary':
-                if (this.tertiary!==null) this.tertiary.addClip(count);
-                break;
+        if ((this.interfaceClipIcon!==null) && (this.weapon.heldBy===this.core.game.map.entityList.getPlayer())) {
+            this.pulseElement(this.interfaceClipIcon,500,10);
         }
-    }
+        else {      // if no clip icon, flash the ammo icon if one
+            if ((this.interfaceAmmoIcon!==null) && (this.weapon.heldBy===this.core.game.map.entityList.getPlayer())) this.pulseElement(this.interfaceAmmoIcon,500,10);
+        }
         
-    addAmmo(fireMethod,count)
+        this.clipCount+=count;
+        if (this.clipCount>this.clipMaxCount) this.clipCount=this.clipMaxCount;
+    }
+    
+    addAmmo(count)
     {
-        switch (fireMethod) {
-            case 'primary':
-                if (this.primary!==null) this.primary.addAmmo(count);
-                break;
-            case 'secondary':
-                if (this.secondary!==null) this.secondary.addAmmo(count);
-                break;
-            case 'tertiary':
-                if (this.tertiary!==null) this.tertiary.addAmmo(count);
-                break;
-        }
+        if ((this.interfaceAmmoIcon!==null) && (this.weapon.heldBy===this.core.game.map.entityList.getPlayer())) this.pulseElement(this.interfaceAmmoIcon,500,10);
+        
+        this.ammoInClipCount+=count;
+        if (this.ammoInClipCount>this.clipSize) this.ammoInClipCount=this.clipSize;
     }
     
     hasAnyAmmo()
     {
-        if (this.primary!==null) {
-            if (this.primary.ammo!==0) return(true);
+        if (this.clipCount===0) return(false);
+        return(this.ammoInClipCount!==0);
+    }
+    
+    updateUI()
+    {
+        if (this.interfaceClipText!==null) this.updateText(this.interfaceClipText,this.clipCount);
+        if (this.interfaceClipCount!==null) this.setCount(this.interfaceClipCount,this.clipCount);
+        if (this.interfaceAmmoText!==null) this.updateText(this.interfaceAmmoText,this.ammoInClipCount);
+        if (this.interfaceAmmoCount!==null) this.setCount(this.interfaceAmmoCount,this.ammoInClipCount);
+    }
+    
+    resetRegenerateAmmo()
+    {
+        this.lastRegenerateTimestamp=this.core.game.timestamp+this.ammoRegenerateTick;
+    }
+    
+    regenerateAmmo()
+    {
+        if (this.ammoRegenerateTick!==-1) {
+            if (this.core.game.timestamp>this.lastRegenerateTimestamp) {
+                this.lastRegenerateTimestamp=this.core.game.timestamp+this.ammoRegenerateTick;
+                this.addAmmo(1);
+            }
         }
-        if (this.secondary!==null) {
-            if (this.secondary.ammo!==0) return(true);
-        }
-        if (this.tertiary!==null) {
-            if (this.tertiary.ammo!==0) return(true);
-        }
-        return(false);
     }
     
         //
@@ -443,39 +371,37 @@ export default class EntityWeaponClass extends EntityClass
         // firing
         //
         
-    isFirePaused(fireMethod)
+    isFirePaused()
     {
-        switch (fireMethod) {
-            case this.FIRE_METHOD_PRIMARY:
-                if (this.primary===null) return(false);
-                return((this.primary.lastFireTimestamp+this.primary.waitTick)>this.core.game.timestamp);
-            case this.FIRE_METHOD_SECONDARY:
-                if (this.secondary===null) return(false);
-                return((this.secondary.lastFireTimestamp+this.secondary.waitTick)>this.core.game.timestamp);
-            case this.FIRE_METHOD_TERTIARY:
-                if (this.tertiary===null) return(false);
-                return((this.tertiary.lastFireTimestamp+this.tertiary.waitTick)>this.core.game.timestamp);
-        }
-        
-        return(false);
+        return((this.lastFireTimestamp+this.waitTick)>this.core.game.timestamp);
     }
     
     fireForType(parentEntity,fire,fireAnimation,fireAnimationFreezeMovement,firePosition,fireAngle)
     {
-        if ((fire.lastFireTimestamp+fire.waitTick)>this.core.game.timestamp) return;
-        fire.lastFireTimestamp=this.core.game.timestamp;
+    }
+    
+    fire(firePosition,fireAngle)
+    {
+        if (this.ammoInClipCount===0) return(false);
+        
+        
+            this.fireForType(this.heldBy,this.primary,this.parentPrimaryFireRunAnimation,this.parentPrimaryFireFreezeMovement,firePosition,fireAngle);
+            
+            
+        if ((this.lastFireTimestamp+this.waitTick)>this.core.game.timestamp) return;
+        this.lastFireTimestamp=this.core.game.timestamp;
         
             // fire
             
-        fire.ammoInClipCount--;
-        fire.resetRegenerateAmmo();
+        this.ammoInClipCount--;
+        this.resetRegenerateAmmo();
         
-        this.playSoundAtPosition(firePosition,fire.fireSound);
+        this.playSoundAtPosition(firePosition,this.fireSound);
            
            // weapon animation
            
         if (this.model!==null) {
-            if (fireAnimation!==null) this.startAnimation(fire.animation);
+            if (this.parentFireRunAnimation!==null) this.startAnimation(this.parentFireRunAnimation);
             this.queueIdleAnimation();
         }
         
@@ -484,10 +410,10 @@ export default class EntityWeaponClass extends EntityClass
         if (parentEntity.model!==null) {
             if (!parentEntity.isAnimationQueued()) {   // don't do this if we have a queue, which means another fire is still going on
                 if ((parentEntity.movement.x!==0) || (parentEntity.movement.z!==0)) {
-                    if (fireAnimation!==null) {
-                        parentEntity.interuptAnimation(fireAnimation);
-                        if ((fireAnimationFreezeMovement) && (parentEntity.movementFreezeTick!==undefined)) {
-                            parentEntity.movementFreezeTick=this.core.game.timestamp+parentEntity.getAnimationTickCount(fireAnimation[0],fireAnimation[1]);
+                    if (this.fireAnimation!==null) {
+                        parentEntity.interuptAnimation(this.parentFireRunAnimation);
+                        if ((this.parentFireFreezeMovement) && (parentEntity.movementFreezeTick!==undefined)) {
+                            parentEntity.movementFreezeTick=this.core.game.timestamp+parentEntity.getAnimationTickCount(this.parentFireRunAnimation);
                         }
                     }
                 }
@@ -499,7 +425,7 @@ export default class EntityWeaponClass extends EntityClass
         
             // and the fire method
             
-        switch (fire.type) {
+        switch (this.fireType) {
             case this.FIRE_TYPE_HIT_SCAN:
                 this.hitScan(parentEntity,fire,firePosition,fireAngle);
                 return;
@@ -507,93 +433,29 @@ export default class EntityWeaponClass extends EntityClass
                 this.projectile(parentEntity,fire,firePosition,fireAngle);
                 return;
         }
-    }
-    
-    fire(fireMethod,firePosition,fireAngle)
-    {
-            // primary
-            
-        if ((fireMethod===this.FIRE_METHOD_PRIMARY) || (fireMethod===this.FIRE_METHOD_ANY)) {
-            if (this.primary!==null) {
-                if (this.primary.ammoInClipCount!==0) {
-                    this.fireForType(this.heldBy,this.primary,this.parentPrimaryFireRunAnimation,this.parentPrimaryFireFreezeMovement,firePosition,fireAngle);
-                    return(true);
-                }
-            }
-            if (fireMethod!==this.FIRE_METHOD_ANY) return(false);
-        }
-        
-            // secondary
-            
-        if ((fireMethod===this.FIRE_METHOD_SECONDARY) || (fireMethod===this.FIRE_METHOD_ANY)) {
-            if (this.secondary!==null) {
-                if (this.secondary.ammoInClipCount!==0) {
-                    this.fireForType(this.heldBy,this.secondary,this.parentSecondaryFireRunAnimation,this.parentSecondaryFireFreezeMovement,firePosition,fireAngle);
-                    return(true);
-                }
-            }
-            if (fireMethod!==this.FIRE_METHOD_ANY) return(false);
-        }
-        
-            // tertiary
-            
-        if ((fireMethod===this.FIRE_METHOD_TERTIARY) || (fireMethod===this.FIRE_METHOD_ANY)) {
-            if (this.tertiary!==null) {
-                if (this.tertiary.ammoInClipCount!==0) {
-                    this.fireForType(this.heldBy,this.tertiary,this.parentTertiaryFireRunAnimation,this.parentTertiaryFireFreezeMovement,firePosition,fireAngle);
-                    return(true);
-                }
-            }
-            if (fireMethod!==this.FIRE_METHOD_ANY) return(false);
-        }
-        
-        return(false);
+
+
+
+        return(true);
     }
     
         //
         // clip changes
         //
      
-    needClipChangeForType(fire)
+    needClipChange()
     {
-        if (fire===null) return(false);
-        if (!fire.usesClips) return(false);
-        if (fire.clipCount===0) return(false);
-        return(fire.ammoInClipCount===0);
+        if (!this.usesClips) return(false);
+        if (this.clipCount===0) return(false);
+        return(this.ammoInClipCount===0);
     }
     
-    needClipChange(fireMethod)
-    {
-        switch(fireMethod) {
-            case this.FIRE_METHOD_PRIMARY:
-                return(this.needClipChangeForType(this.primary));
-            case this.FIRE_METHOD_SECONDARY:
-                return(this.needClipChangeForType(this.secondary));
-            case this.FIRE_METHOD_TERTIARY:
-                return(this.needClipChangeForType(this.tertiary));
-        }
-        
-        return(false);
-    }
-    
-    changeClip(fireMethod,position)
+    changeClip(position)
     {
             // update the clip
             
-        switch(fireMethod) {
-            case this.FIRE_METHOD_PRIMARY:
-                this.primary.clipCount--;
-                this.primary.ammoInClipCount=this.primary.clipSize;
-                break;
-            case this.FIRE_METHOD_SECONDARY:
-                this.secondary.clipCount--;
-                this.secondary.ammoInClipCount=this.secondary.clipSize;
-                break;
-            case this.FIRE_METHOD_TERTIARY:
-                this.tertiary.clipCount--;
-                this.tertiary.ammoInClipCount=this.tertiary.clipSize;
-                break;
-        }
+        this.clipCount--;
+        this.ammoInClipCount=this.clipSize;
         
             // play sound and animation
             
@@ -613,17 +475,13 @@ export default class EntityWeaponClass extends EntityClass
         
             // do any ammo regen
             
-        if (this.primary!==null) this.primary.regenerateAmmo();
-        if (this.secondary!==null) this.secondary.regenerateAmmo();
-        if (this.tertiary!==null) this.tertiary.regenerateAmmo();
+        this.regenerateAmmo();
         
             // update any UI if player
             
         if (parentEntity===this.core.game.map.entityList.getPlayer()) {
             if (this.interfaceCrosshair!==null) this.showElement(this.interfaceCrosshair,((this.show)&&(this.cameraIsFirstPerson())));
-            if (this.primary!==null) this.primary.updateUI();
-            if (this.secondary!==null) this.secondary.updateUI();
-            if (this.tertiary!==null) this.tertiary.updateUI();
+            this.updateUI();
         }
     }
         
