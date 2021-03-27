@@ -114,7 +114,7 @@ export default class EntityKartPlayerClass extends EntityKartBaseClass
             if (setup.mouseXInvert) turnAdd=-turnAdd;
         }
         
-        if (this.hasTouch) {
+        if (this.hasTouch()) {
             if (!this.isTouchStickRightOn()) {
                 brake=true;
                 forward=false;

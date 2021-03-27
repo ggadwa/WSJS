@@ -244,7 +244,7 @@ export default class EntityPlatformPlayerClass extends EntityClass
             
             forward=this.isKeyDown('d');
             backward=this.isKeyDown('a');
-            if (this.hasTouch) {
+            if (this.hasTouch()) {
                 if (this.isTouchStickLeftOn()) {
                     x=this.getTouchStickLeftX();
                     if (x!==0) {

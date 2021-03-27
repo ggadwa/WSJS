@@ -118,9 +118,6 @@ export default class MapEntityListClass
             entityClass=this.getEntityClass(jsonName);        
             if (entityClass===null) return(null);
         }
-        else {
-            console.info('picked up: '+jsonName);
-        }
         
             // create the entity
             
@@ -136,8 +133,12 @@ export default class MapEntityListClass
         
             // get the correct entity class
             
-        entityClass=this.getEntityClass(jsonName);        
-        if (entityClass===null) return(null);
+                entityClass=this.core.project.mapEntity(jsonName);
+        if (entityClass===null) {
+
+            entityClass=this.getEntityClass(jsonName);        
+            if (entityClass===null) return(null);
+        }
         
             // create the entity
             
@@ -336,7 +337,7 @@ export default class MapEntityListClass
         return(foundEntity);
     }
     
-    findClosestWithMaxAngle(position,angle,typeList,maxAngle)
+    findClosestWithMaxAngle(position,angle,namePrefix,skipEntity,maxAngle)
     {
         let d,dist,ang,y,addway,subway;
         let entity,foundEntity;
@@ -345,8 +346,11 @@ export default class MapEntityListClass
         foundEntity=null;
          
         for (entity of this.entities) {
-            if (typeList!==null) {
-                if (typeList.indexOf(entity.json.type)===-1) continue;
+            if (skipEntity!==null) {
+                if (entity===skipEntity) continue;
+            }
+            if (namePrefix!==null) {
+                if (!entity.name.startsWith(namePrefix)) continue;
             }
             
                 // check angle

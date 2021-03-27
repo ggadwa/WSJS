@@ -1,27 +1,33 @@
 
 
 SCRIPT REDO
+
+ - clean up weapon fields
+
+- fps adds weapons statically like kart
+
+
+
     - need to do weapons next (the primary/etc is messing up entity calls)
      
     - remove actions
     - can probably remove primary/secondary/etc from weapons (specific scripts)
 
-  - find weapon by "find held" and add there in captain_chest
   - get rid of findweapon ???
 
   - eventually models and such on entity?
-  - should we get rid of everything in entity and just do it per project entity (probably?)
 
+  ----> runWeaponFiring  move most of that to weapon (bots will have to clip change, too)
+         - hitscan/projectile to entity?
 
+-- redo weapon -> player animation completely
 
-
-
+  FINALLY: map_entity_list.addFromMap/addDynamic
 
 
 
 
 - if no pose, just set ONCE
-- allow any [] to be null in json
 
 
 - rework multiplayer

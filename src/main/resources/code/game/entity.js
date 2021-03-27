@@ -184,7 +184,7 @@ export default class EntityClass
     
     findHeldEntityByName(name)
     {
-        return(this.core.game.map.findHold(this,name));
+        return(this.core.game.map.entityList.findHold(this,name));
     }
     
     getPlayer()
@@ -215,6 +215,11 @@ export default class EntityClass
             damage=Math.trunc((1.0-(dist/maxDistance))*maxDamage);
             entity.damage(hitEntity,damage,centerPosition);
         }
+    }
+    
+    findClosestWithMaxAngle(position,angle,namePrefix,skipEntity,maxAngle)
+    {
+        return(this.core.game.map.entityList.findClosestWithMaxAngle(position,angle,namePrefix,maxAngle));
     }
     
         //
@@ -900,7 +905,7 @@ export default class EntityClass
     
     hasTouch()
     {
-        return(input.hasTouch);
+        return(this.core.input.hasTouch);
     }
     
     isTouchStickLeftClick()

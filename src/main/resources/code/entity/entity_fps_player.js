@@ -74,7 +74,7 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.lastUnderLiquid=false;
         
         this.carouselWeapons=[];        // weapons in the carousel
-        this.grenadeWeapons=null;       // the grenade weapon
+        this.grenadeWeapon=null;        // the grenade weapon
         
         this.currentCarouselWeaponIdx=0;
         this.gotoCarouselWeaponIdx=0;

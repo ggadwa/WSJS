@@ -124,10 +124,7 @@ export default class EntityKartBaseClass extends EntityClass
         this.firstNodeIdx=0;
         this.midpointNodeIdx=0;
         
-            // weapons
-        
-        this.currentWeaponIdx=-1;
-        this.weapons=[];
+        this.bowlingBallWeapon=null;
         
             // pre-allocate
             
@@ -159,8 +156,6 @@ export default class EntityKartBaseClass extends EntityClass
     
     initialize()
     {
-        let n,weaponBlock,weaponEntity;
-        
         super.initialize();
         
             // kart settings
@@ -217,12 +212,7 @@ export default class EntityKartBaseClass extends EntityClass
         this.crashKartSound=this.core.game.lookupSoundValue(this.json.sounds.crashKartSound);
         this.crashWallSound=this.core.game.lookupSoundValue(this.json.sounds.crashWallSound);
         
-        for (n=0;n!==this.json.weapons.length;n++) {
-            weaponBlock=this.json.weapons[n];
-
-             weaponEntity=this.addEntity(weaponBlock.weaponJson,weaponBlock.name,new PointClass(0,0,0),new PointClass(0,0,0),weaponBlock.weaponData,this,this,true);
-             this.weapons.push(weaponEntity);
-        }
+        this.bowlingBallWeapon=this.addEntity('weapon_bowling_ball','weapon_bowling_ball',new PointClass(0,0,0),new PointClass(0,0,0),null,this,this,true);
             
         return(true);
     }
@@ -263,8 +253,6 @@ export default class EntityKartBaseClass extends EntityClass
         
         this.lastDrawTick=this.core.game.timestamp;
         this.rigidGotoAngle.setFromValues(0,0,0);
-        
-        this.currentWeaponIdx=0;
         
             // reset the speed items
             
@@ -344,15 +332,9 @@ export default class EntityKartBaseClass extends EntityClass
         this.playSound(this.burstSound);
     }
     
-    findWeapon(weaponName)
+    addBowlingBall()
     {
-        let weapon;
-
-        for (weapon of this.weapons) {
-            if (weapon.name===weaponName) return(weapon);
-        }
-        
-        return(null);
+        this.bowlingBallWeapon.addAmmo(1);
     }
     
         //
@@ -510,7 +492,6 @@ export default class EntityKartBaseClass extends EntityClass
     {
         let maxTurnSpeed,speed,rate;
         let smokeAngle,burstAngle;
-        let weapon;
         
             // spinning
             
@@ -526,12 +507,9 @@ export default class EntityKartBaseClass extends EntityClass
             // firing
         
         if (fire) {
-            if (this.currentWeaponIdx!==-1) {
-                weapon=this.weapons[this.currentWeaponIdx];
-                this.fireAngle.setFromPoint(this.drawAngle);
-                this.fireAngle.x=-this.fireAngle.z;      // translate rigid body to fire position
-                weapon.fire(weapon.FIRE_METHOD_PRIMARY,this.position,this.fireAngle);
-             }
+            this.fireAngle.setFromPoint(this.drawAngle);
+            this.fireAngle.x=-this.fireAngle.z;      // translate rigid body to fire position
+            this.bowlingBallWeapon.fire(this.position,this.fireAngle);
         }
         
             // turning
