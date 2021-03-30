@@ -31,6 +31,7 @@ export default class EntityClass
         this.collisionSpokeCount=48;                // how many ray spokes we check collisions across x/z
         this.collisionHeightSegmentCount=4;         // how many segements we check collisions across the height
         this.collisionHeightMargin=10;              // sometimes wall segments can extend a couple pixels off of floors or ceilings, so this slop fixes getting stuck on edges
+        this.canBeClimbed=false;                    // if this object can be bumped/climbed over
         
         this.position=position.copy();
         this.angle=angle.copy();
@@ -39,6 +40,8 @@ export default class EntityClass
         this.spawnedBy=spawnedBy;
         this.heldBy=heldBy;
         this.show=show;
+        
+        this.isPlayer=false;
         
         this.originalPosition=this.position.copy();
         this.originalAngle=this.angle.copy();
@@ -57,7 +60,6 @@ export default class EntityClass
         this.gravity=this.core.game.map.gravityMinValue;
         
         this.passThrough=false;
-        this.canBeClimbed=false;    // can be bumped up over
         this.touchEntity=null;
         this.hitEntity=null;
         this.hitPoint=new PointClass(0,0,0);
@@ -149,6 +151,7 @@ export default class EntityClass
         this.collisionSpokeCount=this.json.physics.collisionSpokeCount;
         this.collisionHeightSegmentCount=this.json.physics.collisionHeightSegmentCount;
         this.collisionHeightMargin=this.json.physics.collisionHeightMargin;
+        this.canBeClimbed=this.json.physics.canBeClimbed;
         
             // the collision
             
@@ -665,9 +668,9 @@ export default class EntityClass
         // movement utilities
         //
         
-    floorBounce(motion)
+    floorBounce(motion,bounceFactor)
     {
-        motion.y=-((motion.y+this.gravity)*this.bounceFactor);
+        motion.y=-((motion.y+this.gravity)*bounceFactor);
         this.gravity=this.core.game.map.gravityMinValue;
         
         if (Math.abs(motion.y)<this.weight) motion.y=0;

@@ -241,7 +241,7 @@ export default class MapEntityListClass
     initializeMapEntities()
     {
         let n;
-        let entity,entityCount,character;
+        let entity,entityCount;
         
             // no player found yet
             
@@ -257,7 +257,7 @@ export default class MapEntityListClass
                 // check for player types
                 
             if (this.entityPlayerIdx===-1) {
-                if ((entity.constructor.name==='EntityFPSPlayerClass') || (entity.constructor.name==='EntityKartPlayerClass') || (entity.constructor.name==='EntityPlatformPlayerClass')) this.entityPlayerIdx=n;
+                if ((entity.isPlayer)) this.entityPlayerIdx=n;
             }
             
                 // initialize

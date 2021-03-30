@@ -11,6 +11,8 @@ export default class EntityKartPlayerClass extends EntityKartBaseClass
     {
         super(core,name,jsonName,position,angle,data,mapSpawn,spawnedBy,heldBy,show);
         
+        this.isPlayer=true;
+        
         this.thirdPersonCameraDistance=0;
         this.thirdPersonCameraLookAngle=null;
 

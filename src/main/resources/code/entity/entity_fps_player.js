@@ -9,6 +9,8 @@ export default class EntityFPSPlayerClass extends EntityClass
     {
         super(core,name,jsonName,position,angle,data,mapSpawn,spawnedBy,heldBy,show);
         
+        this.isPlayer=true;
+        
         this.health=0;
         this.healthInitialCount=0;
         this.healthMaxCount=0;

@@ -1,7 +1,14 @@
 
 
+
+
+1. finish robot
+2. clean up weapon fields
+3. do demo pickups
+
 SCRIPT REDO
 
+ - canBeClimbed into physics
  - clean up weapon fields
 
 - fps adds weapons statically like kart
