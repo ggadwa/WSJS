@@ -4,7 +4,6 @@ import EntityFPSBotClass from '../entity/entity_fps_bot.js';
 import EntityFPSMonsterClass from '../entity/entity_fps_monster.js';
 import EntityKartPlayerClass from '../entity/entity_kart_player.js';
 import EntityKartBotClass from '../entity/entity_kart_bot.js';
-import EntityPlatformPlayerClass from '../entity/entity_platform_player.js';
 import EntityPlatformMonsterClass from '../entity/entity_platform_monster.js';
 import EntityWeaponClass from '../entity/entity_weapon.js';
 import EntityProjectileClass from '../entity/entity_projectile.js';
@@ -86,8 +85,6 @@ export default class MapEntityListClass
                 return(EntityKartPlayerClass);
             case 'kart_bot':
                 return(EntityKartBotClass);
-            case 'platform_player':
-                return(EntityPlatformPlayerClass);
             case 'platform_monster':
                 return(EntityPlatformMonsterClass);
             case 'weapon':
@@ -110,7 +107,7 @@ export default class MapEntityListClass
     {
         let entity,entityClass;
         
-        entityClass=this.core.project.mapEntity(jsonName);
+        entityClass=this.core.project.mapEntity(this.core.game.map.name,jsonName);
         if (entityClass===null) {
         
                 // get the correct entity class
@@ -133,7 +130,7 @@ export default class MapEntityListClass
         
             // get the correct entity class
             
-                entityClass=this.core.project.mapEntity(jsonName);
+                entityClass=this.core.project.mapEntity(this.core.game.map.name,jsonName);
         if (entityClass===null) {
 
             entityClass=this.getEntityClass(jsonName);        

@@ -46,48 +46,15 @@ export default class MapSoundListClass
    
     buildSoundList()
     {
-        let soundSet,name,sound;
-        let mesh,move,liquid;
-        let entity,jsonEntity;
-        let game=this.core.game;
-        let map=game.map;
+        let name,sound;
+        let soundList=this.core.project.mapSounds(this.core.game.map.name,(this.core.game.multiplayerMode===this.core.game.MULTIPLAYER_MODE_NONE));
         
-            // load all the necessary sounds
-            // into a set
-            
-        soundSet=new Set();
-        
-            // movement sounds
-            
-        for (mesh of map.meshList.meshes) {
-            if (mesh.movement!==null) {
-                for (move of mesh.movement.moves) {
-                    if (move.sound!==null) soundSet.add(move.sound.name);
-                }
-            }
-        }
-        
-            // liquid sounds
-        
-        for (liquid of map.liquidList.liquids) {
-            if (liquid.soundIn!==null) soundSet.add(liquid.soundIn.name);
-            if (liquid.soundOut!==null) soundSet.add(liquid.soundOut.name);
-        }
-
-            // entity sounds
-            
-        for (entity of map.entityList.entities) {
-            jsonEntity=game.entityCache.getJson(entity.jsonName);
-            if (jsonEntity!==null) game.addJsonObjectToLoadSet(soundSet,entity.data,"sounds",false,['name'],jsonEntity);
-        }
-        
-            // build the sound map
-            
-        for (name of soundSet) {
+        for (name of soundList) {
             sound=new SoundClass(this.core,name);
             sound.initialize();
             this.sounds.set(name,sound);
         }
+
     }
         
         //

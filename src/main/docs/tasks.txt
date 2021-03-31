@@ -1,10 +1,14 @@
 
 
-
+0. models and sounds by list
 
 1. finish robot
 2. clean up weapon fields
 3. do demo pickups
+
+
+
+PgUp Health breaks platformer (need a max health)
 
 SCRIPT REDO
 

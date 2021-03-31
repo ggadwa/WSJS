@@ -22,9 +22,13 @@ export default class EntityClass
         this.json=null;
         
         this.name=name;
+        this.modelName=null;
+        this.frameRate=30;
+        this.rotationOrder=this.MODEL_ROTATION_ORDER_XYZ;
         this.radius=1;
         this.height=1;
         this.scale=new PointClass(1,1,1);
+        this.modelHideMeshes=null;
         
         this.maxBumpCount=2;
         this.floorRiseHeight=2000;                  // heights we can move up or down on a slanted triangle
@@ -100,8 +104,9 @@ export default class EntityClass
         
     initialize()
     {
-        let n,modelName;
+        let n,meshName;
         
+        if (this.jsonName!==null) {
             // get the json
             
         this.json=this.core.game.entityCache.getJson(this.jsonName);
@@ -110,15 +115,16 @@ export default class EntityClass
             // setup
             
         this.model=null;
-        modelName=this.core.game.lookupValue(this.json.setup.model,this.data,null);
-        
-        if (modelName!==null) {
+        this.modelName=this.core.game.lookupValue(this.json.setup.model,this.data,null);
+    }
+    
+        if (this.modelName!==null) {
         
                 // cached shared model
                 
-            this.model=this.core.game.map.modelList.get(modelName);
+            this.model=this.core.game.map.modelList.get(this.modelName);
             if (this.model===undefined) {
-                console.log('model '+modelName+' does not exist, needs to be defined in a entity in the map');
+                console.log('model '+this.modelName+' does not exist, needs to be defined in a entity in the map');
                 return(false);
             }
 
@@ -127,32 +133,48 @@ export default class EntityClass
             this.modelEntityAlter=new ModelEntityAlterClass(this.core,this);
             this.modelEntityAlter.initialize();
 
-            this.modelEntityAlter.frameRate=this.json.setup.frameRate;
-            this.modelEntityAlter.rotationOrder=this.MODEL_ROTATION_ORDER_LIST.indexOf(this.json.setup.rotationOrder);
-            this.scale.setFromValues(this.json.setup.scale.x,this.json.setup.scale.y,this.json.setup.scale.z);
-            
-            for (n=0;n!==this.json.setup.hideMeshes.length;n++) {
-                this.modelEntityAlter.show(this.json.setup.hideMeshes[n],false);
+            if (this.jsonName!==null) {
+                this.modelEntityAlter.frameRate=this.json.setup.frameRate;
+                this.modelEntityAlter.rotationOrder=this.MODEL_ROTATION_ORDER_LIST.indexOf(this.json.setup.rotationOrder);
+                this.scale.setFromValues(this.json.setup.scale.x,this.json.setup.scale.y,this.json.setup.scale.z);
+
+                for (n=0;n!==this.json.setup.hideMeshes.length;n++) {
+                    this.modelEntityAlter.show(this.json.setup.hideMeshes[n],false);
+                }
+            }
+            else {
+                this.modelEntityAlter.frameRate=this.frameRate;
+                this.modelEntityAlter.rotationOrder=this.rotationOrder;
+                //this.scale.setFromValues(this.json.setup.scale.x,this.json.setup.scale.y,this.json.setup.scale.z);
+
+                if (this.modelHideMeshes!=null) {
+                    for (meshName of this.modelHideMeshes) {
+                        this.modelEntityAlter.show(meshName,false);
+                    }
+                }
             }
         }
             
+        if (this.jsonName!==null) {
         this.radius=this.json.setup.radius;
         this.height=this.json.setup.height;
         
         this.eyeOffset=this.json.setup.eyeOffset;
         this.weight=this.json.setup.weight;
-        
+    }
+    
         this.originalScale.setFromPoint(this.scale);
         
             // physics
             
+        if (this.jsonName!==null) {
         this.maxBumpCount=this.json.physics.maxBumpCount;
         this.floorRiseHeight=this.json.physics.floorRiseHeight;
         this.collisionSpokeCount=this.json.physics.collisionSpokeCount;
         this.collisionHeightSegmentCount=this.json.physics.collisionHeightSegmentCount;
         this.collisionHeightMargin=this.json.physics.collisionHeightMargin;
         this.canBeClimbed=this.json.physics.canBeClimbed;
-        
+    }
             // the collision
             
         this.collision.initialize(this);

@@ -855,7 +855,7 @@ export default class ImportGLTFClass
             obj=this.decideMapMeshInformationalParseJSON(meshNode,value);
             if (obj===null) return(this.MESH_INFORMATIONAL_ERROR);
             
-            cubeClass=this.core.project.mapCube(obj.name);
+            cubeClass=this.core.project.mapCube(this.name,obj.name);
             if (cubeClass===null) {
                 console.error('unknown cube name: '+obj.name);
                 return(this.MESH_INFORMATIONAL_ERROR);

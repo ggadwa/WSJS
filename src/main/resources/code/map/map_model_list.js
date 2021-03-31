@@ -52,23 +52,10 @@ export default class MapModelListClass
         
     buildModelList()
     {
-        let entity,jsonEntity;
-        let name,model,modelSet;
-        let game=this.core.game;
+        let name,model;
+        let modelList=this.core.project.mapModels(this.core.game.map.name,(this.core.game.multiplayerMode===this.core.game.MULTIPLAYER_MODE_NONE));
         
-            // look through all the entities and get
-            // a Set of models (to eliminate duplicates)
-        
-        modelSet=new Set();
-        
-        for (entity of this.core.game.map.entityList.entities) {
-            jsonEntity=game.entityCache.getJson(entity.jsonName);
-            if (jsonEntity!==null) game.addJsonObjectToLoadSet(modelSet,entity.data,null,false,['model'],jsonEntity);
-        }
-        
-            // now build the model map
-            
-        for (name of modelSet) {
+        for (name of modelList) {
             model=new ModelClass(this.core,{"name":name});
             model.initialize();
             this.models.set(name,model);
