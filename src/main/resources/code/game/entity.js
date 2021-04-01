@@ -251,16 +251,9 @@ export default class EntityClass
         // effect utilities
         //
         
-    addEffect(spawnedByEntity,jsonName,position,data,show)
+    addEffect(spawnedByEntity,effectName,position,data,show)
     {
-        let effect;
-
-        effect=new EffectClass(this.core,spawnedByEntity,jsonName,position,data,false,show);
-        if (!effect.initialize()) return(false);
-        
-        this.core.game.map.effectList.add(effect);
-        
-        return(true);
+        return(this.core.game.map.effectList.add(spawnedByEntity,effectName,position,data,false,show));
     }
         
         //

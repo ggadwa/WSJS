@@ -4,6 +4,14 @@ import BoundClass from '../utility/bound.js';
 import LightClass from '../light/light.js';
 import GlobeClass from '../utility/globe.js';
 
+class EffectChunkFrameClass
+{
+    constructor(tick,spread,radius,width,height,rotate,uAdd,vAdd,color,alpha)
+    {
+        
+    }
+}
+
 class EffectChunkClass
 {
     constructor(chunkType,bitmap,indexCount,drawMode,frames)
@@ -89,6 +97,21 @@ class EffectChunkClass
         }
     }
     
+    addBillboardFrame(tick,width,height,rotate,color,alpha)
+    {
+        new EffectChunkFrameClass(tick,0,0,width,height,rotate,0,0,color,alpha);
+    }
+    
+    addParticleFrame(tick,spread,width,height,rotate,color,alpha)
+    {
+        new EffectChunkFrameClass(tick,spread,0,width,height,rotate,0,0,color,alpha);
+    }
+    
+    addGlobeFrame(tick,radius,uAdd,vAdd,color,alpha)
+    {
+        new EffectChunkFrameClass(tick,0,radius,0,0,0,uAdd,vAdd,color,alpha);
+    }
+    
     setParticle(motionPoints)
     {
         let n;
@@ -108,7 +131,7 @@ class EffectChunkClass
 
 export default class EffectClass
 {
-    constructor(core,spawnedBy,jsonName,position,data,mapSpawn,show)
+    constructor(core,spawnedBy,position,data,mapSpawn,show)
     {
         this.CHUNK_BILLBOARD=0;
         this.CHUNK_PARTICLE=1;
@@ -121,14 +144,20 @@ export default class EffectClass
         this.mapSpawn=mapSpawn;
         this.show=show;
         
-        this.jsonName=jsonName;
-        this.json=null;
-        
         this.DRAW_MODE_OPAQUE=0;
         this.DRAW_MODE_TRANSPARENT=1;
         this.DRAW_MODE_ADDITIVE=2;
         
         this.DRAW_MODE_LIST=['opaque','transparent','additive'];
+        
+        
+        
+        
+        this.lifeTick=0;
+        this.light=null;
+        this.billboards=null;
+        this.particles=null;
+        this.globes=null;
         
         this.startTimestamp=0;
         
@@ -152,9 +181,24 @@ export default class EffectClass
         this.tempPoint=new PointClass(0,0,0);
         this.motionPoint=new PointClass(0,0,0);
         
-        this.light=null;
+        this.effectLight=null;
         
         this.globe=new GlobeClass();            // this object contains vertexes and uvs for a globe
+    }
+    
+    addBillboard(bitmapName,drawMode)
+    {
+        let chunk,bitmap;
+        
+        bitmap=this.core.game.map.effectList.getSharedBitmap(name);
+        if (bitmap===undefined) {
+            console.log(`Unknown effect bitmap: ${name}`);
+            return(null);
+        }
+        
+        chunk=new EffectChunkClass(this.CHUNK_BILLBOARD,bitmap,6,drawMode,billboard.frames);
+        
+        return(chunk);
     }
     
     lookupValue(value)
@@ -174,18 +218,10 @@ export default class EffectClass
         
         this.startTimestamp=this.core.game.timestamp;
        
-            // get the named json
-            
-        this.json=this.core.game.effectCache.getJson(this.jsonName);
-        if (this.json===undefined) {
-            console.log(`Unknown effect: ${this.jsonName}`);
-            return(false);
-        }
-
             // lights
             
-        if (this.json.light!==undefined) {
-            this.light=new LightClass(this.position.copy(),new ColorClass(1.0,1.0,1.0),0,1.0,false);
+        if (this.light!==null) {
+            this.effectLight=new LightClass(this.position.copy(),new ColorClass(1.0,1.0,1.0),0,1.0,false);
         }
         
             // setup the chunk classes and
@@ -198,9 +234,9 @@ export default class EffectClass
         
             // billboard chunks
         
-        if (this.json.billboards!==undefined) {
+        if (this.billboards!==null) {
             
-            for (billboard of this.json.billboards) {
+            for (billboard of this.billboards) {
                 
                     // setup the chunk
 
@@ -213,7 +249,7 @@ export default class EffectClass
                 
                 
                 name=this.lookupValue(billboard.bitmap);
-                bitmap=this.core.game.effectCache.getBitmap(name);
+                bitmap=this.core.game.map.effectList.getSharedBitmap(name);
                 if (bitmap===undefined) {
                     console.log(`Unknown effect bitmap: ${name}`);
                     return(false);
@@ -243,9 +279,9 @@ export default class EffectClass
         
             // particle chunks
         
-        if (this.json.particles!==undefined) {
+        if (this.particles!==null) {
             
-            for (particle of this.json.particles) {
+            for (particle of this.particles) {
                 
                     // setup the chunk
 
@@ -258,7 +294,7 @@ export default class EffectClass
                 
                 
                 name=this.lookupValue(particle.bitmap);
-                bitmap=this.core.game.effectCache.getBitmap(name);
+                bitmap=this.core.game.map.effectList.getSharedBitmap(name);
                 if (bitmap===undefined) {
                     console.log(`Unknown effect bitmap: ${name}`);
                     return(false);
@@ -300,9 +336,9 @@ export default class EffectClass
         
             // globe chunks
         
-        if (this.json.globes!==undefined) {
+        if (this.globes!==null) {
             
-            for (globe of this.json.globes) {
+            for (globe of this.globes) {
                 
                     // setup the chunk
 
@@ -315,7 +351,7 @@ export default class EffectClass
                 
                 
                 name=this.lookupValue(globe.bitmap);
-                bitmap=this.core.game.effectCache.getBitmap(name);
+                bitmap=this.core.game.map.effectList.getSharedBitmap(name);
                 if (bitmap===undefined) {
                     console.log(`Unknown effect bitmap: ${name}`);
                     return(false);
@@ -406,15 +442,6 @@ export default class EffectClass
         
             // finally any start sound, shaking or damage
             
-        if (this.json.sounds!==undefined) this.core.audio.soundStartGame(this.core.game.effectCache.getSound(this.json.sounds.start.name),this.position,this.json.sounds.start);
-        
-        if (this.json.shake!==undefined) {
-            dist=this.position.distance(this.core.game.map.entityList.getPlayer().position);
-            if (dist<this.json.shake.distance) this.core.game.startCameraShake(this.json.shake.lifeTick,Math.trunc((this.json.shake.maxShift*dist)/this.json.shake.distance));
-        }
-        
-        if (this.json.damage!==undefined) this.core.game.map.entityList.damageForRadius(this.spawnedBy,this.position,this.json.damage.distance,this.json.damage.damage);
-
         return(true);
     }
     
@@ -427,6 +454,28 @@ export default class EffectClass
             gl.deleteBuffer(this.vertexUVBuffer);
             gl.deleteBuffer(this.indexBuffer);
         }
+    }
+    
+        //
+        // misc utilities
+        //
+    
+    playSound(sound)
+    {
+        return(this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,sound));
+    }
+    
+    shakeCamera(distance,maxShift,lifeTick)
+    {
+        let dist;
+ 
+        dist=this.position.distance(this.core.game.map.entityList.getPlayer().position);
+        if (dist<distance) this.core.game.startCameraShake(lifeTick,Math.trunc((maxShift*dist)/distance));
+    }
+    
+    damageForRadius(distance,damage)
+    {
+        this.core.game.map.entityList.damageForRadius(this.spawnedBy,this.position,distance,damage);
     }
     
         //
@@ -566,16 +615,16 @@ export default class EffectClass
         
         if (this.light===null) return;
         
-        frames=this.json.light.frames;
+        frames=this.light.frames;
         
             // if there is only one frame, no tweening
             
         frameCount=frames.length;
         if (frameCount===1) {
             startFrame=frames[0];
-            this.light.color.setFromValues(startFrame.color.r,startFrame.color.g,startFrame.color.b);
-            this.light.exponent=startFrame.exponent;
-            this.light.setIntensity(this.lookupValue(startFrame.intensity));
+            this.effectLight.color.setFromValues(startFrame.color.r,startFrame.color.g,startFrame.color.b);
+            this.effectLight.exponent=startFrame.exponent;
+            this.effectLight.setIntensity(this.lookupValue(startFrame.intensity));
             return;
         }
         
@@ -616,10 +665,10 @@ export default class EffectClass
         g=startFrame.color.g+((endFrame.color.g-startFrame.color.g)*f);
         b=startFrame.color.b+((endFrame.color.b-startFrame.color.b)*f);
         
-        this.light.color.setFromValues(r,g,b);
+        this.effectLight.color.setFromValues(r,g,b);
         
-        this.light.exponent=startFrame.exponent+((endFrame.exponent-startFrame.exponent)*f);
-        this.light.setIntensity(this.lookupValue(startFrame.intensity)+((this.lookupValue(endFrame.intensity)-this.lookupValue(startFrame.intensity))*f));
+        this.effectLight.exponent=startFrame.exponent+((endFrame.exponent-startFrame.exponent)*f);
+        this.effectLight.setIntensity(this.lookupValue(startFrame.intensity)+((this.lookupValue(endFrame.intensity)-this.lookupValue(startFrame.intensity))*f));
     }
         
     tweenChunkFrames(chunk)
@@ -637,6 +686,9 @@ export default class EffectClass
             if (startFrame.width!==undefined) chunk.width=startFrame.width;
             if (startFrame.height!==undefined) chunk.height=startFrame.height;
             if (startFrame.rotate!==undefined) chunk.rotate=startFrame.rotate;
+            if (startFrame.radius!==undefined) chunk.radius=startFrame.radius;
+            if (startFrame.uAdd!==undefined) chunk.uAdd=startFrame.uAdd;
+            if (startFrame.vAdd!==undefined) chunk.vAdd=startFrame.vAdd;
             
             chunk.alpha=startFrame.alpha;
             chunk.color.r=startFrame.color.r;
@@ -653,13 +705,16 @@ export default class EffectClass
             // if there is a life tick and we are equal
             // or over, just pick the last frame
             
-        if (this.json.lifeTick!==undefined) {
-            if ((this.core.game.timestamp-this.startTimestamp)>=this.json.lifeTick) {
+        if (this.lifeTick!==undefined) {
+            if ((this.core.game.timestamp-this.startTimestamp)>=this.lifeTick) {
                 startFrame=chunk.frames[frameCount-1];
                 if (startFrame.spread!==undefined) chunk.spread=startFrame.spread;
                 if (startFrame.width!==undefined) chunk.width=startFrame.width;
                 if (startFrame.height!==undefined) chunk.height=startFrame.height;
                 if (startFrame.rotate!==undefined) chunk.rotate=startFrame.rotate;
+                if (startFrame.radius!==undefined) chunk.radius=startFrame.radius;
+                if (startFrame.uAdd!==undefined) chunk.uAdd=startFrame.uAdd;
+                if (startFrame.vAdd!==undefined) chunk.vAdd=startFrame.vAdd;
 
                 chunk.alpha=startFrame.alpha;
                 chunk.color.r=startFrame.color.r;
@@ -722,8 +777,8 @@ export default class EffectClass
         
             // effects with life tick
           
-        if (this.json.lifeTick!==undefined) {
-            if ((this.core.game.timestamp-this.startTimestamp)>this.json.lifeTick) {
+        if (this.lifeTick!==-1) {
+            if ((this.core.game.timestamp-this.startTimestamp)>this.lifeTick) {
                 this.markDelete=true;
                 return(false);
             }

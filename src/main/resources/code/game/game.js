@@ -9,7 +9,6 @@ import CameraClass from '../game/camera.js';
 import GameOverlayClass from '../game/game_overlay.js';
 import ShadowmapLoadClass from '../light/shadowmap_load.js';
 import EntityCacheClass from '../game/entity_cache.js';
-import EffectCacheClass from '../game/effect_cache.js';
 import SequenceClass from '../sequence/sequence.js';
 
 export default class GameClass
@@ -27,12 +26,9 @@ export default class GameClass
         
         this.multiplayerMode=this.MULTIPLAYER_MODE_NONE;
         
-            // cache for entity and effects
-            // plus effects keep their bitmaps-sounds
-            // as they are global
+            // cache for entity
             
         this.entityCache=new EntityCacheClass(this.core);
-        this.effectCache=new EffectCacheClass(this.core);
         
             // camera
             
@@ -127,10 +123,6 @@ export default class GameClass
             
         if (!(await this.entityCache.initialize())) return(false);
         
-            // effects
-            
-        if (!(await this.effectCache.initialize())) return(false);
-        
             // the camera
             
         if (!this.camera.initialize()) return(false);
@@ -161,7 +153,6 @@ export default class GameClass
         
         this.overlay.release();
         this.camera.release();
-        this.effectCache.release();
         this.entityCache.release();
     }
  

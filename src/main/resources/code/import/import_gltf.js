@@ -888,7 +888,7 @@ export default class ImportGLTFClass
                 return(this.MESH_INFORMATIONAL_ERROR);
             }
             
-            map.effectList.add(new EffectClass(this.core,null,obj.effect,mesh.center,((obj.data===undefined)?null:obj.data),true,true));
+            map.effectList.add(null,obj.effect,mesh.center,((obj.data===undefined)?null:obj.data),true,true);
             return(this.MESH_INFORMATIONAL_REMOVE);
         }
         

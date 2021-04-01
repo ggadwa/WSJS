@@ -4,7 +4,6 @@ import EntityFPSBotClass from '../entity/entity_fps_bot.js';
 import EntityFPSMonsterClass from '../entity/entity_fps_monster.js';
 import EntityKartPlayerClass from '../entity/entity_kart_player.js';
 import EntityKartBotClass from '../entity/entity_kart_bot.js';
-import EntityPlatformMonsterClass from '../entity/entity_platform_monster.js';
 import EntityWeaponClass from '../entity/entity_weapon.js';
 import EntityProjectileClass from '../entity/entity_projectile.js';
 import EntityPickupClass from '../entity/entity_pickup.js';
@@ -85,8 +84,6 @@ export default class MapEntityListClass
                 return(EntityKartPlayerClass);
             case 'kart_bot':
                 return(EntityKartBotClass);
-            case 'platform_monster':
-                return(EntityPlatformMonsterClass);
             case 'weapon':
                 return(EntityWeaponClass);
             case 'projectile':

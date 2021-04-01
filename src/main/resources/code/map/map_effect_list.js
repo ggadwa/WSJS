@@ -1,5 +1,6 @@
 import PointClass from '../utility/point.js';
 import CoreClass from '../main/core.js';
+import BitmapEffectClass from '../bitmap/bitmap_effect.js';
 import EffectClass from '../game/effect.js';
 
 //
@@ -11,6 +12,8 @@ export default class MapEffectListClass
     constructor(core)
     {
         this.core=core;
+        
+        this.sharedBitmapMap=new Map();
         this.effects=[];
         
         Object.seal(this);
@@ -20,28 +23,74 @@ export default class MapEffectListClass
         // initialize/release effect list
         //
 
-    initialize()
+    async initialize()
     {
+        let name,bitmap;
+        
+            // get objects for all the shared bitmaps
+            // to be loaded later
+            
+        this.sharedBitmapMap.clear();
+        
+        for (name of this.core.project.mapBitmaps()) {
+            bitmap=new BitmapEffectClass(this.core,name);
+            this.sharedBitmapMap.set(name,bitmap);
+        }
+        
+            // no running effects
+            
         this.effects=[];
+        
         return(true);
     }
 
     release()
     {
-        let effect;
+        let bitmap,effect;
+        
+        for (bitmap of this.sharedBitmapMap.values()) {
+            bitmap.release();
+        }
         
         for (effect of this.effects) {
             effect.release();
         }
+    }
+    
+        //
+        // effect shared bitmaps
+        //
+        
+    addSharedBitmapToLoadList(bitmapLoadList)
+    {
+        let bitmap;
+        
+        for (bitmap of this.sharedBitmapMap.values()) {
+            bitmapLoadList.push(bitmap);
+        }
+    }
+    
+    getSharedBitmap(name)
+    {
+        return(this.sharedBitmapMap.get(name));
     }
 
         //
         // effect list
         //
 
-    add(effect)
+    add(spawnedByEntity,effectName,position,data,mapSpawn,show)
     {
+        let effect,effectClass;
+        
+        effectClass=this.core.project.mapEffect(this.core.game.map.name,effectName);
+
+        effect=new effectClass(this.core,spawnedByEntity,position,data,mapSpawn,show);
+        if (!effect.initialize()) return(false);
+        
         this.effects.push(effect);
+        
+        return(true);
     }
     
     cleanUpMarkedAsDeleted()
@@ -86,7 +135,7 @@ export default class MapEffectListClass
         for (effect of this.effects) {
             if (!effect.show) continue;
             
-            light=effect.light;
+            light=effect.effectLight;
             if (light===null) continue;
             if (light.intensity===0) continue;
             

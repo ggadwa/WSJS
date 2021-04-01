@@ -165,6 +165,8 @@ export default class GameLoadClass
             return;
         }
         
+        game.map.effectList.addSharedBitmapToLoadList(this.loadStageBitmapList);    // effect bitmaps
+        
         this.loadStage=this.LOAD_STAGE_MAP_BITMAP;
         this.loadStageIndex=0;
     }

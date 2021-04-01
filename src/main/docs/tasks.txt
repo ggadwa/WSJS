@@ -1,14 +1,19 @@
 
 
-0. models and sounds by list
+- make effect constants instead of names
+- make programmable interface for billboards/etc in effects
+   x.add(blah)
+      .add(frame)
+      .add(frame);
 
-1. finish robot
+- jsonName in effects
+
 2. clean up weapon fields
 3. do demo pickups
 
 
 
-PgUp Health breaks platformer (need a max health)
+- EntityCacheClass gone!
 
 SCRIPT REDO
 
