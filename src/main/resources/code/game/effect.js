@@ -8,19 +8,28 @@ class EffectChunkFrameClass
 {
     constructor(tick,spread,radius,width,height,rotate,uAdd,vAdd,color,alpha)
     {
-        
+        this.tick=tick;
+        this.spread=spread;
+        this.radius=radius;
+        this.width=width;
+        this.height=height;
+        this.rotate=rotate;
+        this.uAdd=uAdd;
+        this.vAdd=vAdd;
+        this.color=color;
+        this.alpha=alpha;
     }
 }
 
 class EffectChunkClass
 {
-    constructor(chunkType,bitmap,indexCount,drawMode,frames)
+    constructor(chunkType,bitmap,indexCount,drawMode)
     {
         this.chunkType=chunkType;
         this.bitmap=bitmap;
         this.indexCount=indexCount;
         this.drawMode=drawMode;
-        this.frames=frames;
+        this.frames=[];
         
             // sprite catalog/grid defaults
             
@@ -56,13 +65,6 @@ class EffectChunkClass
         this.uAdd=0;
         this.vAdd=0;
         
-            // waves
-            
-        this.wave=false;
-        this.wavePeriod=0;
-        this.waveSize=0;
-        this.wavePeriodicTickOffset=null;
-        
         Object.seal(this);
     }
     
@@ -79,49 +81,26 @@ class EffectChunkClass
         else {
             this.uSize=this.vSize=1.0/this.gridSquareRoot;
         }
-    }
-    
-    setWave(wave,waveRandomStart,wavePeriod,waveSize)
-    {
-        let n;
         
-        this.wave=wave;
-        this.wavePeriod=wavePeriod;
-        this.waveSize=waveSize;
-        this.wavePeriodicTickOffset=new Int32Array(12);
-            
-        if ((wave) && (waveRandomStart)) {
-            for (n=0;n!==12;n++) {
-                this.wavePeriodicTickOffset[n]=Math.random()*wavePeriod;
-            }
-        }
+        return(this);
     }
     
     addBillboardFrame(tick,width,height,rotate,color,alpha)
     {
-        new EffectChunkFrameClass(tick,0,0,width,height,rotate,0,0,color,alpha);
+        this.frames.push(new EffectChunkFrameClass(tick,0,0,width,height,rotate,0,0,color,alpha));
+        return(this);
     }
     
     addParticleFrame(tick,spread,width,height,rotate,color,alpha)
     {
-        new EffectChunkFrameClass(tick,spread,0,width,height,rotate,0,0,color,alpha);
+        this.frames.push(new EffectChunkFrameClass(tick,spread,0,width,height,rotate,0,0,color,alpha));
+        return(this);
     }
     
     addGlobeFrame(tick,radius,uAdd,vAdd,color,alpha)
     {
-        new EffectChunkFrameClass(tick,0,radius,0,0,0,uAdd,vAdd,color,alpha);
-    }
-    
-    setParticle(motionPoints)
-    {
-        let n;
-        
-        this.particleCount=motionPoints.length;
-        this.motionPoints=motionPoints;
-        
-        for (n=0;n!==this.particleCount;n++) {
-            this.drawPoints.push(new PointClass(0,0,0));
-        }
+        this.frames.push(new EffectChunkFrameClass(tick,0,radius,0,0,0,uAdd,vAdd,color,alpha));
+        return(this);
     }
 }
 
@@ -190,13 +169,66 @@ export default class EffectClass
     {
         let chunk,bitmap;
         
-        bitmap=this.core.game.map.effectList.getSharedBitmap(name);
+        bitmap=this.core.game.map.effectList.getSharedBitmap(bitmapName);
         if (bitmap===undefined) {
             console.log(`Unknown effect bitmap: ${name}`);
             return(null);
         }
         
-        chunk=new EffectChunkClass(this.CHUNK_BILLBOARD,bitmap,6,drawMode,billboard.frames);
+        chunk=new EffectChunkClass(this.CHUNK_BILLBOARD,bitmap,6,drawMode);
+        
+        this.chunks.push(chunk);
+        
+        return(chunk);
+    }
+    
+    addParticle(bitmapName,drawMode,count,motion)
+    {
+        let chunk,bitmap;
+        let n,dx,dy,dz;
+        
+        bitmap=this.core.game.map.effectList.getSharedBitmap(bitmapName);
+        if (bitmap===undefined) {
+            console.log(`Unknown effect bitmap: ${name}`);
+            return(null);
+        }
+                
+        chunk=new EffectChunkClass(this.CHUNK_PARTICLE,bitmap,(count*6),drawMode);
+                
+            // the particles
+            
+        chunk.particleCount=count;
+
+        chunk.motionPoints=[];
+        chunk.drawPoints=[];
+
+        dx=motion.x*2;
+        dy=motion.y*2;
+        dz=motion.z*2;
+
+        for (n=0;n!==count;n++) {
+            chunk.motionPoints.push(new PointClass((((dx*Math.random())-motion.x)*0.5),(((dy*Math.random())-motion.y)*0.5),(((dz*Math.random())-motion.z))*0.5));  // multiply by 0.5 as these are "radius" but listed as "diameter"
+            chunk.drawPoints.push(new PointClass(0,0,0));
+        }
+                
+        this.chunks.push(chunk);
+        
+        return(chunk);
+    }
+    
+    addGlobe(bitmapName,drawMode)
+    {
+        let chunk,bitmap;
+        
+        bitmap=this.core.game.map.effectList.getSharedBitmap(bitmapName);
+        if (bitmap===undefined) {
+            console.log(`Unknown effect bitmap: ${name}`);
+            return(null);
+        }
+        
+        chunk=new EffectChunkClass(this.CHUNK_GLOBE,bitmap,Math.trunc(this.globe.vertexes.length/3),drawMode);
+               
+        this.chunks.push(chunk);
         
         return(chunk);
     }
@@ -208,10 +240,9 @@ export default class EffectClass
     
     initialize()
     {
-        let n,indexes,chunk,billboard,particle,globe,bitmap;
+        let n,indexes,chunk,billboard,particle,globe,bitmap,frame;
         let name,mode,drawMode,grid,gridPeriod,gridOffset;
-        let wave,waveRandomStart,wavePeriod,waveSize;
-        let pmx,pmy,pmz,dx,dy,dz,motionPoints,dist;
+        let pmx,pmy,pmz,dx,dy,dz,motionPoints;
         let vertexCount,indexCount,globeVertexCount;
         let elementIdx,iIdx;
         let gl=this.core.gl;
@@ -227,10 +258,10 @@ export default class EffectClass
             // setup the chunk classes and
             // calculate the needed vertexes and indexes
 
-        vertexCount=0;
-        indexCount=0;
+        //vertexCount=0;
+        //indexCount=0;
         
-        this.chunks=[];
+        //this.chunks=[];
         
             // billboard chunks
         
@@ -247,7 +278,14 @@ export default class EffectClass
                     return(false);
                 }
                 
+                chunk=this.addBillboard(billboard.bitmap,drawMode);
                 
+                for (frame of billboard.frames) {
+                    chunk.addBillboardFrame(frame.tick,frame.width,frame.height,frame.rotate,frame.color,frame.alpha);
+                }
+
+                
+                /*
                 name=this.lookupValue(billboard.bitmap);
                 bitmap=this.core.game.map.effectList.getSharedBitmap(name);
                 if (bitmap===undefined) {
@@ -256,24 +294,19 @@ export default class EffectClass
                 }
                 
                 chunk=new EffectChunkClass(this.CHUNK_BILLBOARD,bitmap,6,drawMode,billboard.frames);
-                
+                */
+               
                 grid=(billboard.grid===undefined)?1:this.lookupValue(billboard.grid);
                 gridPeriod=this.lookupValue(billboard.gridPeriod);
                 gridOffset=this.lookupValue(billboard.gridOffset);
                 chunk.setGrid(grid,gridPeriod,gridOffset);
                 
-                wave=this.lookupValue(billboard.wave);
-                waveRandomStart=this.lookupValue(billboard.waveRandomStart);
-                wavePeriod=this.lookupValue(billboard.wavePeriod);
-                waveSize=this.lookupValue(billboard.waveSize);
-                chunk.setWave(wave,waveRandomStart,wavePeriod,waveSize);
-                
-                this.chunks.push(chunk);
+                //this.chunks.push(chunk);
                 
                     // drawing one quad
                     
-                vertexCount+=4;
-                indexCount+=6;
+                //vertexCount+=4;
+                //indexCount+=6;
             }
         }
         
@@ -292,7 +325,13 @@ export default class EffectClass
                     return(false);
                 }
                 
+                chunk=this.addParticle(particle.bitmap,drawMode,particle.count,particle.motion);
+        
+                for (frame of particle.frames) {
+                    chunk.addParticleFrame(frame.tick,frame.spread,frame.width,frame.height,frame.rotate,frame.color,frame.alpha);
+                }
                 
+                /*
                 name=this.lookupValue(particle.bitmap);
                 bitmap=this.core.game.map.effectList.getSharedBitmap(name);
                 if (bitmap===undefined) {
@@ -301,14 +340,14 @@ export default class EffectClass
                 }
                 
                 chunk=new EffectChunkClass(this.CHUNK_PARTICLE,bitmap,(particle.count*6),drawMode,particle.frames);
-                
+                */
                 grid=(particle.grid===undefined)?1:this.lookupValue(particle.grid);
                 gridPeriod=this.lookupValue(particle.gridPeriod);
                 gridOffset=this.lookupValue(particle.gridOffset);
                 chunk.setGrid(grid,gridPeriod,gridOffset);
                 
                     // need motion points
-                    
+                    /*
                 motionPoints=[];
                 
                 pmx=this.lookupValue(particle.motion.x);
@@ -326,11 +365,11 @@ export default class EffectClass
                 chunk.setParticle(motionPoints);
                 
                 this.chunks.push(chunk);
-                    
+                    */
                     // count quads
                     
-                vertexCount+=(particle.count*4);
-                indexCount+=(particle.count*6);
+                //vertexCount+=(particle.count*4);
+                //indexCount+=(particle.count*6);
             }
         }
         
@@ -349,7 +388,13 @@ export default class EffectClass
                     return(false);
                 }
                 
+                chunk=this.addGlobe(globe.bitmap,drawMode);
+        
+                for (frame of globe.frames) {
+                    chunk.addGlobeFrame(frame.tick,frame.radius,frame.uAdd,frame.vAdd,frame.color,frame.alpha);
+                }
                 
+                /*
                 name=this.lookupValue(globe.bitmap);
                 bitmap=this.core.game.map.effectList.getSharedBitmap(name);
                 if (bitmap===undefined) {
@@ -361,11 +406,45 @@ export default class EffectClass
                 chunk=new EffectChunkClass(this.CHUNK_GLOBE,bitmap,globeVertexCount,drawMode,globe.frames);
                 
                 this.chunks.push(chunk);
-                    
+                    */
+                   
                     // count quads
                     
-                vertexCount+=globeVertexCount;
-                indexCount+=globeVertexCount;
+                //globeVertexCount=Math.trunc(this.globe.vertexes.length/3);
+                
+                //vertexCount+=globeVertexCount;
+                //indexCount+=globeVertexCount;
+            }
+        }
+        
+        // get vertex and index counts
+        // for effect chunks
+        
+        vertexCount=0;
+        indexCount=0;
+        
+        for (chunk of this.chunks) {
+
+            chunk.vertexOffset=elementIdx*3;
+            chunk.indexOffset=iIdx;
+
+            switch (chunk.chunkType) {
+
+                case this.CHUNK_BILLBOARD:
+                    vertexCount+=4;     // one quad
+                    indexCount+=6;
+                    break;
+
+                case this.CHUNK_PARTICLE:
+                    vertexCount+=(chunk.particleCount*4);   // particle count quads
+                    indexCount+=(chunk.particleCount*6);
+                    break;
+
+                case this.CHUNK_GLOBE:
+                    globeVertexCount=Math.trunc(this.globe.vertexes.length/3);  // globe vertexes
+                    vertexCount+=globeVertexCount;
+                    indexCount+=globeVertexCount;
+                    break;
             }
         }
 
@@ -585,23 +664,6 @@ export default class EffectClass
         }
     }
     
-        //
-        // waves
-        //
-        
-    addWave(chunk)
-    {
-        let n,freq;
-        let vertexCount=chunk.indexCount*3;
-        
-        if (!chunk.wave) return;
-        
-        for (n=0;n!==vertexCount;n++) {
-            freq=(((this.core.game.timestamp+chunk.wavePeriodicTickOffset[n])%chunk.wavePeriod)/chunk.wavePeriod)*(Math.PI*2);
-            this.vertexes[chunk.vertexOffset+n]+=Math.trunc(Math.sin(freq)*chunk.waveSize);
-        }
-    }
-
         //
         // frame tweening
         //
@@ -864,7 +926,6 @@ export default class EffectClass
                 
                 case this.CHUNK_BILLBOARD:
                     this.addQuadToVertexList(chunk,this.position);
-                    this.addWave(chunk);
                     break;
                     
                 case this.CHUNK_PARTICLE:

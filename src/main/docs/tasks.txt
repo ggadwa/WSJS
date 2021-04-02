@@ -1,23 +1,19 @@
 
 
-- make effect constants instead of names
-- make programmable interface for billboards/etc in effects
-   x.add(blah)
-      .add(frame)
-      .add(frame);
+- does billboard rotations/size break on lifeTick=-1 (check spotlight)
 
-- jsonName in effects
+- get rid of DRAW_MODE_LIST in effect
+- get rid of undefined tween checks in effect
 
 2. clean up weapon fields
 3. do demo pickups
 
-
+[NEW KART MAP - get rid of ground and put flag ground segments, fix seams]
 
 - EntityCacheClass gone!
 
 SCRIPT REDO
 
- - canBeClimbed into physics
  - clean up weapon fields
 
 - fps adds weapons statically like kart
