@@ -1,11 +1,9 @@
 
+> do model/physics for all weapons/projectiles
+> clean up weapon fields
+> remove entity_weapon/projectile when all clear
 
-- does billboard rotations/size break on lifeTick=-1 (check spotlight)
 
-- get rid of DRAW_MODE_LIST in effect
-- get rid of undefined tween checks in effect
-
-2. clean up weapon fields
 3. do demo pickups
 
 [NEW KART MAP - get rid of ground and put flag ground segments, fix seams]
@@ -14,20 +12,13 @@
 
 SCRIPT REDO
 
- - clean up weapon fields
-
+- animations and sounds as new AnimationDef() and new SoundDef()
 - fps adds weapons statically like kart
+- sequences need scripts
+- remove actions
+- get rid of findweapon ???
 
 
-
-    - need to do weapons next (the primary/etc is messing up entity calls)
-     
-    - remove actions
-    - can probably remove primary/secondary/etc from weapons (specific scripts)
-
-  - get rid of findweapon ???
-
-  - eventually models and such on entity?
 
   ----> runWeaponFiring  move most of that to weapon (bots will have to clip change, too)
          - hitscan/projectile to entity?

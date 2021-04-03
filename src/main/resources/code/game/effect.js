@@ -4,6 +4,10 @@ import BoundClass from '../utility/bound.js';
 import LightClass from '../light/light.js';
 import GlobeClass from '../utility/globe.js';
 
+    //
+    // effect chunks, for billboards, particles, and globes
+    //
+    
 class EffectChunkFrameClass
 {
     constructor(tick,spread,radius,width,height,rotate,uAdd,vAdd,color,alpha)
@@ -104,6 +108,35 @@ class EffectChunkClass
     }
 }
 
+    //
+    // effect lights, for lights
+    //
+    
+class EffectLightFrameClass
+{
+    constructor(tick,color,intensity,exponent)
+    {
+        this.tick=tick;
+        this.color=color;
+        this.intensity=intensity;
+        this.exponent=exponent;
+    }
+}
+
+class EffectLightClass
+{
+    constructor()
+    {
+        this.frames=[];
+    }
+    
+    addLightFrame(tick,color,intensity,exponent)
+    {
+        this.frames.push(new EffectLightFrameClass(tick,color,intensity,exponent));
+        return(this);
+    }
+}
+
 //
 // effect class
 //
@@ -116,21 +149,16 @@ export default class EffectClass
         this.CHUNK_PARTICLE=1;
         this.CHUNK_GLOBE=2;
         
+        this.DRAW_MODE_OPAQUE=0;
+        this.DRAW_MODE_TRANSPARENT=1;
+        this.DRAW_MODE_ADDITIVE=2;
+        
         this.core=core;
         this.spawnedBy=spawnedBy;
         this.position=position.copy();
         this.data=data;
         this.mapSpawn=mapSpawn;
         this.show=show;
-        
-        this.DRAW_MODE_OPAQUE=0;
-        this.DRAW_MODE_TRANSPARENT=1;
-        this.DRAW_MODE_ADDITIVE=2;
-        
-        this.DRAW_MODE_LIST=['opaque','transparent','additive'];
-        
-        
-        
         
         this.lifeTick=0;
         this.light=null;
@@ -152,6 +180,7 @@ export default class EffectClass
         this.indexBuffer=null;
         
         this.chunks=[];
+        this.effectLight=null;
         
         this.xBound=new BoundClass(this.position.x,this.position.x);
         this.yBound=new BoundClass(this.position.y,this.position.y);
@@ -159,8 +188,6 @@ export default class EffectClass
         
         this.tempPoint=new PointClass(0,0,0);
         this.motionPoint=new PointClass(0,0,0);
-        
-        this.effectLight=null;
         
         this.globe=new GlobeClass();            // this object contains vertexes and uvs for a globe
     }
@@ -233,192 +260,29 @@ export default class EffectClass
         return(chunk);
     }
     
-    lookupValue(value)
+    addLight()
     {
-        return(this.core.game.lookupValue(value,this.data));
+        this.light=new EffectLightClass();
+        return(this.light);
     }
     
     initialize()
     {
-        let n,indexes,chunk,billboard,particle,globe,bitmap,frame;
-        let name,mode,drawMode,grid,gridPeriod,gridOffset;
-        let pmx,pmy,pmz,dx,dy,dz,motionPoints;
+        let n,indexes,chunk;
         let vertexCount,indexCount,globeVertexCount;
         let elementIdx,iIdx;
         let gl=this.core.gl;
         
         this.startTimestamp=this.core.game.timestamp;
        
-            // lights
+            // add a map light
             
         if (this.light!==null) {
             this.effectLight=new LightClass(this.position.copy(),new ColorClass(1.0,1.0,1.0),0,1.0,false);
         }
         
-            // setup the chunk classes and
-            // calculate the needed vertexes and indexes
-
-        //vertexCount=0;
-        //indexCount=0;
-        
-        //this.chunks=[];
-        
-            // billboard chunks
-        
-        if (this.billboards!==null) {
-            
-            for (billboard of this.billboards) {
-                
-                    // setup the chunk
-
-                mode=this.lookupValue(billboard.mode);
-                drawMode=this.DRAW_MODE_LIST.indexOf(mode);
-                if (drawMode===-1) {
-                    console.log(`Unknown effect draw mode: ${mode}`);
-                    return(false);
-                }
-                
-                chunk=this.addBillboard(billboard.bitmap,drawMode);
-                
-                for (frame of billboard.frames) {
-                    chunk.addBillboardFrame(frame.tick,frame.width,frame.height,frame.rotate,frame.color,frame.alpha);
-                }
-
-                
-                /*
-                name=this.lookupValue(billboard.bitmap);
-                bitmap=this.core.game.map.effectList.getSharedBitmap(name);
-                if (bitmap===undefined) {
-                    console.log(`Unknown effect bitmap: ${name}`);
-                    return(false);
-                }
-                
-                chunk=new EffectChunkClass(this.CHUNK_BILLBOARD,bitmap,6,drawMode,billboard.frames);
-                */
-               
-                grid=(billboard.grid===undefined)?1:this.lookupValue(billboard.grid);
-                gridPeriod=this.lookupValue(billboard.gridPeriod);
-                gridOffset=this.lookupValue(billboard.gridOffset);
-                chunk.setGrid(grid,gridPeriod,gridOffset);
-                
-                //this.chunks.push(chunk);
-                
-                    // drawing one quad
-                    
-                //vertexCount+=4;
-                //indexCount+=6;
-            }
-        }
-        
-            // particle chunks
-        
-        if (this.particles!==null) {
-            
-            for (particle of this.particles) {
-                
-                    // setup the chunk
-
-                mode=this.lookupValue(particle.mode);
-                drawMode=this.DRAW_MODE_LIST.indexOf(mode);
-                if (drawMode===-1) {
-                    console.log(`Unknown effect draw mode: ${mode}`);
-                    return(false);
-                }
-                
-                chunk=this.addParticle(particle.bitmap,drawMode,particle.count,particle.motion);
-        
-                for (frame of particle.frames) {
-                    chunk.addParticleFrame(frame.tick,frame.spread,frame.width,frame.height,frame.rotate,frame.color,frame.alpha);
-                }
-                
-                /*
-                name=this.lookupValue(particle.bitmap);
-                bitmap=this.core.game.map.effectList.getSharedBitmap(name);
-                if (bitmap===undefined) {
-                    console.log(`Unknown effect bitmap: ${name}`);
-                    return(false);
-                }
-                
-                chunk=new EffectChunkClass(this.CHUNK_PARTICLE,bitmap,(particle.count*6),drawMode,particle.frames);
-                */
-                grid=(particle.grid===undefined)?1:this.lookupValue(particle.grid);
-                gridPeriod=this.lookupValue(particle.gridPeriod);
-                gridOffset=this.lookupValue(particle.gridOffset);
-                chunk.setGrid(grid,gridPeriod,gridOffset);
-                
-                    // need motion points
-                    /*
-                motionPoints=[];
-                
-                pmx=this.lookupValue(particle.motion.x);
-                pmy=this.lookupValue(particle.motion.y);
-                pmz=this.lookupValue(particle.motion.z);
-                
-                dx=pmx*2;
-                dy=pmy*2;
-                dz=pmz*2;
-
-                for (n=0;n!==particle.count;n++) {
-                    motionPoints.push(new PointClass((((dx*Math.random())-pmx)*0.5),(((dy*Math.random())-pmy)*0.5),(((dz*Math.random())-pmz))*0.5));  // multiply by 0.5 as these are "radius" but listed as "diameter"
-                }
-                
-                chunk.setParticle(motionPoints);
-                
-                this.chunks.push(chunk);
-                    */
-                    // count quads
-                    
-                //vertexCount+=(particle.count*4);
-                //indexCount+=(particle.count*6);
-            }
-        }
-        
-            // globe chunks
-        
-        if (this.globes!==null) {
-            
-            for (globe of this.globes) {
-                
-                    // setup the chunk
-
-                mode=this.lookupValue(globe.mode);
-                drawMode=this.DRAW_MODE_LIST.indexOf(mode);
-                if (drawMode===-1) {
-                    console.log(`Unknown effect draw mode: ${mode}`);
-                    return(false);
-                }
-                
-                chunk=this.addGlobe(globe.bitmap,drawMode);
-        
-                for (frame of globe.frames) {
-                    chunk.addGlobeFrame(frame.tick,frame.radius,frame.uAdd,frame.vAdd,frame.color,frame.alpha);
-                }
-                
-                /*
-                name=this.lookupValue(globe.bitmap);
-                bitmap=this.core.game.map.effectList.getSharedBitmap(name);
-                if (bitmap===undefined) {
-                    console.log(`Unknown effect bitmap: ${name}`);
-                    return(false);
-                }
-                
-                globeVertexCount=Math.trunc(this.globe.vertexes.length/3);
-                chunk=new EffectChunkClass(this.CHUNK_GLOBE,bitmap,globeVertexCount,drawMode,globe.frames);
-                
-                this.chunks.push(chunk);
-                    */
-                   
-                    // count quads
-                    
-                //globeVertexCount=Math.trunc(this.globe.vertexes.length/3);
-                
-                //vertexCount+=globeVertexCount;
-                //indexCount+=globeVertexCount;
-            }
-        }
-        
-        // get vertex and index counts
-        // for effect chunks
+            // get vertex and index counts
+            // for effect chunks
         
         vertexCount=0;
         indexCount=0;
@@ -686,7 +550,7 @@ export default class EffectClass
             startFrame=frames[0];
             this.effectLight.color.setFromValues(startFrame.color.r,startFrame.color.g,startFrame.color.b);
             this.effectLight.exponent=startFrame.exponent;
-            this.effectLight.setIntensity(this.lookupValue(startFrame.intensity));
+            this.effectLight.setIntensity(startFrame.intensity);
             return;
         }
         
@@ -730,7 +594,7 @@ export default class EffectClass
         this.effectLight.color.setFromValues(r,g,b);
         
         this.effectLight.exponent=startFrame.exponent+((endFrame.exponent-startFrame.exponent)*f);
-        this.effectLight.setIntensity(this.lookupValue(startFrame.intensity)+((this.lookupValue(endFrame.intensity)-this.lookupValue(startFrame.intensity))*f));
+        this.effectLight.setIntensity(startFrame.intensity+((endFrame.intensity-startFrame.intensity)*f));
     }
         
     tweenChunkFrames(chunk)
@@ -744,14 +608,13 @@ export default class EffectClass
         frameCount=chunk.frames.length;
         if (frameCount===1) {
             startFrame=chunk.frames[0];
-            if (startFrame.spread!==undefined) chunk.spread=startFrame.spread;
-            if (startFrame.width!==undefined) chunk.width=startFrame.width;
-            if (startFrame.height!==undefined) chunk.height=startFrame.height;
-            if (startFrame.rotate!==undefined) chunk.rotate=startFrame.rotate;
-            if (startFrame.radius!==undefined) chunk.radius=startFrame.radius;
-            if (startFrame.uAdd!==undefined) chunk.uAdd=startFrame.uAdd;
-            if (startFrame.vAdd!==undefined) chunk.vAdd=startFrame.vAdd;
-            
+            chunk.spread=startFrame.spread;
+            chunk.width=startFrame.width;
+            chunk.height=startFrame.height;
+            chunk.rotate=startFrame.rotate;
+            chunk.radius=startFrame.radius;
+            chunk.uAdd=startFrame.uAdd;
+            chunk.vAdd=startFrame.vAdd;
             chunk.alpha=startFrame.alpha;
             chunk.color.r=startFrame.color.r;
             chunk.color.g=startFrame.color.g;
@@ -767,17 +630,16 @@ export default class EffectClass
             // if there is a life tick and we are equal
             // or over, just pick the last frame
             
-        if (this.lifeTick!==undefined) {
+        if (this.lifeTick!==-1) {
             if ((this.core.game.timestamp-this.startTimestamp)>=this.lifeTick) {
                 startFrame=chunk.frames[frameCount-1];
-                if (startFrame.spread!==undefined) chunk.spread=startFrame.spread;
-                if (startFrame.width!==undefined) chunk.width=startFrame.width;
-                if (startFrame.height!==undefined) chunk.height=startFrame.height;
-                if (startFrame.rotate!==undefined) chunk.rotate=startFrame.rotate;
-                if (startFrame.radius!==undefined) chunk.radius=startFrame.radius;
-                if (startFrame.uAdd!==undefined) chunk.uAdd=startFrame.uAdd;
-                if (startFrame.vAdd!==undefined) chunk.vAdd=startFrame.vAdd;
-
+                chunk.spread=startFrame.spread;
+                chunk.width=startFrame.width;
+                chunk.height=startFrame.height;
+                chunk.rotate=startFrame.rotate;
+                chunk.radius=startFrame.radius;
+                chunk.uAdd=startFrame.uAdd;
+                chunk.vAdd=startFrame.vAdd;
                 chunk.alpha=startFrame.alpha;
                 chunk.color.r=startFrame.color.r;
                 chunk.color.g=startFrame.color.g;
@@ -813,14 +675,13 @@ export default class EffectClass
         
             // tween
             
-        if (startFrame.spread!==undefined) chunk.spread=startFrame.spread+((endFrame.spread-startFrame.spread)*f);
-        if (startFrame.width!==undefined) chunk.width=startFrame.width+Math.trunc((endFrame.width-startFrame.width)*f);
-        if (startFrame.height!==undefined) chunk.height=startFrame.height+Math.trunc((endFrame.height-startFrame.height)*f);
-        if (startFrame.rotate!==undefined) chunk.rotate=startFrame.rotate+((endFrame.rotate-startFrame.rotate)*f);
-        if (startFrame.radius!==undefined) chunk.radius=startFrame.radius+((endFrame.radius-startFrame.radius)*f);
-        if (startFrame.uAdd!==undefined) chunk.uAdd=startFrame.uAdd+((endFrame.uAdd-startFrame.uAdd)*f);
-        if (startFrame.vAdd!==undefined) chunk.vAdd=startFrame.vAdd+((endFrame.vAdd-startFrame.vAdd)*f);
-        
+        chunk.spread=startFrame.spread+((endFrame.spread-startFrame.spread)*f);
+        chunk.width=startFrame.width+Math.trunc((endFrame.width-startFrame.width)*f);
+        chunk.height=startFrame.height+Math.trunc((endFrame.height-startFrame.height)*f);
+        chunk.rotate=startFrame.rotate+((endFrame.rotate-startFrame.rotate)*f);
+        chunk.radius=startFrame.radius+((endFrame.radius-startFrame.radius)*f);
+        chunk.uAdd=startFrame.uAdd+((endFrame.uAdd-startFrame.uAdd)*f);
+        chunk.vAdd=startFrame.vAdd+((endFrame.vAdd-startFrame.vAdd)*f);
         chunk.alpha=startFrame.alpha+((endFrame.alpha-startFrame.alpha)*f);
         chunk.color.r=startFrame.color.r+((endFrame.color.r-startFrame.color.r)*f);
         chunk.color.g=startFrame.color.g+((endFrame.color.g-startFrame.color.g)*f);
