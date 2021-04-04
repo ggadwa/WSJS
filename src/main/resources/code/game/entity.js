@@ -1199,18 +1199,6 @@ export default class EntityClass
     {
     }
     
-    addClip(weaponName,count)
-    {
-    }
-    
-    addAmmo(weaponName,count)
-    {
-    }
-    
-    addHealth(count)
-    {
-    }
-    
     remoteEntering(name)
     {
     }

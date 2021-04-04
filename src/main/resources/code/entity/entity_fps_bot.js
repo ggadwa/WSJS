@@ -60,8 +60,8 @@ export default class EntityFPSBotClass extends EntityClass
         
         this.lastWheelClick=0;
         
-        this.carouselWeapons=[];        // weapons in the carousel
-        this.extraWeapons=[];           // any other weapon
+        this.carouselWeapons=[];
+        this.grenadeWeapon=null;
         
         this.currentCarouselWeaponIdx=0;
         this.defaultCarouselWeaponIdx=0;
@@ -178,7 +178,7 @@ export default class EntityFPSBotClass extends EntityClass
             }
             else {
                 weaponEntity=this.addEntity(weaponBlock.weaponJson,weaponBlock.name,new PointClass(0,0,0),new PointClass(0,0,0),weaponBlock.weaponData,this,this,true);
-                this.extraWeapons.push(weaponEntity);
+                this.grenadeWeapon=weaponEntity;
             }
             
                 // add in the bot slop
@@ -204,6 +204,19 @@ export default class EntityFPSBotClass extends EntityClass
         }
         
         return(true);
+    }
+    
+    release()
+    {
+        let n;
+        
+        super.release();
+        
+        for (n=0;n!==this.carouselWeapons.length;n++) {
+            this.carouselWeapons[n].release();
+        }
+
+        this.grenadeWeapon.release();
     }
     
     ready()
@@ -318,9 +331,7 @@ export default class EntityFPSBotClass extends EntityClass
             if (this.carouselWeapons[n].name===weaponName) return(this.carouselWeapons[n]);
         }
         
-        for (n=0;n!==this.extraWeapons.length;n++) {
-            if (this.extraWeapons[n].name===weaponName) return(this.extraWeapons[n]);
-        }
+        if (this.grenadeWeapon.name===weaponName) return(this.grenadeWeapon);
 
         console.log('Unknown weapon: '+weaponName);
         return(null);
@@ -334,6 +345,18 @@ export default class EntityFPSBotClass extends EntityClass
             // make weapon available
             
         weapon.available=true;
+    }
+    
+    addClip(weaponName,count)
+    {
+        let weapon=this.findWeaponByName(weaponName);
+        if (weapon!==null) weapon.addClip(count);
+    }
+    
+    addAmmo(weaponName,count)
+    {
+        let weapon=this.findWeaponByName(weaponName);
+        if (weapon!==null) weapon.addAmmo(count);
     }
     
     addHealth(count)
@@ -477,11 +500,9 @@ export default class EntityFPSBotClass extends EntityClass
            
         dist=this.position.distance(this.targetEntity.position);
         
-        for (weapon of this.extraWeapons) {
-            if (weapon.hasAnyAmmo()) {
-                if ((dist>weapon.botFireRange.min) && (dist<weapon.botFireRange.max)) {
-                    if (weapon.fire(weapon.FIRE_METHOD_ANY,this.firePosition,this.drawAngle)) return;
-                }
+        if (this.grenadeWeapon.hasAnyAmmo()) {
+            if ((dist>weapon.botFireRange.min) && (dist<weapon.botFireRange.max)) {
+                if (weapon.fire(weapon.FIRE_METHOD_ANY,this.firePosition,this.drawAngle)) return;
             }
         }
            

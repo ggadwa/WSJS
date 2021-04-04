@@ -2,7 +2,9 @@
 > do model/physics for all weapons/projectiles
 > clean up weapon fields
 > remove entity_weapon/projectile when all clear
+> transition entity_fps_player/entity_fps_bot to statically add weapons
 
+- player seems to have m16 at start
 
 3. do demo pickups
 
@@ -13,7 +15,6 @@
 SCRIPT REDO
 
 - animations and sounds as new AnimationDef() and new SoundDef()
-- fps adds weapons statically like kart
 - sequences need scripts
 - remove actions
 - get rid of findweapon ???

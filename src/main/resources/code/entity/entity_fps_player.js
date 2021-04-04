@@ -75,8 +75,8 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.lastInLiquidIdx=-1;
         this.lastUnderLiquid=false;
         
-        this.carouselWeapons=[];        // weapons in the carousel
-        this.grenadeWeapon=null;        // the grenade weapon
+        this.carouselWeapons=[];
+        this.grenadeWeapon=null;
         
         this.currentCarouselWeaponIdx=0;
         this.gotoCarouselWeaponIdx=0;
@@ -168,6 +168,10 @@ export default class EntityFPSPlayerClass extends EntityClass
             // setup the weapons
         
         this.defaultCarouselWeaponIdx=-1;
+        
+        //this.pistolWeapon=this.addEntity('weapon_bowling_ball','weapon_bowling_ball',new PointClass(0,0,0),new PointClass(0,0,0),null,this,this,true);
+        //this.m16Weapon=this.addEntity('weapon_bowling_ball','weapon_bowling_ball',new PointClass(0,0,0),new PointClass(0,0,0),null,this,this,true);
+        //this.grenadeWeapon=this.addEntity('weapon_bowling_ball','weapon_bowling_ball',new PointClass(0,0,0),new PointClass(0,0,0),null,this,this,true);
         
         for (n=0;n!==this.json.weapons.length;n++) {
             weaponBlock=this.json.weapons[n];
@@ -299,6 +303,17 @@ export default class EntityFPSPlayerClass extends EntityClass
         return(null);
     }
     
+    hasWeapon(weaponName)
+    {
+        let n;
+        
+        for (n=0;n!==this.carouselWeapons.length;n++) {
+            if (this.carouselWeapons[n].name===weaponName) return(this.carouselWeapons[n].available);
+        }
+        
+        return(false);
+    }
+    
     addWeapon(weaponName)
     {
         let n;
@@ -318,6 +333,18 @@ export default class EntityFPSPlayerClass extends EntityClass
                 break;
             }
         }
+    }
+    
+    addClip(weaponName,count)
+    {
+        let weapon=this.findWeaponByName(weaponName);
+        if (weapon!==null) weapon.addClip(count);
+    }
+    
+    addAmmo(weaponName,count)
+    {
+        let weapon=this.findWeaponByName(weaponName);
+        if (weapon!==null) weapon.addAmmo(count);
     }
     
     addHealth(count)
