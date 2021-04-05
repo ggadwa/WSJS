@@ -1,6 +1,5 @@
 import PointClass from '../utility/point.js';
 import EntityClass from '../game/entity.js';
-import EntityPickupClass from '../entity/entity_pickup.js';
 
 export default class EntityProjectileClass extends EntityClass
 {
@@ -284,7 +283,7 @@ export default class EntityProjectileClass extends EntityClass
             // touching object
             
         if (this.touchEntity!==null) {
-            if ((this.touchEntity instanceof EntityPickupClass) || (this.touchEntity.passThrough)) return;
+            if (this.touchEntity.passThrough) return;
             
             if (this.stopOnHit) {
                 this.finish();

@@ -1,35 +1,26 @@
+SCRIPT REDO
 
 > do model/physics for all weapons/projectiles
 > clean up weapon fields
 > remove entity_weapon/projectile when all clear
 > transition entity_fps_player/entity_fps_bot to statically add weapons
-
-- player seems to have m16 at start
-
-3. do demo pickups
-
-[NEW KART MAP - get rid of ground and put flag ground segments, fix seams]
+   - get rid of initiallyAvailable when done
+   - redo all the third person weapon animations, get code from bot.js
 
 - EntityCacheClass gone!
-
-SCRIPT REDO
 
 - animations and sounds as new AnimationDef() and new SoundDef()
 - sequences need scripts
 - remove actions
-- get rid of findweapon ???
-
-
-
-  ----> runWeaponFiring  move most of that to weapon (bots will have to clip change, too)
-         - hitscan/projectile to entity?
-
--- redo weapon -> player animation completely
 
   FINALLY: map_entity_list.addFromMap/addDynamic
 
 
+- ambients (on effects)
+   - crackling fire
+   - fountain
 
+[NEW KART MAP - get rid of ground and put flag ground segments, fix seams]
 
 - if no pose, just set ONCE
 

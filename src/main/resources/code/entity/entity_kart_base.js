@@ -3,7 +3,6 @@ import QuaternionClass from '../utility/quaternion.js';
 import BoundClass from '../utility/bound.js';
 import ColorClass from '../utility/color.js';
 import EntityClass from '../game/entity.js';
-import EntityPickupClass from '../entity/entity_pickup.js';
 
 //
 // kart base module
@@ -33,9 +32,6 @@ export default class EntityKartBaseClass extends EntityClass
         this.spinOutSpeed=0;
         this.driftDecelerationFactor=0;
         
-        this.maxSpeedItemCount=0;
-        this.speedItemIncrease=0;
-        this.burstSpeed=0;
         this.burstEndTimestamp=0;
         
         this.turnCoolDownPeriod=0;
@@ -91,7 +87,7 @@ export default class EntityKartBaseClass extends EntityClass
         this.engineSoundPlayIdx=0;
         this.engineSoundRateAirIncrease=0;
         
-        this.speedItemCount=0;
+        this.starCount=0;
         
             // variables for bots, they
             // are here so player kart can self-drive
@@ -175,9 +171,6 @@ export default class EntityKartBaseClass extends EntityClass
         this.spinOutSpeed=this.core.game.lookupValue(this.json.config.spinOutSpeed,this.data,6);
         this.driftDecelerationFactor=this.core.game.lookupValue(this.json.config.driftDecelerationFactor,this.data,0.99);
         
-        this.maxSpeedItemCount=this.core.game.lookupValue(this.json.config.maxSpeedItemCount,this.data,0);
-        this.speedItemIncrease=this.core.game.lookupValue(this.json.config.speedItemIncrease,this.data,0);
-        
         this.turnCoolDownPeriod=this.core.game.lookupValue(this.json.config.turnCoolDownPeriod,this.data,15);
 
         this.driftMinAngle=this.core.game.lookupValue(this.json.config.driftMinAngle,this.data,60);
@@ -244,7 +237,6 @@ export default class EntityKartBaseClass extends EntityClass
         this.turnSmooth=0;
         this.turnCoolDown=0;
         
-        this.burstSpeed=0;
         this.burstEndTimestamp=0
         
         this.lapStatus=this.LAP_STATUS_BEFORE_GOAL;
@@ -254,9 +246,9 @@ export default class EntityKartBaseClass extends EntityClass
         this.lastDrawTick=this.core.game.timestamp;
         this.rigidGotoAngle.setFromValues(0,0,0);
         
-            // reset the speed items
+            // reset the stars
             
-        this.speedItemCount=0;
+        this.starCount=0;
         
             // engine sound
             
@@ -312,29 +304,23 @@ export default class EntityKartBaseClass extends EntityClass
         // pickup items
         //
         
-    addSpeed(count)
+    addStar()
     {
-        this.speedItemCount+=count;
-        if (this.speedItemCount>this.maxSpeedItemCount) this.speedItemCount=this.maxSpeedItemCount;
+        this.starCount++;
+        if (this.starCount>10) this.starCount=10;
     }
     
-    removeSpeed(count)
+    removeStar()
     {
-        this.speedItemCount-=count;
-        if (this.speedItemCount<0) this.speedItemCount=0;
+        this.starCount--;
+        if (this.starCount<0) this.starCount=0;
     }
     
-    addBurst(burstSpeed,burstLifeTick)
+    addBurst()
     {
-        this.burstSpeed=burstSpeed;
-        this.burstEndTimestamp=this.core.game.timestamp+burstLifeTick;
+        this.burstEndTimestamp=this.core.game.timestamp+2500;
         
         this.playSound(this.burstSound);
-    }
-    
-    addBowlingBall()
-    {
-        this.bowlingBallWeapon.addAmmo(1);
     }
     
         //
@@ -374,9 +360,9 @@ export default class EntityKartBaseClass extends EntityClass
         
         this.playSound(this.crashWallSound);
         
-            // bounce cost a speed item
+            // bounce cost a star
             
-        this.removeSpeed(1);
+        this.removeStar();
         
             // bounces cancel drifts
             
@@ -395,9 +381,9 @@ export default class EntityKartBaseClass extends EntityClass
         
         this.playSound(this.crashKartSound);
         
-            // reflect cost a speed item
+            // reflect cost a star
             
-        this.removeSpeed(1);
+        this.removeStar();
         
             // reflect cancel drifts
             
@@ -410,11 +396,11 @@ export default class EntityKartBaseClass extends EntityClass
         
     damage(fromEntity,damage,hitPoint)
     {
-            // projectile hits cost a speed and start
+            // projectile hits cost a star and start
             // a spin
             
         this.spinOutCount=360;
-        this.removeSpeed(1);
+        this.removeStar();
         
         this.playSound(this.crashWallSound);
     }
@@ -563,13 +549,13 @@ export default class EntityKartBaseClass extends EntityClass
             }
             else {
                 if (this.isStandingOnFloor()) {
-                    speed=this.forwardMaxSpeed+(this.speedItemIncrease*this.speedItemCount);
+                    speed=this.forwardMaxSpeed+(10*this.starCount);
                     if (this.burstEndTimestamp!==0) {
                         if (this.burstEndTimestamp<this.core.game.timestamp) {
                             this.burstEndTimestamp=0;
                         }
                         else {
-                            speed+=this.burstSpeed;
+                            speed+=75;
                         }
                     }
                     this.movement.moveZWithAcceleration(moveForward,moveReverse,this.forwardAcceleration,this.forwardDeceleration,speed,this.reverseAcceleration,this.reverseDeceleration,this.reverseMaxSpeed);

@@ -149,7 +149,7 @@ export default class EntityKartPlayerClass extends EntityKartBaseClass
             this.previousLap=this.lap;
         }
             
-        if (this.interfaceSpeedItem!==null) this.setCount(this.interfaceSpeedItem,this.speedItemCount);
+        if (this.interfaceSpeedItem!==null) this.setCount(this.interfaceSpeedItem,this.starCount);
         
         if (this.interfaceSpeedGauge!==null) {
             speed=this.rotMovement.lengthXZ()/this.interfaceSpeedGaugeMax;

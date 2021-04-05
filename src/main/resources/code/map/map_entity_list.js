@@ -6,7 +6,6 @@ import EntityKartPlayerClass from '../entity/entity_kart_player.js';
 import EntityKartBotClass from '../entity/entity_kart_bot.js';
 import EntityWeaponClass from '../entity/entity_weapon.js';
 import EntityProjectileClass from '../entity/entity_projectile.js';
-import EntityPickupClass from '../entity/entity_pickup.js';
 
 //
 // map entity list class
@@ -88,8 +87,6 @@ export default class MapEntityListClass
                 return(EntityWeaponClass);
             case 'projectile':
                 return(EntityProjectileClass);
-            case 'pickup':
-                return(EntityPickupClass);
         }
         
         console.log('Unknown entity type: '+json.type);

@@ -60,11 +60,11 @@ export default class EntityFPSBotClass extends EntityClass
         
         this.lastWheelClick=0;
         
-        this.carouselWeapons=[];
+        this.pistolWeapons=null;
+        this.m16Weapon=null;
         this.grenadeWeapon=null;
         
-        this.currentCarouselWeaponIdx=0;
-        this.defaultCarouselWeaponIdx=0;
+        this.currentWeapon=null;
         
         this.forceAnimationUpdate=false;
         this.currentIdleAnimation=null;
@@ -109,8 +109,6 @@ export default class EntityFPSBotClass extends EntityClass
     
     initialize()
     {
-        let n,weaponBlock,weaponEntity;
-        
         if (!super.initialize()) return(false);
         
         this.healthInitialCount=this.core.game.lookupValue(this.json.config.healthInitialCount,this.data,0);
@@ -163,59 +161,22 @@ export default class EntityFPSBotClass extends EntityClass
         this.nextDamageTick=0;
         this.lastInLiquidIdx=-1;
         this.lastUnderLiquid=false;
-
+        
             // setup the weapons
         
-        for (n=0;n!==this.json.weapons.length;n++) {
-            weaponBlock=this.json.weapons[n];
-            
-                // add the weapon in the correct array
-                
-            if (weaponBlock.inCarousel) {
-                weaponEntity=this.addEntity(weaponBlock.weaponJson,weaponBlock.name,new PointClass(0,0,0),new PointClass(0,0,0),weaponBlock.weaponData,this,this,true);
-                this.carouselWeapons.push(weaponEntity);
-                if ((weaponBlock.default) && (this.defaultCarouselWeaponIdx===-1)) this.defaultCarouselWeaponIdx=n;
-            }
-            else {
-                weaponEntity=this.addEntity(weaponBlock.weaponJson,weaponBlock.name,new PointClass(0,0,0),new PointClass(0,0,0),weaponBlock.weaponData,this,this,true);
-                this.grenadeWeapon=weaponEntity;
-            }
-            
-                // add in the bot slop
-                
-            weaponEntity.fireYSlop=this.targetFireSlop;
-            
-                // available to entity?
-                
-            weaponEntity.initiallyAvailable=this.core.game.lookupValue(weaponBlock.initiallyAvailable,this.data,false);
-            
-                // push the parent animations to the weapons
-                // so we can pick them up later
-                
-            weaponEntity.parentIdleAnimation=this.core.game.lookupAnimationValue(weaponBlock.parentIdleAnimation);
-            weaponEntity.parentRunAnimation=this.core.game.lookupAnimationValue(weaponBlock.parentRunAnimation);
-            weaponEntity.parentFireIdleAnimation=this.core.game.lookupAnimationValue(weaponBlock.parentFireIdleAnimation);
-            weaponEntity.parentPrimaryFireRunAnimation=this.core.game.lookupAnimationValue(weaponBlock.parentPrimaryFireRunAnimation);
-            weaponEntity.parentPrimaryFireFreezeMovement=this.core.game.lookupValue(weaponBlock.parentPrimaryFireFreezeMovement,this.data,false);
-            weaponEntity.parentSecondaryFireRunAnimation=this.core.game.lookupAnimationValue(weaponBlock.parentSecondaryFireRunAnimation);
-            weaponEntity.parentSecondaryFireFreezeMovement=this.core.game.lookupValue(weaponBlock.parentSecondaryFireFreezeMovement,this.data,false);
-            weaponEntity.parentTertiaryFireRunAnimation=this.core.game.lookupAnimationValue(weaponBlock.parentTertiaryFireRunAnimation);
-            weaponEntity.parentTertiaryFireFreezeMovement=this.core.game.lookupValue(weaponBlock.parentTertiaryFireFreezeMovement,this.data,false);
-        }
+        this.pistolWeapon=this.addEntity('weapon_pistole','pistol',new PointClass(0,0,0),new PointClass(0,0,0),null,this,this,true);
+        this.m16Weapon=this.addEntity('weapon_m16','m16',new PointClass(0,0,0),new PointClass(0,0,0),null,this,this,true);
+        this.grenadeWeapon=this.addEntity('weapon_grenade','grenade',new PointClass(0,0,0),new PointClass(0,0,0),null,this,this,true);
         
         return(true);
     }
     
     release()
     {
-        let n;
-        
         super.release();
         
-        for (n=0;n!==this.carouselWeapons.length;n++) {
-            this.carouselWeapons[n].release();
-        }
-
+        this.pistolWeapon.release();
+        this.m16Weapon.release();
         this.grenadeWeapon.release();
     }
     
@@ -238,10 +199,13 @@ export default class EntityFPSBotClass extends EntityClass
         
         this.movementFreezeTick=0;
         
-            // start with best weapon
+            // weapons
             
-        this.currentCarouselWeaponIdx=-1;
-        this.pickBestWeapon();
+        this.pistolWeapon.available=true;
+        this.m16Weapon.available=false;
+        this.grenadeWeapon.available=true;
+
+        this.currentWeapon=this.pistolWeapon;   
         
             // start scanning in middle
             
@@ -320,43 +284,27 @@ export default class EntityFPSBotClass extends EntityClass
     }
     
         //
-        // action messages
+        // weapons, health, armor updates
         //
         
-    findWeaponByName(weaponName)
+    addM16Weapon()
     {
-        let n;
-        
-        for (n=0;n!==this.carouselWeapons.length;n++) {
-            if (this.carouselWeapons[n].name===weaponName) return(this.carouselWeapons[n]);
-        }
-        
-        if (this.grenadeWeapon.name===weaponName) return(this.grenadeWeapon);
-
-        console.log('Unknown weapon: '+weaponName);
-        return(null);
+        this.m16Weapon.available=true;
     }
     
-    addWeapon(weaponName)
+    addPistolClip(count)
     {
-        let weapon=this.findWeaponByName(weaponName);
-        if (weapon===null) return;
-        
-            // make weapon available
-            
-        weapon.available=true;
+        this.pistolWeapon.addClip(count);
     }
     
-    addClip(weaponName,count)
+    addM16Clip(count)
     {
-        let weapon=this.findWeaponByName(weaponName);
-        if (weapon!==null) weapon.addClip(count);
+        this.m16Weapon.addClip(count);
     }
     
-    addAmmo(weaponName,count)
+    addGrenadeAmmo(count)
     {
-        let weapon=this.findWeaponByName(weaponName);
-        if (weapon!==null) weapon.addAmmo(count);
+        this.grenadeWeapon.addAmmo(count);
     }
     
     addHealth(count)
@@ -397,17 +345,14 @@ export default class EntityFPSBotClass extends EntityClass
         
     pickBestWeapon()
     {
-        let n,idx,weaponEntity,meshName;
+        let n,idx,weapon,meshName;
         
             // find best weapon
             
-        idx=0;
+        weapon=this.pistolWeapon;
+        if ((this.m16Weapon.available) && (this.m16Weapon.ammoInClipCount!==0)) weapon=this.m16Weapon;
 
-        for (n=0;n!==this.carouselWeapons.length;n++) {
-            if ((this.carouselWeapons[n].available) && (this.carouselWeapons[n].primary.ammo!==0)) idx=n;
-        }
-
-        if (idx===this.currentCarouselWeaponIdx) return;
+        if (this.currentWeapon===weapon) return;
         
             // switch weapon
             
@@ -440,7 +385,7 @@ export default class EntityFPSBotClass extends EntityClass
             // special check for no ammo
             // if so, don't fight
         
-        if (this.carouselWeapons[this.currentCarouselWeaponIdx].primary.ammo===0) {
+        if (this.currentWeapon.ammoInClip===0) {
             this.targetEntity=null;
             return;
         }
@@ -500,16 +445,15 @@ export default class EntityFPSBotClass extends EntityClass
            
         dist=this.position.distance(this.targetEntity.position);
         
-        if (this.grenadeWeapon.hasAnyAmmo()) {
+        if (this.grenadeWeapon.ammoCount!==0) {
             if ((dist>weapon.botFireRange.min) && (dist<weapon.botFireRange.max)) {
-                if (weapon.fire(weapon.FIRE_METHOD_ANY,this.firePosition,this.drawAngle)) return;
+                if (weapon.fire(this.firePosition,this.drawAngle)) return;
             }
         }
            
             // otherwise shot the held weapon
             
-        weapon=this.carouselWeapons[this.currentCarouselWeaponIdx];
-        weapon.fire(weapon.FIRE_METHOD_ANY,this.firePosition,this.drawAngle);
+        this.currentWeapon.fire(this.firePosition,this.drawAngle);
     }
     
         //

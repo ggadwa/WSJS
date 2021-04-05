@@ -75,12 +75,12 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.lastInLiquidIdx=-1;
         this.lastUnderLiquid=false;
         
-        this.carouselWeapons=[];
+        this.pistolWeapon=null;
+        this.m16Weapon=null;
         this.grenadeWeapon=null;
         
-        this.currentCarouselWeaponIdx=0;
-        this.gotoCarouselWeaponIdx=0;
-        this.defaultCarouselWeaponIdx=0;
+        this.currentWeapon=null;
+        this.gotoWeapon=null;
         this.weaponLowerFinishTick=-1;
         this.weaponRaiseFinishTick=-1;
         this.weaponClipFinishTick=-1;
@@ -104,8 +104,6 @@ export default class EntityFPSPlayerClass extends EntityClass
         
     initialize()
     {
-        let n,weaponBlock,weaponEntity;
-        
         if (!super.initialize()) return(false);
         
         this.idleAnimation=this.core.game.lookupAnimationValue(this.json.animations.idleAnimation);
@@ -167,58 +165,19 @@ export default class EntityFPSPlayerClass extends EntityClass
 
             // setup the weapons
         
-        this.defaultCarouselWeaponIdx=-1;
-        
-        //this.pistolWeapon=this.addEntity('weapon_bowling_ball','weapon_bowling_ball',new PointClass(0,0,0),new PointClass(0,0,0),null,this,this,true);
-        //this.m16Weapon=this.addEntity('weapon_bowling_ball','weapon_bowling_ball',new PointClass(0,0,0),new PointClass(0,0,0),null,this,this,true);
-        //this.grenadeWeapon=this.addEntity('weapon_bowling_ball','weapon_bowling_ball',new PointClass(0,0,0),new PointClass(0,0,0),null,this,this,true);
-        
-        for (n=0;n!==this.json.weapons.length;n++) {
-            weaponBlock=this.json.weapons[n];
-            
-                // add the weapon in the correct array
-                
-            if (weaponBlock.inCarousel) {
-                weaponEntity=this.addEntity(weaponBlock.weaponJson,weaponBlock.name,new PointClass(0,0,0),new PointClass(0,0,0),weaponBlock.weaponData,this,this,true);
-                this.carouselWeapons.push(weaponEntity);
-                if ((weaponBlock.default) && (this.defaultCarouselWeaponIdx===-1)) this.defaultCarouselWeaponIdx=n;
-            }
-            else {
-                weaponEntity=this.addEntity(weaponBlock.weaponJson,weaponBlock.name,new PointClass(0,0,0),new PointClass(0,0,0),weaponBlock.weaponData,this,this,true);
-                this.grenadeWeapon=weaponEntity;
-            }
-            
-                // available to entity?
-                
-            weaponEntity.initiallyAvailable=this.core.game.lookupValue(weaponBlock.initiallyAvailable,this.data,false);
-            
-                // push the parent animations to the weapons
-                // so we can pick them up later
-                
-            weaponEntity.parentIdleAnimation=weaponBlock.parentIdleAnimation;
-            weaponEntity.parentRunAnimation=weaponBlock.parentRunAnimation;
-            weaponEntity.parentFireIdleAnimation=weaponBlock.parentFireIdleAnimation;
-            weaponEntity.parentPrimaryFireRunAnimation=weaponBlock.parentPrimaryFireRunAnimation;
-            weaponEntity.parentPrimaryFireFreezeMovement=false;
-            weaponEntity.parentSecondaryFireRunAnimation=weaponBlock.parentSecondaryFireRunAnimation;
-            weaponEntity.parentSecondaryFireFreezeMovement=false;
-            weaponEntity.parentTertiaryFireRunAnimation=weaponBlock.parentTertiaryFireRunAnimation;
-            weaponEntity.parentTertiaryFireFreezeMovement=false;
-        }
-        
+        this.pistolWeapon=this.addEntity('weapon_pistol','pistol',new PointClass(0,0,0),new PointClass(0,0,0),null,this,this,true);
+        this.m16Weapon=this.addEntity('weapon_m16','m16',new PointClass(0,0,0),new PointClass(0,0,0),null,this,this,true);
+        this.grenadeWeapon=this.addEntity('weapon_grenade','grenade',new PointClass(0,0,0),new PointClass(0,0,0),null,this,this,true);
+       
         return(true);
     }
     
     release()
     {
-        let n;
-        
         super.release();
         
-        for (n=0;n!==this.carouselWeapons.length;n++) {
-            this.carouselWeapons[n].release();
-        }
-
+        this.pistolWeapon.release();
+        this.m16Weapon.release();
         this.grenadeWeapon.release();
     }
     
@@ -228,8 +187,6 @@ export default class EntityFPSPlayerClass extends EntityClass
         
     ready()
     {
-        let n;
-        
         super.ready();
         
             // set the camera
@@ -260,13 +217,17 @@ export default class EntityFPSPlayerClass extends EntityClass
         
             // ready all the weapons
             
-        for (n=0;n!==this.carouselWeapons.length;n++) {
-            this.carouselWeapons[n].ready();
-        }
-        
+        this.pistolWeapon.ready();
+        this.m16Weapon.ready();
         this.grenadeWeapon.ready();
         
-        this.setCarouselWeaponDefault();
+        this.pistolWeapon.available=true;
+        this.pistolWeapon.show=true;
+        this.m16Weapon.available=true;
+        this.m16Weapon.show=false;
+        this.grenadeWeapon.available=true;          // don't need a show here, weapon has no model
+        
+        this.currentWeapon=this.pistolWeapon;
 
             // start with the idle animation
             
@@ -286,65 +247,35 @@ export default class EntityFPSPlayerClass extends EntityClass
     }
     
         //
-        // messages
+        // weapons, health, armor updates
         //
         
-    findWeaponByName(weaponName)
+    addM16Weapon()
     {
-        let n;
+        if (this.m16Weapon.available) return;
         
-        for (n=0;n!==this.carouselWeapons.length;n++) {
-            if (this.carouselWeapons[n].name===weaponName) return(this.carouselWeapons[n]);
-        }
+        this.m16Weapon.available=true;
+        this.startWeaponSwitch(this.m16Weapon);
         
-        if (this.grenadeWeapon.name===weaponName) return(this.grenadeWeapon);
-
-        console.log('Unknown weapon: '+weaponName);
-        return(null);
+        this.pulseElement('m16_bullet',500,10);
     }
     
-    hasWeapon(weaponName)
+    addPistolClip(count)
     {
-        let n;
-        
-        for (n=0;n!==this.carouselWeapons.length;n++) {
-            if (this.carouselWeapons[n].name===weaponName) return(this.carouselWeapons[n].available);
-        }
-        
-        return(false);
+        this.pistolWeapon.addClip(count);
+        this.pulseElement('pistol_bullet',500,10);
     }
     
-    addWeapon(weaponName)
+    addM16Clip(count)
     {
-        let n;
-        
-        let weapon=this.findWeaponByName(weaponName);
-        if (weapon===null) return;
-        
-            // make weapon available
-            
-        weapon.available=true;
-        
-            // select weapon if in carousel
-            
-        for (n=0;n!==this.carouselWeapons.length;n++) {
-            if (this.carouselWeapons[n].name===weaponName) {
-                this.startCarouselWeaponSwitch(n);
-                break;
-            }
-        }
+        this.m16Weapon.addClip(count);
+        this.pulseElement('m16_bullet',500,10);
     }
     
-    addClip(weaponName,count)
+    addGrenadeAmmo(count)
     {
-        let weapon=this.findWeaponByName(weaponName);
-        if (weapon!==null) weapon.addClip(count);
-    }
-    
-    addAmmo(weaponName,count)
-    {
-        let weapon=this.findWeaponByName(weaponName);
-        if (weapon!==null) weapon.addAmmo(count);
+        this.grenadeWeapon.addAmmo(count);
+        this.pulseElement('grenade',500,10);
     }
     
     addHealth(count)
@@ -488,119 +419,68 @@ export default class EntityFPSPlayerClass extends EntityClass
         //
         // weapons
         //
-        
-    setCarouselWeaponDefault()
-    {
-        let n,weaponEntity,meshName;
-        
-        this.currentCarouselWeaponIdx=this.defaultCarouselWeaponIdx;
-        this.weaponLowerFinishTick=-1;
-        this.weaponRaiseFinishTick=-1;
-        this.weaponClipFinishTick=-1;
-        
-            // show hide weapons
-
-        for (n=0;n!==this.carouselWeapons.length;n++) {
-            weaponEntity=this.carouselWeapons[n];
-            
-            if (n===this.currentCarouselWeaponIdx) {
-                weaponEntity.show=true;
-                
-                this.forceAnimationUpdate=true;
-                this.currentIdleAnimation=weaponEntity.parentIdleAnimation;
-                this.currentRunAnimation=weaponEntity.parentRunAnimation;
-                
-                for (meshName of this.json.weapons[n].meshes) {
-                    this.showMesh(meshName,true);
-                }
-                
-                weaponEntity.startIdleAnimation();
-            }
-            else {
-                weaponEntity.show=false;
-                
-                for (meshName of this.json.weapons[n].meshes) {
-                    this.showMesh(meshName,false);
-                }
-            }
-        }
-    }
-        
-    startCarouselWeaponSwitch(weaponIdx)
+               
+    startWeaponSwitch(weapon)
     {
         let weaponEntity;
         
-        this.gotoCarouselWeaponIdx=weaponIdx;
+        if (weapon===this.currentWeapon) return;
+        
+        this.gotoWeapon=weapon;
         
             // lower current weapon
         
-        if (this.currentCarouselWeaponIdx!==-1) {
-            weaponEntity=this.carouselWeapons[this.currentCarouselWeaponIdx];
-            this.weaponLowerFinishTick=this.core.game.timestamp+weaponEntity.runLowerAnimation();
+        if (this.currentWeapon!==null) {
+            this.weaponLowerFinishTick=this.core.game.timestamp+this.currentWeapon.runLowerAnimation();
         }
         else {
-            swapCarouselWeaponSwitch();
+            swapWeaponSwitch();
         }
     }
     
-    swapCarouselWeaponSwitch()
+    swapWeaponSwitch()
     {
-        let meshName,weaponEntity;
-        
             // hide the current weapon
         
-        if (this.currentCarouselWeaponIdx!==-1) {
-            weaponEntity=this.carouselWeapons[this.currentCarouselWeaponIdx];
-            
-            weaponEntity.show=false;
-                
-            for (meshName of this.json.weapons[this.currentCarouselWeaponIdx].meshes) {
-                this.showMesh(meshName,false);
-            }
-        }
+        if (this.currentWeapon!==null) this.currentWeapon.show=false;
         
         this.weaponLowerFinishTick=-1;
         
             // start the raise
             
-        this.currentCarouselWeaponIdx=this.gotoCarouselWeaponIdx;
-        weaponEntity=this.carouselWeapons[this.currentCarouselWeaponIdx];
+        this.currentWeapon=this.gotoWeapon;
                 
-        weaponEntity.show=true;
+        this.currentWeapon.show=true;
 
         this.forceAnimationUpdate=true;
-        this.currentIdleAnimation=weaponEntity.parentIdleAnimation;
-        this.currentRunAnimation=weaponEntity.parentRunAnimation;
+        //this.currentIdleAnimation=weaponEntity.parentIdleAnimation;
+        //this.currentRunAnimation=weaponEntity.parentRunAnimation;
 
-        for (meshName of this.json.weapons[this.currentCarouselWeaponIdx].meshes) {
-            this.showMesh(meshName,true);
-        }
-
-        this.weaponRaiseFinishTick=this.core.game.timestamp+weaponEntity.runRaiseAnimation();
+        this.weaponRaiseFinishTick=this.core.game.timestamp+this.currentWeapon.runRaiseAnimation();
     }
     
-    endCarouselWeaponSwitch()
+    endWeaponSwitch()
     {
         this.weaponRaiseFinishTick=-1;
     }
     
     runWeaponAnimations()
     {
-        let weaponCarouselFreeze=false;
+        let weaponSwitchFreeze=false;
         
         if (this.weaponLowerFinishTick!==-1) {
             if (this.weaponLowerFinishTick<=this.core.game.timestamp) {
-                this.swapCarouselWeaponSwitch();
+                this.swapWeaponSwitch();
             }
-            weaponCarouselFreeze=true;
+            weaponSwitchFreeze=true;
         }
         
         if (this.weaponRaiseFinishTick!==-1) {
             if (this.weaponRaiseFinishTick<=this.core.game.timestamp) {
-                this.endCarouselWeaponSwitch();
+                this.endWeaponSwitch();
             }
             else {
-                weaponCarouselFreeze=true;
+                weaponSwitchFreeze=true;
             }
         }
 
@@ -609,85 +489,51 @@ export default class EntityFPSPlayerClass extends EntityClass
                 this.weaponClipFinishTick=-1;
             }
             else {
-                weaponCarouselFreeze=true;
+                weaponSwitchFreeze=true;
             }
         }
 
-        return(weaponCarouselFreeze);
+        return(weaponSwitchFreeze);
     }
     
-    runWeaponCarouselInput()
+    runSwitchWeaponInput()
     {
-        let n;
-        let switchWeaponIdx,weapChangeDir,startWeaponIdx;
+        let switchWeapon,weapChangeDir;
         
-        switchWeaponIdx=this.currentCarouselWeaponIdx;
+        switchWeapon=this.currentWeapon;
         weapChangeDir=this.mouseWheelRead()+this.getTouchSwipeLeftX();
 
-        if (weapChangeDir<0) {
-            startWeaponIdx=switchWeaponIdx;
-
-            while (true) {
-                switchWeaponIdx--;
-                if (switchWeaponIdx<0) switchWeaponIdx=this.carouselWeapons.length-1;
-                if (switchWeaponIdx===startWeaponIdx) break;
-
-                if (this.carouselWeapons[switchWeaponIdx].available) break;
+        if (weapChangeDir!==0) {
+            if (this.currentWeapon===this.pistolWeapon) {
+                if (this.m16Weapon.available) switchWeapon=this.m16Weapon;
+            }
+            else {
+                switchWeapon=this.pistolWeapon;
             }
         }
-
-        if (weapChangeDir>0) {
-            startWeaponIdx=switchWeaponIdx;
-
-            while (true) {
-                switchWeaponIdx++;
-                if (switchWeaponIdx>(this.carouselWeapons.length-1)) switchWeaponIdx=0;
-                if (switchWeaponIdx===startWeaponIdx) break;
-
-                if (this.carouselWeapons[switchWeaponIdx].available) break;
-            }
-        }
-
-        for (n=0;n<this.carouselWeapons.length;n++) {
-            if (this.isKeyDown(String.fromCharCode(49+n))) {
-                if (this.carouselWeapons[n].available) {
-                    switchWeaponIdx=n;
-                    break;
-                }
-            }
-        }
-
-        if (this.currentCarouselWeaponIdx!==switchWeaponIdx) {
-            this.startCarouselWeaponSwitch(switchWeaponIdx);
+        
+        if (this.isKeyDown('1')) switchWeapon=this.pistolWeapon;
+        if ((this.isKeyDown('2')) && (this.m16Weapon.available)) switchWeapon=this.m16Weapon;
+    
+        if (this.currentWeapon!==switchWeapon) {
+            this.startWeaponSwitch(switchWeapon);
         }
     }
     
     runWeaponFiring()
     {
-        let n,weapon;
-        let fireCarouselWeapon,fireGrenade;
+        let weapon;
         
-        fireCarouselWeapon=this.isMouseButtonDown(0)||this.isTouchStickRightClick();
-        fireGrenade=this.isMouseButtonDown(2)||(this.getTouchSwipeRightY()<0);
+        weapon=null;
+        
+        if (this.isMouseButtonDown(0)||this.isTouchStickRightClick()) weapon=this.currentWeapon;
+        if (this.isMouseButtonDown(2)||(this.getTouchSwipeRightY()<0)) weapon=this.grenadeWeapon;
 
-        if ((!fireCarouselWeapon) && (!fireGrenade)) return;
+        if (weapon===null) return;
         
         this.firePosition.setFromPoint(this.position);
         this.firePosition.y+=this.eyeOffset;
         
-            // which weapon to fire
-            
-        weapon=null;
-        
-        if (fireCarouselWeapon) {
-            weapon=this.carouselWeapons[this.currentCarouselWeaponIdx];
-        }
-        else {
-            weapon=this.grenadeWeapon;
-        }
-        
-        if (!weapon.available) return;
-            
             // fire wait
 
         if (weapon.isFirePaused()) return;
@@ -807,7 +653,7 @@ export default class EntityFPSPlayerClass extends EntityClass
             // weapons
             
         if (!this.runWeaponAnimations()) {
-            this.runWeaponCarouselInput();
+            this.runSwitchWeaponInput();
             this.runWeaponFiring();
         }
         
@@ -916,9 +762,9 @@ export default class EntityFPSPlayerClass extends EntityClass
             
         this.setCurrentAnimation();
         
-        if (this.currentCarouselWeaponIdx!==-1) {
+        if (this.currentWeapon!==null) {
             if ((this.weaponLowerFinishTick===-1) && (this.weaponRaiseFinishTick===-1) && (this.weaponClipFinishTick===-1)) {
-                this.carouselWeapons[this.currentCarouselWeaponIdx].setIdleAnimation();
+                this.currentWeapon.setIdleAnimation();
             }
         }
     }
