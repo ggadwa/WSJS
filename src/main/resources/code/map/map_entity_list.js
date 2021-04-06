@@ -5,7 +5,6 @@ import EntityFPSMonsterClass from '../entity/entity_fps_monster.js';
 import EntityKartPlayerClass from '../entity/entity_kart_player.js';
 import EntityKartBotClass from '../entity/entity_kart_bot.js';
 import EntityWeaponClass from '../entity/entity_weapon.js';
-import EntityProjectileClass from '../entity/entity_projectile.js';
 
 //
 // map entity list class
@@ -85,8 +84,6 @@ export default class MapEntityListClass
                 return(EntityKartBotClass);
             case 'weapon':
                 return(EntityWeaponClass);
-            case 'projectile':
-                return(EntityProjectileClass);
         }
         
         console.log('Unknown entity type: '+json.type);
@@ -303,29 +300,6 @@ export default class MapEntityListClass
         }
         
         return(null);
-    }
-    
-    findClosest(position,typeList)
-    {
-        let d,dist;
-        let entity,foundEntity;
-        
-        dist=0;
-        foundEntity=null;
-         
-        for (entity of this.entities) {
-            if (typeList!==null) {
-                if (typeList.indexOf(entity.json.type)===-1) continue;
-            }
-            
-            d=entity.position.distance(position);
-            if ((foundEntity===null) || (d<dist)) {
-                dist=d;
-                foundEntity=entity;
-            }
-        }
-        
-        return(foundEntity);
     }
     
     findClosestWithMaxAngle(position,angle,namePrefix,skipEntity,maxAngle)

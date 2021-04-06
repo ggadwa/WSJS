@@ -3,9 +3,9 @@ SCRIPT REDO
 > do model/physics for all weapons/projectiles
 > clean up weapon fields
 > remove entity_weapon/projectile when all clear
-> transition entity_fps_player/entity_fps_bot to statically add weapons
-   - get rid of initiallyAvailable when done
-   - redo all the third person weapon animations, get code from bot.js
+> redo all the third person weapon animations, get code from bot.js
+
+- player needs third person camera switch (backspace? maybe) to test new animations
 
 - EntityCacheClass gone!
 
@@ -19,6 +19,8 @@ SCRIPT REDO
 - ambients (on effects)
    - crackling fire
    - fountain
+   - wind for castle
+   - spooky mixed sounds for dungeon (add to wsjsMap)
 
 [NEW KART MAP - get rid of ground and put flag ground segments, fix seams]
 

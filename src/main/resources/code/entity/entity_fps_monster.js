@@ -288,7 +288,7 @@ export default class EntityFPSMonsterClass extends EntityClass
         for (entity of this.core.game.map.entityList.entities) {
             if (entity===this) continue;
             if ((!entity.show) || (entity.health<=0)) continue;
-            if (entity.json.name!==this.json.name) continue;
+            if (entity.constructor.name!==this.constructor.name) continue;
             
             if (this.position.distance(entity.position)<entity.wakeUpOnOtherWakeUpDistance) {
                 entity.goWakeUp(true);

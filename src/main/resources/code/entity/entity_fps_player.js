@@ -223,7 +223,7 @@ export default class EntityFPSPlayerClass extends EntityClass
         
         this.pistolWeapon.available=true;
         this.pistolWeapon.show=true;
-        this.m16Weapon.available=true;
+        this.m16Weapon.available=false;
         this.m16Weapon.show=false;
         this.grenadeWeapon.available=true;          // don't need a show here, weapon has no model
         
@@ -599,8 +599,28 @@ export default class EntityFPSPlayerClass extends EntityClass
         
             // update any UI
             
-        if (this.interfaceHealthCount!==null) this.updateText(this.interfaceHealthCount,this.health);
-        if (this.interfaceArmorCount!==null) this.updateText(this.interfaceArmorCount,this.armor);
+        this.updateText('pistol_clip_count',this.pistolWeapon.clipCount);
+        this.updateText('pistol_bullet_count',this.pistolWeapon.ammoInClipCount);
+        this.updateText('m16_clip_count',this.m16Weapon.clipCount);
+        this.updateText('m16_bullet_count',this.m16Weapon.ammoInClipCount);
+        this.updateText('grenade_count',this.grenadeWeapon.ammoCount);
+        this.updateText('health_count',this.health);
+        this.updateText('armor_count',this.armor);
+        
+        if (!this.cameraIsFirstPerson()) {
+            this.showElement('pistol_crosshair',false);
+            this.showElement('m16_crosshair',false);
+        }
+        else {
+            if (this.currentWeapon===this.pistolWeapon) {
+                this.showElement('pistol_crosshair',true);
+                this.showElement('m16_crosshair',false);
+            }
+            else {
+                this.showElement('pistol_crosshair',false);
+                this.showElement('m16_crosshair',true);
+            }
+        }
         
             // dead
             
