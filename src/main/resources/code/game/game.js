@@ -466,8 +466,9 @@ export default class GameClass
         this.freezeAI=false;
         this.hideUI=false;
         
-            // start any music
+            // start any ambient/music
             
+        this.core.audio.ambientStart();
         this.core.audio.musicStart(this.map.music);
         
             // start actions
@@ -482,8 +483,9 @@ export default class GameClass
         this.lastRunTimestamp=this.timestamp;
         this.lastDrawTimestamp=this.timestamp;
         
-            // resume any music/looping sounds
+            // resume any music/ambient/looping sounds
             
+        this.core.audio.ambientStart();
         this.core.audio.musicStart(this.map.music);
         this.core.audio.soundResumeAllLooping();
     }

@@ -17,9 +17,6 @@ export default class EntityFPSBotClass extends EntityClass
         this.armorInitialCount=0;
         this.armorMaxCount=0;
         
-        this.idleAnimation=null;
-        this.waitAnimation=null;
-        this.runAnimation=null;
         this.dieAnimation=null;
         
         this.inStandingAnimation=true;
@@ -67,8 +64,6 @@ export default class EntityFPSBotClass extends EntityClass
         this.currentWeapon=null;
         
         this.forceAnimationUpdate=false;
-        this.currentIdleAnimation=null;
-        this.currentRunAnimation=null;
         
         this.goalNodeIdx=-1;
         this.nextNodeIdx=-1;
@@ -90,6 +85,18 @@ export default class EntityFPSBotClass extends EntityClass
         this.targetForgetDistance=0;
         this.targetFireYRange=0;
         this.targetFireSlop=0;
+        
+            // animations
+            
+        this.idleAnimationPistol={"startFrame":0,"endFrame":50, "actionFrame":0,"meshes":null};
+        this.runAnimationPistol={"startFrame":492,"endFrame":518,"actionFrame":0,"meshes":null};
+        this.fireIdleAnimationPistol={"startFrame":364,"endFrame":401,"actionFrame":0,"meshes":null};
+        this.fireRunAnimationPistol={"startFrame":523,"endFrame":549,"actionFrame":0,"meshes":null};
+
+        this.idleAnimationM16={"startFrame":710,"endFrame":760,"actionFrame":0,"meshes":null};
+        this.runAnimationM16={"startFrame":933,"endFrame":955,"actionFrame":0,"meshes":null};
+        this.fireIdleAnimationM16={"startFrame":775,"endFrame":815,"actionFrame":0,"meshes":null};
+        this.fireRunAnimationM16={"startFrame":865,"endFrame":887,"actionFrame":0,"meshes":null};
         
             // pre-allocates
             
@@ -148,9 +155,6 @@ export default class EntityFPSBotClass extends EntityClass
         this.targetFireYRange=this.core.game.lookupValue(this.json.config.targetFireYRange,this.data,0);
         this.targetFireSlop=this.core.game.lookupValue(this.json.config.targetFireSlop,this.data,0);
         
-        this.idleAnimation=this.core.game.lookupAnimationValue(this.json.animations.idleAnimation);
-        this.waitAnimation=this.core.game.lookupAnimationValue(this.json.animations.waitAnimation);
-        this.runAnimation=this.core.game.lookupAnimationValue(this.json.animations.runAnimation);
         this.dieAnimation=this.core.game.lookupAnimationValue(this.json.animations.dieAnimation);
         
         this.hurtSound=this.core.game.lookupSoundValue(this.json.sounds.hurtSound);
@@ -205,7 +209,9 @@ export default class EntityFPSBotClass extends EntityClass
         this.m16Weapon.available=false;
         this.grenadeWeapon.available=true;
 
-        this.currentWeapon=this.pistolWeapon;   
+        this.currentWeapon=this.pistolWeapon;
+        
+        this.adjustMeshesForCurrentWeapon();
         
             // start scanning in middle
             
@@ -241,7 +247,7 @@ export default class EntityFPSBotClass extends EntityClass
 
             // start animation
             
-        this.startAnimation(this.runAnimation);
+        this.startAnimation(this.runAnimationPistol);
     }
     
         //
@@ -345,7 +351,7 @@ export default class EntityFPSBotClass extends EntityClass
         
     pickBestWeapon()
     {
-        let n,idx,weapon,meshName;
+        let weapon;
         
             // find best weapon
             
@@ -356,28 +362,8 @@ export default class EntityFPSBotClass extends EntityClass
         
             // switch weapon
             
-        this.currentCarouselWeaponIdx=idx;
-        
-        for (n=0;n!==this.carouselWeapons.length;n++) {
-            weaponEntity=this.carouselWeapons[n];
-            
-            if (n===this.currentCarouselWeaponIdx) {
-                this.forceAnimationUpdate=true;
-                this.currentIdleAnimation=weaponEntity.parentIdleAnimation;
-                this.currentRunAnimation=weaponEntity.parentRunAnimation;
-                
-                for (meshName of this.json.weapons[n].meshes) {
-                    this.showMesh(meshName,true);
-                }
-            }
-            else {
-                weaponEntity.show=false;
-                
-                for (meshName of this.json.weapons[n].meshes) {
-                    this.showMesh(meshName,false);
-                }
-            }
-        }
+        this.currentWeapon=weapon;
+        this.adjustMeshesForCurrentWeapon();
     }
 
     findEntityToFight()
@@ -427,6 +413,26 @@ export default class EntityFPSBotClass extends EntityClass
             }
         }
     }
+    
+        //
+        // weapons
+        //
+        
+    adjustMeshesForCurrentWeapon()
+    {
+        let show=(this.currentWeapon===this.pistolWeapon);
+        
+        this.showMesh('beretta',show);
+        this.showMesh('peen',show);
+        this.showMesh('beretta_top',show);
+        this.showMesh('triger',show);
+        this.showMesh('holder',show);
+
+        this.showMesh('m16_rifle',!show);
+        this.showMesh('m16_holder_01',!show);
+        this.showMesh('shutter',!show);
+        this.showMesh('trigger',!show);
+    }
 
     fireWeapon()
     {
@@ -446,7 +452,7 @@ export default class EntityFPSBotClass extends EntityClass
         dist=this.position.distance(this.targetEntity.position);
         
         if (this.grenadeWeapon.ammoCount!==0) {
-            if ((dist>weapon.botFireRange.min) && (dist<weapon.botFireRange.max)) {
+            if ((dist>15000) && (dist<60000)) {
                 if (weapon.fire(this.firePosition,this.drawAngle)) return;
             }
         }
@@ -454,6 +460,17 @@ export default class EntityFPSBotClass extends EntityClass
             // otherwise shot the held weapon
             
         this.currentWeapon.fire(this.firePosition,this.drawAngle);
+        
+            // animations
+            
+        if (this.currentWeapon===this.pistolWeapon) {
+            this.interuptAnimation((this.inStandingAnimation)?this.fireIdleAnimationPistol:this.fireRunAnimationPistol);
+        }
+        else {
+            if (this.currentWeapon===this.m16Weapon) {
+                this.interuptAnimation((this.inStandingAnimation)?this.fireIdleAnimationM16:this.fireRunAnimationM16);
+            }
+        }
     }
     
         //
@@ -464,7 +481,6 @@ export default class EntityFPSBotClass extends EntityClass
     {
         let nodeIdx,prevNodeIdx,moveForward;
         let turnDiff,slideLeft,liquid,liquidIdx,gravityFactor,fallDist;
-        let idleAnimation;
         
         super.run();
         
@@ -579,13 +595,6 @@ export default class EntityFPSBotClass extends EntityClass
                 // is this a node we should pause at?
 
             this.pausedTriggerName=this.isNodeATriggerPauseNode(prevNodeIdx,this.nextNodeIdx);
-            if (this.pausedTriggerName!==null) {
-                if (!this.checkTrigger(this.pausedTriggerName)) {
-                    idleAnimation=this.carouselWeapons[this.currentCarouselWeaponIdx].parentIdleAnimation;
-                    this.startAnimation(idleAnimation);
-                    return;
-                }
-            }
         }
         
             // always start by moving
@@ -601,8 +610,16 @@ export default class EntityFPSBotClass extends EntityClass
             }
             else {
                 this.pausedTriggerName=null;
-                this.startAnimation(this.waitAnimation);
             }
+        }
+        
+            // select proper animation
+            
+        if (!moveForward) {
+            this.continueAnimation((this.currentWeapon===this.pistolWeapon)?this.idleAnimationPistol:this.idleAnimationM16);
+        }
+        else {
+            this.continueAnimation((this.currentWeapon===this.pistolWeapon)?this.runAnimationPistol:this.runAnimationM16);
         }
         
             // if we are touching an entity, try to slide out

@@ -1,11 +1,9 @@
 SCRIPT REDO
 
-> do model/physics for all weapons/projectiles
-> clean up weapon fields
-> remove entity_weapon/projectile when all clear
-> redo all the third person weapon animations, get code from bot.js
-
-- player needs third person camera switch (backspace? maybe) to test new animations
+- karts
+- player (need to preserve data changes)
+- bot
+- monsters
 
 - EntityCacheClass gone!
 
@@ -14,13 +12,16 @@ SCRIPT REDO
 - remove actions
 
   FINALLY: map_entity_list.addFromMap/addDynamic
-
+- bots: need to recheck everything
+   - make sure pauses at elevators are working
 
 - ambients (on effects)
    - crackling fire
    - fountain
    - wind for castle
    - spooky mixed sounds for dungeon (add to wsjsMap)
+
+- player: fall damage lights up all damage hit sides
 
 [NEW KART MAP - get rid of ground and put flag ground segments, fix seams]
 

@@ -224,6 +224,7 @@ export default class DialogBaseClass
         
             // stop music/looping sounds
             
+        this.core.audio.ambientStop();
         this.core.audio.musicStop();
         this.core.audio.soundPauseAllLooping();
         

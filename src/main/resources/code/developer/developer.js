@@ -686,8 +686,9 @@ export default class DeveloperClass
         this.core.game.map.lightList.lightMin.setFromValues(1,1,1);
         this.core.game.map.lightList.lightMax.setFromValues(1,1,1);
         
-            // stop music
+            // stop ambient/music
             
+        this.core.audio.ambientStop();
         this.core.audio.musicStop();
 
             // timing setup
@@ -720,8 +721,9 @@ export default class DeveloperClass
         this.core.game.map.lightList.lightMin.setFromColor(this.lightMinBackup);
         this.core.game.map.lightList.lightMax.setFromColor(this.lightMaxBackup);
         
-            // resume sound
+            // resume ambient/music
             
+        this.core.audio.ambientStart();
         this.core.audio.musicStart(this.core.game.map.music);
     }
     

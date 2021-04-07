@@ -22,6 +22,11 @@ export default class AudioClass
             // playing sounds
 
         this.soundPlays=null;
+        
+            // playing ambients
+            
+        this.ambientSourceNode=null;
+        this.ambientGainNode=null;
 
             // playing music
             
@@ -66,7 +71,12 @@ export default class AudioClass
             this.soundPlays.push(new SoundPlayClass(this.core));
         }
         
-            // currently no music
+            // ambients
+            
+        this.ambientSourceNode=null;
+        this.ambientGainNode=null;
+        
+            // music
             
         this.music=null;
         this.musicSourceNode=null;
@@ -81,6 +91,7 @@ export default class AudioClass
         
             // clear any music
 
+        this.ambientStop();
         this.musicStop();
         
             // clear all playing sounds
@@ -155,6 +166,61 @@ export default class AudioClass
         for (n=0;n!==this.MAX_CONCURRENT_SOUNDS;n++) {
             if (!this.soundPlays[n].free) this.soundPlays[n].update(this.currentListenerEntity);
         }
+    }
+    
+        //
+        // map ambients
+        //
+        
+    ambientStart()
+    {
+        let sound;
+        let soundList=this.core.game.map.soundList;
+        let ambientSound=this.core.game.map.ambientSound;
+        
+            // already playing?
+            
+        if (this.ambientSourceNode!==null) return;
+        
+            // any ambient to play?
+        
+        if (ambientSound===null) return;
+        sound=soundList.sounds.get(ambientSound.name);
+        if (sound===null) {
+            console.log(`warning: unknown sound: ${ambientSound.name}`);
+            return;
+        }
+        
+            // set the audio nodes
+        
+        this.ambientSourceNode=this.core.audio.audioCTX.createBufferSource();
+        this.ambientSourceNode.buffer=sound.buffer;
+        this.ambientSourceNode.playbackRate.value=ambientSound.rate;
+        this.ambientSourceNode.loopStart=ambientSound.loopStart;
+        this.ambientSourceNode.loopEnd=ambientSound.loopEnd;
+        this.ambientSourceNode.loop=true;
+        
+        this.ambientGainNode=this.core.audio.audioCTX.createGain();
+        this.ambientGainNode.gain.value=this.core.setup.soundVolume;
+
+        this.ambientSourceNode.connect(this.ambientGainNode);
+        this.ambientGainNode.connect(this.core.audio.audioCTX.destination);
+        
+            // finally play the ambient
+            
+        this.ambientSourceNode.start();
+    }
+    
+    ambientStop()
+    {
+        if (this.ambientSourceNode===null) return;
+        
+        this.ambientSourceNode.stop();
+        
+        this.ambientSourceNode.disconnect();
+        this.ambientGainNode.disconnect();
+        this.ambientSourceNode=null;
+        this.ambientGainNode=null;
     }
     
         //

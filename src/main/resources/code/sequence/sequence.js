@@ -176,6 +176,10 @@ export default class SequenceClass
         
         this.startTimestamp=this.core.game.timestamp;
         
+            // stop any ambients
+            
+        this.core.audio.ambientStop();
+        
             // music
             
         this.core.audio.musicStop();
@@ -224,8 +228,9 @@ export default class SequenceClass
             return;
         }
         
-            // restart any music
+            // restart any ambient/music
             
+        this.core.audio.ambientStart();
         this.core.audio.musicStart(this.core.game.map.music);
     }
     

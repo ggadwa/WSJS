@@ -19,13 +19,6 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.armorInitialCount=0;
         this.armorMaxCount=0;
         
-        this.interfaceHealthIcon=null;
-        this.interfaceHealthCount=null;
-        this.interfaceArmorIcon=null;
-        this.interfaceArmorCount=null;
-        
-        this.idleAnimation=null;
-        this.runAnimation=null;
         this.dieAnimation=null;
         
         this.inStandingAnimation=true;
@@ -57,12 +50,6 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.fallDamagePercentage=0;
         this.respawnWaitTick=0;
         
-        this.isThirdPersonCamera=false;
-        this.thirdPersonCameraDistance=0;
-        this.thirdPersonCameraLookAngle=null;
-        this.isTopDownCameraOnDeath=false;
-        this.topDownCameraDistance=0;
-        
         this.hitIndicator=false;
         this.hitIndicatorFlashTick=0;
         
@@ -86,18 +73,31 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.weaponClipFinishTick=-1;
         
         this.forceAnimationUpdate=false;
-        this.currentIdleAnimation=null;
-        this.currentRunAnimation=null;
         
         this.respawnTick=0;
         this.telefragTriggerEntity=null;
         
+
+            // animations
+            
+        this.idleAnimationPistol={"startFrame":0,"endFrame":50, "actionFrame":0,"meshes":null};
+        this.runAnimationPistol={"startFrame":492,"endFrame":518,"actionFrame":0,"meshes":null};
+        this.fireIdleAnimationPistol={"startFrame":364,"endFrame":401,"actionFrame":0,"meshes":null};
+        this.fireRunAnimationPistol={"startFrame":523,"endFrame":549,"actionFrame":0,"meshes":null};
+
+        this.idleAnimationM16={"startFrame":710,"endFrame":760,"actionFrame":0,"meshes":null};
+        this.runAnimationM16={"startFrame":933,"endFrame":955,"actionFrame":0,"meshes":null};
+        this.fireIdleAnimationM16={"startFrame":775,"endFrame":815,"actionFrame":0,"meshes":null};
+        this.fireRunAnimationM16={"startFrame":865,"endFrame":887,"actionFrame":0,"meshes":null};
+
             // pre-allocates
             
         this.movement=new PointClass(0,0,0);
         this.rotMovement=new PointClass(0,0,0);
         this.firePosition=new PointClass(0,0,0);
         this.drawAngle=new PointClass(0,0,0);
+        
+        this.thirdPersonRegularCameraAngle=new PointClass(-20,180,0);
         
         Object.seal(this);
     }
@@ -106,19 +106,12 @@ export default class EntityFPSPlayerClass extends EntityClass
     {
         if (!super.initialize()) return(false);
         
-        this.idleAnimation=this.core.game.lookupAnimationValue(this.json.animations.idleAnimation);
-        this.runAnimation=this.core.game.lookupAnimationValue(this.json.animations.runAnimation);
         this.dieAnimation=this.core.game.lookupAnimationValue(this.json.animations.dieAnimation);
         
         this.healthInitialCount=this.core.game.lookupValue(this.json.config.healthInitialCount,this.data,0);
         this.healthMaxCount=this.core.game.lookupValue(this.json.config.healthMaxCount,this.data,0);
         this.armorInitialCount=this.core.game.lookupValue(this.json.config.armorInitialCount,this.data,0);
         this.armorMaxCount=this.core.game.lookupValue(this.json.config.armorMaxCount,this.data,0);
-        
-        this.interfaceHealthIcon=this.core.game.lookupValue(this.json.config.interfaceHealthIcon,this.data,null);
-        this.interfaceHealthCount=this.core.game.lookupValue(this.json.config.interfaceHealthCount,this.data,null);
-        this.interfaceArmorIcon=this.core.game.lookupValue(this.json.config.interfaceArmorIcon,this.data,null);
-        this.interfaceArmorCount=this.core.game.lookupValue(this.json.config.interfaceArmorCount,this.data,null);
         
         this.maxTurnSpeed=this.core.game.lookupValue(this.json.config.maxTurnSpeed,this.data,0);
         this.maxLookSpeed=this.core.game.lookupValue(this.json.config.maxLookSpeed,this.data,0);
@@ -146,12 +139,6 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.fallDamageMinDistance=this.core.game.lookupValue(this.json.config.fallDamageMinDistance,this.data,0);
         this.fallDamagePercentage=this.core.game.lookupValue(this.json.config.fallDamagePercentage,this.data,0);
         this.respawnWaitTick=this.core.game.lookupValue(this.json.config.respawnWaitTick,this.data,0);
-        
-        this.isThirdPersonCamera=this.core.game.lookupValue(this.json.config.isThirdPersonCamera,this.data,0);
-        this.thirdPersonCameraDistance=this.core.game.lookupValue(this.json.config.thirdPersonCameraDistance,this.data,0);
-        this.thirdPersonCameraLookAngle=new PointClass(this.json.config.thirdPersonCameraLookAngle.x,this.json.config.thirdPersonCameraLookAngle.y,this.json.config.thirdPersonCameraLookAngle.z);
-        this.isTopDownCameraOnDeath=this.core.game.lookupValue(this.json.config.isTopDownCameraOnDeath,this.data,0);
-        this.topDownCameraDistance=this.core.game.lookupValue(this.json.config.topDownCameraDistance,this.data,0);
         
         this.hitIndicator=this.core.game.lookupValue(this.json.config.hitIndicator,this.data,null);
         this.hitIndicatorFlashTick=this.core.game.lookupValue(this.json.config.hitIndicatorFlashTick,this.data,0);
@@ -189,14 +176,9 @@ export default class EntityFPSPlayerClass extends EntityClass
     {
         super.ready();
         
-            // set the camera
+            // default camera is first person
             
-        if (!this.isThirdPerson) {
-            this.cameraGotoFirstPerson();
-        }
-        else {
-            this.cameraGotoThirdPerson(this.thirdPersonCameraDistance,this.thirdPersonCameraAngle);
-        }
+        this.cameraGotoFirstPerson();
         
             // health
             
@@ -209,11 +191,6 @@ export default class EntityFPSPlayerClass extends EntityClass
         
         this.falling=false;
         this.fallStartY=0;
-        
-            // some animation defaults
-            
-        this.currentIdleAnimation=this.idleAnimation;
-        this.currentRunAnimation=this.runAnimation;
         
             // ready all the weapons
             
@@ -228,6 +205,8 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.grenadeWeapon.available=true;          // don't need a show here, weapon has no model
         
         this.currentWeapon=this.pistolWeapon;
+        
+        this.adjustMeshesForCurrentWeapon();
 
             // start with the idle animation
             
@@ -280,18 +259,18 @@ export default class EntityFPSPlayerClass extends EntityClass
     
     addHealth(count)
     {
-        if (this.interfaceHealthIcon!==null) this.pulseElement(this.interfaceHealthIcon,500,10);
-        
         this.health+=count;
         if (this.health>this.healthMaxCount) this.health=this.healthMaxCount;
+        
+        this.pulseElement('health',500,10);
     }
     
     addArmor(count)
     {
-        if (this.interfaceArmorIcon!==null) this.pulseElement(this.interfaceArmorIcon,500,10);
-        
         this.armor+=count;
         if (this.armor>this.armorMaxCount) this.armor=this.armorMaxCount;
+        
+        this.pulseElement('armor',500,10);
     }
     
         //
@@ -303,7 +282,7 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.respawnTick=this.core.game.timestamp+this.respawnWaitTick;
         this.passThrough=true;
         
-        if (this.isTopDownCameraOnDeath) this.cameraGotoTopDown(this.topDownCameraDistance);
+        this.cameraGotoTopDown(10000);
 
         this.playSound(this.dieSound);
         this.startAnimation(this.dieAnimation);
@@ -366,12 +345,12 @@ export default class EntityFPSPlayerClass extends EntityClass
             
         this.armor-=damage;
         if (this.armor<0) {
-            if (this.interfaceHealthIcon!==null) this.pulseElement(this.interfaceHealthIcon,500,5);
+            this.pulseElement('health',500,5);
             this.health+=this.armor;
             this.armor=0;
         }
         else {
-            if (this.interfaceArmorIcon!==null) this.pulseElement(this.interfaceArmorIcon,500,5);
+            this.pulseElement('armor',500,5);
         }
         
             // dead?
@@ -402,13 +381,13 @@ export default class EntityFPSPlayerClass extends EntityClass
     {
         if ((this.movement.x!==0) || (this.movement.z!==0)) {
             if ((this.inStandingAnimation) || (this.forceAnimationUpdate)) {
-                this.startAnimation(this.currentRunAnimation);
+                this.continueAnimation((this.currentWeapon===this.pistolWeapon)?this.runAnimationPistol:this.runAnimationM16);
             }
             this.inStandingAnimation=false;
         }
         else {
             if ((!this.inStandingAnimation) || (this.forceAnimationUpdate)) {
-                this.startAnimation(this.currentIdleAnimation);
+                this.continueAnimation((this.currentWeapon===this.pistolWeapon)?this.idleAnimationPistol:this.idleAnimationM16);
             }
             this.inStandingAnimation=true;
         }
@@ -419,11 +398,25 @@ export default class EntityFPSPlayerClass extends EntityClass
         //
         // weapons
         //
+        
+    adjustMeshesForCurrentWeapon()
+    {
+        let show=(this.currentWeapon===this.pistolWeapon);
+        
+        this.showMesh('beretta',show);
+        this.showMesh('peen',show);
+        this.showMesh('beretta_top',show);
+        this.showMesh('triger',show);
+        this.showMesh('holder',show);
+
+        this.showMesh('m16_rifle',!show);
+        this.showMesh('m16_holder_01',!show);
+        this.showMesh('shutter',!show);
+        this.showMesh('trigger',!show);
+    }   
                
     startWeaponSwitch(weapon)
     {
-        let weaponEntity;
-        
         if (weapon===this.currentWeapon) return;
         
         this.gotoWeapon=weapon;
@@ -453,8 +446,7 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.currentWeapon.show=true;
 
         this.forceAnimationUpdate=true;
-        //this.currentIdleAnimation=weaponEntity.parentIdleAnimation;
-        //this.currentRunAnimation=weaponEntity.parentRunAnimation;
+        this.adjustMeshesForCurrentWeapon();
 
         this.weaponRaiseFinishTick=this.core.game.timestamp+this.currentWeapon.runRaiseAnimation();
     }
@@ -548,6 +540,17 @@ export default class EntityFPSPlayerClass extends EntityClass
             // fire
 
         weapon.fire(this.firePosition,this.angle);
+        
+            // animations
+            
+        if (this.currentWeapon===this.pistolWeapon) {
+            this.interuptAnimation((this.inStandingAnimation)?this.fireIdleAnimationPistol:this.fireRunAnimationPistol);
+        }
+        else {
+            if (this.currentWeapon===this.m16Weapon) {
+                this.interuptAnimation((this.inStandingAnimation)?this.fireIdleAnimationM16:this.fireRunAnimationM16);
+            }
+        }
     }
     
         //
@@ -785,6 +788,17 @@ export default class EntityFPSPlayerClass extends EntityClass
         if (this.currentWeapon!==null) {
             if ((this.weaponLowerFinishTick===-1) && (this.weaponRaiseFinishTick===-1) && (this.weaponClipFinishTick===-1)) {
                 this.currentWeapon.setIdleAnimation();
+            }
+        }
+        
+            // camera switching
+            
+        if (this.isKeyDownAndClear('/')) {
+            if (this.cameraIsFirstPerson()) {
+                this.cameraGotoThirdPerson(10000,this.thirdPersonRegularCameraAngle);
+            }
+            else {
+                this.cameraGotoFirstPerson();
             }
         }
     }

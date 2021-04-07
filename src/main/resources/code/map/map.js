@@ -43,6 +43,7 @@ export default class MapClass
         this.background=new MapBackgroundClass(core);
         this.modelList=new MapModelListClass(core);
         this.soundList=new MapSoundListClass(core);
+        this.ambientSound=null;
         this.music=new MusicClass(core);
         
         this.hasShadowmap=false;
@@ -72,6 +73,7 @@ export default class MapClass
 
     release()
     {
+        this.core.audio.ambientStop();
         this.core.audio.musicStop();
         this.core.audio.soundStopAll();
         

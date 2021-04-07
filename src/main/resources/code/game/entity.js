@@ -901,6 +901,11 @@ export default class EntityClass
         return(this.core.input.isKeyDown(key));
     }
     
+    isKeyDownAndClear(key)
+    {
+        return(this.core.input.isKeyDownAndClear(key));
+    }
+    
     isMouseButtonDown(buttonIdx)
     {
         return(this.core.input.mouseButtonFlags[buttonIdx]);
