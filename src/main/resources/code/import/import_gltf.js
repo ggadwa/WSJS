@@ -910,14 +910,14 @@ export default class ImportGLTFClass
             return(this.MESH_INFORMATIONAL_REMOVE);
         }
         
-            // kart starts
+            // spots (completely custom map spots)
             
-        value=this.getCustomProperty(materialNode,meshNode,'wsjsKartStart');
+        value=this.getCustomProperty(materialNode,meshNode,'wsjsSpot');
         if (value!==null) {
             obj=this.decideMapMeshInformationalParseJSON(meshNode,value);
             if (obj===null) return(this.MESH_INFORMATIONAL_ERROR);
 
-            map.kartStartPositions.push(new PointClass(mesh.center.x,mesh.yBound.min,mesh.center.z));
+            map.spotList.add(obj.name,new PointClass(mesh.center.x,mesh.yBound.min,mesh.center.z),((obj.data===undefined)?null:obj.data));
             return(this.MESH_INFORMATIONAL_REMOVE);
         }
 

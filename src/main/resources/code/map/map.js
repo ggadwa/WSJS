@@ -6,6 +6,7 @@ import MapLightListClass from '../map/map_light_list.js';
 import MapEntityListClass from '../map/map_entity_list.js';
 import MapEffectListClass from '../map/map_effect_list.js';
 import MapCubeListClass from '../map/map_cube_list.js';
+import MapSpotListClass from '../map/map_spot_list.js';
 import MapPathClass from '../map/map_path.js';
 import MapSkyClass from '../map/map_sky.js';
 import MapBackgroundClass from '../map/map_background.js';
@@ -38,6 +39,7 @@ export default class MapClass
         this.entityList=new MapEntityListClass(core);
         this.effectList=new MapEffectListClass(core);
         this.cubeList=new MapCubeListClass(core);
+        this.spotList=new MapSpotListClass(core);
         this.path=new MapPathClass(core);
         this.sky=new MapSkyClass(core);
         this.background=new MapBackgroundClass(core);
@@ -47,8 +49,6 @@ export default class MapClass
         this.music=new MusicClass(core);
         
         this.hasShadowmap=false;
-        
-        this.kartStartPositions=[]; // a little hack for kart starting positions on kart games
         
         Object.seal(this);
     }
@@ -65,6 +65,7 @@ export default class MapClass
         if (!this.entityList.initialize()) return(false);
         if (!this.effectList.initialize()) return(false);
         if (!this.cubeList.initialize()) return(false);
+        if (!this.spotList.initialize()) return(false);
         if (!this.sky.initialize()) return(false);
         if (!this.background.initialize()) return(false);
         if (!this.modelList.initialize()) return(false);
@@ -83,6 +84,7 @@ export default class MapClass
         this.entityList.release();
         this.effectList.release();
         this.cubeList.release();
+        this.spotList.release();
         this.sky.release();
         this.background.release();
         this.modelList.release();

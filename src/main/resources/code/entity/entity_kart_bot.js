@@ -108,6 +108,7 @@ export default class EntityKartBotClass extends EntityKartBaseClass
     run()
     {
         let turnAdd,ang,drifting,brake;
+        let burstEntity;
         
         super.run();
 
@@ -124,13 +125,21 @@ export default class EntityKartBotClass extends EntityKartBaseClass
         this.pathRun();
         
             // turn towards the position
-            // and figure out if we need to drift or break
         
         turnAdd=this.angle.getTurnYTowards(this.position.angleYTo(this.gotoPosition));
         
+            // if there is a burst nearby, go for that
+        /*    
+        burstEntity=this.findClosestWithMaxAngle(this.position,this.angle,'pickup_burst',null,30);
+        if (burstEntity!==null) {
+            if (burstEntity.position.distance(this.position)<90000) turnAdd=this.angleYToEntity(burstEntity)-this.angle.y;
+        }
+        */
+            // and figure out if we need to drift or break
+        
         ang=Math.abs(turnAdd);
-        brake=(ang>=this.brakeMinAngle);
-        drifting=brake?false:(ang>this.driftMinAngle);
+        brake=(ang>=90.0);
+        drifting=brake?false:(ang>60.0);
         
             // run the kart
             

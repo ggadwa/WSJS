@@ -151,3 +151,10 @@ wsjsEntity                  Mesh is an entity definition.  Entity is x/z center 
                                     "show":true,                                [default: true]
                                     "data":{"pickupOnce":true}                  [default: null]
                                 }
+
+wsjsSpot                    Mesh is an spot definition.  Spot is x/z center of mesh and Y at the bottom of the mesh.  This is a custom point in the map, is
+                            named and can have data.  It does nothing on it's own, just something you can use in your scripts to point out parts of the map.
+                                {
+                                    "name":"start1",
+                                    "data":{}                                   [default: null]
+                                }

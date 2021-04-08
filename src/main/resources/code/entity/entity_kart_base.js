@@ -17,54 +17,25 @@ export default class EntityKartBaseClass extends EntityClass
     {
         super(core,name,jsonName,position,angle,data,mapSpawn,spawnedBy,heldBy,show);
         
-        this.maxTurnSpeed=0;
-        this.driftMaxTurnSpeed=0;
-        this.forwardAcceleration=0;
-        this.forwardDeceleration=0;
-        this.forwardMaxSpeed=0;
-        this.reverseAcceleration=0;
-        this.reverseDeceleration=0;
-        this.reverseMaxSpeed=0;
-        this.forwardBrakeDeceleration=0;
-        this.reverseBrakeDeceleration=0;
-        this.jumpHeight=0;
-        this.bounceWaitCount=0;
-        this.spinOutSpeed=0;
-        this.driftDecelerationFactor=0;
-        
-        this.burstEndTimestamp=0;
-        
-        this.turnCoolDownPeriod=0;
-        
-        this.rigidBodyMaxDrop=0;
-        this.rigidBodyMaxAngle=0;
-        this.rigidBodyTransformPerTick=0;
-        
-        this.engineSoundRateMin=0;
-        this.engineSoundRateAdd=0;
-        this.engineSoundRateAirIncrease=0;
-
-        this.smokeThickness=0;
-        this.smokeAngles=[];
-        this.smokeEffect=null;
-        
-        this.burstThickness=0;
-        this.burstAngles=[];
-        this.burstEffect=null;
-        
-        this.idleAnimation=null;
-        this.driveAnimation=null;
-        this.turnLeftAnimation=null;
-        this.turnRightAnimation=null;
-        this.spinOutAnimation=null;
-        
-        this.engineSound=null;
-        this.skidSound=null;
-        this.burstSound=null;
-        this.crashKartSound=null;
-        this.crashWallSound=null;
+            // settable by data fields
+            
+        this.maxTurnSpeed=data.turnSpeed;
+        this.driftMaxTurnSpeed=data.turnSpeed+1;
+        this.forwardAcceleration=data.acceleration;
+        this.forwardDeceleration=data.acceleration*3.0;
+        this.forwardMaxSpeed=data.speed;
+        this.reverseAcceleration=data.acceleration*0.75;
+        this.reverseDeceleration=data.acceleration*4.0;
+        this.reverseMaxSpeed=data.speed*0.7;
+        this.forwardBrakeDeceleration=this.speed*0.04;
+        this.reverseBrakeDeceleration=this.speed*0.05;
+        this.jumpHeight=1000+((500-data.weight)*0.5);
+        this.spinOutSpeed=6+((500-data.weight)*0.06);
+        this.driftDecelerationFactor=0.95+((data.weight-500)*0.0005);
         
             // variables
+        
+        this.starCount=0;
             
         this.inDrift=false;
         
@@ -75,19 +46,15 @@ export default class EntityKartBaseClass extends EntityClass
         this.spinOutCount=0;
         this.lastDriftSoundPlayIdx=-1;
         
+        this.burstEndTimestamp=0;
+        
         this.turnSmooth=0;
         this.turnCoolDown=0;
 
-        this.driftMinAngle=0;
-        this.brakeMinAngle=0;
-        this.pathNodeSlop=0;
-    
         this.lastDrawTick=0;
         
         this.engineSoundPlayIdx=0;
         this.engineSoundRateAirIncrease=0;
-        
-        this.starCount=0;
         
             // variables for bots, they
             // are here so player kart can self-drive
@@ -122,6 +89,22 @@ export default class EntityKartBaseClass extends EntityClass
         
         this.bowlingBallWeapon=null;
         
+            // animations
+            
+        this.idleAnimation={"startFrame":175,"endFrame":275,"actionFrame":0,"meshes":null};
+        this.driveAnimation={"startFrame":380,"endFrame":400,"actionFrame":0,"meshes":null};
+        this.turnLeftAnimation={"startFrame":405,"endFrame":425,"actionFrame":0,"meshes":null};
+        this.turnRightAnimation={"startFrame":435,"endFrame":455,"actionFrame":0,"meshes":null};
+        this.spinOutAnimation={"startFrame":275,"endFrame":375,"actionFrame":0,"meshes":null};
+        
+            // sounds
+            
+        this.engineSound={"name":"engine","rate":0.5,"randomRateAdd":0,"distance":800000,"loopStart":0,"loopEnd":3.0,"loop":true};
+        this.skidSound={"name":"skid","rate":1.0,"randomRateAdd":0,"distance":80000,"loopStart":0,"loopEnd":0,"loop":false};
+        this.burstSound={"name":"burst","rate":1.0,"randomRateAdd":0,"distance":50000,"loopStart":0,"loopEnd":0,"loop":false};
+        this.crashKartSound={"name":"crash","rate":1.0,"randomRateAdd":0.2,"distance":100000,"loopStart":0,"loopEnd":0,"loop":false};
+        this.crashWallSound={"name":"crash","rate":0.8,"randomRateAdd":0.2,"distance":100000,"loopStart":0,"loopEnd":0,"loop":false};
+        
             // pre-allocate
             
         this.movement=new PointClass(0,0,0);
@@ -154,57 +137,8 @@ export default class EntityKartBaseClass extends EntityClass
     {
         super.initialize();
         
-            // kart settings
-            
-        this.maxTurnSpeed=this.core.game.lookupValue(this.json.config.maxTurnSpeed,this.data,1.5);
-        this.driftMaxTurnSpeed=this.core.game.lookupValue(this.json.config.driftMaxTurnSpeed,this.data,2.5);
-        this.forwardAcceleration=this.core.game.lookupValue(this.json.config.forwardAcceleration,this.data,8);
-        this.forwardDeceleration=this.core.game.lookupValue(this.json.config.forwardDeceleration,this.data,25);
-        this.forwardMaxSpeed=this.core.game.lookupValue(this.json.config.forwardMaxSpeed,this.data,1500);
-        this.reverseAcceleration=this.core.game.lookupValue(this.json.config.reverseAcceleration,this.data,5);
-        this.reverseDeceleration=this.core.game.lookupValue(this.json.config.reverseDeceleration,this.data,35);
-        this.reverseMaxSpeed=this.core.game.lookupValue(this.json.config.reverseMaxSpeed,this.data,1000);
-        this.forwardBrakeDeceleration=this.core.game.lookupValue(this.json.config.forwardBrakeDeceleration,this.data,50);
-        this.reverseBrakeDeceleration=this.core.game.lookupValue(this.json.config.reverseBrakeDeceleration,this.data,50);
-        this.jumpHeight=this.core.game.lookupValue(this.json.config.jumpHeight,this.data,1000);
-        this.bounceWaitCount=this.core.game.lookupValue(this.json.config.bounceWaitCount,this.data,20);
-        this.spinOutSpeed=this.core.game.lookupValue(this.json.config.spinOutSpeed,this.data,6);
-        this.driftDecelerationFactor=this.core.game.lookupValue(this.json.config.driftDecelerationFactor,this.data,0.99);
-        
-        this.turnCoolDownPeriod=this.core.game.lookupValue(this.json.config.turnCoolDownPeriod,this.data,15);
+            // bowling ball weapon
 
-        this.driftMinAngle=this.core.game.lookupValue(this.json.config.driftMinAngle,this.data,60);
-        this.brakeMinAngle=this.core.game.lookupValue(this.json.config.brakeMinAngle,this.data,90);
-        this.pathNodeSlop=this.core.game.lookupValue(this.json.config.pathNodeSlop,this.data,0);
-        
-        this.rigidBodyMaxDrop=this.core.game.lookupValue(this.json.config.rigidBodyMaxDrop,this.data,0);
-        this.rigidBodyMaxAngle=this.core.game.lookupValue(this.json.config.rigidBodyMaxAngle,this.data,0);
-        this.rigidBodyTransformPerTick=this.core.game.lookupValue(this.json.config.rigidBodyTransformPerTick,this.data,0);
-        
-        this.engineSoundRateMin=this.core.game.lookupValue(this.json.config.engineSoundRateMin,this.data,0);
-        this.engineSoundRateAdd=this.core.game.lookupValue(this.json.config.engineSoundRateAdd,this.data,0);
-        this.engineSoundRateAirIncrease=this.core.game.lookupValue(this.json.config.engineSoundRateAirIncrease,this.data,0);
-
-        this.smokeThickness=this.core.game.lookupValue(this.json.config.smokeThickness,this.data,5);
-        this.smokeAngles=this.json.config.smokeAngles;
-        this.smokeEffect=this.core.game.lookupValue(this.json.config.smokeEffect,this.data,null);
-        
-        this.burstThickness=this.core.game.lookupValue(this.json.config.burstThickness,this.data,5);
-        this.burstAngles=this.json.config.burstAngles;
-        this.burstEffect=this.core.game.lookupValue(this.json.config.burstEffect,this.data,null);
-        
-        this.idleAnimation=this.core.game.lookupAnimationValue(this.json.animations.idleAnimation);
-        this.driveAnimation=this.core.game.lookupAnimationValue(this.json.animations.driveAnimation);
-        this.turnLeftAnimation=this.core.game.lookupAnimationValue(this.json.animations.turnLeftAnimation);
-        this.turnRightAnimation=this.core.game.lookupAnimationValue(this.json.animations.turnRightAnimation);
-        this.spinOutAnimation=this.core.game.lookupAnimationValue(this.json.animations.spinOutAnimation);
-        
-        this.engineSound=this.core.game.lookupSoundValue(this.json.sounds.engineSound);
-        this.skidSound=this.core.game.lookupSoundValue(this.json.sounds.skidSound);
-        this.burstSound=this.core.game.lookupSoundValue(this.json.sounds.burstSound);
-        this.crashKartSound=this.core.game.lookupSoundValue(this.json.sounds.crashKartSound);
-        this.crashWallSound=this.core.game.lookupSoundValue(this.json.sounds.crashWallSound);
-        
         this.bowlingBallWeapon=this.addEntity('weapon_bowling_ball','weapon_bowling_ball',new PointClass(0,0,0),new PointClass(0,0,0),null,this,this,true);
             
         return(true);
@@ -221,7 +155,7 @@ export default class EntityKartBaseClass extends EntityClass
         
     ready()
     {
-        let startIdx;
+        let spot;
         
         super.ready();
          
@@ -246,7 +180,7 @@ export default class EntityKartBaseClass extends EntityClass
         this.lastDrawTick=this.core.game.timestamp;
         this.rigidGotoAngle.setFromValues(0,0,0);
         
-            // reset the stars
+            // star count
             
         this.starCount=0;
         
@@ -262,12 +196,10 @@ export default class EntityKartBaseClass extends EntityClass
         this.firstNodeIdx=this.findKeyNodeIndex('first');
         this.midpointNodeIdx=this.findKeyNodeIndex('midpoint');
         
-            // get a random place
+            // get a random place from the spots
             
-        startIdx=Math.trunc(this.core.game.map.kartStartPositions.length*Math.random());
-        this.position.setFromPoint(this.core.game.map.kartStartPositions[startIdx]);
-        
-        this.core.game.map.kartStartPositions.splice(startIdx,1);
+        spot=this.core.game.map.spotList.getRandomUnusedSpotAndMark();
+        this.position.setFromPoint(spot.position);
 
             // idle animation
             
@@ -286,7 +218,7 @@ export default class EntityKartBaseClass extends EntityClass
         this.smokePosition.rotateY(null,((this.angle.y+offsetAngleY)%360));
         this.smokePosition.addPoint(this.position);
 
-        this.addEffect(this,this.smokeEffect,this.smokePosition,null,true);
+        this.addEffect(this,'tire_smoke',this.smokePosition,null,true);
     }
     
     createBurst(offsetAngleY)
@@ -297,7 +229,7 @@ export default class EntityKartBaseClass extends EntityClass
         this.burstPosition.rotateY(null,((this.angle.y+offsetAngleY)%360));
         this.burstPosition.addPoint(this.position);
 
-        this.addEffect(this,this.burstEffect,this.burstPosition,null,true);
+        this.addEffect(this,'exhaust',this.burstPosition,null,true);
     }
     
         //
@@ -352,7 +284,7 @@ export default class EntityKartBaseClass extends EntityClass
         
             // turn on bounce
             
-        this.bounceCount=this.bounceWaitCount;
+        this.bounceCount=20;
         this.bounceReflectMovement.setFromPoint(this.rotMovement);
         this.bounceReflectMovement.scale(-1);
         
@@ -375,7 +307,7 @@ export default class EntityKartBaseClass extends EntityClass
         
             // turn on reflect
             
-        this.reflectCount=this.bounceWaitCount;
+        this.reflectCount=20;
         this.bounceReflectMovement.setFromPoint(this.movement);
         this.bounceReflectMovement.rotateY(null,hitEntity.position.angleYTo(this.position));
         
@@ -456,7 +388,7 @@ export default class EntityKartBaseClass extends EntityClass
         
             // have we hit the next drive to position?
             
-        if (this.position.distance(this.gotoPosition)<this.pathNodeSlop) {
+        if (this.position.distance(this.gotoPosition)<8000) {
             fromNodeIdx=this.pathNodeIdx;
             
             if (this.getNodeKey(this.pathNodeIdx)==='end') {
@@ -477,7 +409,6 @@ export default class EntityKartBaseClass extends EntityClass
     moveKart(turnAdd,moveForward,moveReverse,drifting,brake,fire,jump)
     {
         let maxTurnSpeed,speed,rate;
-        let smokeAngle,burstAngle;
         
             // spinning
             
@@ -588,7 +519,7 @@ export default class EntityKartBaseClass extends EntityClass
             }
             else {
                 if (this.turnCoolDown===0) {
-                    this.turnCoolDown=this.turnCoolDownPeriod;
+                    this.turnCoolDown=15;
                     this.turnSmooth=turnAdd;
                 }
                 
@@ -629,39 +560,33 @@ export default class EntityKartBaseClass extends EntityClass
             // smoke if drifting, spinning out, bursting, or turning
             // without moving
             
-        if (this.smokeEffect!==null) {
-            if ((this.inDrift) || (this.spinOutCount!==0) || ((turnAdd!==0) && (this.movement.z===0))) {
-                if (this.smokeCoolDownCount===0) {
-                    this.smokeCoolDownCount=this.smokeThickness;
-                    for (smokeAngle of this.smokeAngles) {
-                        this.createSmoke(smokeAngle);
-                    }
-                }
-                else {
-                    this.smokeCoolDownCount--;
-                }
+        if ((this.inDrift) || (this.spinOutCount!==0) || ((turnAdd!==0) && (this.movement.z===0))) {
+            if (this.smokeCoolDownCount===0) {
+                this.smokeCoolDownCount=2;
+                this.createSmoke(135);
+                this.createSmoke(225);
+            }
+            else {
+                this.smokeCoolDownCount--;
             }
         }
         
             // burst if bursting
             
-        if (this.burstEffect!==null) {
-            if (this.burstEndTimestamp!==0) {
-                if (this.burstCoolDownCount===0) {
-                    this.burstCoolDownCount=this.burstThickness;
-                    for (burstAngle of this.burstAngles) {
-                        this.createBurst(burstAngle);
-                    }
-                }
-                else {
-                    this.burstCoolDownCount--;
-                }
+        if (this.burstEndTimestamp!==0) {
+            if (this.burstCoolDownCount===0) {
+                this.burstCoolDownCount=1;
+                this.createBurst(135);
+                this.createBurst(225);
+            }
+            else {
+                this.burstCoolDownCount--;
             }
         }
         
             // update the sound
         
-        rate=this.engineSoundRateMin+(((Math.abs(this.movement.z)/this.forwardMaxSpeed)*this.engineSoundRateAdd)+this.engineSoundRateAirIncrease);
+        rate=0.5+(((Math.abs(this.movement.z)/this.forwardMaxSpeed)*0.8)+this.engineSoundRateAirIncrease);
         if (this.isStandingOnFloor()) {
             if (this.engineSoundRateAirIncrease>=0) {
                 this.engineSoundRateAirIncrease-=0.01;
@@ -671,7 +596,7 @@ export default class EntityKartBaseClass extends EntityClass
         else {
             if (this.engineSoundRateAirIncrease<=this.engineSoundRateAirIncrease) {
                 this.engineSoundRateAirIncrease+=0.01;
-                if (this.engineSoundRateAirIncrease>this.engineSoundRateAirIncrease) this.engineSoundRateAirIncrease=this.engineSoundRateAirIncrease;
+                if (this.engineSoundRateAirIncrease>0.2) this.engineSoundRateAirIncrease=0.2;
             }
         }
         
@@ -885,7 +810,7 @@ export default class EntityKartBaseClass extends EntityClass
             this.rigidGotoAngle.z=0;
         }
         else {
-            this.getRigidBodyAngle(this.rigidAngle,this.rigidBodyMaxDrop,this.rigidBodyMaxAngle);
+            this.getRigidBodyAngle(this.rigidAngle,3000,25);
 
                 // go towards the larger angle of the X/Z
                 // and then reduce the other angle in half
@@ -904,7 +829,7 @@ export default class EntityKartBaseClass extends EntityClass
             // actual draw angles, depending on how
             // much time has passed
             
-        speed=this.rigidBodyTransformPerTick*(timestamp-this.lastDrawTick);
+        speed=(timestamp-this.lastDrawTick)*0.025;
         this.lastDrawTick=timestamp;
         
         this.angle.turnXTowards(this.rigidGotoAngle.x,speed);

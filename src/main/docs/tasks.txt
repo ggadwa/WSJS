@@ -22,6 +22,8 @@ SCRIPT REDO
    - spooky mixed sounds for dungeon (add to wsjsMap)
 
 - player: fall damage lights up all damage hit sides
+- kart: make grid of places to go, always go to next closest one +1
+- kart: crashes have weight effect
 
 [NEW KART MAP - get rid of ground and put flag ground segments, fix seams]
 

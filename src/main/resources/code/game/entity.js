@@ -222,6 +222,11 @@ export default class EntityClass
         return(entity.position.distance(this.position)<dist);
     }
     
+    angleYToEntity(entity)
+    {
+        return(this.position.angleYTo(entity.position));
+    }
+    
     turnYTowardsEntity(entity,turnSpeed)
     {
         return(this.angle.turnYTowards(this.position.angleYTo(entity.position),turnSpeed));
@@ -244,7 +249,7 @@ export default class EntityClass
     
     findClosestWithMaxAngle(position,angle,namePrefix,skipEntity,maxAngle)
     {
-        return(this.core.game.map.entityList.findClosestWithMaxAngle(position,angle,namePrefix,maxAngle));
+        return(this.core.game.map.entityList.findClosestWithMaxAngle(position,angle,namePrefix,skipEntity,maxAngle));
     }
     
         //
