@@ -2,8 +2,6 @@ import PointClass from '../utility/point.js';
 import EntityFPSPlayerClass from '../entity/entity_fps_player.js';
 import EntityFPSBotClass from '../entity/entity_fps_bot.js';
 import EntityFPSMonsterClass from '../entity/entity_fps_monster.js';
-import EntityKartPlayerClass from '../entity/entity_kart_player.js';
-import EntityKartBotClass from '../entity/entity_kart_bot.js';
 
 //
 // map entity list class
@@ -77,10 +75,6 @@ export default class MapEntityListClass
                 return(EntityFPSBotClass);
             case 'fps_monster':
                 return(EntityFPSMonsterClass);
-            case 'kart_player':
-                return(EntityKartPlayerClass);
-            case 'kart_bot':
-                return(EntityKartBotClass);
         }
         
         console.log('Unknown entity type: '+json.type);
@@ -312,6 +306,7 @@ export default class MapEntityListClass
                 if (entity===skipEntity) continue;
             }
             if (namePrefix!==null) {
+                console.info(entity.name+'>'+namePrefix);
                 if (!entity.name.startsWith(namePrefix)) continue;
             }
             
