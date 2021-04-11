@@ -1,4 +1,5 @@
 import PointClass from '../utility/point.js';
+import LineClass from '../utility/line.js';
 import Matrix4Class from '../utility/matrix4.js';
 import MapPathNodeClass from '../map/map_path_node.js';
 
@@ -20,6 +21,9 @@ export default class MapPathClass
 
         this.editorSplitStartNodeIdx=-1;
         this.editorSplitEndNodeIdx=-1;
+        this.editorParentNodeIdx=-1;
+        
+        Object.seal(this);
     }
     
         //
@@ -42,6 +46,85 @@ export default class MapPathClass
             if (node.key!==null) this.keyNodes.push(n);
             if (node.spawn) this.spawnNodes.push(n);
         }
+    }
+    
+        //
+        // builds a perpendicular line of a certain length
+        // that follows the path of the nodes, usually reserved
+        // for nodes that have a single path as they are average
+        //
+    
+    buildPerpendicularLine(node,lineLen)
+    {
+        let n,angY,angY2;
+        let rotPoint=new PointClass(0,0,0);
+        let p1=new PointClass(0,0,0);
+        let p2=new PointClass(0,0,0);
+
+        node.perpendicularLine=null;
+        
+            // average all the perpendiculars coming from
+            // any linked node to this node
+            
+        for (n=0;n!=node.links.length;n++) {
+            angY=this.nodes[node.links[n]].position.angleYTo(node.position);
+
+            angY2=angY+90.0;
+            if (angY2>360.0) angY2-=360.0;
+
+            rotPoint.setFromValues(0,0,lineLen);
+            rotPoint.rotateY(null,angY2);
+            p1.setFromAddPoint(node.position,rotPoint);
+            p2.setFromSubPoint(node.position,rotPoint);
+            
+            if (node.perpendicularLine===null) {
+                node.perpendicularLine=new LineClass(p1,p2);
+            }
+            else {
+                node.perpendicularLine.average(p1,p2);
+            }
+        }
+    }
+        
+    buildPerpendicularLines(lineLen)
+    {
+        let node;
+        
+        for (node of this.nodes) {
+            this.buildPerpendicularLine(node,lineLen);
+        }
+    }
+    
+        //
+        // perpendicular line collision
+        // if collide, return distance, or -1
+        // for no collision
+        //
+        
+    checkPerpendicularXZCollision(nodeIdx,checkLine)
+    {
+        let sx1,sx2,sz1,sz2,px,pz;
+        let f,s,t;
+        let line=this.nodes[nodeIdx].perpendicularLine;
+            
+        sx1=line.p2.x-line.p1.x;
+        sz1=line.p2.z-line.p1.z;
+        sx2=checkLine.p2.x-checkLine.p1.x;
+        sz2=checkLine.p2.z-checkLine.p1.z;
+
+        f=((-sx2*sz1)+(sx1*sz2));
+        if (f===0) return(-1);
+        
+        s=((-sz1*(line.p1.x-checkLine.p1.x))+(sx1*(line.p1.z-checkLine.p1.z)))/f;
+        t=((sx2*(line.p1.z-checkLine.p1.z))-(sz2*(line.p1.x-checkLine.p1.x)))/f;
+
+        if ((s>=0)&&(s<=1)&&(t>=0)&&(t<=1)) {
+            px=checkLine.p1.x-(line.p1.x+(t*sx1));
+            pz=checkLine.p1.z-(line.p1.z+(t*sz1));
+            return(Math.sqrt((px*px)+(pz*pz)));
+        }
+        
+        return(-1);
     }
     
         //
@@ -107,9 +190,10 @@ export default class MapPathClass
         
     drawPath()
     {
-        let n,k,nNode,nLine,node,linkNode,selNodeIdx;
+        let n,k,nNode,nLinkLine,nPerpendicularLine,node,linkNode,selNodeIdx;
         let vertices,indexes,vIdx,iIdx,elementIdx;
-        let lineElementOffset,lineVertexStartIdx;
+        let linkLineElementOffset,linkLineVertexStartIdx;
+        let perpendicularLineElementOffset,perpendicularLineVertexStartIdx;
         let vertexBuffer,indexBuffer;
         let nodeSize=350;
         let drawSlop=50;
@@ -122,18 +206,26 @@ export default class MapPathClass
         nNode=this.nodes.length;
         if (nNode===0) return;
         
-            // get total line count
+            // get total link line count
             
-        nLine=0;
+        nLinkLine=0;
         
         for (n=0;n!==nNode;n++) {
-            nLine+=this.nodes[n].links.length;
+            nLinkLine+=this.nodes[n].links.length;
+        }
+        
+            // get perpendicular line count
+            
+        nPerpendicularLine=0;
+        
+        for (n=0;n!==nNode;n++) {
+            if (this.nodes[n].perpendicularLine!==null) nPerpendicularLine++;
         }
         
             // path nodes
             
-        vertices=new Float32Array(((3*4)*nNode)+((3*2)*nLine));
-        indexes=new Uint16Array((nNode*6)+(nLine*2));
+        vertices=new Float32Array(((3*4)*nNode)+((3*2)*(nLinkLine+nPerpendicularLine)));
+        indexes=new Uint16Array((nNode*6)+((nLinkLine+nPerpendicularLine)*2));
         
             // nodes
         
@@ -190,10 +282,10 @@ export default class MapPathClass
             indexes[iIdx++]=elementIdx+3;
         }
         
-            // lines
+            // link lines
             
-        lineElementOffset=iIdx;
-        lineVertexStartIdx=Math.trunc(vIdx/3);
+        linkLineElementOffset=iIdx;
+        linkLineVertexStartIdx=Math.trunc(vIdx/3);
         
         for (n=0;n!==nNode;n++) {
             node=this.nodes[n];
@@ -209,9 +301,30 @@ export default class MapPathClass
                 vertices[vIdx++]=linkNode.position.y+drawSlop;
                 vertices[vIdx++]=linkNode.position.z;
 
-                indexes[iIdx++]=lineVertexStartIdx++;
-                indexes[iIdx++]=lineVertexStartIdx++;
+                indexes[iIdx++]=linkLineVertexStartIdx++;
+                indexes[iIdx++]=linkLineVertexStartIdx++;
             }
+        }
+        
+            // perpendicular lines
+            
+        perpendicularLineElementOffset=iIdx;
+        perpendicularLineVertexStartIdx=Math.trunc(vIdx/3);
+        
+        for (n=0;n!==nNode;n++) {
+            node=this.nodes[n];
+            if (node.perpendicularLine===null) continue;
+
+            vertices[vIdx++]=node.perpendicularLine.p1.x;
+            vertices[vIdx++]=node.perpendicularLine.p1.y+drawSlop;
+            vertices[vIdx++]=node.perpendicularLine.p1.z;
+
+            vertices[vIdx++]=node.perpendicularLine.p2.x;
+            vertices[vIdx++]=node.perpendicularLine.p2.y+drawSlop;
+            vertices[vIdx++]=node.perpendicularLine.p2.z;
+
+            indexes[iIdx++]=perpendicularLineVertexStartIdx++;
+            indexes[iIdx++]=perpendicularLineVertexStartIdx++;
         }
         
             // build the buffers
@@ -230,10 +343,15 @@ export default class MapPathClass
             
         shader.drawStart();
         
-            // the lines
+            // the link lines
             
         gl.uniform3f(shader.colorUniform,0.0,0.0,1.0);
-        gl.drawElements(gl.LINES,(nLine*2),gl.UNSIGNED_SHORT,(lineElementOffset*2));
+        gl.drawElements(gl.LINES,(nLinkLine*2),gl.UNSIGNED_SHORT,(linkLineElementOffset*2));
+        
+            // the perpendicular lines
+            
+        gl.uniform3f(shader.colorUniform,0.3,0.3,1.0);
+        gl.drawElements(gl.LINES,(nPerpendicularLine*2),gl.UNSIGNED_SHORT,(perpendicularLineElementOffset*2));
         
             // the nodes
             

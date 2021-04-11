@@ -306,7 +306,6 @@ export default class MapEntityListClass
                 if (entity===skipEntity) continue;
             }
             if (namePrefix!==null) {
-                console.info(entity.name+'>'+namePrefix);
                 if (!entity.name.startsWith(namePrefix)) continue;
             }
             

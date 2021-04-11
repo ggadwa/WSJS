@@ -14,7 +14,10 @@ export default class MapPathNodeClass
         this.pathHints=pathHints;
         this.data=(data===undefined)?null:data;
 
-        this.pathHintCounts=null;   // used in path hints construction
+        this.pathHintCounts=null;       // used in path hints construction
+        this.perpendicularLine=null;    // a line that can be used for certain AI routines
+        
+        Object.seal(this);
     }
     
 }

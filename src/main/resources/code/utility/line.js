@@ -26,6 +26,12 @@ export default class LineClass
         this.p2.addPoint(pnt);
     }
     
+    average(pnt1,pnt2)
+    {
+        this.p1.average(pnt1);
+        this.p2.average(pnt2);
+    }
+    
     equals(line)
     {
         if ((this.p1.equals(line.p1)) && (this.p2.equals(line.p2))) return(true);
