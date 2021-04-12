@@ -38,6 +38,37 @@ export default class LineClass
         return((this.p1.equals(line.p2)) && (this.p2.equals(line.p1)));
     }
     
+    length()
+    {
+        return(this.p1.distance(this.p2));
+    }
+    
+    getFactorForXZPointOnLine(pnt)
+    {
+        let len,hitLen;
+        
+        len=this.p1.distanceScrubY(this.p2);
+        hitLen=this.p1.distanceScrubY(pnt);
+        
+        return(hitLen/len);
+    }
+    
+    getXZPointOnLineForFactor(f,pnt)
+    {
+        let len;
+        
+        len=this.p1.distance(this.p2);
+        
+        pnt.x=this.p2.x-this.p1.x;
+        pnt.y=0;
+        pnt.z=this.p2.z-this.p1.z;
+        pnt.normalize();
+        pnt.scale(len*f);
+        
+        pnt.x+=this.p1.x;
+        pnt.z+=this.p1.z;
+    }
+    
     boxBoundCollision(xBound,yBound,zBound)
     {
         if ((this.p1.x<xBound.min) && (this.p2.x<xBound.min)) return(false);

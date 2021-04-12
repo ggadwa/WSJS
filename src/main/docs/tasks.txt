@@ -1,5 +1,13 @@
 SCRIPT REDO
 
+
+---> kart
+      - get rid of trackZOffset
+      - move in new perp based AI
+      - possibly move behind other kart if have bowling ball and certain distance
+
+- developer turn off ambients like dialogs do
+
 - karts
 - player (need to preserve data changes)
 - bot

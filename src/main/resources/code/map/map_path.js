@@ -50,48 +50,32 @@ export default class MapPathClass
     
         //
         // builds a perpendicular line of a certain length
-        // that follows the path of the nodes, usually reserved
-        // for nodes that have a single path as they are average
+        // that follows the nodes by index, creating a series
+        // of lines that follow the a loop of nodes
         //
     
-    buildPerpendicularLine(node,lineLen)
+    buildPerpendicularLineForLoop(startNodeIdx,endNodeIdx,lineLen)
     {
-        let n,angY,angY2;
+        let n,angY,node,prevNode;
         let rotPoint=new PointClass(0,0,0);
         let p1=new PointClass(0,0,0);
         let p2=new PointClass(0,0,0);
-
-        node.perpendicularLine=null;
         
-            // average all the perpendiculars coming from
-            // any linked node to this node
+        for (n=startNodeIdx;n<=endNodeIdx;n++) {
+            node=this.nodes[n];
+            prevNode=this.nodes[(n===startNodeIdx)?endNodeIdx:(n-1)];
             
-        for (n=0;n!=node.links.length;n++) {
-            angY=this.nodes[node.links[n]].position.angleYTo(node.position);
+            angY=prevNode.position.angleYTo(node.position);
 
-            angY2=angY+90.0;
-            if (angY2>360.0) angY2-=360.0;
+            angY+=90.0;
+            if (angY>360.0) angY-=360.0;
 
             rotPoint.setFromValues(0,0,lineLen);
-            rotPoint.rotateY(null,angY2);
+            rotPoint.rotateY(null,angY);
             p1.setFromAddPoint(node.position,rotPoint);
             p2.setFromSubPoint(node.position,rotPoint);
-            
-            if (node.perpendicularLine===null) {
-                node.perpendicularLine=new LineClass(p1,p2);
-            }
-            else {
-                node.perpendicularLine.average(p1,p2);
-            }
-        }
-    }
-        
-    buildPerpendicularLines(lineLen)
-    {
-        let node;
-        
-        for (node of this.nodes) {
-            this.buildPerpendicularLine(node,lineLen);
+
+            node.perpendicularLine=new LineClass(p1.copy(),p2.copy());
         }
     }
     
@@ -101,9 +85,9 @@ export default class MapPathClass
         // for no collision
         //
         
-    checkPerpendicularXZCollision(nodeIdx,checkLine)
+    checkPerpendicularXZCollision(nodeIdx,checkLine,hitPnt)
     {
-        let sx1,sx2,sz1,sz2,px,pz;
+        let sx1,sx2,sz1,sz2;
         let f,s,t;
         let line=this.nodes[nodeIdx].perpendicularLine;
             
@@ -113,18 +97,33 @@ export default class MapPathClass
         sz2=checkLine.p2.z-checkLine.p1.z;
 
         f=((-sx2*sz1)+(sx1*sz2));
-        if (f===0) return(-1);
+        if (f===0) return(false);
         
         s=((-sz1*(line.p1.x-checkLine.p1.x))+(sx1*(line.p1.z-checkLine.p1.z)))/f;
         t=((sx2*(line.p1.z-checkLine.p1.z))-(sz2*(line.p1.x-checkLine.p1.x)))/f;
 
         if ((s>=0)&&(s<=1)&&(t>=0)&&(t<=1)) {
-            px=checkLine.p1.x-(line.p1.x+(t*sx1));
-            pz=checkLine.p1.z-(line.p1.z+(t*sz1));
-            return(Math.sqrt((px*px)+(pz*pz)));
+            if (hitPnt!==null) {
+                hitPnt.x=line.p1.x+(t*sx1);
+                hitPnt.z=line.p1.z+(t*sz1);
+            }
+            return(true);
         }
         
-        return(-1);
+        return(false);
+    }
+    
+    translatePerpendicularXZHitToOtherPerpendicularXZHit(hitNodeIdx,hitPnt,otherNodeIdx,otherHitPnt)
+    {
+        let line=this.nodes[hitNodeIdx].perpendicularLine;
+        let otherLine=this.nodes[otherNodeIdx].perpendicularLine;
+        let f;
+        
+            // get the line factor
+            
+        f=line.getFactorForXZPointOnLine(hitPnt);
+        console.info('factor='+f);
+        otherLine.getXZPointOnLineForFactor(f,otherHitPnt);
     }
     
         //
