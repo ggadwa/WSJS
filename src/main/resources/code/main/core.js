@@ -31,7 +31,7 @@ export default class CoreClass
     {
             // the project
 
-        this.project=project;
+        this.project=new project(this);
         
             // some testing flags
             

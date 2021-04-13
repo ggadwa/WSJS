@@ -216,6 +216,11 @@ export default class EntityClass
     {
         return(this.core.game.map.entityList.getPlayer());
     }
+    
+    getEntityList()
+    {
+        return(this.core.game.map.entityList.entities);
+    }
         
     isEntityInRange(entity,dist)
     {
@@ -247,9 +252,9 @@ export default class EntityClass
         }
     }
     
-    findClosestWithMaxAngle(position,angle,namePrefix,skipEntity,maxAngle)
+    findClosestWithMaxAngle(position,angle,namePrefix,skipEntity,maxAngle,maxDistance)
     {
-        return(this.core.game.map.entityList.findClosestWithMaxAngle(position,angle,namePrefix,skipEntity,maxAngle));
+        return(this.core.game.map.entityList.findClosestWithMaxAngle(position,angle,namePrefix,skipEntity,maxAngle,maxDistance));
     }
     
         //
@@ -265,9 +270,34 @@ export default class EntityClass
         // node and path utilities
         //
         
-    getPathNodeList()
+    getRandomKeyNodeIndex()
     {
-        return(this.core.game.map.path.nodes);
+        return(this.core.game.map.path.getRandomKeyNodeIndex());
+    }
+    
+    findKeyNodeIndex(key)
+    {
+        return(this.core.game.map.path.findKeyNodeIndex(key));
+    }
+    
+    getNodeKey(nodeIdx)
+    {
+        return(this.core.game.map.path.getNodeKey(nodeIdx));
+    }
+    
+    getNodeData(nodeIdx)
+    {
+        return(this.core.game.map.path.getNodeData(nodeIdx));
+    }
+    
+    getNodePosition(nodeIdx)
+    {
+        return(this.core.game.map.path.getNodePosition(nodeIdx));
+    }
+    
+    getYAngleBetweenNodes(fromNodeIdx,toNodeIdx)
+    {
+        return(this.core.game.map.path.getYAngleBetweenNodes(fromNodeIdx,toNodeIdx));
     }
     
     findNearestPathNode(maxDistance)
@@ -416,42 +446,7 @@ export default class EntityClass
             if (idx===origIdx) return;      // ran out of spots, nothing we can do
         }
     }
-    
-    getRandomKeyNodeIndex()
-    {
-        let keyNodes=this.core.game.map.path.keyNodes;
-        return(keyNodes[Math.trunc(keyNodes.length*Math.random())]);
-    }
-    
-    findKeyNodeIndex(key)
-    {
-        let n;
-        let keyNodes=this.core.game.map.path.keyNodes;
         
-        for (n=0;n!==keyNodes.length;n++) {
-            if (this.core.game.map.path.nodes[keyNodes[n]].key===key) return(keyNodes[n]);
-        }
-        
-        return(-1);
-    }
-    
-    getNodeKey(nodeIdx)
-    {
-        if (this.core.game.map.path.nodes[nodeIdx].key===undefined) return(null);
-        return(this.core.game.map.path.nodes[nodeIdx].key);
-    }
-    
-    getNodeData(nodeIdx)
-    {
-        if (this.core.game.map.path.nodes[nodeIdx].data===undefined) return(null);
-        return(this.core.game.map.path.nodes[nodeIdx].data);
-    }
-    
-    getNodePosition(nodeIdx)
-    {
-        return(this.core.game.map.path.nodes[nodeIdx].position);
-    }
-    
     turnYTowardsNode(nodeIdx,turnSpeed)
     {
         return(this.angle.turnYTowards(this.position.angleYTo(this.core.game.map.path.nodes[nodeIdx].position),turnSpeed));
@@ -467,10 +462,14 @@ export default class EntityClass
         pnt.setFromSubPoint(this.core.game.map.path.nodes[nodeIdx].position,this.position);
     }
     
-    getYAngleBetweenNodes(fromNodeIdx,toNodeIdx)
+    checkPathPerpendicularXZCollision(nodeIdx,line,hitPnt)
     {
-        let nodes=this.core.game.map.path.nodes;
-        return(nodes[fromNodeIdx].position.angleYTo(nodes[toNodeIdx].position));
+        return(this.core.game.map.path.checkPerpendicularXZCollision(nodeIdx,line,hitPnt));
+    }
+    
+    translatePathPerpendicularXZHitToOtherPerpendicularXZHit(hitNodeIdx,hitPnt,otherNodeIdx,otherHitPnt)
+    {
+        return(this.core.game.map.path.translatePerpendicularXZHitToOtherPerpendicularXZHit(hitNodeIdx,hitPnt,otherNodeIdx,otherHitPnt));
     }
     
         //

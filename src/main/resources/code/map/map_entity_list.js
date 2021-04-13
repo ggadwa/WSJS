@@ -293,7 +293,7 @@ export default class MapEntityListClass
         return(null);
     }
     
-    findClosestWithMaxAngle(position,angle,namePrefix,skipEntity,maxAngle)
+    findClosestWithMaxAngle(position,angle,namePrefix,skipEntity,maxAngle,maxDistance)
     {
         let d,dist,ang,y,addway,subway;
         let entity,foundEntity;
@@ -330,6 +330,8 @@ export default class MapEntityListClass
                 // then distance
             
             d=entity.position.distance(position);
+            if (d>maxDistance) continue;
+            
             if ((foundEntity===null) || (d<dist)) {
                 dist=d;
                 foundEntity=entity;

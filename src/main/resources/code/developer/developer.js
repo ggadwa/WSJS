@@ -691,6 +691,7 @@ export default class DeveloperClass
             
         this.core.audio.ambientStop();
         this.core.audio.musicStop();
+        this.core.audio.soundPauseAllLooping();
 
             // timing setup
             

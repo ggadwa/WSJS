@@ -53,14 +53,30 @@ export default class MapPathClass
         // that follows the nodes by index, creating a series
         // of lines that follow the a loop of nodes
         //
-    
-    buildPerpendicularLineForLoop(startNodeIdx,endNodeIdx,lineLen)
+        
+    buildPerpendicularLineForLoop(startNodeKey,endNodeKey,lineLen)
     {
-        let n,angY,node,prevNode;
+        let n,startNodeIdx,endNodeIdx,angY,node,prevNode;
         let rotPoint=new PointClass(0,0,0);
         let p1=new PointClass(0,0,0);
         let p2=new PointClass(0,0,0);
         
+            // get start and end node
+            
+        startNodeIdx=this.findKeyNodeIndex(startNodeKey);
+        if (startNodeIdx===-1) {
+            console.log(`Unknown node key: ${startNodeKey}`);
+            return;
+        }
+        
+        endNodeIdx=this.findKeyNodeIndex(endNodeKey);
+        if (endNodeIdx===-1) {
+            console.log(`Unknown node key: ${endNodeKey}`);
+            return;
+        }
+
+            // build the loop perpendiculars
+            
         for (n=startNodeIdx;n<=endNodeIdx;n++) {
             node=this.nodes[n];
             prevNode=this.nodes[(n===startNodeIdx)?endNodeIdx:(n-1)];
@@ -122,8 +138,49 @@ export default class MapPathClass
             // get the line factor
             
         f=line.getFactorForXZPointOnLine(hitPnt);
-        console.info('factor='+f);
         otherLine.getXZPointOnLineForFactor(f,otherHitPnt);
+    }
+    
+        //
+        // utilities
+        //
+        
+    getRandomKeyNodeIndex()
+    {
+        return(this.keyNodes[Math.trunc(this.keyNodes.length*Math.random())]);
+    }
+    
+    findKeyNodeIndex(key)
+    {
+        let n;
+        
+        for (n=0;n!==this.keyNodes.length;n++) {
+            if (this.nodes[this.keyNodes[n]].key===key) return(this.keyNodes[n]);
+        }
+        
+        return(-1);
+    }
+    
+    getNodeKey(nodeIdx)
+    {
+        if (this.nodes[nodeIdx].key===undefined) return(null);
+        return(this.nodes[nodeIdx].key);
+    }
+    
+    getNodeData(nodeIdx)
+    {
+        if (this.nodes[nodeIdx].data===undefined) return(null);
+        return(this.nodes[nodeIdx].data);
+    }
+    
+    getNodePosition(nodeIdx)
+    {
+        return(this.nodes[nodeIdx].position);
+    }
+    
+    getYAngleBetweenNodes(fromNodeIdx,toNodeIdx)
+    {
+        return(this.nodes[fromNodeIdx].position.angleYTo(this.nodes[toNodeIdx].position));
     }
     
         //
