@@ -414,7 +414,8 @@ export default class GameLoadClass
         game.core.audio.setListenerToEntity(game.map.entityList.getPlayer());
         
             // ready all the entities
-            
+        
+        game.map.effectList.ready();    
         game.map.entityList.ready();
        
             // start the main loop

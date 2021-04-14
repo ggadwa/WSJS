@@ -65,7 +65,7 @@ export default class SoundPlayClass
             this.pannerNode=ctx.createPanner();
             
             this.pannerNode.panningModel='HRTF';
-            this.pannerNode.distanceModel='inverse';
+            this.pannerNode.distanceModel='linear';
             this.pannerNode.refDistance=distance*0.25;
             this.pannerNode.maxDistance=distance;
             this.pannerNode.rolloffFactor=1;

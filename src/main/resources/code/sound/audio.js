@@ -8,7 +8,7 @@ export default class AudioClass
     {
         this.core=core;
         
-        this.MAX_CONCURRENT_SOUNDS=8;                   // maximum number of concurrent sounds you can have playing
+        this.MAX_CONCURRENT_SOUNDS=64;                   // maximum number of concurrent sounds you can have playing
         
         this.audioCTX=null;
         

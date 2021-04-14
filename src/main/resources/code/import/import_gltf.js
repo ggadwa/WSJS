@@ -1179,6 +1179,8 @@ export default class ImportGLTFClass
             if (obj.lightMin!==undefined) map.lightList.lightMin.setFromValues(obj.lightMin.r,obj.lightMin.g,obj.lightMin.b);
             if (obj.lightMax!==undefined) map.lightList.lightMax.setFromValues(obj.lightMax.r,obj.lightMax.g,obj.lightMax.b);
             
+            if (obj.ambientSound!==undefined) map.ambientSound=obj.ambientSound;
+            
             return(true);
         }
         

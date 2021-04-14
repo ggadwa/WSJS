@@ -2,7 +2,7 @@ SCRIPT REDO
 
 - player (need to preserve data changes)
 - bot
-- monsters
+- monsters (make this a base class)
 
 - EntityCacheClass gone!
 
@@ -14,15 +14,6 @@ SCRIPT REDO
 - bots: need to recheck everything
    - make sure pauses at elevators are working
 
-- ambients (on effects)
-   - crackling fire
-   - fountain
-   - wind for castle
-   - spooky mixed sounds for dungeon (add to wsjsMap)
-
-- player: fall damage lights up all damage hit sides
-- kart: make grid of places to go, always go to next closest one +1
-- kart: crashes have weight effect
 
 [NEW KART MAP - get rid of ground and put flag ground segments, fix seams]
 
@@ -40,15 +31,11 @@ INTERFACE
   - gamepad support
 
 DEMOS
-  - kart: weird bug with laps near goal line
+  - kart: crashes have weight effect
   - kart: going backwards
-  - fps: pulses need to be in json
-  - fps: bots run away if no ammo?
-  - fps: death messages by game with json setup
 
 MISC
   - run some more profiling
-  - eventually clean up entity and unnecessary pass through APIs from old version
 
 NETWORKING
   - need map_sync message (timestamp + map movements - round robin out to first player) todo partially implemented

@@ -17,8 +17,6 @@ export default class EntityFPSBotClass extends EntityClass
         this.armorInitialCount=0;
         this.armorMaxCount=0;
         
-        this.dieAnimation=null;
-        
         this.inStandingAnimation=true;
         
         this.maxTurnSpeed=0;
@@ -45,9 +43,6 @@ export default class EntityFPSBotClass extends EntityClass
         this.fallDamagePercentage=0;
         this.respawnWaitTick=0;
         this.movementFreezeTick=0;
-        
-        this.hurtSound=null;
-        this.dieSound=null;
         
         this.nextDamageTick=0;
         this.falling=false;
@@ -97,6 +92,13 @@ export default class EntityFPSBotClass extends EntityClass
         this.runAnimationM16={"startFrame":933,"endFrame":955,"actionFrame":0,"meshes":null};
         this.fireIdleAnimationM16={"startFrame":775,"endFrame":815,"actionFrame":0,"meshes":null};
         this.fireRunAnimationM16={"startFrame":865,"endFrame":887,"actionFrame":0,"meshes":null};
+        
+        this.dieAnimation={"startFrame":209,"endFrame":247,"actionFrame":0,"meshes":null};
+        
+            // sounds
+            
+        this.hurtSound={"name":"hurt","rate":0.5,"randomRateAdd":1.0,"distance":5000,"loopStart":0,"loopEnd":0,"loop":false};
+        this.dieSound={"name":"player_die","rate":0.8,"randomRateAdd":0,"distance":30000,"loopStart":0,"loopEnd":0,"loop":false};
         
             // pre-allocates
             
@@ -154,11 +156,6 @@ export default class EntityFPSBotClass extends EntityClass
         this.targetForgetDistance=this.core.game.lookupValue(this.json.config.targetForgetDistance,this.data,0);
         this.targetFireYRange=this.core.game.lookupValue(this.json.config.targetFireYRange,this.data,0);
         this.targetFireSlop=this.core.game.lookupValue(this.json.config.targetFireSlop,this.data,0);
-        
-        this.dieAnimation=this.core.game.lookupAnimationValue(this.json.animations.dieAnimation);
-        
-        this.hurtSound=this.core.game.lookupSoundValue(this.json.sounds.hurtSound);
-        this.dieSound=this.core.game.lookupSoundValue(this.json.sounds.dieSound);
         
         this.flying=false;
         

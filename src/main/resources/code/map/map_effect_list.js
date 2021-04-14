@@ -86,7 +86,10 @@ export default class MapEffectListClass
         effectClass=this.core.project.mapEffect(this.core.game.map.name,effectName);
 
         effect=new effectClass(this.core,spawnedByEntity,position,data,mapSpawn,show);
-        if (!effect.initialize()) return(false);
+        if (!mapSpawn) {
+            if (!effect.initialize()) return(false);            // if we are being spawn by a map, we do the init and ready later
+            effect.ready();
+        }
         
         this.effects.push(effect);
         
@@ -119,6 +122,15 @@ export default class MapEffectListClass
         }
 
         return(true);
+    }
+    
+    ready()
+    {
+        let effect;
+        
+        for (effect of this.effects) {
+            effect.ready();
+        }
     }
     
         //

@@ -19,8 +19,6 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.armorInitialCount=0;
         this.armorMaxCount=0;
         
-        this.dieAnimation=null;
-        
         this.inStandingAnimation=true;
         
         this.maxTurnSpeed=0;
@@ -49,12 +47,6 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.fallDamageMinDistance=0;
         this.fallDamagePercentage=0;
         this.respawnWaitTick=0;
-        
-        this.hitIndicator=false;
-        this.hitIndicatorFlashTick=0;
-        
-        this.hurtSound=null;
-        this.dieSound=null;
         
         this.nextDamageTick=0;
         this.falling=false;
@@ -89,6 +81,12 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.runAnimationM16={"startFrame":933,"endFrame":955,"actionFrame":0,"meshes":null};
         this.fireIdleAnimationM16={"startFrame":775,"endFrame":815,"actionFrame":0,"meshes":null};
         this.fireRunAnimationM16={"startFrame":865,"endFrame":887,"actionFrame":0,"meshes":null};
+        this.dieAnimation={"startFrame":209,"endFrame":247,"actionFrame":0,"meshes":null};
+        
+            // sounds
+            
+        this.hurtSound={"name":"hurt","rate":0.5,"randomRateAdd":1.0,"distance":5000,"loopStart":0,"loopEnd":0,"loop":false};
+        this.dieSound={"name":"player_die","rate":0.8,"randomRateAdd":0,"distance":30000,"loopStart":0,"loopEnd":0,"loop":false};
 
             // pre-allocates
             
@@ -105,8 +103,6 @@ export default class EntityFPSPlayerClass extends EntityClass
     initialize()
     {
         if (!super.initialize()) return(false);
-        
-        this.dieAnimation=this.core.game.lookupAnimationValue(this.json.animations.dieAnimation);
         
         this.healthInitialCount=this.core.game.lookupValue(this.json.config.healthInitialCount,this.data,0);
         this.healthMaxCount=this.core.game.lookupValue(this.json.config.healthMaxCount,this.data,0);
@@ -139,12 +135,6 @@ export default class EntityFPSPlayerClass extends EntityClass
         this.fallDamageMinDistance=this.core.game.lookupValue(this.json.config.fallDamageMinDistance,this.data,0);
         this.fallDamagePercentage=this.core.game.lookupValue(this.json.config.fallDamagePercentage,this.data,0);
         this.respawnWaitTick=this.core.game.lookupValue(this.json.config.respawnWaitTick,this.data,0);
-        
-        this.hitIndicator=this.core.game.lookupValue(this.json.config.hitIndicator,this.data,null);
-        this.hitIndicatorFlashTick=this.core.game.lookupValue(this.json.config.hitIndicatorFlashTick,this.data,0);
-        
-        this.hurtSound=this.core.game.lookupSoundValue(this.json.sounds.hurtSound);
-        this.dieSound=this.core.game.lookupSoundValue(this.json.sounds.dieSound);
         
         this.nextDamageTick=0;
         this.lastInLiquidIdx=-1;
@@ -300,11 +290,12 @@ export default class EntityFPSPlayerClass extends EntityClass
 
             // already dead, can't take damage
             
-        if (this.health<=0) return;
+        if ((this.health<=0) || (damage<=0)) return;
         
             // apply the hit indicator
+            // or if no hit point, then on all sides
             
-        if ((hitPoint!==null) && (this.hitIndicator)) {
+        if (hitPoint!==null) {
             
                 // get position of hit from view direction
                 
@@ -324,21 +315,24 @@ export default class EntityFPSPlayerClass extends EntityClass
                 // get hit spot
 
             if ((y<=-45) && (y>=-135)) {
-                this.hitFlashRight(this.hitIndicatorFlashTick);
+                this.hitFlashRight(500);
             }
             else {
                 if ((y>=45) && (y<=135)) {
-                    this.hitFlashLeft(this.hitIndicatorFlashTick);
+                    this.hitFlashLeft(500);
                 }
                 else {
                     if ((y>-45) && (y<45)) {
-                        this.hitFlashTop(this.hitIndicatorFlashTick);
+                        this.hitFlashTop(500);
                     }
                     else {
-                        this.hitFlashBottom(this.hitIndicatorFlashTick);
+                        this.hitFlashBottom(500);
                     }
                 }
             }
+        }
+        else {
+            this.hitFlashAll(500);
         }
         
             // apply the damage
@@ -658,7 +652,7 @@ export default class EntityFPSPlayerClass extends EntityClass
             if (this.falling) {
                 this.falling=false;
                 fallDist=(this.fallStartY-this.position.y)-this.fallDamageMinDistance;
-                if (fallDist>0) this.damage(this,Math.trunc(fallDist*this.fallDamagePercentage),this.position);
+                if (fallDist>0) this.damage(this,Math.trunc(fallDist*this.fallDamagePercentage),null);
             }
         }
         else {

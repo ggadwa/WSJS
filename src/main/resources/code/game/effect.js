@@ -2,6 +2,7 @@ import PointClass from '../utility/point.js';
 import ColorClass from '../utility/color.js';
 import BoundClass from '../utility/bound.js';
 import LightClass from '../light/light.js';
+import SoundDefClass from '../sound/sound_def.js';
 import GlobeClass from '../utility/globe.js';
 
     //
@@ -165,6 +166,7 @@ export default class EffectClass
         this.billboards=null;
         this.particles=null;
         this.globes=null;
+        this.ambientSound=null;
         
         this.startTimestamp=0;
         
@@ -180,7 +182,9 @@ export default class EffectClass
         this.indexBuffer=null;
         
         this.chunks=[];
+        
         this.effectLight=null;
+        this.ambientSoundIdx=-1;
         
         this.xBound=new BoundClass(this.position.x,this.position.x);
         this.yBound=new BoundClass(this.position.y,this.position.y);
@@ -264,6 +268,11 @@ export default class EffectClass
     {
         this.light=new EffectLightClass();
         return(this.light);
+    }
+    
+    addAmbientSound(name,rate,randomRateAdd,distance,loopStart,loopEnd,loop)
+    {
+        this.ambientSound=new SoundDefClass(name,rate,randomRateAdd,distance,loopStart,loopEnd,loop);
     }
     
     initialize()
@@ -383,8 +392,6 @@ export default class EffectClass
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
         }
         
-            // finally any start sound, shaking or damage
-            
         return(true);
     }
     
@@ -396,6 +403,23 @@ export default class EffectClass
             gl.deleteBuffer(this.vertexPosBuffer);
             gl.deleteBuffer(this.vertexUVBuffer);
             gl.deleteBuffer(this.indexBuffer);
+        }
+        
+        if (this.ambientSoundIdx!==-1) {
+            this.core.audio.soundStop(this.ambientSoundIdx);
+        }
+    }
+    
+        //
+        // ready effects
+        //
+        
+    ready()
+    {
+        this.ambientSoundIdx=-1;
+        
+        if (this.ambientSound!==null) {
+            this.ambientSoundIdx=this.core.audio.soundStartGameFromList(this.core.game.map.soundList,this.position,this.ambientSound);
         }
     }
     
