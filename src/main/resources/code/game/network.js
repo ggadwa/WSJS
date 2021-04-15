@@ -1,4 +1,4 @@
-//import EntityRemoteClass from '../entity/entity_remote.js';
+import EntityClass from '../game/entity.js';
 
 //
 // network class
@@ -234,7 +234,7 @@ export default class NetworkClass
         
         console.info('ENTER>'+remoteId+'>'+userName);
         
-        entity=new EntityRemoteClass(this.core,userName,null,new PointClass(0,0,0),new PointClass(0,0,0),null,false,null,null,false);
+        entity=new EntityClass(this.core,userName,null,new PointClass(0,0,0),new PointClass(0,0,0),null,false,null,null,false);
         entity.remoteId=remoteId;
         entity.initialize();        // errors here!
         

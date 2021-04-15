@@ -46,6 +46,8 @@ export default class EntityClass
         this.show=show;
         
         this.isPlayer=false;
+        this.isRemote=false;
+        this.isBot=false;
         
         this.originalPosition=this.position.copy();
         this.originalAngle=this.angle.copy();

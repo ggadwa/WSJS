@@ -1,7 +1,4 @@
 import PointClass from '../utility/point.js';
-import EntityFPSPlayerClass from '../entity/entity_fps_player.js';
-import EntityFPSBotClass from '../entity/entity_fps_bot.js';
-import EntityFPSMonsterClass from '../entity/entity_fps_monster.js';
 
 //
 // map entity list class
@@ -51,37 +48,6 @@ export default class MapEntityListClass
     }
     
         //
-        // entity classes
-        //
-        
-    getEntityClass(jsonName)
-    {
-        let json;
-        
-            // get json
-            
-        json=this.core.game.entityCache.getJson(jsonName);
-        if (json===undefined) {
-            console.log('Unable to find entity json in the cache, probably missing from core.json entities list: '+jsonName);
-            return(null);
-        }
-        
-            // lookup type
-            
-        switch (json.type) {
-            case 'fps_player':
-                return(EntityFPSPlayerClass);
-            case 'fps_bot':
-                return(EntityFPSBotClass);
-            case 'fps_monster':
-                return(EntityFPSMonsterClass);
-        }
-        
-        console.log('Unknown entity type: '+json.type);
-        return(null);
-    }
-    
-        //
         // list items
         //
     
@@ -91,11 +57,8 @@ export default class MapEntityListClass
         
         entityClass=this.core.project.mapEntity(this.core.game.map.name,jsonName);
         if (entityClass===null) {
-        
-                // get the correct entity class
-
-            entityClass=this.getEntityClass(jsonName);        
-            if (entityClass===null) return(null);
+            console.log('Unable to find an entity for this name: '+jsonName);
+            return(null);
         }
         
             // create the entity
@@ -112,11 +75,10 @@ export default class MapEntityListClass
         
             // get the correct entity class
             
-                entityClass=this.core.project.mapEntity(this.core.game.map.name,jsonName);
+        entityClass=this.core.project.mapEntity(this.core.game.map.name,jsonName);
         if (entityClass===null) {
-
-            entityClass=this.getEntityClass(jsonName);        
-            if (entityClass===null) return(null);
+            console.log('Unable to find an entity for this name: '+jsonName);
+            return(null);
         }
         
             // create the entity

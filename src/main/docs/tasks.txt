@@ -1,16 +1,19 @@
 SCRIPT REDO
 
+
+
+
 - player (need to preserve data changes)
 - bot
 - monsters (make this a base class)
 
-- EntityCacheClass gone!
+- EntityCacheClass delete when all json gone
 
 - animations and sounds as new AnimationDef() and new SoundDef()
 - sequences need scripts
 - remove actions
 
-  FINALLY: map_entity_list.addFromMap/addDynamic
+
 - bots: need to recheck everything
    - make sure pauses at elevators are working
 

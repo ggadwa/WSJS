@@ -9,8 +9,6 @@ import LiquidTintClass from '../game/liquid_tint.js';
 import HitOverlayClass from '../game/hit_overlay.js';
 import TouchStickClass from '../game/touch_stick.js';
 import TouchButtonClass from '../game/touch_button.js';
-import EntityFPSPlayerClass from '../entity/entity_fps_player.js';
-import EntityFPSBotClass from '../entity/entity_fps_bot.js';
 
 export default class GameOverlayClass
 {
@@ -459,8 +457,7 @@ export default class GameOverlayClass
         this.scores=new Map();
 
         for (entity of this.core.game.map.entityList.entities) {
-            if ((entity instanceof EntityFPSPlayerClass) ||
-                (entity instanceof EntityFPSBotClass)) this.scores.set(entity.name,0);
+            if ((entity.isPlayer) || (entity.isRemote) || (entity.isBot)) this.scores.set(entity.name,0);
         }
 
             // no scores yet
@@ -535,7 +532,7 @@ export default class GameOverlayClass
             
         points=0;
             
-        if ((fromEntity!==null) && ((fromEntity instanceof EntityFPSPlayerClass) || (fromEntity instanceof EntityFPSBotClass))) {
+        if ((fromEntity!==null) && ((fromEntity.isPlayer) || (fromEntity.isRemote) || (fromEntity.isBot))) {
             if (isTelefrag) {
                 scoreEntity=fromEntity;
                 points=1;
