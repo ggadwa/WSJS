@@ -113,13 +113,10 @@ export default class EntityClass
             
         this.json=this.core.game.entityCache.getJson(this.jsonName);
         if (this.json===null) return(false);
-        
-            // setup
-            
-        this.model=null;
-        this.modelName=this.core.game.lookupValue(this.json.setup.model,this.data,null);
     }
     
+            // setup
+            
         if (this.modelName!==null) {
         
                 // cached shared model
@@ -135,48 +132,18 @@ export default class EntityClass
             this.modelEntityAlter=new ModelEntityAlterClass(this.core,this);
             this.modelEntityAlter.initialize();
 
-            if (this.jsonName!==null) {
-                this.modelEntityAlter.frameRate=this.json.setup.frameRate;
-                this.modelEntityAlter.rotationOrder=this.MODEL_ROTATION_ORDER_LIST.indexOf(this.json.setup.rotationOrder);
-                this.scale.setFromValues(this.json.setup.scale.x,this.json.setup.scale.y,this.json.setup.scale.z);
+            this.modelEntityAlter.frameRate=this.frameRate;
+            this.modelEntityAlter.rotationOrder=this.rotationOrder;
 
-                for (n=0;n!==this.json.setup.hideMeshes.length;n++) {
-                    this.modelEntityAlter.show(this.json.setup.hideMeshes[n],false);
-                }
-            }
-            else {
-                this.modelEntityAlter.frameRate=this.frameRate;
-                this.modelEntityAlter.rotationOrder=this.rotationOrder;
-                //this.scale.setFromValues(this.json.setup.scale.x,this.json.setup.scale.y,this.json.setup.scale.z);
-
-                if (this.modelHideMeshes!=null) {
-                    for (meshName of this.modelHideMeshes) {
-                        this.modelEntityAlter.show(meshName,false);
-                    }
+            if (this.modelHideMeshes!=null) {
+                for (meshName of this.modelHideMeshes) {
+                    this.modelEntityAlter.show(meshName,false);
                 }
             }
         }
             
-        if (this.jsonName!==null) {
-        this.radius=this.json.setup.radius;
-        this.height=this.json.setup.height;
-        
-        this.eyeOffset=this.json.setup.eyeOffset;
-        this.weight=this.json.setup.weight;
-    }
-    
         this.originalScale.setFromPoint(this.scale);
         
-            // physics
-            
-        if (this.jsonName!==null) {
-        this.maxBumpCount=this.json.physics.maxBumpCount;
-        this.floorRiseHeight=this.json.physics.floorRiseHeight;
-        this.collisionSpokeCount=this.json.physics.collisionSpokeCount;
-        this.collisionHeightSegmentCount=this.json.physics.collisionHeightSegmentCount;
-        this.collisionHeightMargin=this.json.physics.collisionHeightMargin;
-        this.canBeClimbed=this.json.physics.canBeClimbed;
-    }
             // the collision
             
         this.collision.initialize(this);
@@ -1088,6 +1055,11 @@ export default class EntityClass
         //
         // networking utilities
         //
+    
+    isMultiplayerGame()
+    {
+        return(this.core.game.multiplayerMode!==this.core.game.MULTIPLAYER_MODE_NONE);
+    }
     
     sendCustomNetworkMessage(intParam0,intParam1,intParam2,floatParam0,floatParam1,floatParam2,stringParam0,stringParam1,stringParam2)
     {

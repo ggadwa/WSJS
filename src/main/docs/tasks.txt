@@ -1,6 +1,8 @@
 SCRIPT REDO
 
 
+1. move in model, physics to remaining bits
+2. remove model/physics/json==null stuff from entity
 
 
 - player (need to preserve data changes)
