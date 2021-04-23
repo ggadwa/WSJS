@@ -158,6 +158,15 @@ export default class EntityClass
     }
     
         //
+        // timestamps
+        //
+        
+    getTimestamp()
+    {
+        return(this.core.game.timestamp);
+    }
+    
+        //
         // entity utilities
         //
         
@@ -1059,6 +1068,11 @@ export default class EntityClass
     isMultiplayerGame()
     {
         return(this.core.game.multiplayerMode!==this.core.game.MULTIPLAYER_MODE_NONE);
+    }
+    
+    getMultiplayerRespawnWaitTick()
+    {
+        return(this.core.setup.multiplayerRespawnTime*1000);
     }
     
     sendCustomNetworkMessage(intParam0,intParam1,intParam2,floatParam0,floatParam1,floatParam2,stringParam0,stringParam1,stringParam2)

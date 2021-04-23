@@ -501,6 +501,14 @@ export default class ModelEntityAlterClass
             
         if (this.currentAnimation===null) return(this.startAnimationChunkInFrames(animation));
         
+            // if this animation is queued up then
+            // we can count that as a continue, this allows
+            // interupting animations to finish
+            
+        if (this.queuedAnimation!==null) {
+            if ((animation.startFrame!==this.queuedAnimation.startFrame) || (animation.endFrame!==this.queuedAnimation.endFrame)) return(true);
+        }
+        
             // otherwise only start if animation
             // is not already playing
             

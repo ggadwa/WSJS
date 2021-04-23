@@ -1,16 +1,14 @@
 SCRIPT REDO
 
 
-1. move in model, physics to remaining bits
-2. remove model/physics/json==null stuff from entity
+- animations need to be done differently, we need weaponfirelasttick kind of thing for bots/players
 
 
-- player (need to preserve data changes)
-- bot
-- monsters (make this a base class)
 
 - EntityCacheClass delete when all json gone
 
+- this.core.game.timestamp
+- remove core.entities, core.effects
 - animations and sounds as new AnimationDef() and new SoundDef()
 - sequences need scripts
 - remove actions

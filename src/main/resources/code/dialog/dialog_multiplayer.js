@@ -45,6 +45,7 @@ export default class DialogMultiplayerClass extends DialogBaseClass
         y=this.DIALOG_CONTROL_TOP_MARGIN;
         y+=this.addDialogControlText(this,'server','serverURL',x,y,'Network Server URL:');
         y+=this.addDialogControlList(this,'server','localMap',x,y,'Local Game Map:',this.core.json.multiplayerMaps);
+        y+=this.addDialogControlRange(this,'server','respawnTime',x,y,'Respawn Time:');
         
             // bot controls
 
@@ -116,6 +117,7 @@ export default class DialogMultiplayerClass extends DialogBaseClass
         
         this.setDialogControl('serverURL',this.core.setup.multiplayerServerURL);
         this.setDialogControl('localMap',multiplayerLocalMap);
+        this.setDialogControl('respawnTime',this.core.setup.multiplayerRespawnTime);
         
         for (n=0;n!==10;n++) {
             this.setDialogControl(('bot'+n),this.core.setup.multiplayerBotCharacters[n]);
@@ -131,6 +133,7 @@ export default class DialogMultiplayerClass extends DialogBaseClass
         
         this.core.setup.multiplayerLocalMap=this.getDialogControl('localMap');
         this.core.setup.multiplayerServerURL=this.getDialogControl('serverURL');
+        this.core.setup.multiplayerRespawnTime=this.getDialogControl('respawnTime');
         
         for (n=0;n!==10;n++) {
             this.core.setup.multiplayerBotCharacters[n]=this.getDialogControl('bot'+n);
