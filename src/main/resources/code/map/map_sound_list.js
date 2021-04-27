@@ -47,7 +47,7 @@ export default class MapSoundListClass
     buildSoundList()
     {
         let name,sound;
-        let soundList=this.core.project.mapSounds(this.core.game.map.name,(this.core.game.multiplayerMode===this.core.game.MULTIPLAYER_MODE_NONE));
+        let soundList=this.core.project.getSoundList(this.core.game.multiplayerMode===this.core.game.MULTIPLAYER_MODE_NONE);
         
         for (name of soundList) {
             sound=new SoundClass(this.core,name);

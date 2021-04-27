@@ -279,6 +279,10 @@ export default class CoreClass
             
         this.createFontTexture();
         
+            // project initialization
+            
+        this.project.initialize();
+        
             // title/dialog common interfaces
             
         this.background=new BackgroundClass(this);
@@ -335,6 +339,7 @@ export default class CoreClass
 
     release()
     {
+        this.project.release();
         this.developer.release();
         this.game.release();
         this.gameLoad.release();

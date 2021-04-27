@@ -53,7 +53,7 @@ export default class MapModelListClass
     buildModelList()
     {
         let name,model;
-        let modelList=this.core.project.mapModels(this.core.game.map.name,(this.core.game.multiplayerMode===this.core.game.MULTIPLAYER_MODE_NONE));
+        let modelList=this.core.project.getModelList(this.core.game.multiplayerMode===this.core.game.MULTIPLAYER_MODE_NONE);
         
         for (name of modelList) {
             model=new ModelClass(this.core,{"name":name});

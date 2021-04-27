@@ -10,7 +10,7 @@ import CollisionClass from '../collision/collisions.js';
 
 export default class EntityClass
 {
-    constructor(core,name,jsonName,position,angle,data,mapSpawn,spawnedBy,heldBy,show)
+    constructor(core,name,position,angle,data,mapSpawn,spawnedBy,heldBy,show)
     {
         this.MODEL_ROTATION_ORDER_XYZ=0;
         this.MODEL_ROTATION_ORDER_XZY=1;
@@ -18,7 +18,6 @@ export default class EntityClass
         this.MODEL_ROTATION_ORDER_LIST=['XYZ','XZY'];
         
         this.core=core;
-        this.jsonName=jsonName;
         this.json=null;
         
         this.name=name;
@@ -106,14 +105,7 @@ export default class EntityClass
         
     initialize()
     {
-        let n,meshName;
-        
-        if (this.jsonName!==null) {
-            // get the json
-            
-        this.json=this.core.game.entityCache.getJson(this.jsonName);
-        if (this.json===null) return(false);
-    }
+        let meshName;
     
             // setup
             
@@ -170,9 +162,9 @@ export default class EntityClass
         // entity utilities
         //
         
-    addEntity(jsonName,name,position,angle,data,spawnedBy,heldBy,show)
+    addEntity(typeName,name,position,angle,data,spawnedBy,heldBy,show)
     {
-        return(this.core.game.map.entityList.addDynamic(jsonName,name,position,angle,data,spawnedBy,heldBy,show));
+        return(this.core.game.map.entityList.addDynamic(typeName,name,position,angle,data,spawnedBy,heldBy,show));
     }
     
     removeEntity(entity)
@@ -1155,6 +1147,15 @@ export default class EntityClass
             // updates show remote
 
         this.show=true;
+    }
+    
+        //
+        // sequences
+        //
+        
+    startSequence(name)
+    {
+        this.core.game.startSequence(name);
     }
     
         //

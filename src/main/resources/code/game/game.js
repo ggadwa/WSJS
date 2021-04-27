@@ -8,7 +8,6 @@ import MapClass from '../map/map.js';
 import CameraClass from '../game/camera.js';
 import GameOverlayClass from '../game/game_overlay.js';
 import ShadowmapLoadClass from '../light/shadowmap_load.js';
-import EntityCacheClass from '../game/entity_cache.js';
 import SequenceClass from '../sequence/sequence.js';
 
 export default class GameClass
@@ -25,10 +24,6 @@ export default class GameClass
         this.MULTIPLAYER_MODE_JOIN=2;
         
         this.multiplayerMode=this.MULTIPLAYER_MODE_NONE;
-        
-            // cache for entity
-            
-        this.entityCache=new EntityCacheClass(this.core);
         
             // camera
             
@@ -119,10 +114,6 @@ export default class GameClass
     {
         let name,sequence;
         
-            // entities
-            
-        if (!(await this.entityCache.initialize())) return(false);
-        
             // the camera
             
         if (!this.camera.initialize()) return(false);
@@ -133,7 +124,7 @@ export default class GameClass
         
             // the sequences
         
-        for (name of this.core.json.sequences) {
+        for (name of this.core.project.getSequenceList()) {
             sequence=new SequenceClass(this.core,name);
             if (!(await sequence.initialize())) return(false);
             
@@ -153,94 +144,8 @@ export default class GameClass
         
         this.overlay.release();
         this.camera.release();
-        this.entityCache.release();
     }
  
-        //
-        // json lookup/load utilities
-        //
-        
-    lookupValue(value,data,valueDefault)
-    {
-        if ((data===undefined) || (data===null)) return(value);
-        if (value===undefined) return(valueDefault);
-        if (value===null) return(value);
-        if (typeof(value)!=='string') return(value);
-        if (value.length<2) return(value);
-        if (value.charAt(0)!=='@') return(value);
-        
-        return(data[value.substring(1)]);
-    }
-    
-    lookupAnimationValue(value)
-    {
-        if ((value===undefined) || (value===null)) return(null);
-        return(value);
-    }
-    
-    lookupSoundValue(value)
-    {
-        if ((value==undefined) || (value===null)) return(null);
-        return(value);
-    }
-    
-    lookupPointValue(value,valueDefaultX,valueDefaultY,valueDefaultZ)
-    {
-        if ((value==undefined) || (value===null)) return(new PointClass(valueDefaultX,valueDefaultY,valueDefaultZ));
-        return(new PointClass(value[0],value[1],value[2]));
-    }
-    
-    addJsonObjectToLoadSet(loadSet,data,requiredParentObjectKey,inParentObject,keyNames,obj)
-    {
-        let key,item,jsonEntity;
-        let recurseInParentObject;
-        
-        for (key in obj) {
-            
-                // recursal keys
-                
-            if (typeof(obj[key])==='object') {
-                
-                    // some properties are required to be within
-                    // a named parent object, check that here
-                
-                recurseInParentObject=inParentObject;
-                if (requiredParentObjectKey!==null) recurseInParentObject|=(key===requiredParentObjectKey);
-                
-                this.addJsonObjectToLoadSet(loadSet,data,requiredParentObjectKey,recurseInParentObject,keyNames,obj[key]);
-                continue;
-            }
-            
-            if (typeof(obj[key])==='array') {
-                for (item of obj[key]) {
-                    if (typeof(item)==='object') this.addJsonObjectToLoadSet(loadSet,data,requiredParentObjectKey,false,keyNames,item);
-                }
-                continue;
-            }
-                
-                // recurse into other entities
-                
-            if (key==='weaponJson') {
-                jsonEntity=this.entityCache.getJson(obj[key]);
-                if (jsonEntity!==null) this.addJsonObjectToLoadSet(loadSet,obj['weaponData'],requiredParentObjectKey,false,keyNames,jsonEntity);
-                continue;
-            }
-            
-            if (key==='projectileJson') {
-                jsonEntity=this.entityCache.getJson(obj[key]);
-                if (jsonEntity!==null) this.addJsonObjectToLoadSet(loadSet,obj['projectileData'],requiredParentObjectKey,false,keyNames,jsonEntity);
-                continue;
-            }
-            
-                // effect keys
-                
-            if (!keyNames.includes(key)) continue;
-            if ((requiredParentObjectKey!==null) && (!inParentObject)) continue;
-            
-            loadSet.add(this.lookupValue(obj[key],data,null));
-        }
-    }
-        
         //
         // timing utilities
         //
@@ -281,115 +186,6 @@ export default class GameClass
         let value=this.triggers.get(triggerName);
         return((value===null)?false:value);
     }
-    
-        //
-        // actions
-        //
-        
-    hasActions(entity,actions)
-    {
-        let action;
-        
-        if (actions===null) return(true);
-        
-        for (action of actions) {
-            
-            switch (action.action) {
-                case 'addWeapon':
-                    if (entity.addWeapon===undefined) return(false);
-                    break;
-                case 'addClip':
-                    if (entity.addClip===undefined) return(false);
-                    break;
-                case 'addAmmo':
-                    if (entity.addAmmo===undefined) return(false);
-                    break;
-                case 'addHealth':
-                    if (entity.addHealth===undefined) return(false);
-                    break;
-                case 'addArmor':
-                    if (entity.addArmor===undefined) return(false);
-                    break;
-                case 'addSpeed':
-                    if (entity.addSpeed===undefined) return(false);
-                    break;
-                case 'addBurst':
-                    if (entity.addBurst===undefined) return(false);
-                    break;
-                case 'addWinCollect':
-                    if (entity.addWinCollect===undefined) return(false);
-                    break;
-                case 'kill':
-                    if (entity.die===undefined) return(false);
-                    break;
-            }
-        }
-        
-        return(true);
-    }
-    
-    runActions(entity,actions,data)
-    {
-        let action;
-        
-        if (actions===null) return;
-        
-        for (action of actions) {
-            
-            switch (action.action) {
-                case 'trigger':
-                    this.setTrigger(this.lookupValue(action.name,data,''));
-                    break;
-                case 'switchMap':
-                    this.switchMap(this.lookupValue(action.name,data,''));
-                    break;
-                case 'sequence':
-                    this.startSequence(this.lookupValue(action.name,data,''));
-                    break;
-                case 'addWeapon':
-                    if (entity!==null) entity.addWeapon(this.lookupValue(action.weapon,data,''));
-                    break;
-                case 'addClip':
-                    if (entity!==null) entity.addClip(this.lookupValue(action.weapon,data,''),this.lookupValue(action.fireMethod,data,''),this.lookupValue(action.count,data,0));
-                    break;
-                case 'addAmmo':
-                    if (entity!==null) entity.addAmmo(this.lookupValue(action.weapon,data,''),this.lookupValue(action.fireMethod,data,''),this.lookupValue(action.count,data,0));
-                    break;
-                case 'addHealth':
-                    if (entity!==null) entity.addHealth(this.lookupValue(action.count,data,0));
-                    break;
-                case 'addArmor':
-                    if (entity!==null) entity.addArmor(this.lookupValue(action.count,data,0));
-                    break;
-                case 'addSpeed':
-                    if (entity!==null) entity.addSpeed(this.lookupValue(action.count,data,0));
-                    break;
-                case 'addBurst':
-                    if (entity!==null) entity.addBurst(this.lookupValue(action.speed,data,0),this.lookupValue(action.lifeTick,data,0));
-                    break;
-                case 'addWinCollect':
-                    if (entity!==null) entity.addWinCollect(this.lookupValue(action.winCount,data,10));
-                    break;
-                case 'kill':
-                    if (entity!==null) entity.die(null,false);
-                    break;
-            }
-        }
-    }
-    
-        //
-        // won-lost
-        //
-        
-    won(entity)
-    {
-        if (this.core.json.config.wonActions!==null) this.runActions(entity,this.core.json.config.wonActions,this.data);
-    }
-    
-    lost(entity)
-    {
-        if (this.core.json.config.lostActions!==null) this.runActions(entity,this.core.json.config.lostActions,this.data);
-    }
         
         //
         // remote changes
@@ -423,7 +219,7 @@ export default class GameClass
             // no map, so pick the right start map
             
         if (this.multiplayerMode===this.MULTIPLAYER_MODE_NONE) {
-            this.currentMapName=this.lookupValue(this.core.json.startMap,this.data);
+            this.currentMapName=this.core.json.startMap;
         }
         else {
             this.currentMapName=this.core.setup.multiplayerLocalMap;
@@ -471,9 +267,9 @@ export default class GameClass
         this.core.audio.ambientStart();
         this.core.audio.musicStart(this.map.music);
         
-            // start actions
+            // any project map setup
             
-        if (this.core.json.config.startActions!==null) this.runActions(null,this.core.json.config.startActions,this.data);
+        this.core.project.mapStartup(this.currentMapName);
     }
     
     resumeLoop()

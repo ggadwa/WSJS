@@ -1,21 +1,13 @@
 SCRIPT REDO
 
 
-- animations need to be done differently, we need weaponfirelasttick kind of thing for bots/players
+- character stuff to project
 
-
-
-- EntityCacheClass delete when all json gone
+- bot picker interface needs highlighting
 
 - this.core.game.timestamp
-- remove core.entities, core.effects
 - animations and sounds as new AnimationDef() and new SoundDef()
-- sequences need scripts
-- remove actions
 
-
-- bots: need to recheck everything
-   - make sure pauses at elevators are working
 
 
 [NEW KART MAP - get rid of ground and put flag ground segments, fix seams]

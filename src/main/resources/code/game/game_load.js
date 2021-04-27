@@ -397,10 +397,6 @@ export default class GameLoadClass
         
         game.triggers.clear();
         
-            // any project map setup
-            
-        this.core.project.mapStartup(game.currentMapName);      // any project specific startup
-        
             // multiplayer scores
             
         game.overlay.multiplayerInitScores();

@@ -46,7 +46,7 @@ export default class SequenceClass
         let bitmapDef,bitmap;
         let entityDef,entity;
         let soundDef,sound;
-        let name,colorURL,mode,drawMode,positionMode;
+        let drawMode,positionMode;
         
             // get the json
             
@@ -76,23 +76,19 @@ export default class SequenceClass
                 
                     // setup the bitmap
 
-                mode=this.core.game.lookupValue(bitmapDef.drawMode,this.data);
-                drawMode=this.DRAW_MODE_LIST.indexOf(mode);
+                drawMode=this.DRAW_MODE_LIST.indexOf(bitmapDef.drawMode);
                 if (drawMode===-1) {
-                    console.log('Unknown sequence bitmap draw mode: '+mode);
+                    console.log('Unknown sequence bitmap draw mode: '+bitmapDef.drawMode);
                     return(false);
                 }
                 
-                mode=this.core.game.lookupValue(bitmapDef.positionMode,this.data);
-                positionMode=this.POSITION_MODE_LIST.indexOf(mode);
+                positionMode=this.POSITION_MODE_LIST.indexOf(bitmapDef.positionMode);
                 if (positionMode===-1) {
-                    console.log('Unknown sequence bitmap position mode: '+mode);
+                    console.log('Unknown sequence bitmap position mode: '+bitmapDef.positionMode);
                     return(false);
                 }
                 
-                colorURL=this.core.game.lookupValue(bitmapDef.bitmap,this.data);
-                
-                bitmap=new SequenceBitmapClass(this.core,this,colorURL,positionMode,drawMode,bitmapDef.frames);
+                bitmap=new SequenceBitmapClass(this.core,this,bitmapDef.bitmap,positionMode,drawMode,bitmapDef.frames);
                 if (!(await bitmap.initialize())) return(false);
                 
                 this.bitmaps.push(bitmap);
@@ -106,9 +102,7 @@ export default class SequenceClass
         if (this.json.entities!==undefined) {
             
             for (entityDef of this.json.entities) {
-                
-                name=this.core.game.lookupValue(entityDef.entity,this.data);
-                entity=new SequenceEntityClass(this.core,this,name,entityDef.frames);
+                entity=new SequenceEntityClass(this.core,this,entityDef.entity,entityDef.frames);
                 if (!entity.initialize()) return(false);
                 
                 this.entities.push(entity);
@@ -122,9 +116,7 @@ export default class SequenceClass
         if (this.json.sounds!==undefined) {
             
             for (soundDef of this.json.sounds) {
-                
-                name=this.core.game.lookupValue(soundDef.name,this.data);
-                sound=new SequenceSoundClass(this.core,this,name,soundDef);
+                sound=new SequenceSoundClass(this.core,this,soundDef.name,soundDef);
                 if (!sound.initialize()) return(false);
                 
                 this.sounds.push(sound);
@@ -134,7 +126,6 @@ export default class SequenceClass
             // load music
             
         if (this.json.music!==undefined) {
-            name=this.core.game.lookupValue(this.json.music.name,this.data);
             this.music=new MusicClass(this.core);
             this.music.setMusic(this.json.music.name,((this.json.music.loopStart===undefined)?0:this.json.music.loopStart),((this.json.music.loopEnd===undefined)?0:this.json.music.loopEnd),((this.json.music.autoStop===undefined)?false:this.json.music.autoStop));
             

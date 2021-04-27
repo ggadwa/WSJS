@@ -32,7 +32,7 @@ export default class MapEffectListClass
             
         this.sharedBitmapMap.clear();
         
-        for (name of this.core.project.mapBitmaps()) {
+        for (name of this.core.project.getBitmapList(this.core.game.multiplayerMode===this.core.game.MULTIPLAYER_MODE_NONE)) {
             bitmap=new BitmapEffectClass(this.core,name);
             this.sharedBitmapMap.set(name,bitmap);
         }
@@ -83,7 +83,7 @@ export default class MapEffectListClass
     {
         let effect,effectClass;
         
-        effectClass=this.core.project.mapEffect(this.core.game.map.name,effectName);
+        effectClass=this.core.project.effectClasses.get(effectName);
 
         effect=new effectClass(this.core,spawnedByEntity,position,data,mapSpawn,show);
         if (!mapSpawn) {

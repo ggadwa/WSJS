@@ -51,39 +51,39 @@ export default class MapEntityListClass
         // list items
         //
     
-    addFromMap(jsonName,name,position,angle,data,show)
+    addFromMap(typeName,name,position,angle,data,show)
     {
         let entity,entityClass;
         
-        entityClass=this.core.project.mapEntity(this.core.game.map.name,jsonName);
+        entityClass=this.core.project.entityClasses.get(typeName);
         if (entityClass===null) {
-            console.log('Unable to find an entity for this name: '+jsonName);
+            console.log('Unable to find an entity for this name: '+typeName);
             return(null);
         }
         
             // create the entity
             
-        entity=new entityClass(this.core,name,jsonName,position,angle,data,true,null,null,show);        
+        entity=new entityClass(this.core,name,position,angle,data,true,null,null,show);        
         this.entities.push(entity);
         
         return(entity);
     }
         
-    addDynamic(jsonName,name,position,angle,data,spawnedBy,heldBy,show)
+    addDynamic(typeName,name,position,angle,data,spawnedBy,heldBy,show)
     {
         let entity,entityClass;
         
             // get the correct entity class
             
-        entityClass=this.core.project.mapEntity(this.core.game.map.name,jsonName);
+        entityClass=this.core.project.entityClasses.get(typeName);
         if (entityClass===null) {
-            console.log('Unable to find an entity for this name: '+jsonName);
+            console.log('Unable to find an entity for this name: '+typeName);
             return(null);
         }
         
             // create the entity
             
-        entity=new entityClass(this.core,name,jsonName,position,angle,data,false,spawnedBy,heldBy,show);        
+        entity=new entityClass(this.core,name,position,angle,data,false,spawnedBy,heldBy,show);        
         this.entities.push(entity);
         
             // finally initialize it
