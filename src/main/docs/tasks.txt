@@ -2,6 +2,9 @@ SCRIPT REDO
 
 
 - character stuff to project
+- interface to project
+- remove POSITION_MODE_LIST
+- remove TEXT_ALIGN_LIST
 
 - bot picker interface needs highlighting
 

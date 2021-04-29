@@ -10,12 +10,6 @@ export default class SequenceClass
 {
     constructor(core,jsonName)
     {
-        this.POSITION_MODE_TOP_LEFT=0;
-        this.POSITION_MODE_TOP_RIGHT=1;
-        this.POSITION_MODE_BOTTOM_LEFT=2;
-        this.POSITION_MODE_BOTTOM_RIGHT=3;
-        this.POSITION_MODE_MIDDLE=4;
-        
         this.POSITION_MODE_LIST=['topLeft','topRight','bottomLeft','bottomRight','middle'];
 
         this.DRAW_MODE_OPAQUE=0;

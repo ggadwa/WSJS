@@ -14,7 +14,6 @@ import RectClass from '../utility/rect.js';
 import PlaneClass from '../utility/plane.js';
 import ColorClass from '../utility/color.js';
 import Matrix4Class from '../utility/matrix4.js';
-import CharacterListClass from '../main/character_list.js';
 import GameLoadClass from '../game/game_load.js';
 import GameClass from '../game/game.js';
 import DeveloperClass from '../developer/developer.js';
@@ -77,6 +76,14 @@ export default class CoreClass
         
         this.TEXT_ALIGN_LIST=['left','center','right'];
         
+            // element positions
+            
+        this.POSITION_TOP_LEFT=0;
+        this.POSITION_TOP_RIGHT=1;
+        this.POSITION_BOTTOM_LEFT=2;
+        this.POSITION_BOTTOM_RIGHT=3;
+        this.POSITION_MIDDLE=4;
+        
             // misc statics
             
         this.MAX_LIGHT_COUNT=24;        // max lights in scene, needs to be the same as lights[x] in shaders
@@ -109,10 +116,6 @@ export default class CoreClass
             // the core.json
             
         this.json=null;
-        
-            // characters
-            
-        this.characterList=null;
         
             // title/dialog common interfaces
             
@@ -296,10 +299,9 @@ export default class CoreClass
         this.shaderList=new ShaderListClass(this);
         this.shaderList.initialize();
         
-            // characters
-            
-        this.characterList=new CharacterListClass(this);
-        if (!(await this.characterList.initialize())) return;
+            // initialize characters
+         
+        if (!this.project.initializeCharacters()) return;
         
             // main game class
             
@@ -349,7 +351,6 @@ export default class CoreClass
         this.dialogDeveloper.release();
         this.dialogNode.release();
         this.dialogError.release();
-        this.characterList.release();
         this.shaderList.release();
         this.cursor.release();
         this.background.release();

@@ -18,12 +18,6 @@ export default class GameOverlayClass
         
         this.MAX_SCORE_COUNT=10;
         
-        this.POSITION_MODE_TOP_LEFT=0;
-        this.POSITION_MODE_TOP_RIGHT=1;
-        this.POSITION_MODE_BOTTOM_LEFT=2;
-        this.POSITION_MODE_BOTTOM_RIGHT=3;
-        this.POSITION_MODE_MIDDLE=4;
-        
         this.POSITION_MODE_LIST=['topLeft','topRight','bottomLeft','bottomRight','middle'];
         
         this.TOUCH_SWIPE_DEAD_ZONE=20;
@@ -79,15 +73,36 @@ export default class GameOverlayClass
     async initialize()
     {
         let n,y;
+        let element,count,dial,text;
         
-            // load interface json
+            // load interfaces from project
             
         this.elements.clear();
         this.counts.clear();
         this.dials.clear();
         this.texts.clear();
-            
-        if (!(await this.addJsonInterfaceObject(this.core.json.interface))) return(false);
+        
+        for (element of this.core.project.getInterfaceElementList()) {
+            if (!await (this.addElement(element.id,element.bitmap,element.width,element.height,element.positionMode,element.positionOffset,element.color,element.alpha,false))) return(false);
+            this.showElement(element.id,element.show);
+        }
+
+        for (count of this.core.project.getInterfaceCountList()) {
+            if (!await (this.addCount(count.id,count.bitmap,count.count,count.width,count.height,count.positionMode,count.positionOffset,count.addOffset,count.onColor,count.onAlpha,count.offColor,count.offAlpha,false))) return(false);
+            this.showCount(count.id,count.show);
+        }
+        
+        for (dial of this.core.project.getInterfaceDialList()) {
+            if (!await (this.addDial(dial.id,dial.backgroundBitmap,dial.foregroundBitmap,dial.needleBitmap,dial.width,dial.height,dial.positionMode,dial.positionOffset,false))) return(false);
+            this.showDial(dial.id,dial.show);
+        }
+
+        for (text of this.core.project.getInterfaceTextList()) {
+            this.addText(text.id,text.text,text.positionMode,text.positionOffset,text.textSize,text.align,text.color,text.alpha,false);
+            this.showText(text.id,text.show);
+        }
+
+            // built in interfaces
         
         this.fpsText=new TextClass(this.core,'',(this.core.canvas.width-5),23,20,this.core.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1);
         this.fpsText.initialize();
@@ -100,9 +115,9 @@ export default class GameOverlayClass
         y=-Math.trunc((35*(this.MAX_SCORE_COUNT-1))*0.5);
 
         for (n=0;n!==this.MAX_SCORE_COUNT;n++) {
-            this.addText(('score_name_'+n),'',this.POSITION_MODE_MIDDLE,{"x":0,"y":y},30,this.core.TEXT_ALIGN_RIGHT,this.scoreColor,1);
+            this.addText(('score_name_'+n),'',this.core.POSITION_MIDDLE,{"x":0,"y":y},30,this.core.TEXT_ALIGN_RIGHT,this.scoreColor,1);
             this.showText(('score_name_'+n),false);
-            this.addText(('score_point_'+n),'',this.POSITION_MODE_MIDDLE,{"x":10,"y":y},30,this.core.TEXT_ALIGN_LEFT,this.scoreColor,1);
+            this.addText(('score_point_'+n),'',this.core.POSITION_MIDDLE,{"x":10,"y":y},30,this.core.TEXT_ALIGN_LEFT,this.scoreColor,1);
             this.showText(('score_point_'+n),false);
             y+=35;
         }
@@ -174,16 +189,16 @@ export default class GameOverlayClass
         let rect=new RectClass(positionOffset.x,positionOffset.y,(positionOffset.x+width),(positionOffset.y+height));
         
         switch (positionMode) {
-            case this.POSITION_MODE_TOP_RIGHT:
+            case this.core.POSITION_TOP_RIGHT:
                 rect.move(this.core.canvas.width,0);
                 break;
-            case this.POSITION_MODE_BOTTOM_LEFT:
+            case this.core.POSITION_BOTTOM_LEFT:
                 rect.move(0,this.core.canvas.height);
                 break;
-            case this.POSITION_MODE_BOTTOM_RIGHT:
+            case this.core.POSITION_BOTTOM_RIGHT:
                 rect.move(this.core.canvas.width,this.core.canvas.height);
                 break;
-            case this.POSITION_MODE_MIDDLE:
+            case this.core.POSITION_MIDDLE:
                 rect.move(Math.trunc(this.core.canvas.width*0.5),Math.trunc(this.core.canvas.height*0.5));
                 break;
         }
@@ -227,16 +242,16 @@ export default class GameOverlayClass
         let rect=new RectClass(positionOffset.x,positionOffset.y,(positionOffset.x+width),(positionOffset.y+height));
         
         switch (positionMode) {
-            case this.POSITION_MODE_TOP_RIGHT:
+            case this.core.POSITION_TOP_RIGHT:
                 rect.move(this.core.canvas.width,0);
                 break;
-            case this.POSITION_MODE_BOTTOM_LEFT:
+            case this.core.POSITION_BOTTOM_LEFT:
                 rect.move(0,this.core.canvas.height);
                 break;
-            case this.POSITION_MODE_BOTTOM_RIGHT:
+            case this.core.POSITION_BOTTOM_RIGHT:
                 rect.move(this.core.canvas.width,this.core.canvas.height);
                 break;
-            case this.POSITION_MODE_MIDDLE:
+            case this.core.POSITION_MIDDLE:
                 rect.move(Math.trunc(this.core.canvas.width*0.5),Math.trunc(this.core.canvas.height*0.5));
                 break;
         }
@@ -280,16 +295,16 @@ export default class GameOverlayClass
         let rect=new RectClass(positionOffset.x,positionOffset.y,(positionOffset.x+width),(positionOffset.y+height));
         
         switch (positionMode) {
-            case this.POSITION_MODE_TOP_RIGHT:
+            case this.core.POSITION_TOP_RIGHT:
                 rect.move(this.core.canvas.width,0);
                 break;
-            case this.POSITION_MODE_BOTTOM_LEFT:
+            case this.core.POSITION_BOTTOM_LEFT:
                 rect.move(0,this.core.canvas.height);
                 break;
-            case this.POSITION_MODE_BOTTOM_RIGHT:
+            case this.core.POSITION_BOTTOM_RIGHT:
                 rect.move(this.core.canvas.width,this.core.canvas.height);
                 break;
-            case this.POSITION_MODE_MIDDLE:
+            case this.core.POSITION_MIDDLE:
                 rect.move(Math.trunc(this.core.canvas.width*0.5),Math.trunc(this.core.canvas.height*0.5));
                 break;
         }
@@ -334,17 +349,17 @@ export default class GameOverlayClass
         let y=positionOffset.y;
         
         switch (positionMode) {
-            case this.POSITION_MODE_TOP_RIGHT:
+            case this.core.POSITION_TOP_RIGHT:
                 x+=this.core.canvas.width;
                 break;
-            case this.POSITION_MODE_BOTTOM_LEFT:
+            case this.core.POSITION_BOTTOM_LEFT:
                 y+=this.core.canvas.height;
                 break;
-            case this.POSITION_MODE_BOTTOM_RIGHT:
+            case this.core.POSITION_BOTTOM_RIGHT:
                 x+=this.core.canvas.width;
                 y+=this.core.canvas.height;
                 break;
-            case this.POSITION_MODE_MIDDLE:
+            case this.core.POSITION_MIDDLE:
                 x+=Math.trunc(this.core.canvas.width*0.5);
                 y+=Math.trunc(this.core.canvas.height*0.5);
                 break;
@@ -392,56 +407,6 @@ export default class GameOverlayClass
         text.hideTick=this.core.game.timestamp+tick;
     }
 
-        //
-        // load and covert a json interface object into various interface parts
-        //
-        
-    async addJsonInterfaceObject(jsonInterface)
-    {
-        let element,count,dial,text;
-        let positionMode,align;
-        
-        if (jsonInterface===undefined) return(true);
-        
-        if (jsonInterface.elements!==undefined) {
-            for (element of jsonInterface.elements) {
-                positionMode=this.POSITION_MODE_LIST.indexOf(element.positionMode);
-
-                if (!await (this.addElement(element.id,element.bitmap,element.width,element.height,positionMode,element.positionOffset,new ColorClass(element.color.r,element.color.g,element.color.b),element.alpha,false))) return(false);
-                this.showElement(element.id,element.show);
-            }
-        }
-        
-        if (jsonInterface.counts!==undefined) {
-            for (count of jsonInterface.counts) {
-                positionMode=this.POSITION_MODE_LIST.indexOf(count.positionMode);
-
-                if (!await (this.addCount(count.id,count.bitmap,count.count,count.width,count.height,positionMode,count.positionOffset,count.addOffset,new ColorClass(count.onColor.r,count.onColor.g,count.onColor.b),count.onAlpha,new ColorClass(count.offColor.r,count.offColor.g,count.offColor.b),count.offAlpha,false))) return(false);
-                this.showCount(count.id,count.show);
-            }
-        }
-        
-        if (jsonInterface.dials!==undefined) {
-            for (dial of jsonInterface.dials) {
-                positionMode=this.POSITION_MODE_LIST.indexOf(dial.positionMode);
-
-                if (!await (this.addDial(dial.id,dial.backgroundBitmap,dial.foregroundBitmap,dial.needleBitmap,dial.width,dial.height,positionMode,dial.positionOffset,false))) return(false);
-                this.showDial(dial.id,dial.show);
-            }
-        }
-        
-        if (jsonInterface.texts!==undefined) {
-            for (text of jsonInterface.texts) {
-                align=this.core.TEXT_ALIGN_LIST.indexOf(text.textAlign);
-                positionMode=this.POSITION_MODE_LIST.indexOf(text.positionMode);
-                this.addText(text.id,text.text,positionMode,text.positionOffset,text.textSize,align,new ColorClass(text.color.r,text.color.g,text.color.b),text.alpha,false);
-                this.showText(text.id,text.show);
-            }
-        }
-        
-        return(true);
-    }
-    
         //
         // multiplayer scores
         //

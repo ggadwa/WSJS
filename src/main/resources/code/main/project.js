@@ -1,9 +1,101 @@
+import CharacterClass from '../main/character.js';
+
+    //
+    // temporary structs for some objects
+    //
+
+class InterfaceTextClass
+{
+    constructor(id,text,positionMode,positionOffset,textSize,textAlign,color,alpha,show)
+    {
+        this.id=id;
+        this.text=text;
+        this.positionMode=positionMode;
+        this.positionOffset=positionOffset;
+        this.textSize=textSize;
+        this.textAlign=textAlign;
+        this.color=color;
+        this.alpha=alpha;
+        this.show=show;
+    }
+}
+
+class InterfaceElementClass
+{
+    constructor(id,bitmap,width,height,positionMode,positionOffset,color,alpha,show)
+    {
+        this.id=id;
+        this.bitmap=bitmap;
+        this.width=width;
+        this.height=height;
+        this.positionMode=positionMode;
+        this.positionOffset=positionOffset;
+        this.color=color;
+        this.alpha=alpha;
+        this.show=show;
+    }
+}
+
+class InterfaceCountClass
+{
+    constructor(id,bitmap,count,width,height,positionMode,positionOffset,addOffset,onColor,onAlpha,offColor,offAlpha,show)
+    {
+        this.id=id;
+        this.bitmap=bitmap;
+        this.count=count;
+        this.width=width;
+        this.height=height;
+        this.positionMode=positionMode;
+        this.positionOffset=positionOffset;
+        this.addOffset=addOffset;
+        this.onColor=onColor;
+        this.onAlpha=onAlpha;
+        this.offColor=offColor;
+        this.offAlpha=offAlpha;
+        this.show=show;
+    }
+}
+   
+class InterfaceDialClass
+{
+    constructor(id,backgroundBitmap,foregroundBitmap,needleBitmap,width,height,positionMode,positionOffset,show)
+    {
+        this.id=id;
+        this.backgroundBitmap=backgroundBitmap;
+        this.foregroundBitmap=foregroundBitmap;
+        this.needleBitmap=needleBitmap;
+        this.width=width;
+        this.height=height;
+        this.positionMode=positionMode;
+        this.positionOffset=positionOffset;
+        this.show=show;
+    }
+}
+
+    //
+    // main project class
+    //
+    
 export default class ProjectClass
 {
     constructor(core)
     {
         this.core=core;
         
+            // constants
+            
+        this.TEXT_ALIGN_LEFT=core.TEXT_ALIGN_LEFT;
+        this.TEXT_ALIGN_CENTER=core.TEXT_ALIGN_CENTER;
+        this.TEXT_ALIGN_RIGHT=core.TEXT_ALIGN_RIGHT;
+
+        this.POSITION_TOP_LEFT=core.POSITION_TOP_LEFT;
+        this.POSITION_TOP_RIGHT=core.POSITION_TOP_LEFT;
+        this.POSITION_BOTTOM_LEFT=core.POSITION_TOP_LEFT;
+        this.POSITION_BOTTOM_RIGHT=core.POSITION_TOP_LEFT;
+        this.POSITION_MIDDLE=core.POSITION_TOP_LEFT;
+
+            // lists
+            
         this.entityClasses=new Map();
         this.effectClasses=new Map();
         this.cubeClasses=new Map();
@@ -21,6 +113,12 @@ export default class ProjectClass
         this.multiplayerSoundList=new Set();
         
         this.sequenceList=new Set();
+        this.characters=new Map();
+        
+        this.interfaceTextList=new Set();
+        this.interfaceElementList=new Set();
+        this.interfaceCountList=new Set();
+        this.interfaceDialList=new Set();
     }
     
         //
@@ -31,8 +129,24 @@ export default class ProjectClass
     {
     }
     
+    async initializeCharacters()
+    {
+        let character;
+        
+        for (character of this.characters.values()) {
+            if (!(await character.initialize())) return(false);
+        }
+        
+        return(true);
+    }
+    
     release()
     {
+        let character;
+        
+        for (character of this.characters.values()) {
+            character.release();
+        }
     }
     
         //
@@ -103,6 +217,31 @@ export default class ProjectClass
     {
         this.sequenceList.add(name);
     }
+    
+    addCharacter(name,playerType,botType,bitmap,data)
+    {
+        this.characters.set(name,new CharacterClass(this.core,name,playerType,botType,bitmap,data));
+    }
+    
+    addInterfaceText(id,text,positionMode,positionOffset,textSize,textAlign,color,alpha,show)
+    {
+        this.interfaceTextList.add(new InterfaceTextClass(id,text,positionMode,positionOffset,textSize,textAlign,color,alpha,show));
+    }
+    
+    addInterfaceElement(id,bitmap,width,height,positionMode,positionOffset,color,alpha,show)
+    {
+        this.interfaceElementList.add(new InterfaceElementClass(id,bitmap,width,height,positionMode,positionOffset,color,alpha,show));
+    }
+    
+    addInterfaceCount(id,bitmap,count,width,height,positionMode,positionOffset,addOffset,onColor,onAlpha,offColor,offAlpha,show)
+    {
+        this.interfaceCountList.add(new InterfaceCountClass(id,bitmap,count,width,height,positionMode,positionOffset,addOffset,onColor,onAlpha,offColor,offAlpha,show));
+    }
+    
+    addInterfaceDial(id,backgroundBitmap,foregroundBitmap,needleBitmap,width,height,positionMode,positionOffset,show)
+    {
+        this.interfaceDialList.add(new InterfaceDialClass(id,backgroundBitmap,foregroundBitmap,needleBitmap,width,height,positionMode,positionOffset,show));
+    }
 
         //
         // utilities
@@ -118,8 +257,19 @@ export default class ProjectClass
         this.core.game.startSequence(name);
     }
     
+    getCharacter(name)
+    {
+        return(this.characters.get(name));
+    }
+    
+    getCharacterList()
+    {
+        return([...this.characters.keys()]);
+    }
+    
         //
-        // combine model lists for loading
+        // combine lists for loading, or just convert
+        // sets to arrays
         //
         
     getModelList(isSingleplayer)
@@ -143,6 +293,26 @@ export default class ProjectClass
     getSequenceList()
     {
         return([...this.sequenceList]);
+    }
+    
+    getInterfaceTextList()
+    {
+        return([...this.interfaceTextList]);
+    }
+    
+    getInterfaceElementList()
+    {
+        return([...this.interfaceElementList]);
+    }
+    
+    getInterfaceCountList()
+    {
+        return([...this.interfaceCountList]);
+    }
+    
+    getInterfaceDialList()
+    {
+        return([...this.interfaceDialList]);
     }
     
         //

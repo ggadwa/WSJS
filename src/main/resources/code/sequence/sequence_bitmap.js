@@ -144,17 +144,17 @@ export default class SequenceBitmapClass
             // position offset
             
         switch (this.positionMode) {
-            case this.sequence.POSITION_MODE_TOP_RIGHT:
+            case this.core.POSITION_TOP_RIGHT:
                 x+=this.core.canvas.width;
                 break;
-            case this.sequence.POSITION_MODE_BOTTOM_LEFT:
+            case this.core.POSITION_BOTTOM_LEFT:
                 y+=this.core.canvas.height;
                 break;
-            case this.sequence.POSITION_MODE_BOTTOM_RIGHT:
+            case this.core.POSITION_BOTTOM_RIGHT:
                 x+=this.core.canvas.width;
                 y+=this.core.canvas.height;
                 break;
-            case this.sequence.POSITION_MODE_MIDDLE:
+            case this.core.POSITION_MIDDLE:
                 x+=Math.trunc(this.core.canvas.width*0.5);
                 y+=Math.trunc(this.core.canvas.height*0.5);
                 break;

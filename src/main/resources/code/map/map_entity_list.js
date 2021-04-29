@@ -146,7 +146,7 @@ export default class MapEntityListClass
             
             for (n=0;n!==10;n++) {
                 if (this.core.setup.multiplayerBotCharacters[n]!=='') {
-                    character=this.core.characterList.get(this.core.setup.multiplayerBotCharacters[n]);
+                    character=this.core.project.getCharacter(this.core.setup.multiplayerBotCharacters[n]);
                     
                         // don't use the same name
                         
@@ -172,7 +172,7 @@ export default class MapEntityListClass
             // telefrag right off the bat
             
         if (this.core.game.multiplayerMode!==this.core.game.MULTIPLAYER_MODE_NONE) {
-            character=this.core.characterList.get(this.core.json.config.multiplayerDefaultCharacter);
+            character=this.core.project.getCharacter(this.core.json.config.multiplayerDefaultCharacter);
             if (this.addFromMap(character.playerJsonName,this.core.setup.multiplayerName,new PointClass(0,0,0),new PointClass(0,0,0),character.data,true)===null) return(false);
         }
         

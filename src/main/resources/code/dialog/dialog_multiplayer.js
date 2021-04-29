@@ -17,7 +17,7 @@ export default class DialogMultiplayerClass extends DialogBaseClass
     initialize()
     {
         let x,y,sx;
-        let n,ctrlName,botCount;
+        let n,ctrlName,botNameList,botCount;
         
         if (!super.initialize()) return(false);
         
@@ -70,12 +70,13 @@ export default class DialogMultiplayerClass extends DialogBaseClass
         sx=x=Math.trunc(this.core.canvas.width*0.5)-(this.PICKER_SIZE*2);
         y=Math.trunc(this.core.canvas.height*0.5)-(this.PICKER_SIZE*2);
         
-        botCount=this.core.json.characters.length;
+        botNameList=this.core.project.getCharacterList();
+        botCount=botNameList.length;
         
         for (n=0;n!==16;n++) {
             ctrlName='botPick'+n;
             this.addDialogControlCharacterPicker(this,null,ctrlName,x,y);
-            this.setDialogControl(ctrlName,(n<botCount)?this.core.json.characters[n].name:'');
+            this.setDialogControl(ctrlName,(n<botCount)?botNameList[n]:'');
             
             if (((n+1)%4)===0) {
                 x=sx;

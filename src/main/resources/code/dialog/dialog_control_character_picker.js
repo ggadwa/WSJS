@@ -150,7 +150,7 @@ export default class DialogControlCharacterPickerClass extends DialogControlBase
         
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
             
-            this.core.characterList.get(this.value).bitmap.attach();
+            this.core.project.getCharacter(this.value).bitmap.attach();
             gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_SHORT,0);
             
             gl.bindBuffer(gl.ARRAY_BUFFER,null);
