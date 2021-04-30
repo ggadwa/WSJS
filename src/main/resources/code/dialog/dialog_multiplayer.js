@@ -16,7 +16,7 @@ export default class DialogMultiplayerClass extends DialogBaseClass
     
     initialize()
     {
-        let x,y,sx;
+        let x,y,psz,sx;
         let n,ctrlName,botNameList,botCount;
         
         if (!super.initialize()) return(false);
@@ -49,26 +49,28 @@ export default class DialogMultiplayerClass extends DialogBaseClass
         
             // bot controls
 
-        x=Math.trunc(this.core.canvas.width*0.5)-Math.trunc(this.PICKER_SIZE*2.5);
+        psz=this.PICKER_SIZE+4;
+        
+        x=Math.trunc(this.core.canvas.width*0.5)-Math.trunc(psz*2.5);
         y=this.DIALOG_CONTROL_TOP_MARGIN;
         
         this.addDialogControlCharacterPicker(this,'bot','bot0',x,y);
-        this.addDialogControlCharacterPicker(this,'bot','bot1',(x+this.PICKER_SIZE),y);
-        this.addDialogControlCharacterPicker(this,'bot','bot2',(x+(this.PICKER_SIZE*2)),y);
-        this.addDialogControlCharacterPicker(this,'bot','bot3',(x+(this.PICKER_SIZE*3)),y);
-        this.addDialogControlCharacterPicker(this,'bot','bot4',(x+(this.PICKER_SIZE*4)),y);
+        this.addDialogControlCharacterPicker(this,'bot','bot1',(x+psz),y);
+        this.addDialogControlCharacterPicker(this,'bot','bot2',(x+(psz*2)),y);
+        this.addDialogControlCharacterPicker(this,'bot','bot3',(x+(psz*3)),y);
+        this.addDialogControlCharacterPicker(this,'bot','bot4',(x+(psz*4)),y);
         
-        y+=this.PICKER_SIZE;
+        y+=psz;
         this.addDialogControlCharacterPicker(this,'bot','bot5',x,y);
-        this.addDialogControlCharacterPicker(this,'bot','bot6',(x+this.PICKER_SIZE),y);
-        this.addDialogControlCharacterPicker(this,'bot','bot7',(x+(this.PICKER_SIZE*2)),y);
-        this.addDialogControlCharacterPicker(this,'bot','bot8',(x+(this.PICKER_SIZE*3)),y);
-        this.addDialogControlCharacterPicker(this,'bot','bot9',(x+(this.PICKER_SIZE*4)),y);
+        this.addDialogControlCharacterPicker(this,'bot','bot6',(x+psz),y);
+        this.addDialogControlCharacterPicker(this,'bot','bot7',(x+(psz*2)),y);
+        this.addDialogControlCharacterPicker(this,'bot','bot8',(x+(psz*3)),y);
+        this.addDialogControlCharacterPicker(this,'bot','bot9',(x+(psz*4)),y);
         
             // character picking
             
-        sx=x=Math.trunc(this.core.canvas.width*0.5)-(this.PICKER_SIZE*2);
-        y=Math.trunc(this.core.canvas.height*0.5)-(this.PICKER_SIZE*2);
+        sx=x=Math.trunc(this.core.canvas.width*0.5)-(psz*2);
+        y=Math.trunc(this.core.canvas.height*0.5)-(psz*2);
         
         botNameList=this.core.project.getCharacterList();
         botCount=botNameList.length;
@@ -80,10 +82,10 @@ export default class DialogMultiplayerClass extends DialogBaseClass
             
             if (((n+1)%4)===0) {
                 x=sx;
-                y+=this.PICKER_SIZE;
+                y+=psz;
             }
             else {
-                x+=this.PICKER_SIZE;
+                x+=psz;
             }
         }
         

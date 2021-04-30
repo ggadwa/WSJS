@@ -89,10 +89,18 @@ export default class ProjectClass
         this.TEXT_ALIGN_RIGHT=core.TEXT_ALIGN_RIGHT;
 
         this.POSITION_TOP_LEFT=core.POSITION_TOP_LEFT;
-        this.POSITION_TOP_RIGHT=core.POSITION_TOP_LEFT;
-        this.POSITION_BOTTOM_LEFT=core.POSITION_TOP_LEFT;
-        this.POSITION_BOTTOM_RIGHT=core.POSITION_TOP_LEFT;
-        this.POSITION_MIDDLE=core.POSITION_TOP_LEFT;
+        this.POSITION_TOP_RIGHT=core.POSITION_TOP_RIGHT;
+        this.POSITION_BOTTOM_LEFT=core.POSITION_BOTTOM_LEFT;
+        this.POSITION_BOTTOM_RIGHT=core.POSITION_BOTTOM_RIGHT;
+        this.POSITION_MIDDLE=core.POSITION_MIDDLE;
+        
+        this.MENU_X_ALIGN_LEFT=core.MENU_X_ALIGN_LEFT;
+        this.MENU_X_ALIGN_CENTER=core.MENU_X_ALIGN_CENTER;
+        this.MENU_X_ALIGN_RIGHT=core.MENU_X_ALIGN_RIGHT;
+        
+        this.MENU_Y_ALIGN_TOP=core.MENU_Y_ALIGN_TOP;
+        this.MENU_Y_ALIGN_CENTER=core.MENU_Y_ALIGN_CENTER;
+        this.MENU_Y_ALIGN_BOTTOM=core.MENU_Y_ALIGN_BOTTOM;
 
             // lists
             
@@ -241,6 +249,40 @@ export default class ProjectClass
     addInterfaceDial(id,backgroundBitmap,foregroundBitmap,needleBitmap,width,height,positionMode,positionOffset,show)
     {
         this.interfaceDialList.add(new InterfaceDialClass(id,backgroundBitmap,foregroundBitmap,needleBitmap,width,height,positionMode,positionOffset,show));
+    }
+    
+        //
+        // project setup
+        //
+
+    setTitleConfig(fontName,clickSound,selectSound)
+    {
+        
+    }
+    
+    setTitleMenu(textSize,highlightTextSize,color,highlightColor,alignX,alignY)
+    {
+        
+    }
+    
+    setTitlePlayButton(title,show)
+    {
+        
+    }
+    
+    setTitleMultiplayerButton(title,show)
+    {
+        
+    }
+    
+    setTitleSetupButton(title,show)
+    {
+        
+    }
+    
+    setTitleQuitButton(title,show)
+    {
+        
     }
 
         //

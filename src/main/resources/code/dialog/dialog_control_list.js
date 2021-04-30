@@ -110,37 +110,49 @@ export default class DialogControlListClass extends DialogControlBaseClass
         gl.deleteBuffer(this.colorBuffer);
         gl.deleteBuffer(this.indexBuffer);
     }
-        
-    click()
+    
+    cursorInList()
     {
-        let idx,y,lft,rgt,top,bot;
+        return((this.core.cursor.x>=this.x) && (this.core.cursor.x<((this.x+(this.TITLE_MARGIN*2))+this.LIST_INPUT_WIDTH)) && (this.core.cursor.y>=this.y) && (this.core.cursor.y<(this.y+this.LIST_INPUT_HEIGHT)));
+    }
+    
+    cursorInUpArrow()
+    {
+        let rgt=((this.x+this.TITLE_MARGIN)+this.LIST_INPUT_WIDTH)-this.LIST_ARROW_MARGIN;
+        let lft=rgt-this.LIST_ARROW_WIDTH;
+        let top=this.y+this.LIST_ARROW_MARGIN;
+        let bot=top+this.LIST_ARROW_WIDTH;
         
-        if ((this.core.cursor.x<this.x) || (this.core.cursor.x>((this.x+(this.TITLE_MARGIN*2))+this.LIST_INPUT_WIDTH)) || (this.core.cursor.y<this.y) || (this.core.cursor.y>(this.y+this.LIST_INPUT_HEIGHT))) return(false);
+        return((this.core.cursor.x>=lft) && (this.core.cursor.x<rgt) && (this.core.cursor.y>=top) && (this.core.cursor.y<bot));
+    }
+    
+    cursorInDownArrow()
+    {
+        let rgt=((this.x+this.TITLE_MARGIN)+this.LIST_INPUT_WIDTH)-this.LIST_ARROW_MARGIN;
+        let lft=rgt-this.LIST_ARROW_WIDTH;
+        let bot=(this.y+this.LIST_INPUT_HEIGHT)-this.LIST_ARROW_MARGIN;    
+        let top=bot-this.LIST_ARROW_WIDTH;
         
-        rgt=((this.x+this.TITLE_MARGIN)+this.LIST_INPUT_WIDTH)-this.LIST_ARROW_MARGIN;
-        lft=rgt-this.LIST_ARROW_WIDTH;
+        return((this.core.cursor.x>=lft) && (this.core.cursor.x<rgt) && (this.core.cursor.y>=top) && (this.core.cursor.y<bot));
+    }
+        
+    clickUp()
+    {
+        let idx,y;
+        
+        if (!this.cursorInList()) return(false);
         
              // up
              
-        top=this.y+this.LIST_ARROW_MARGIN;
-        bot=top+this.LIST_ARROW_WIDTH;
-            
-        if ((this.core.cursor.x>=lft) && (this.core.cursor.x<rgt) && (this.core.cursor.y>=top) && (this.core.cursor.y<bot)) {
+        if (this.cursorInUpArrow()) {
             if (this.listScrollIndex>0) this.listScrollIndex-=this.LIST_INPUT_PER_VIEW_ITEM_COUNT;
-            
-            this.dialog.currentTextInputControl=null;
             return(true);
         }
 
             // down
             
-        bot=(this.y+this.LIST_INPUT_HEIGHT)-this.LIST_ARROW_MARGIN;    
-        top=bot-this.LIST_ARROW_WIDTH;
-            
-        if ((this.core.cursor.x>=lft) && (this.core.cursor.x<rgt) && (this.core.cursor.y>=top) && (this.core.cursor.y<bot)) {
+        if (this.cursorInDownArrow()) {
             if ((this.listScrollIndex+this.LIST_INPUT_PER_VIEW_ITEM_COUNT)<this.list.length) this.listScrollIndex+=this.LIST_INPUT_PER_VIEW_ITEM_COUNT;
-            
-            this.dialog.currentTextInputControl=null;
             return(true);
         }
         
@@ -157,7 +169,7 @@ export default class DialogControlListClass extends DialogControlBaseClass
 
     draw()
     {
-        let n,y,lft,rgt,top,bot,mx,idx;
+        let n,y,lft,rgt,top,bot,mx,idx,highlight;
         let shader=this.core.shaderList.colorShader;
         let gl=this.core.gl;
         
@@ -189,9 +201,11 @@ export default class DialogControlListClass extends DialogControlBaseClass
         
             // the outline
             
-        this.colorArray[0]=this.colorArray[4]=this.colorArray[8]=this.colorArray[12]=this.outlineColor.r;
-        this.colorArray[1]=this.colorArray[5]=this.colorArray[9]=this.colorArray[13]=this.outlineColor.g;
-        this.colorArray[2]=this.colorArray[6]=this.colorArray[10]=this.colorArray[14]=this.outlineColor.b;
+        highlight=this.cursorInList();
+        
+        this.colorArray[0]=this.colorArray[4]=this.colorArray[8]=this.colorArray[12]=highlight?this.highlightOutlineColor.r:this.outlineColor.r;
+        this.colorArray[1]=this.colorArray[5]=this.colorArray[9]=this.colorArray[13]=highlight?this.highlightOutlineColor.g:this.outlineColor.g;
+        this.colorArray[2]=this.colorArray[6]=this.colorArray[10]=this.colorArray[14]=highlight?this.highlightOutlineColor.b:this.outlineColor.b;
         this.colorArray[3]=this.colorArray[7]=this.colorArray[11]=this.colorArray[15]=1;
         
         gl.bindBuffer(gl.ARRAY_BUFFER,this.colorBuffer);
@@ -284,9 +298,11 @@ export default class DialogControlListClass extends DialogControlBaseClass
         gl.bufferSubData(gl.ARRAY_BUFFER,0,this.vertexArray);
         gl.vertexAttribPointer(shader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
         
-        this.colorArray[0]=this.colorArray[4]=this.colorArray[8]=this.widgetBottomColor.r;
-        this.colorArray[1]=this.colorArray[5]=this.colorArray[9]=this.widgetBottomColor.g;
-        this.colorArray[2]=this.colorArray[6]=this.colorArray[10]=this.widgetBottomColor.b;
+        highlight=this.cursorInUpArrow();
+        
+        this.colorArray[0]=this.colorArray[4]=this.colorArray[8]=highlight?this.widgetBottomHighlightColor.r:this.widgetBottomColor.r;
+        this.colorArray[1]=this.colorArray[5]=this.colorArray[9]=highlight?this.widgetBottomHighlightColor.g:this.widgetBottomColor.g;
+        this.colorArray[2]=this.colorArray[6]=this.colorArray[10]=highlight?this.widgetBottomHighlightColor.b:this.widgetBottomColor.b;
         this.colorArray[3]=this.colorArray[7]=this.colorArray[11]=1;
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.colorBuffer);
@@ -321,9 +337,11 @@ export default class DialogControlListClass extends DialogControlBaseClass
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
         gl.bufferSubData(gl.ARRAY_BUFFER,0,this.vertexArray);
         
-        this.colorArray[0]=this.colorArray[4]=this.colorArray[8]=this.widgetBottomColor.r;
-        this.colorArray[1]=this.colorArray[5]=this.colorArray[9]=this.widgetBottomColor.g;
-        this.colorArray[2]=this.colorArray[6]=this.colorArray[10]=this.widgetBottomColor.b;
+        highlight=this.cursorInDownArrow();
+        
+        this.colorArray[0]=this.colorArray[4]=this.colorArray[8]=highlight?this.widgetBottomHighlightColor.r:this.widgetBottomColor.r;
+        this.colorArray[1]=this.colorArray[5]=this.colorArray[9]=highlight?this.widgetBottomHighlightColor.g:this.widgetBottomColor.g;
+        this.colorArray[2]=this.colorArray[6]=this.colorArray[10]=highlight?this.widgetBottomHighlightColor.b:this.widgetBottomColor.b;
         this.colorArray[3]=this.colorArray[7]=this.colorArray[11]=1;
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.colorBuffer);

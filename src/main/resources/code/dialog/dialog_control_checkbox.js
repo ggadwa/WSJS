@@ -81,19 +81,24 @@ export default class DialogControlCheckboxClass extends DialogControlBaseClass
         gl.deleteBuffer(this.colorBuffer);
         gl.deleteBuffer(this.indexBuffer);
     }
-        
-    click()
+    
+    cursorInCheck()
     {
-        if ((this.core.cursor.x<(this.x+this.TITLE_MARGIN)) || (this.core.cursor.x>((this.x+this.TITLE_MARGIN)+(this.CONTROL_HEIGHT*2))) || (this.core.cursor.y<this.y) || (this.core.cursor.y>(this.y+this.CONTROL_HEIGHT))) return(false);
+        return((this.core.cursor.x>(this.x+this.TITLE_MARGIN)) && (this.core.cursor.x<=((this.x+this.TITLE_MARGIN)+(this.CONTROL_HEIGHT*2))) && (this.core.cursor.y>this.y) && (this.core.cursor.y<=(this.y+this.CONTROL_HEIGHT)));
+    }
+        
+    clickUp()
+    {
+        if (!this.cursorInCheck()) return(false);
         
         this.value=!this.value;
         
-        this.dialog.currentTextInputControl=null;
         return(true);
     }
         
     draw()
     {
+        let highlight;
         let shader=this.core.shaderList.colorShader;
         let gl=this.core.gl;
         
@@ -185,10 +190,12 @@ export default class DialogControlCheckboxClass extends DialogControlBaseClass
             
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
         gl.bufferSubData(gl.ARRAY_BUFFER,0,this.vertexArray);
+        
+        highlight=this.cursorInCheck();
             
-        this.colorArray[0]=this.colorArray[4]=this.colorArray[8]=this.colorArray[12]=this.outlineColor.r;
-        this.colorArray[1]=this.colorArray[5]=this.colorArray[9]=this.colorArray[13]=this.outlineColor.g;
-        this.colorArray[2]=this.colorArray[6]=this.colorArray[10]=this.colorArray[14]=this.outlineColor.b;
+        this.colorArray[0]=this.colorArray[4]=this.colorArray[8]=this.colorArray[12]=highlight?this.highlightOutlineColor.r:this.outlineColor.r;
+        this.colorArray[1]=this.colorArray[5]=this.colorArray[9]=this.colorArray[13]=highlight?this.highlightOutlineColor.g:this.outlineColor.g;
+        this.colorArray[2]=this.colorArray[6]=this.colorArray[10]=this.colorArray[14]=highlight?this.highlightOutlineColor.b:this.outlineColor.b;
         this.colorArray[3]=this.colorArray[7]=this.colorArray[11]=this.colorArray[15]=1;
         
         gl.bindBuffer(gl.ARRAY_BUFFER,this.colorBuffer);

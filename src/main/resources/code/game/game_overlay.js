@@ -16,10 +16,7 @@ export default class GameOverlayClass
     {
         this.core=core;
         
-        this.MAX_SCORE_COUNT=10;
-        
-        this.POSITION_MODE_LIST=['topLeft','topRight','bottomLeft','bottomRight','middle'];
-        
+        this.MAX_SCORE_COUNT=10;        
         this.TOUCH_SWIPE_DEAD_ZONE=20;
         
             // some colors
@@ -98,7 +95,7 @@ export default class GameOverlayClass
         }
 
         for (text of this.core.project.getInterfaceTextList()) {
-            this.addText(text.id,text.text,text.positionMode,text.positionOffset,text.textSize,text.align,text.color,text.alpha,false);
+            this.addText(text.id,text.text,text.positionMode,text.positionOffset,text.textSize,text.textAlign,text.color,text.alpha,false);
             this.showText(text.id,text.show);
         }
 

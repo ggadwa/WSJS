@@ -1,13 +1,6 @@
 SCRIPT REDO
 
 
-- character stuff to project
-- interface to project
-- remove POSITION_MODE_LIST
-- remove TEXT_ALIGN_LIST
-
-- bot picker interface needs highlighting
-
 - this.core.game.timestamp
 - animations and sounds as new AnimationDef() and new SoundDef()
 

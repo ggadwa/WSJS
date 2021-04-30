@@ -80,27 +80,33 @@ export default class DialogControlRangeClass extends DialogControlBaseClass
         gl.deleteBuffer(this.colorBuffer);
         gl.deleteBuffer(this.indexBuffer);
     }
-                
-    click()
+    
+    cursorInRange()
+    {
+        return((this.core.cursor.x>=this.x) && (this.core.cursor.x<((this.x+(this.TITLE_MARGIN*2))+this.TEXT_INPUT_WIDTH)) && (this.core.cursor.y>=this.y) && (this.core.cursor.y<(this.y+this.CONTROL_HEIGHT)));
+    }
+    
+    clickDown()
     {
         let hx;
         
-        if ((this.core.cursor.x<this.x) || (this.core.cursor.x>((this.x+(this.TITLE_MARGIN*2))+this.TEXT_INPUT_WIDTH)) || (this.core.cursor.y<this.y) || (this.core.cursor.y>(this.y+this.CONTROL_HEIGHT))) return(false);
+        if (!this.cursorInRange()) return(false);
         
         hx=Math.trunc(((this.core.cursor.x-(this.x+this.TITLE_MARGIN))/this.TEXT_INPUT_WIDTH)*100); // we go a little over each edge so we can click to 0/100
         if (hx<0) hx=0;
         if (hx>100) hx=100;
         
         this.value=hx;
-        
-        this.dialog.currentTextInputControl=null;
-        
-        return(true);
+    }
+                
+    clickUp()
+    {
+        return(this.cursorInRange());
     }
         
     draw()
     {
-        let hx,my,hsz;
+        let hx,my,hsz,highlight;
         let shader=this.core.shaderList.colorShader;
         let gl=this.core.gl;
         
@@ -109,7 +115,7 @@ export default class DialogControlRangeClass extends DialogControlBaseClass
         shader.drawStart();
         
             // the track
-        
+       
         this.vertexArray[0]=this.vertexArray[6]=this.x+this.TITLE_MARGIN;
         this.vertexArray[1]=this.vertexArray[3]=my;
         this.vertexArray[2]=this.vertexArray[4]=(this.x+this.TITLE_MARGIN)+this.TEXT_INPUT_WIDTH;
@@ -118,12 +124,12 @@ export default class DialogControlRangeClass extends DialogControlBaseClass
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
         gl.bufferSubData(gl.ARRAY_BUFFER,0,this.vertexArray);
         gl.vertexAttribPointer(shader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
-        
+
             // the track fill
             
-        this.colorArray[0]=this.colorArray[4]=this.colorArray[8]=this.colorArray[12]=this.fillColor.r;
-        this.colorArray[1]=this.colorArray[5]=this.colorArray[9]=this.colorArray[13]=this.fillColor.g;
-        this.colorArray[2]=this.colorArray[6]=this.colorArray[10]=this.colorArray[14]=this.fillColor.b;
+        this.colorArray[0]=this.colorArray[4]=this.colorArray[8]=this.colorArray[12]=this.outlineColor.r;
+        this.colorArray[1]=this.colorArray[5]=this.colorArray[9]=this.colorArray[13]=this.outlineColor.g;
+        this.colorArray[2]=this.colorArray[6]=this.colorArray[10]=this.colorArray[14]=this.outlineColor.b;
         this.colorArray[3]=this.colorArray[7]=this.colorArray[11]=this.colorArray[15]=1;
         
         gl.bindBuffer(gl.ARRAY_BUFFER,this.colorBuffer);
@@ -133,18 +139,6 @@ export default class DialogControlRangeClass extends DialogControlBaseClass
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
             
         gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_SHORT,0);
-        
-            // the track outline
-            
-        this.colorArray[0]=this.colorArray[4]=this.colorArray[8]=this.colorArray[12]=this.outlineColor.r;
-        this.colorArray[1]=this.colorArray[5]=this.colorArray[9]=this.colorArray[13]=this.outlineColor.g;
-        this.colorArray[2]=this.colorArray[6]=this.colorArray[10]=this.colorArray[14]=this.outlineColor.b;
-        this.colorArray[3]=this.colorArray[7]=this.colorArray[11]=this.colorArray[15]=1;
-        
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.colorBuffer);
-        gl.bufferSubData(gl.ARRAY_BUFFER,0,this.colorArray);
-        
-        gl.drawArrays(gl.LINE_LOOP,0,4);
         
             // the handle
             
@@ -164,14 +158,16 @@ export default class DialogControlRangeClass extends DialogControlBaseClass
         
             // the handle fill
             
-        this.colorArray[0]=this.colorArray[4]=this.widgetBottomColor.r;
-        this.colorArray[1]=this.colorArray[5]=this.widgetBottomColor.g;
-        this.colorArray[2]=this.colorArray[6]=this.widgetBottomColor.b;
+        highlight=this.cursorInRange();
+            
+        this.colorArray[0]=this.colorArray[4]=highlight?this.widgetBottomHighlightColor.r:this.widgetBottomColor.r;
+        this.colorArray[1]=this.colorArray[5]=highlight?this.widgetBottomHighlightColor.g:this.widgetBottomColor.g;
+        this.colorArray[2]=this.colorArray[6]=highlight?this.widgetBottomHighlightColor.b:this.widgetBottomColor.b;
         this.colorArray[3]=this.colorArray[7]=1;
 
-        this.colorArray[8]=this.colorArray[12]=this.widgetTopColor.r;
-        this.colorArray[9]=this.colorArray[13]=this.widgetTopColor.g
-        this.colorArray[10]=this.colorArray[14]=this.widgetTopColor.b;
+        this.colorArray[8]=this.colorArray[12]=highlight?this.widgetTopHighlightColor.r:this.widgetTopColor.r;
+        this.colorArray[9]=this.colorArray[13]=highlight?this.widgetTopHighlightColor.g:this.widgetTopColor.g
+        this.colorArray[10]=this.colorArray[14]=highlight?this.widgetTopHighlightColor.b:this.widgetTopColor.b;
         this.colorArray[11]=this.colorArray[15]=1;
         
         gl.bindBuffer(gl.ARRAY_BUFFER,this.colorBuffer);

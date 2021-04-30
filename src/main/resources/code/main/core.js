@@ -28,10 +28,6 @@ export default class CoreClass
 {
     constructor(project)
     {
-            // the project
-
-        this.project=new project(this);
-        
             // some testing flags
             
         this.debugForceTouch=false;
@@ -74,8 +70,6 @@ export default class CoreClass
         this.TEXT_ALIGN_CENTER=1;
         this.TEXT_ALIGN_RIGHT=2;
         
-        this.TEXT_ALIGN_LIST=['left','center','right'];
-        
             // element positions
             
         this.POSITION_TOP_LEFT=0;
@@ -84,10 +78,24 @@ export default class CoreClass
         this.POSITION_BOTTOM_RIGHT=3;
         this.POSITION_MIDDLE=4;
         
+            // menu positions
+            
+        this.MENU_X_ALIGN_LEFT=-1;
+        this.MENU_X_ALIGN_CENTER=0;
+        this.MENU_X_ALIGN_RIGHT=1;
+        
+        this.MENU_Y_ALIGN_TOP=-1;
+        this.MENU_Y_ALIGN_CENTER=0;
+        this.MENU_Y_ALIGN_BOTTOM=1;
+        
             // misc statics
             
         this.MAX_LIGHT_COUNT=24;        // max lights in scene, needs to be the same as lights[x] in shaders
         this.MAX_SKELETON_JOINT=64;    // max joints in a skeleton, needs to be the same as jointMatrix[x] in shaders
+
+            // the project
+
+        this.project=new project(this);
         
             // current loop
             

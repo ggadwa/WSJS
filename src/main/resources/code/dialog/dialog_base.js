@@ -32,7 +32,7 @@ export default class DialogBaseClass
         this.controls=new Map();
         this.buttons=new Map();
         
-        this.clickDown=false;
+        this.currentMouseDown=false;
         this.selectedTabId=null;
         this.defButtonId=null;
         
@@ -55,7 +55,7 @@ export default class DialogBaseClass
         this.controls.clear();
         this.buttons.clear();
         
-        this.clickDown=false;
+        this.currentMouseDown=false;
         this.selectedTabId=null;
         this.defButtonId=null;
         
@@ -220,7 +220,7 @@ export default class DialogBaseClass
         this.lastRunTimestamp=0;
         this.lastDrawTimestamp=0;
         
-        this.clickDown=false;
+        this.currentMouseDown=false;
         
             // stop music/looping sounds
             
@@ -242,7 +242,7 @@ export default class DialogBaseClass
         this.lastRunTimestamp=this.timestamp;
         this.lastDrawTimestamp=this.timestamp;
         
-        this.clickDown=false;
+        this.currentMouseDown=false;
     }
     
         //
@@ -252,7 +252,7 @@ export default class DialogBaseClass
     runInternal()
     {
         let key,tab,control,button;
-        let hadKey;
+        let hadKey,mouseDown,mouseUp;
         
             // keyboard
             
@@ -286,24 +286,31 @@ export default class DialogBaseClass
             if (hadKey) return(null);
         }
 
-            // mouse clicking
+            // cursor clicking
             
-        if (this.core.cursor.run()) {
-            this.clickDown=true;
-            return(null);
-        }
+        mouseDown=false;
+        mouseUp=false;
         
-        if (!this.clickDown) return(null);
-        this.clickDown=false;
+        if (this.core.cursor.run()) {
+            this.currentMouseDown=true;
+            mouseDown=true;
+        }
+        else {
+            if (this.currentMouseDown) {
+                this.currentMouseDown=false;
+                mouseUp=true;
+            }
+        }
 
             // tabs
 
-        if (!this.pickerMode) {
+        if ((!this.pickerMode) && (mouseUp)) {
             for ([key,tab] of this.tabs) {
                 if (tab.cursorInTab()) {
                     this.core.audio.soundStartUI(this.core.title.clickSound);
                     this.selectedTabId=key;
                     this.currentTextInputControl=null;
+                    this.core.input.keyClearLastRaw();
                     return(null);
                 }
             }
@@ -320,21 +327,31 @@ export default class DialogBaseClass
                 if (control.tabId!==null) continue;
             }
             
-            if (control.click()) {
-                this.core.audio.soundStartUI(this.core.title.selectSound);
-                return(key);
+            if (mouseDown) {
+                control.clickDown();
+            }
+            else {
+                if (mouseUp) {
+                    if (control.clickUp()) {
+                        this.core.audio.soundStartUI(this.core.title.selectSound);
+                        this.currentTextInputControl=(control instanceof DialogControlTextClass)?control:null;
+                        this.core.input.keyClearLastRaw();
+                        return(key);
+                    }
+                }
             }
         }
 
             // buttons
 
-        if (!this.pickerMode) {
+        if ((!this.pickerMode) && (mouseUp)) {
             for ([key,button] of this.buttons) {
                 if (!button.show) continue;
 
                 if (button.cursorInButton()) {
-                    this.currentTextInputControl=null;
                     this.core.audio.soundStartUI(this.core.title.clickSound);
+                    this.currentTextInputControl=null;
+                    this.core.input.keyClearLastRaw();
                     return(key);
                 }
             }

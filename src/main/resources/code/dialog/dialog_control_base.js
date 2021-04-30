@@ -27,7 +27,8 @@ export default class DialogControlBaseClass
         this.widgetOutlineColor=new ColorClass(0.0,0.0,0.6);
         this.disableColor=new ColorClass(0.6,0.6,0.7);
         this.fillColor=new ColorClass(0.9,0.9,0.9);
-        this.outlineColor=new ColorClass(0.5,0.5,0.5);
+        this.outlineColor=new ColorClass(0.6,0.6,1.0);
+        this.highlightOutlineColor=new ColorClass(0.8,0.0,1.0);
     }
     
         //
@@ -47,7 +48,11 @@ export default class DialogControlBaseClass
         // clicking
         //
         
-    click()
+    clickDown()
+    {
+    }
+    
+    clickUp()
     {
         return(false);
     }

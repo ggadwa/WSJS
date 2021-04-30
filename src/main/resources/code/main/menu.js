@@ -45,28 +45,28 @@ export default class MenuClass
             // the alignment
             
         switch (this.alignX) {
-            case -1:
+            case this.core.MENU_X_ALIGN_LEFT:
                 x=margin;
                 align=this.core.TEXT_ALIGN_LEFT;
                 break;
-            case 0:
+            case this.core.MENU_X_ALIGN_CENTER:
                 x=Math.trunc(this.core.canvas.width*0.5);
                 align=this.core.TEXT_ALIGN_CENTER;
                 break;
-            case 1:
+            case this.core.MENU_X_ALIGN_RIGHT:
                 x=this.core.canvas.width-margin;
                 align=this.core.TEXT_ALIGN_RIGHT;
                 break;
         }
         
         switch (this.alignY) {
-            case -1:
+            case this.core.MENU_Y_ALIGN_TOP:
                 y=high+margin;
                 break;
-            case 0:
+            case this.core.MENU_Y_ALIGN_CENTER:
                 y=(Math.trunc(this.core.canvas.height*0.5)-Math.trunc((high*itemCount)*0.5))+textSize;
                 break;
-            case 1:
+            case this.core.MENU_Y_ALIGN_BOTTOM:
                 y=this.core.canvas.height-((high*(itemCount-1))+margin);
                 break;
         }
