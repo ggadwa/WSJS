@@ -42,20 +42,20 @@ export default class TitleClass
             // audio
             // will share with dialogs
             
-        this.clickSound=new SoundClass(this.core,this.core.json.title.clickSound);
+        this.clickSound=new SoundClass(this.core,this.core.project.titleClickSoundName);
         this.clickSound.initialize();
         if (!(await this.clickSound.load())) return(false);
         
-        this.selectSound=new SoundClass(this.core,this.core.json.title.selectSound);
+        this.selectSound=new SoundClass(this.core,this.core.project.titleSelectSoundName);
         this.selectSound.initialize();
         if (!(await this.selectSound.load())) return(false);
         
             // the menu
-        
-        if (this.core.json.title.playButton.show) items.push([this.PLAY_MENU_ID,this.core.json.title.playButton.title]);
-        if (this.core.json.title.multiplayerButton.show) items.push([this.MULTIPLAYER_MENU_ID,this.core.json.title.multiplayerButton.title]);
-        if (this.core.json.title.setupButton.show) items.push([this.SETUP_MENU_ID,this.core.json.title.setupButton.title]);
-        if (this.core.json.title.quitButton.show) items.push([this.QUIT_MENU_ID,this.core.json.title.quitButton.title]);
+            
+        if (this.core.project.titlePlayButton.show) items.push([this.PLAY_MENU_ID,this.core.project.titlePlayButton.title]);
+        if (this.core.project.titleMultiplayerButton.show) items.push([this.MULTIPLAYER_MENU_ID,this.core.project.titleMultiplayerButton.title]);
+        if (this.core.project.titleSetupButton.show) items.push([this.SETUP_MENU_ID,this.core.project.titleSetupButton.title]);
+        if (this.core.project.titleQuitButton.show) items.push([this.QUIT_MENU_ID,this.core.project.titleQuitButton.title]);
         
         this.menu=new MenuClass(this.core,items);
         if (!this.menu.initialize()) return(false);

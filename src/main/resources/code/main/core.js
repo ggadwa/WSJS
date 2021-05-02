@@ -402,7 +402,7 @@ export default class CoreClass
 
             // draw the text
 
-        ctx.font=(this.TEXT_FONT_SIZE+'px ')+this.json.title.font;
+        ctx.font=(this.TEXT_FONT_SIZE+'px ')+this.project.fontName;
         ctx.textAlign='left';
         ctx.textBaseline='middle';
         ctx.fillStyle='#FFFFFF';

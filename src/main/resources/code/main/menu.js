@@ -12,16 +12,6 @@ export default class MenuClass
         this.texts=[];
         this.ids=[];
         
-        this.color=new ColorClass(this.core.json.title.menu.color.r,this.core.json.title.menu.color.g,this.core.json.title.menu.color.b);
-        this.highlightColor=new ColorClass(this.core.json.title.menu.highlightColor.r,this.core.json.title.menu.highlightColor.g,this.core.json.title.menu.highlightColor.b);
-        
-        this.alignX=0;
-        if (this.core.json.title.menu.alignX==='left') this.alignX=-1;
-        if (this.core.json.title.menu.alignX==='right') this.alignX=1;
-        this.alignY=0;
-        if (this.core.json.title.menu.alignY==='top') this.alignY=-1;
-        if (this.core.json.title.menu.alignY==='bottom') this.alignY=1;
-        
         this.rect=new RectClass(0,0,0,0);
         
         this.currentSelectIndex=-1;
@@ -36,7 +26,7 @@ export default class MenuClass
     async initialize()
     {
         let n,x,y,high,margin,align,itemCount,text;
-        let textSize=this.core.json.title.menu.textSize;
+        let textSize=this.core.project.menuFontSize;
         
         itemCount=this.items.length;
         margin=Math.trunc(textSize*0.1)
@@ -44,7 +34,7 @@ export default class MenuClass
         
             // the alignment
             
-        switch (this.alignX) {
+        switch (this.core.project.menuAlignX) {
             case this.core.MENU_X_ALIGN_LEFT:
                 x=margin;
                 align=this.core.TEXT_ALIGN_LEFT;
@@ -59,7 +49,7 @@ export default class MenuClass
                 break;
         }
         
-        switch (this.alignY) {
+        switch (this.core.project.menuAlignY) {
             case this.core.MENU_Y_ALIGN_TOP:
                 y=high+margin;
                 break;
@@ -74,7 +64,7 @@ export default class MenuClass
             // the items
         
         for (n=0;n!==itemCount;n++) {    
-            text=new TextClass(this.core,this.items[n][1],x,y,textSize,align,this.color,1,false);
+            text=new TextClass(this.core,this.items[n][1],x,y,textSize,align,this.core.project.menuColor,1,false);
             text.initialize();
             this.texts.push(text);
             
@@ -128,8 +118,6 @@ export default class MenuClass
     draw()
     {
         let n,text,selectIdx;
-        let textSize=this.core.json.title.menu.textSize;
-        let highlightTextSize=this.core.json.title.menu.highlightTextSize;
             
             // draw the list
             
@@ -141,13 +129,13 @@ export default class MenuClass
             text=this.texts[n];
             
             if (this.cursorInItemForIndex(n)) {
-                text.fontSize=highlightTextSize;
-                text.color=this.highlightColor;
+                text.fontSize=this.core.project.menuFontSizeHighlight;
+                text.color=this.core.project.menuColorHighlight;
                 selectIdx=n;
             }
             else {
-                text.fontSize=textSize;
-                text.color=this.color;
+                text.fontSize=this.core.project.menuFontSize;
+                text.color=this.core.project.menuColor;
             }
             
             text.draw();

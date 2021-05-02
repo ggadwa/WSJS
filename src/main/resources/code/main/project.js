@@ -1,3 +1,4 @@
+import ColorClass from '../utility/color.js';
 import CharacterClass from '../main/character.js';
 
     //
@@ -72,6 +73,15 @@ class InterfaceDialClass
     }
 }
 
+class TitleButtonClass
+{
+    constructor()
+    {
+        this.title='';
+        this.show=false;
+    }
+}
+
     //
     // main project class
     //
@@ -127,6 +137,25 @@ export default class ProjectClass
         this.interfaceElementList=new Set();
         this.interfaceCountList=new Set();
         this.interfaceDialList=new Set();
+        
+            // configs
+            
+        this.fontName='Arial';
+        this.menuFontSize=80;
+        this.menuFontSizeHighlight=80;
+        this.menuColor=new ColorClass(1.0,1.0,1.0);
+        this.menuColorHighlight=new ColorClass(1.0,1.0,1.0);
+        this.menuAlignX=this.MENU_X_ALIGN_CENTER;
+        this.menuAlignY=this.MENU_Y_ALIGN_CENTER;
+        this.titleClickSoundName=null;
+        this.titleSelectSoundName=null;
+        
+        this.titlePlayButton=new TitleButtonClass();
+        this.titleMultiplayerButton=new TitleButtonClass();
+        this.titleSetupButton=new TitleButtonClass();
+        this.titleQuitButton=new TitleButtonClass();
+        
+        Object.seal(this);
     }
     
         //
@@ -255,34 +284,45 @@ export default class ProjectClass
         // project setup
         //
 
-    setTitleConfig(fontName,clickSound,selectSound)
+    setTitleConfig(fontName,titleClickSoundName,titleSelectSoundName)
     {
-        
+        this.fontName=fontName;
+        this.titleClickSoundName=titleClickSoundName;
+        this.titleSelectSoundName=titleSelectSoundName;
     }
     
-    setTitleMenu(textSize,highlightTextSize,color,highlightColor,alignX,alignY)
+    setTitleMenu(menuFontSize,menuFontSizeHighlight,menuColor,menuColorHighlight,menuAlignX,menuAlignY)
     {
-        
+        this.menuFontSize=menuFontSize;
+        this.menuFontSizeHighlight=menuFontSizeHighlight;
+        this.menuColor=menuColor;
+        this.menuColorHighlight=menuColorHighlight;
+        this.menuAlignX=menuAlignX;
+        this.menuAlignY=menuAlignY;
     }
     
     setTitlePlayButton(title,show)
     {
-        
+        this.titlePlayButton.title=title;
+        this.titlePlayButton.show=show;
     }
     
     setTitleMultiplayerButton(title,show)
     {
-        
+        this.titleMultiplayerButton.title=title;
+        this.titleMultiplayerButton.show=show;
     }
     
     setTitleSetupButton(title,show)
     {
-        
+        this.titleSetupButton.title=title;
+        this.titleSetupButton.show=show;
     }
     
     setTitleQuitButton(title,show)
     {
-        
+        this.titleQuitButton.title=title;
+        this.titleQuitButton.show=show;
     }
 
         //
