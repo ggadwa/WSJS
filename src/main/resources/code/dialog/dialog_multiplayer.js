@@ -108,7 +108,7 @@ export default class DialogMultiplayerClass extends DialogBaseClass
             // force a multiplayer character/map for player
             
         multiplayerCharacter=this.core.setup.multiplayerCharacter;
-        if (multiplayerCharacter==='') multiplayerCharacter=this.core.json.config.multiplayerDefaultCharacter;
+        if (multiplayerCharacter==='') multiplayerCharacter=this.core.project.multiplayerDefaultCharacter;
         
         multiplayerLocalMap=this.core.setup.multiplayerLocalMap;
         if (multiplayerLocalMap==='') multiplayerLocalMap=this.core.json.multiplayerMaps[0];

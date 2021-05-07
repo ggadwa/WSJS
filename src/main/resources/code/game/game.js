@@ -194,13 +194,13 @@ export default class GameClass
     remoteEntering(name)
     {
         this.overlay.scores.set(name,0);
-        if (this.core.json.config.multiplayerMessageText!==null) this.overlay.updateTemporaryText(this.core.json.config.multiplayerMessageText,(name+' has joined'),5000);
+        if (this.core.project.multiplayerMessageTextId!==null) this.overlay.updateTemporaryText(this.core.project.multiplayerMessageTextId,(name+' has joined'),this.core.project.multiplayerMessageWaitTick);
     }
     
     remoteLeaving(name)
     {
         this.overlay.scores.delete(name);
-        if (this.core.json.config.multiplayerMessageText!==null) this.overlay.updateTemporaryText(this.core.json.config.multiplayerMessageText,(name+' has left'),5000);
+        if (this.core.project.multiplayerMessageTextId!==null) this.overlay.updateTemporaryText(this.core.project.multiplayerMessageTextId,(name+' has left'),this.core.project.multiplayerMessageWaitTick);
     }
     
         //

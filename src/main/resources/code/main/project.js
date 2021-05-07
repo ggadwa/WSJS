@@ -1,3 +1,4 @@
+import PointClass from '../utility/point.js';
 import ColorClass from '../utility/color.js';
 import CharacterClass from '../main/character.js';
 
@@ -154,6 +155,16 @@ export default class ProjectClass
         this.titleMultiplayerButton=new TitleButtonClass();
         this.titleSetupButton=new TitleButtonClass();
         this.titleQuitButton=new TitleButtonClass();
+        
+        this.touchStickSize=256;
+        this.touchMenuSize=48;
+        this.touchMenuPosition=new PointClass(0,0,0);
+        this.touchShowLeftStick=true;
+        this.touchShowRightStick=true;
+        
+        this.multiplayerDefaultCharacter=null;
+        this.multiplayerMessageTextId=null;
+        this.multiplayerMessageWaitTick=0;
         
         Object.seal(this);
     }
@@ -323,6 +334,39 @@ export default class ProjectClass
     {
         this.titleQuitButton.title=title;
         this.titleQuitButton.show=show;
+    }
+    
+    setTouchControls(stickSize,menuSize,menuPositionMode,menuPositionOffset,showLeftStick,showRightStick)
+    {
+        this.touchStickSize=stickSize;
+        this.touchMenuSize=menuSize;
+    
+        this.touchMenuPosition.setFromPoint(menuPositionOffset);
+        
+        switch (menuPositionMode) {
+            case this.core.POSITION_TOP_RIGHT:
+                this.touchMenuPosition.addValues(this.core.canvas.width,0,0);
+                break;
+            case this.core.POSITION_BOTTOM_LEFT:
+                this.touchMenuPosition.addValues(0,this.core.canvas.height,0);
+                break;
+            case this.core.POSITION_BOTTOM_RIGHT:
+                this.touchMenuPosition.addValues(this.core.canvas.width,this.core.canvas.height,0);
+                break;
+            case this.core.POSITION_MIDDLE:
+                this.touchMenuPosition.addValues(Math.trunc(this.core.canvas.width*0.5),Math.trunc(this.core.canvas.height*0.5),0);
+                break;
+        }
+        
+        this.touchShowLeftStick=showLeftStick;
+        this.touchShowRightStick=showRightStick;
+    }
+
+    setMultiplayerUI(defaultCharacter,messageTextId,messageWaitTick)
+    {
+        this.multiplayerDefaultCharacter=defaultCharacter;
+        this.multiplayerMessageTextId=messageTextId;
+        this.multiplayerMessageWaitTick=messageWaitTick;
     }
 
         //

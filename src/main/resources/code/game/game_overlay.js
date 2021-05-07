@@ -129,13 +129,13 @@ export default class GameOverlayClass
             
             // virtual touch controls
             
-        this.touchStickLeft=new TouchStickClass(this.core,'textures/ui_touch_stick_left_ring.png','textures/ui_touch_stick_left_thumb.png',this.core.json.config.touchStickSize,this.core.json.config.touchShowLeftStick);
+        this.touchStickLeft=new TouchStickClass(this.core,'textures/ui_touch_stick_left_ring.png','textures/ui_touch_stick_left_thumb.png',this.core.project.touchStickSize,this.core.project.touchShowLeftStick);
         if (!(await this.touchStickLeft.initialize())) return(false);
         
-        this.touchStickRight=new TouchStickClass(this.core,'textures/ui_touch_stick_right_ring.png','textures/ui_touch_stick_right_thumb.png',this.core.json.config.touchStickSize,this.core.json.config.touchShowRightStick);
+        this.touchStickRight=new TouchStickClass(this.core,'textures/ui_touch_stick_right_ring.png','textures/ui_touch_stick_right_thumb.png',this.core.project.touchStickSize,this.core.project.touchShowRightStick);
         if (!(await this.touchStickRight.initialize())) return(false);
         
-        this.touchButtonMenu=new TouchButtonClass(this.core,'textures/ui_touch_menu.png',new PointClass(Math.trunc(this.core.json.config.touchMenuPosition[0]*this.core.canvas.width),Math.trunc(this.core.json.config.touchMenuPosition[1]*this.core.canvas.height),0),this.core.json.config.touchButtonSize);
+        this.touchButtonMenu=new TouchButtonClass(this.core,'textures/ui_touch_menu.png',this.core.project.touchMenuPosition,this.core.project.touchMenuSize);
         if (!(await this.touchButtonMenu.initialize())) return(false);
 
         return(true);
@@ -498,18 +498,18 @@ export default class GameOverlayClass
             if (isTelefrag) {
                 scoreEntity=fromEntity;
                 points=1;
-                if (this.core.json.config.multiplayerMessageText!==null) this.updateTemporaryText(this.core.json.config.multiplayerMessageText,(fromEntity.name+' telefragged '+killedEntity.name),this.core.json.config.multiplayerMessageWaitTick);
+                if (this.core.project.multiplayerMessageTextId!==null) this.updateTemporaryText(this.core.project.multiplayerMessageTextId,(fromEntity.name+' telefragged '+killedEntity.name),this.core.project.multiplayerMessageWaitTick);
             }
             else {
                 if (fromEntity!==killedEntity) {
                     scoreEntity=fromEntity;
                     points=1;
-                    if (this.core.json.config.multiplayerMessageText!==null) this.updateTemporaryText(this.core.json.config.multiplayerMessageText,(fromEntity.name+' killed '+killedEntity.name),this.core.json.config.multiplayerMessageWaitTick);
+                    if (this.core.project.multiplayerMessageTextId!==null) this.updateTemporaryText(this.core.project.multiplayerMessageTextId,(fromEntity.name+' killed '+killedEntity.name),this.core.project.multiplayerMessageWaitTick);
                 }
                 else {
                     scoreEntity=killedEntity;
                     points=-1;
-                    if (this.core.json.config.multiplayerMessageText!==null) this.updateTemporaryText(this.core.json.config.multiplayerMessageText,(killedEntity.name+' committed suicide'),this.core.json.config.multiplayerMessageWaitTick);
+                    if (this.core.project.multiplayerMessageTextId!==null) this.updateTemporaryText(this.core.project.multiplayerMessageTextId,(killedEntity.name+' committed suicide'),this.core.project.multiplayerMessageWaitTick);
                 }
             }
         }
