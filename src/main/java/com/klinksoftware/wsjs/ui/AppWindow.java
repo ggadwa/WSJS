@@ -16,19 +16,17 @@ public class AppWindow implements WindowListener
     public static final int         TOOLBAR_HEIGHT=38;
     public static final int         HEADER_HEIGHT=22;
     public static final int         USER_WIDTH=250;
-    public static final int         LOG_HEIGHT=200;
-    public static final int         STATUS_CANVAS_HEIGHT=USER_WIDTH;
+    public static final int         LOG_HEIGHT=500;
+    public static final int         STATUS_CANVAS_HEIGHT=100;
     
     private final App       app;
     
     private JFrame          frame;
     private JToolBar        toolBar;
     private JComboBox       projectCombo;
-    private JLabel          gameLabel,mapLabel,userLabel,logLabel;
-    private JScrollPane     gameScrollPane,mapScrollPane,userScrollPane,logScrollPane;
+    private JLabel          gameLabel,userLabel,statusLabel,logLabel;
+    private JScrollPane     userScrollPane,logScrollPane;
     private LogPanel        logPanel;
-    private GamePanel       gamePanel;
-    private MapPanel        mapPanel;
     private UserPanel       userPanel;
     private StatusCanvas    statusCanvas;
     private StatusUpdater   statusUpdater;
@@ -116,8 +114,6 @@ public class AppWindow implements WindowListener
         Project         project;
         
         project=app.getProjectList().get((String)projectCombo.getSelectedItem());
-        gamePanel.update(project);
-        mapPanel.update(project);
         userPanel.update(project);
     }
     
@@ -140,7 +136,6 @@ public class AppWindow implements WindowListener
         URL                 iconURL;
         Image               image;
         GridBagConstraints  gbc;
-        Project             project;
         
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -189,83 +184,32 @@ public class AppWindow implements WindowListener
         gbc.fill=GridBagConstraints.BOTH;
         gbc.gridx=0;
         gbc.gridy=0;
-        gbc.gridwidth=3;
+        gbc.gridwidth=2;
         gbc.weightx=1.0;
         gbc.weighty=0.0;
         frame.add(toolBar,gbc);
-            
+
             // game header
             
-        gameLabel=new GenericLabel("Games",false);
+        gameLabel=new GenericLabel("No game/map has been set yet",true,false);
 
         gbc=new GridBagConstraints();
         gbc.fill=GridBagConstraints.BOTH;
         gbc.gridx=0;
         gbc.gridy=1;
-        gbc.weightx=0.0;
+        gbc.gridwidth=2;
+        gbc.weightx=1.0;
         gbc.weighty=0.0;
         frame.add(gameLabel,gbc);
         
-            // game List
+            // user header
             
-        gamePanel=new GamePanel();
-        
-        gameScrollPane=new JScrollPane(gamePanel); 
-        gameScrollPane.setBorder(BorderFactory.createMatteBorder(0,0,0,0,Color.black));
-        gameScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        gameScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        gameScrollPane.setPreferredSize(new Dimension(USER_WIDTH,100));
-        gameScrollPane.setMinimumSize(new Dimension(USER_WIDTH,HEADER_HEIGHT));
-        gameScrollPane.setMaximumSize(new Dimension(USER_WIDTH,Integer.MAX_VALUE));
-        
+        userLabel=new GenericLabel("Users",false,false);
+
         gbc=new GridBagConstraints();
         gbc.fill=GridBagConstraints.BOTH;
         gbc.gridx=0;
         gbc.gridy=2;
-        gbc.weightx=0.0;
-        gbc.weighty=1.0;
-        frame.add(gameScrollPane,gbc);
-        
-            // map header
-            
-        mapLabel=new GenericLabel("Maps",false);
-
-        gbc=new GridBagConstraints();
-        gbc.fill=GridBagConstraints.BOTH;
-        gbc.gridx=0;
-        gbc.gridy=3;
-        gbc.weightx=0.0;
-        gbc.weighty=0.0;
-        frame.add(mapLabel,gbc);
-        
-            // map List
-            
-        mapPanel=new MapPanel();
-        
-        mapScrollPane=new JScrollPane(mapPanel); 
-        mapScrollPane.setBorder(BorderFactory.createMatteBorder(0,0,0,0,Color.black));
-        mapScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        mapScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        mapScrollPane.setPreferredSize(new Dimension(USER_WIDTH,100));
-        mapScrollPane.setMinimumSize(new Dimension(USER_WIDTH,HEADER_HEIGHT));
-        mapScrollPane.setMaximumSize(new Dimension(USER_WIDTH,Integer.MAX_VALUE));
-        
-        gbc=new GridBagConstraints();
-        gbc.fill=GridBagConstraints.BOTH;
-        gbc.gridx=0;
-        gbc.gridy=4;
-        gbc.weightx=0.0;
-        gbc.weighty=1.0;
-        frame.add(mapScrollPane,gbc);
-        
-            // user header
-            
-        userLabel=new GenericLabel("Users",true);
-
-        gbc=new GridBagConstraints();
-        gbc.fill=GridBagConstraints.BOTH;
-        gbc.gridx=1;
-        gbc.gridy=1;
         gbc.weightx=0.0;
         gbc.weighty=0.0;
         frame.add(userLabel,gbc);
@@ -275,7 +219,7 @@ public class AppWindow implements WindowListener
         userPanel=new UserPanel();
         
         userScrollPane=new JScrollPane(userPanel); 
-        userScrollPane.setBorder(BorderFactory.createMatteBorder(0,1,0,0,Color.black));
+        userScrollPane.setBorder(BorderFactory.createMatteBorder(0,0,0,0,Color.black));
         userScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         userScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         userScrollPane.setPreferredSize(new Dimension(USER_WIDTH,100));
@@ -284,24 +228,23 @@ public class AppWindow implements WindowListener
         
         gbc=new GridBagConstraints();
         gbc.fill=GridBagConstraints.BOTH;
-        gbc.gridx=1;
-        gbc.gridy=2;
-        gbc.gridheight=3;
+        gbc.gridx=0;
+        gbc.gridy=3;
         gbc.weightx=0.0;
         gbc.weighty=1.0;
         frame.add(userScrollPane,gbc);
         
             // status header
             
-        userLabel=new GenericLabel("Status",true);
+        statusLabel=new GenericLabel("Status",false,false);
 
         gbc=new GridBagConstraints();
         gbc.fill=GridBagConstraints.BOTH;
-        gbc.gridx=2;
-        gbc.gridy=1;
+        gbc.gridx=0;
+        gbc.gridy=4;
         gbc.weightx=0.0;
         gbc.weighty=0.0;
-        frame.add(userLabel,gbc);
+        frame.add(statusLabel,gbc);
         
             // status
             
@@ -312,23 +255,21 @@ public class AppWindow implements WindowListener
         
         gbc=new GridBagConstraints();
         gbc.fill=GridBagConstraints.BOTH;
-        gbc.gridx=2;
-        gbc.gridy=2;
-        gbc.gridheight=3;
+        gbc.gridx=0;
+        gbc.gridy=5;
         gbc.weightx=0.0;
-        gbc.weighty=1.0;
+        gbc.weighty=0.0;
         frame.add(statusCanvas,gbc);
 
             // log header
 
-        logLabel=new GenericLabel("Log",true);
+        logLabel=new GenericLabel("Log",false,true);
         
         gbc=new GridBagConstraints();
         gbc.fill=GridBagConstraints.BOTH;
-        gbc.gridx=0;
-        gbc.gridy=5;
-        gbc.gridwidth=3;
-        gbc.weightx=1.0;
+        gbc.gridx=1;
+        gbc.gridy=2;
+        gbc.weightx=0.0;
         gbc.weighty=0.0;
         frame.add(logLabel,gbc);
         
@@ -336,8 +277,8 @@ public class AppWindow implements WindowListener
             
         logPanel=new LogPanel();
         
-        logScrollPane=new JScrollPane(logPanel); 
-        logScrollPane.setBorder(BorderFactory.createMatteBorder(0,0,0,0,Color.black));
+        logScrollPane=new JScrollPane(logPanel);
+        logScrollPane.setBorder(BorderFactory.createMatteBorder(0,1,0,0,Color.black));
         logScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         logScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         logScrollPane.setPreferredSize(new Dimension(Integer.MAX_VALUE,LOG_HEIGHT));
@@ -346,10 +287,10 @@ public class AppWindow implements WindowListener
         
         gbc=new GridBagConstraints();
         gbc.fill=GridBagConstraints.BOTH;
-        gbc.gridx=0;
-        gbc.gridy=6;
-        gbc.gridwidth=3;
-        gbc.weightx=1.0;
+        gbc.gridx=1;
+        gbc.gridy=3;
+        gbc.gridheight=3;
+        gbc.weightx=0.0;
         gbc.weighty=1.0;
         frame.add(logScrollPane,gbc);
 
@@ -361,12 +302,6 @@ public class AppWindow implements WindowListener
             
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
-        
-            // update the windows
-            
-        project=app.getProjectList().get((String)projectCombo.getSelectedItem());
-        gamePanel.update(project);
-        mapPanel.update(project);
         
             // start the status thread
             
@@ -398,16 +333,6 @@ public class AppWindow implements WindowListener
     public synchronized void log(String str)
     {
         logPanel.log(str);
-    }
-    
-    public void updateGames()
-    {
-        gamePanel.update(app.getProjectList().get((String)projectCombo.getSelectedItem()));
-    }
-    
-    public void updateMaps()
-    {
-        mapPanel.update(app.getProjectList().get((String)projectCombo.getSelectedItem()));
     }
     
     public void updateUsers()

@@ -1,6 +1,9 @@
 SCRIPT REDO
 
 
+- first log in needs to pick game/map
+- update game label when combo changes
+
 - this.core.game.timestamp
 - animations and sounds as new AnimationDef() and new SoundDef()
 

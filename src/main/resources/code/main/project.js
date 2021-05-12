@@ -165,6 +165,12 @@ export default class ProjectClass
         this.multiplayerDefaultCharacter=null;
         this.multiplayerMessageTextId=null;
         this.multiplayerMessageWaitTick=0;
+        this.multiplayerGames=new Set();
+        this.multiplayerMaps=new Map();
+        
+        this.startMap=null;
+        
+        this.developer=false;
         
         Object.seal(this);
     }
@@ -367,6 +373,26 @@ export default class ProjectClass
         this.multiplayerDefaultCharacter=defaultCharacter;
         this.multiplayerMessageTextId=messageTextId;
         this.multiplayerMessageWaitTick=messageWaitTick;
+    }
+    
+    addMultiplayerGame(gameName)
+    {
+        this.multiplayerGames.add(gameName);
+    }
+    
+    addMultiplayerMap(name,mapName)
+    {
+        this.multiplayerMaps.set(name,mapName);
+    }
+    
+    setStartMap(startMap)
+    {
+        this.startMap=startMap;
+    }
+    
+    setDeveloper(developer)
+    {
+        this.developer=developer;
     }
 
         //

@@ -148,7 +148,6 @@ export default class GameLoadClass
         
         this.setLoadStatus('Loading Map');
         
-        console.log(game.currentMapName);
         game.map=new MapClass(this.core,game.currentMapName);
         if (!game.map.initialize()) return;
         

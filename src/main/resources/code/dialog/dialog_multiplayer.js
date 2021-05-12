@@ -44,7 +44,8 @@ export default class DialogMultiplayerClass extends DialogBaseClass
             
         y=this.DIALOG_CONTROL_TOP_MARGIN;
         y+=this.addDialogControlText(this,'server','serverURL',x,y,'Network Server URL:');
-        y+=this.addDialogControlList(this,'server','localMap',x,y,'Local Game Map:',this.core.json.multiplayerMaps);
+        y+=this.addDialogControlList(this,'server','gameName',x,y,'Game:',Array.from(this.core.project.multiplayerGames.values()));
+        y+=this.addDialogControlList(this,'server','mapName',x,y,'Map:',Array.from(this.core.project.multiplayerMaps.keys()));
         y+=this.addDialogControlRange(this,'server','respawnTime',x,y,'Respawn Time:');
         
             // bot controls
@@ -99,7 +100,7 @@ export default class DialogMultiplayerClass extends DialogBaseClass
     loadDialogControls()
     {
         let n;
-        let multiplayerCharacter,multiplayerLocalMap;
+        let multiplayerCharacter,multiplayerGameName,multiplayerMapName;
         
             // no selected text
             
@@ -110,8 +111,11 @@ export default class DialogMultiplayerClass extends DialogBaseClass
         multiplayerCharacter=this.core.setup.multiplayerCharacter;
         if (multiplayerCharacter==='') multiplayerCharacter=this.core.project.multiplayerDefaultCharacter;
         
-        multiplayerLocalMap=this.core.setup.multiplayerLocalMap;
-        if (multiplayerLocalMap==='') multiplayerLocalMap=this.core.json.multiplayerMaps[0];
+        multiplayerGameName=this.core.setup.multiplayerGameName;
+        if (multiplayerGameName==='') multiplayerGameName=this.core.project.multiplayerGames.values().next().value;
+        
+        multiplayerMapName=this.core.setup.multiplayerMapName;
+        if (multiplayerMapName==='') multiplayerMapName=this.core.project.multiplayerMaps.keys().next().value;
         
             // the values
 
@@ -119,7 +123,8 @@ export default class DialogMultiplayerClass extends DialogBaseClass
         this.setDialogControl('character',multiplayerCharacter);
         
         this.setDialogControl('serverURL',this.core.setup.multiplayerServerURL);
-        this.setDialogControl('localMap',multiplayerLocalMap);
+        this.setDialogControl('gameName',multiplayerGameName);
+        this.setDialogControl('mapName',multiplayerMapName);
         this.setDialogControl('respawnTime',this.core.setup.multiplayerRespawnTime);
         
         for (n=0;n!==10;n++) {
@@ -134,7 +139,8 @@ export default class DialogMultiplayerClass extends DialogBaseClass
         this.core.setup.multiplayerName=this.getDialogControl('name');
         this.core.setup.multiplayerCharacter=this.getDialogControl('character');
         
-        this.core.setup.multiplayerLocalMap=this.getDialogControl('localMap');
+        this.core.setup.multiplayerGameName=this.getDialogControl('gameName');
+        this.core.setup.multiplayerMapName=this.getDialogControl('mapName');
         this.core.setup.multiplayerServerURL=this.getDialogControl('serverURL');
         this.core.setup.multiplayerRespawnTime=this.getDialogControl('respawnTime');
         

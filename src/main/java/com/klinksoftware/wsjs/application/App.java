@@ -176,8 +176,6 @@ public class App
             // start the projects
             
         projectList.start();
-        appWindow.updateGames();
-        appWindow.updateMaps();
         
             // start the http listener, and wait
             // for a confirmed start

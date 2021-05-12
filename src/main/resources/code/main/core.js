@@ -121,10 +121,6 @@ export default class CoreClass
         this.fontTexture=null;
         this.fontCharWidths=new Float32Array(128);
         
-            // the core.json
-            
-        this.json=null;
-        
             // title/dialog common interfaces
             
         this.background=null;
@@ -249,24 +245,6 @@ export default class CoreClass
     
     async initialize(data)
     {
-        let resp;
-        
-            // get the core json
-            
-        try {
-            resp=await fetch('../html/core.json');
-            if (!resp.ok) {
-                alert(`Unable to load core.json: ${resp.statusText}`);
-                return(false);
-            }
-            
-            this.json=await resp.json();
-        }
-        catch (e) {
-            alert(`Unable to load core.json: ${e.message}`);
-            return(false);
-        }
-
             // get the gl context
 
         this.gl=this.canvas.getContext("webgl2",this.GL_OPTIONS);

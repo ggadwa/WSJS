@@ -219,10 +219,10 @@ export default class GameClass
             // no map, so pick the right start map
             
         if (this.multiplayerMode===this.MULTIPLAYER_MODE_NONE) {
-            this.currentMapName=this.core.json.startMap;
+            this.currentMapName=this.core.project.startMap;
         }
         else {
-            this.currentMapName=this.core.setup.multiplayerLocalMap;
+            this.currentMapName=this.core.project.multiplayerMaps.get(this.core.setup.multiplayerMapName);  // display names are keys, actual map name is value
         }
     }
     
@@ -505,7 +505,7 @@ export default class GameClass
         
             // special keys
             
-        if ((this.core.input.isKeyDownAndClear('pageup')) && (this.core.json.developer)) {
+        if ((this.core.input.isKeyDownAndClear('pageup')) && (this.core.project.developer)) {
             this.core.switchLoop(this.core.LOOP_DEVELOPER);
             return(false);
         }
