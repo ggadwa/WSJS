@@ -20,7 +20,19 @@ export default class NetworkClass
         this.MESSAGE_TYPE_ENTITY_UPDATE=4;
         this.MESSAGE_TYPE_ENTITY_CUSTOM=5;
         
-        this.USER_NAME_LENGTH=32;
+        this.ERROR_UNKNOWN_PROJECT=-1;
+        this.ERROR_PROJECT_VERSION=-2;
+        this.ERROR_DUPLICATE_USERID=-3;
+        this.ERROR_UNAUTHORIZED=-4;
+        this.ERROR_STRINGS=
+                        [
+                            'This project is not running on that server',
+                            'This server has a different version of this project',
+                            'That user name is already in use',
+                            'You are unauthorized on this server'
+                        ];
+        
+        this.GENERAL_STR_LENGTH=32;
 
         this.core=core;
         
@@ -132,16 +144,26 @@ export default class NetworkClass
     {
             // after opening, we send the logon message, which is:
             // int16 MESSAGE_TYPE_ENTITY_LOGON_REQUEST
-            // str[USER_NAME_LENGTH] user name
+            // str[GENERAL_STR_LENGTH] user name
+            // str[GENERAL_STR_LENGTH] character
+            // str[GENERAL_STR_LENGTH] project name
+            // str[GENERAL_STR_LENGTH] game name
+            // str[GENERAL_STR_LENGTH] map name
+            // str[GENERAL_STR_LENGTH] map file name
             
             // we then wait for the reply, which tells us if we
             // have properly logged in
             
-        let msg=new ArrayBuffer(2+32+2+4);
+        let msg=new ArrayBuffer(2+32+32+32+32+32+32);
         let dataView=new DataView(msg);
         
         dataView.setInt16(0,this.MESSAGE_TYPE_ENTITY_LOGON_REQUEST);
-        this.setStringInDataView(dataView,2,this.core.setup.multiplayerName,this.USER_NAME_LENGTH);
+        this.setStringInDataView(dataView,2,this.core.setup.multiplayerName,this.GENERAL_STR_LENGTH);
+        this.setStringInDataView(dataView,34,this.core.setup.multiplayerCharacter,this.GENERAL_STR_LENGTH);
+        this.setStringInDataView(dataView,66,this.core.project.getName(),this.GENERAL_STR_LENGTH);
+        this.setStringInDataView(dataView,98,this.core.setup.multiplayerGameName,this.GENERAL_STR_LENGTH);
+        this.setStringInDataView(dataView,130,this.core.setup.multiplayerMapName,this.GENERAL_STR_LENGTH);
+        this.setStringInDataView(dataView,162,this.core.project.multiplayerMaps.get(this.core.setup.multiplayerMapName),this.GENERAL_STR_LENGTH);
         
         this.socket.send(msg);
     }
@@ -172,7 +194,7 @@ export default class NetworkClass
                 
             this.id=dataView.getInt16(2);
             if (this.id<0) {
-                this.connectErrorCallback("Invalid Logon");
+                this.connectErrorCallback(this.ERROR_STRINGS[(-this.id)-1]);
                 return;
             }
 
@@ -230,7 +252,7 @@ export default class NetworkClass
     {
         let userName,entity;
         
-        userName=this.getStringFromDataView(dataView,4,this.USER_NAME_LENGTH);
+        userName=this.getStringFromDataView(dataView,4,this.GENERAL_STR_LENGTH);
         
         console.info('ENTER>'+remoteId+'>'+userName);
         

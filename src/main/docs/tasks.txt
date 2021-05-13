@@ -1,13 +1,7 @@
 SCRIPT REDO
 
-
-- first log in needs to pick game/map
-- update game label when combo changes
-
-- this.core.game.timestamp
-- animations and sounds as new AnimationDef() and new SoundDef()
-
-
+- add project versions
+- any this.core.
 
 [NEW KART MAP - get rid of ground and put flag ground segments, fix seams]
 
@@ -15,6 +9,10 @@ SCRIPT REDO
 
 
 - rework multiplayer
+   - first log in needs to pick game/map
+   - update game label when combo changes
+   - check for dup names
+   - check for project versions
    - logon needs to have project name, pass back game & map name
    - clients need to be in a paused state until final synch message
    - don't enter other players until synch is OK

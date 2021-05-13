@@ -203,6 +203,15 @@ export default class ProjectClass
         }
     }
     
+    getName()
+    {
+        let path,pathTokens;
+        
+        path=window.location.pathname;
+        pathTokens=path.split('/');
+        return(pathTokens[2]);
+    }
+    
         //
         // add project items
         //

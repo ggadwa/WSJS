@@ -261,6 +261,11 @@ export default class AudioClass
         this.musicSourceNode.start();
     }
     
+    musicSetRate(rate)
+    {
+        if (this.music!==null) this.musicSourceNode.playbackRate.value=rate;
+    }
+    
     musicStop()
     {
         if (this.music===null) return;

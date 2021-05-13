@@ -121,7 +121,7 @@ export default class GameLoadClass
     stageNetworkConnectOK()
     {
         this.loadStage=this.LOAD_STAGE_AWAIT;
-        thia.core.game.network.sync(this.runMultiplayerSyncOK.bind(this),this.runMultiplayerSyncError.bind(this));     // return here, callback from connection or error
+        this.core.game.network.sync(this.runMultiplayerSyncOK.bind(this),this.runMultiplayerSyncError.bind(this));     // return here, callback from connection or error
     }
     
     stageNetworkConnectError(errStr)

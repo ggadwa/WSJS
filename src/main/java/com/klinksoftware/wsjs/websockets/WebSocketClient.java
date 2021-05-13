@@ -11,7 +11,7 @@ import java.util.*;
 public class WebSocketClient implements Runnable
 {
     public static final int MAX_MESSAGE_LENGTH=64*1024;
-    public static final int USER_NAME_LENGTH=32;
+    public static final int GENERAL_STR_LENGTH=32;
     
     public static final short MESSAGE_TYPE_ENTITY_ENTER=0;
     public static final short MESSAGE_TYPE_ENTITY_LEAVE=1;
@@ -22,9 +22,21 @@ public class WebSocketClient implements Runnable
     public static final short MESSAGE_TYPE_ENTITY_UPDATE=6;
     public static final short MESSAGE_TYPE_ENTITY_CUSTOM=7;
     
+    private static final short ERROR_UNKNOWN_PROJECT=-1;
+    private static final short ERROR_PROJECT_VERSION=-2;
+    private static final short ERROR_DUPLICATE_USERID=-3;
+    private static final short ERROR_UNAUTHORIZED=-4;
+    private static final String[] ERROR_STRINGS=
+                        {
+                            "Requested project is not running on this server",
+                            "Server and player have different versions of project",
+                            "Duplicate user name",
+                            "User is unauthorized on this server"
+                        };
+    
     private final int               id;
     private boolean                 synched,inShutdown;
-    private String                  userName;
+    private String                  userName,characterName,gameName,mapName,mapFileName;
     private byte[]                  socketInBytes,socketOutHeaderBytes;
     private final App               app;
     private Project                 project;
@@ -302,6 +314,8 @@ public class WebSocketClient implements Runnable
     
     private boolean getLogonRequest()
     {
+        int             errorId;
+        String          projectName;
         byte[]          bytes;
         ByteBuffer      byteBuf;
         
@@ -329,7 +343,25 @@ public class WebSocketClient implements Runnable
         
             // decode it
             
-        userName=getStringFromByteBuffer(byteBuf,2,USER_NAME_LENGTH);
+        userName=getStringFromByteBuffer(byteBuf,2,GENERAL_STR_LENGTH);
+        characterName=getStringFromByteBuffer(byteBuf,34,GENERAL_STR_LENGTH);
+        projectName=getStringFromByteBuffer(byteBuf,66,GENERAL_STR_LENGTH);
+        gameName=getStringFromByteBuffer(byteBuf,98,GENERAL_STR_LENGTH);
+        mapName=getStringFromByteBuffer(byteBuf,130,GENERAL_STR_LENGTH);
+        mapFileName=getStringFromByteBuffer(byteBuf,162,GENERAL_STR_LENGTH);
+        
+            // no error yet
+            
+        errorId=0;
+        
+            // find project
+            
+        project=app.getProjectList().get(projectName);
+        if (project==null) {
+            errorId=ERROR_UNKNOWN_PROJECT;
+        }
+        
+        errorId=ERROR_PROJECT_VERSION;
         
             // TODO -- AUTHORIZATION and duplicate names
         
@@ -338,7 +370,7 @@ public class WebSocketClient implements Runnable
          
         byteBuf=ByteBuffer.allocate(4);
         byteBuf.putShort(0,MESSAGE_TYPE_ENTITY_LOGON_REPLY);
-        byteBuf.putShort(2,(short)id);
+        byteBuf.putShort(2,(errorId==0)?(short)id:(short)errorId);
         
         try {
             writeMessage(byteBuf.array());
@@ -351,7 +383,8 @@ public class WebSocketClient implements Runnable
             // if we couldn't log on, nothing more to do
             // break out and tear down the client
             
-        if (id<0) {
+        if (errorId!=0) {
+            app.log("Rejecting: "+userName+"; reason: "+ERROR_STRINGS[(-errorId)-1]);
             userName=null;
             return(false);
         }
@@ -431,10 +464,10 @@ public class WebSocketClient implements Runnable
         ByteBuffer      byteBuf;
         
         try {
-            byteBuf=ByteBuffer.allocate(USER_NAME_LENGTH+4);
+            byteBuf=ByteBuffer.allocate(GENERAL_STR_LENGTH+4);
             byteBuf.putShort(0,MESSAGE_TYPE_ENTITY_ENTER);
             byteBuf.putShort(2,(short)id);
-            putStringInByteBuffer(byteBuf,4,userName,USER_NAME_LENGTH);
+            putStringInByteBuffer(byteBuf,4,userName,GENERAL_STR_LENGTH);
 
             project.distributeMessageToOtherClients(this,byteBuf.array());    
         }

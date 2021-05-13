@@ -10,7 +10,7 @@ export default class DialogControlListClass extends DialogControlBaseClass
 
         this.list=list;
         
-        this.LIST_INPUT_PER_VIEW_ITEM_COUNT=5;
+        this.LIST_INPUT_PER_VIEW_ITEM_COUNT=10;
         this.LIST_INPUT_ITEM_HEIGHT=this.CONTROL_HEIGHT;
         
         this.LIST_INPUT_WIDTH=this.TEXT_INPUT_WIDTH;

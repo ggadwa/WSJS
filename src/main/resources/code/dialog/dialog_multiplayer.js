@@ -35,18 +35,29 @@ export default class DialogMultiplayerClass extends DialogBaseClass
         
             // profile controls
             
-        x=Math.trunc(this.core.canvas.width*0.5);
+        x=Math.trunc(this.core.canvas.width*0.35);
+        y=this.DIALOG_CONTROL_TOP_MARGIN+50;
+        this.addDialogControlText(this,'profile','name',x,y,'Name:');
+
+        x=Math.trunc(this.core.canvas.width*0.58);
         y=this.DIALOG_CONTROL_TOP_MARGIN;
-        y+=this.addDialogControlText(this,'profile','name',x,y,'Name:');
-        y+=this.addDialogControlCharacterPicker(this,'profile','character',(x+5),y);
+        y+=this.addDialogControlCharacterPicker(this,'profile','character',x,y);
+        
+        x=Math.trunc(this.core.canvas.width*0.45);
+        y+=this.addDialogControlRange(this,'profile','respawnTime',x,y,'Respawn Time:');        
         
             // server controls
-            
+          
+        x=Math.trunc(this.core.canvas.width*0.15);
         y=this.DIALOG_CONTROL_TOP_MARGIN;
-        y+=this.addDialogControlText(this,'server','serverURL',x,y,'Network Server URL:');
-        y+=this.addDialogControlList(this,'server','gameName',x,y,'Game:',Array.from(this.core.project.multiplayerGames.values()));
-        y+=this.addDialogControlList(this,'server','mapName',x,y,'Map:',Array.from(this.core.project.multiplayerMaps.keys()));
-        y+=this.addDialogControlRange(this,'server','respawnTime',x,y,'Respawn Time:');
+        y+=this.addDialogControlText(this,'server','serverURL',x,y,'Network Server:');
+        this.addDialogControlList(this,'server','serverList',x,y,'Recent Servers:',this.core.setup.multiplayerRecentServerURLs);
+        
+        x=Math.trunc(this.core.canvas.width*0.45);
+        this.addDialogControlList(this,'server','gameName',x,y,'Game:',Array.from(this.core.project.multiplayerGames.values()));
+        
+        x=Math.trunc(this.core.canvas.width*0.75);
+        this.addDialogControlList(this,'server','mapName',x,y,'Map:',Array.from(this.core.project.multiplayerMaps.keys()));
         
             // bot controls
 
@@ -121,11 +132,11 @@ export default class DialogMultiplayerClass extends DialogBaseClass
 
         this.setDialogControl('name',this.core.setup.multiplayerName);
         this.setDialogControl('character',multiplayerCharacter);
+        this.setDialogControl('respawnTime',this.core.setup.multiplayerRespawnTime);
         
         this.setDialogControl('serverURL',this.core.setup.multiplayerServerURL);
         this.setDialogControl('gameName',multiplayerGameName);
         this.setDialogControl('mapName',multiplayerMapName);
-        this.setDialogControl('respawnTime',this.core.setup.multiplayerRespawnTime);
         
         for (n=0;n!==10;n++) {
             this.setDialogControl(('bot'+n),this.core.setup.multiplayerBotCharacters[n]);
@@ -176,6 +187,14 @@ export default class DialogMultiplayerClass extends DialogBaseClass
         
         if (id==='joinGame') {
             this.saveDialogControls();
+            
+                // add this url to the recent list
+                
+            if (this.core.setup.multiplayerRecentServerURLs.indexOf(this.core.setup.multiplayerServerURL)===-1) {
+                this.core.setup.multiplayerRecentServerURLs.splice(0,0,this.core.setup.multiplayerServerURL);
+                if (this.core.setup.multiplayerRecentServerURLs.length>20) this.core.setup.multiplayerRecentServerURLs.length=20;
+            }
+            
             this.core.game.setMultiplayerMode(this.core.game.MULTIPLAYER_MODE_JOIN);
             this.core.switchLoop(this.core.LOOP_GAME_LOAD);
             return(false);
@@ -184,6 +203,11 @@ export default class DialogMultiplayerClass extends DialogBaseClass
             // controls
             
         if (id===null) return(true);
+        
+        if (id==='serverList') {
+            this.setDialogControl('serverURL',this.getDialogControl('serverList'));
+            return(true);
+        }
         
         if (id.startsWith('botPick')) {
             value=this.getDialogControl(id);

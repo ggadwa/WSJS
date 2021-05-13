@@ -35,7 +35,7 @@ export default class SetupClass
         this.multiplayerMapName='';
         this.multiplayerRespawnTime=5;
         this.multiplayerServerURL='127.0.0.1';
-        this.multiplayerSavedServerURLList=['127.0.0.1'];
+        this.multiplayerRecentServerURLs=['127.0.0.1'];
         this.multiplayerBotCharacters=['','','','','','','','','',''];
         
         this.skipShadowMapNormals=false;

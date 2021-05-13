@@ -158,6 +158,22 @@ export default class EntityClass
         return(this.core.game.timestamp);
     }
     
+    getPeriodicCos(millisecondPeriod,amplitude)
+    {
+        return(this.core.game.getPeriodicCos(millisecondPeriod,amplitude));
+    }
+    
+    getPeriodicSin(millisecondPeriod,amplitude)
+    {
+        return(this.core.game.getPeriodicSin(millisecondPeriod,amplitude));
+    }
+    
+    getPeriodicLinear(millisecondPeriod,amplitude)
+    {
+        return(this.core.game.getPeriodicLinear(millisecondPeriod,amplitude));
+    }
+
+    
         //
         // entity utilities
         //
@@ -227,6 +243,16 @@ export default class EntityClass
         return(this.core.game.map.entityList.findClosestWithMaxAngle(position,angle,namePrefix,skipEntity,maxAngle,maxDistance));
     }
     
+    inFreezeAI()
+    {
+        return(this.core.game.freezeAI);
+    }
+    
+    inFreezePlayer()
+    {
+        return(this.core.game.freezePlayer);
+    }
+    
         //
         // effect utilities
         //
@@ -235,7 +261,16 @@ export default class EntityClass
     {
         return(this.core.game.map.effectList.add(spawnedByEntity,effectName,position,data,false,show));
     }
-        
+    
+        //
+        // map utilities
+        //
+    
+    getMapGravityMinValue()
+    {
+        return(this.core.game.map.gravityMinValue);    
+    }
+    
         //
         // node and path utilities
         //
@@ -857,6 +892,21 @@ export default class EntityClass
         return(this.core.audio.soundStartGameFromList(this.core.game.map.soundList,position,sound));
     }
     
+    stopSound(soundPlayIdx)
+    {
+        this.core.audio.soundStop(soundPlayIdx);
+    }
+    
+    changeSoundRate(soundPlayIdx,rate)
+    {
+        this.core.audio.soundChangeRate(soundPlayIdx,rate);
+    }
+    
+    musicSetRate(rate)
+    {
+        this.core.audio.musicSetRate(rate);
+    }
+    
         //
         // meshes
         //
@@ -870,6 +920,11 @@ export default class EntityClass
         // input
         //
         
+    getSetup()
+    {
+        return(this.core.setup);
+    }
+    
     isKeyDown(key)
     {
         return(this.core.input.isKeyDown(key));

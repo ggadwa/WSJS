@@ -129,7 +129,7 @@ public class Project
         
         sourceId=sourceClient.getId();
            
-        byteBuf=ByteBuffer.allocate(WebSocketClient.USER_NAME_LENGTH+4);
+        byteBuf=ByteBuffer.allocate(WebSocketClient.GENERAL_STR_LENGTH+4);
         byteBuf.putShort(0,WebSocketClient.MESSAGE_TYPE_ENTITY_ENTER);
         
         synchronized (clients) {
@@ -137,7 +137,7 @@ public class Project
                 if (client.getId()==sourceId) continue;
                 
                 byteBuf.putShort(2,(short)client.getId());
-                sourceClient.putStringInByteBuffer(byteBuf,4,client.getUserName(),WebSocketClient.USER_NAME_LENGTH);
+                sourceClient.putStringInByteBuffer(byteBuf,4,client.getUserName(),WebSocketClient.GENERAL_STR_LENGTH);
                 
                 try {
                     sourceClient.sendMessage(byteBuf.array());

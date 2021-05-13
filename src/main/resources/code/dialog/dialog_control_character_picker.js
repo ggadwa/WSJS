@@ -78,7 +78,7 @@ export default class DialogControlCharacterPickerClass extends DialogControlBase
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,indexArray,gl.STATIC_DRAW);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
         
-        return(this.PICKER_HEIGHT);
+        return(this.dialog.PICKER_SIZE);
     }
     
     release()
