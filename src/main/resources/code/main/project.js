@@ -112,6 +112,8 @@ export default class ProjectClass
         this.MENU_Y_ALIGN_TOP=core.MENU_Y_ALIGN_TOP;
         this.MENU_Y_ALIGN_CENTER=core.MENU_Y_ALIGN_CENTER;
         this.MENU_Y_ALIGN_BOTTOM=core.MENU_Y_ALIGN_BOTTOM;
+        
+        this.version=1.0;
 
             // lists
             
@@ -201,6 +203,15 @@ export default class ProjectClass
         for (character of this.characters.values()) {
             character.release();
         }
+    }
+    
+        //
+        // project utilities
+        //
+        
+    setVersion(version)
+    {
+        this.version=version;
     }
     
     getName()

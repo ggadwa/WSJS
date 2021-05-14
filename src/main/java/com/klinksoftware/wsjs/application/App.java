@@ -47,6 +47,11 @@ public class App
         appWindow.log(str);
     }
     
+    public void updateGame()
+    {
+        appWindow.updateGame();
+    }
+    
     public void updateUsers()
     {
         appWindow.updateUsers();

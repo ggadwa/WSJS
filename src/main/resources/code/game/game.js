@@ -91,8 +91,9 @@ export default class GameClass
         this.frustumNearPlane=new PlaneClass(0.0,0.0,0.0,0.0);
         this.frustumFarPlane=new PlaneClass(0.0,0.0,0.0,0.0);
         
-            // current map
+            // current map and game
             
+        this.currentGameName=null;
         this.currentMapName=null;
         
             // networking
@@ -207,21 +208,19 @@ export default class GameClass
         // game setup
         //
         
-    setMapName(mapName)
+    gameSetup(gameName,mapName)
     {
-            // switching to a map
-            
-        if (mapName!==null) {
-            this.currentMapName=mapName;
-            return;
-        }
-        
-            // no map, so pick the right start map
-            
         if (this.multiplayerMode===this.MULTIPLAYER_MODE_NONE) {
-            this.currentMapName=this.core.project.startMap;
+            this.gameName=null;
+            if (mapName!==null) {
+                this.currentMapName=mapName;
+            }
+            else {
+                this.currentMapName=this.core.project.startMap;
+            }
         }
         else {
+            this.currentGameName=gameName;
             this.currentMapName=this.core.project.multiplayerMaps.get(this.core.setup.multiplayerMapName);  // display names are keys, actual map name is value
         }
     }

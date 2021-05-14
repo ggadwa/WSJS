@@ -9,7 +9,7 @@ public class GenericLabel extends JLabel
     {
         super(" "+title);
         
-        super.setFont(new Font("Arial",(gameHeader?Font.PLAIN:Font.BOLD),14));
+        super.setFont(new Font("Arial",Font.BOLD,14));
         super.setBackground(gameHeader?new Color(0.8f,0.2f,1.0f):new Color(0.7f,0.7f,1.0f));
         super.setBorder(BorderFactory.createMatteBorder(1,(leftBorder?1:0),(gameHeader?0:1),0,Color.black));
         super.setVerticalTextPosition(JLabel.CENTER);

@@ -10,6 +10,8 @@ SCRIPT REDO
 
 - rework multiplayer
    - first log in needs to pick game/map
+      - needs to pass back game/map/etc
+      - what's going on with the sync?
    - update game label when combo changes
    - check for dup names
    - check for project versions

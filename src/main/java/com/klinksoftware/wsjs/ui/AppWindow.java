@@ -335,6 +335,14 @@ public class AppWindow implements WindowListener
         logPanel.log(str);
     }
     
+    public void updateGame()
+    {
+        Project         project;
+        
+        project=app.getProjectList().get((String)projectCombo.getSelectedItem());
+        gameLabel.setText(project.getGameName()+"/"+project.getMapName());
+    }
+    
     public void updateUsers()
     {
         userPanel.update(app.getProjectList().get((String)projectCombo.getSelectedItem()));

@@ -8,21 +8,18 @@ export default class NetworkClass
 {
     constructor(core)
     {
-        //this.PORT=52419;
-        this.PORT=52418;
+        this.PORT=52419;
         
         this.MESSAGE_TYPE_ENTITY_ENTER=0;
         this.MESSAGE_TYPE_ENTITY_LEAVE=1;
         this.MESSAGE_TYPE_ENTITY_LOGON_REQUEST=2;
         this.MESSAGE_TYPE_ENTITY_LOGON_REPLY=3;
-        this.MESSAGE_TYPE_MAP_SYNC_REQUEST=4;
-        this.MESSAGE_TYPE_MAP_SYNC_REPLY=5;
         this.MESSAGE_TYPE_ENTITY_UPDATE=4;
         this.MESSAGE_TYPE_ENTITY_CUSTOM=5;
         
         this.ERROR_UNKNOWN_PROJECT=-1;
         this.ERROR_PROJECT_VERSION=-2;
-        this.ERROR_DUPLICATE_USERID=-3;
+        this.ERROR_DUPLICATE_USER_NAME=-3;
         this.ERROR_UNAUTHORIZED=-4;
         this.ERROR_STRINGS=
                         [
@@ -44,10 +41,6 @@ export default class NetworkClass
         this.connectOKCallback=null;
         this.connectErrorCallback=null;
         this.inConnectWait=false;
-    
-        this.syncOKCallback=null;
-        this.syncErrorCallback=null;
-        this.inSyncWait=false;
         
         Object.seal(this);
     }
@@ -79,26 +72,6 @@ export default class NetworkClass
             this.socket.close(1000);        // 1000 is code for normal close
             this.socket=null;
         } 
-    }
-    
-        //
-        // this is the initial sync.  The first player in list is considered
-        // the master player, and his time and map are 
-        //
-        
-    sync(okCallback,errorCallback)
-    {
-        let buffer=new ArrayBuffer(4);
-        let dataView=new DataView(buffer);
-        
-        this.syncOKCallback=okCallback;
-        this.syncErrorCallback=errorCallback;
-        this.inSyncWait=true;
-        
-        dataView.setInt16(0,this.MESSAGE_TYPE_MAP_SYNC_REQUEST);
-        dataView.setInt16(2,this.id);
-        
-        this.socket.send(buffer);
     }
     
         //
@@ -147,6 +120,7 @@ export default class NetworkClass
             // str[GENERAL_STR_LENGTH] user name
             // str[GENERAL_STR_LENGTH] character
             // str[GENERAL_STR_LENGTH] project name
+            // float32 project version
             // str[GENERAL_STR_LENGTH] game name
             // str[GENERAL_STR_LENGTH] map name
             // str[GENERAL_STR_LENGTH] map file name
@@ -154,16 +128,17 @@ export default class NetworkClass
             // we then wait for the reply, which tells us if we
             // have properly logged in
             
-        let msg=new ArrayBuffer(2+32+32+32+32+32+32);
+        let msg=new ArrayBuffer(2+4+(this.GENERAL_STR_LENGTH*6));
         let dataView=new DataView(msg);
         
         dataView.setInt16(0,this.MESSAGE_TYPE_ENTITY_LOGON_REQUEST);
         this.setStringInDataView(dataView,2,this.core.setup.multiplayerName,this.GENERAL_STR_LENGTH);
         this.setStringInDataView(dataView,34,this.core.setup.multiplayerCharacter,this.GENERAL_STR_LENGTH);
         this.setStringInDataView(dataView,66,this.core.project.getName(),this.GENERAL_STR_LENGTH);
-        this.setStringInDataView(dataView,98,this.core.setup.multiplayerGameName,this.GENERAL_STR_LENGTH);
-        this.setStringInDataView(dataView,130,this.core.setup.multiplayerMapName,this.GENERAL_STR_LENGTH);
-        this.setStringInDataView(dataView,162,this.core.project.multiplayerMaps.get(this.core.setup.multiplayerMapName),this.GENERAL_STR_LENGTH);
+        dataView.setFloat32(98,this.core.project.version);
+        this.setStringInDataView(dataView,102,this.core.setup.multiplayerGameName,this.GENERAL_STR_LENGTH);
+        this.setStringInDataView(dataView,134,this.core.setup.multiplayerMapName,this.GENERAL_STR_LENGTH);
+        this.setStringInDataView(dataView,166,this.core.project.multiplayerMaps.get(this.core.setup.multiplayerMapName),this.GENERAL_STR_LENGTH);
         
         this.socket.send(msg);
     }
@@ -176,6 +151,7 @@ export default class NetworkClass
     {
         let buffer=await (new Response(event.data).arrayBuffer());
         let dataView;
+        let mapName,gameName;
         
             // special case of waiting for connection
             
@@ -197,28 +173,17 @@ export default class NetworkClass
                 this.connectErrorCallback(this.ERROR_STRINGS[(-this.id)-1]);
                 return;
             }
+            
+                // setup the game and map
+                
+            gameName=this.getStringFromDataView(dataView,4,this.GENERAL_STR_LENGTH);
+            mapName=this.getStringFromDataView(dataView,36,this.GENERAL_STR_LENGTH);
+            
+            this.core.game.gameSetup(gameName,mapName);
 
                 // we connected OK
                 
             this.connectOKCallback();
-            return;
-        }
-        
-            // special case of waiting for sync
-            
-        if (this.inSyncWait) {
-            
-                // ignore any spurious no logon replies
-                
-            dataView=new DataView(buffer);
-            if (dataView.getInt16(0)!==this.MESSAGE_TYPE_MAP_SYNC_REPLY) return;
-            
-                // got the connection
-                
-            this.inSyncWait=false;
-            
-            
-            this.syncOKCallback();
             return;
         }
         

@@ -120,23 +120,11 @@ export default class GameLoadClass
     
     stageNetworkConnectOK()
     {
-        this.loadStage=this.LOAD_STAGE_AWAIT;
-        this.core.game.network.sync(this.runMultiplayerSyncOK.bind(this),this.runMultiplayerSyncError.bind(this));     // return here, callback from connection or error
-    }
-    
-    stageNetworkConnectError(errStr)
-    {
-        this.core.dialogError.setup('Network error: '+this.core.setup.multiplayerServerURL,errStr);
-        this.core.switchLoop(this.core.LOOP_DIALOG_ERROR);
-    }
-    
-    runMultiplayerSyncOK()
-    {
         this.loadStage=this.LOAD_STAGE_MAP;
         this.loadStageIndex=0;
     }
     
-    runMultiplayerSyncError(errStr)
+    stageNetworkConnectError(errStr)
     {
         this.core.dialogError.setup('Network error: '+this.core.setup.multiplayerServerURL,errStr);
         this.core.switchLoop(this.core.LOOP_DIALOG_ERROR);

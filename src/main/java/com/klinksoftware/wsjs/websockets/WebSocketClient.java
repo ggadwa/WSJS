@@ -17,14 +17,12 @@ public class WebSocketClient implements Runnable
     public static final short MESSAGE_TYPE_ENTITY_LEAVE=1;
     public static final short MESSAGE_TYPE_ENTITY_LOGON_REQUEST=2;
     public static final short MESSAGE_TYPE_ENTITY_LOGON_REPLY=3;
-    public static final short MESSAGE_TYPE_MAP_SYNC_REQUEST=4;
-    public static final short MESSAGE_TYPE_MAP_SYNC_REPLY=5;
-    public static final short MESSAGE_TYPE_ENTITY_UPDATE=6;
-    public static final short MESSAGE_TYPE_ENTITY_CUSTOM=7;
+    public static final short MESSAGE_TYPE_ENTITY_UPDATE=4;
+    public static final short MESSAGE_TYPE_ENTITY_CUSTOM=5;
     
     private static final short ERROR_UNKNOWN_PROJECT=-1;
     private static final short ERROR_PROJECT_VERSION=-2;
-    private static final short ERROR_DUPLICATE_USERID=-3;
+    private static final short ERROR_DUPLICATE_USER_NAME=-3;
     private static final short ERROR_UNAUTHORIZED=-4;
     private static final String[] ERROR_STRINGS=
                         {
@@ -54,7 +52,6 @@ public class WebSocketClient implements Runnable
         this.socket=socket;
         
         userName=null;
-        synched=false;              // this is for the state after a logon but before the first sync
         inShutdown=false;
         
         socketInBytes=new byte[MAX_MESSAGE_LENGTH];       // preallocate to reduce GC
@@ -315,6 +312,7 @@ public class WebSocketClient implements Runnable
     private boolean getLogonRequest()
     {
         int             errorId;
+        float           projectVersion;
         String          projectName;
         byte[]          bytes;
         ByteBuffer      byteBuf;
@@ -346,31 +344,62 @@ public class WebSocketClient implements Runnable
         userName=getStringFromByteBuffer(byteBuf,2,GENERAL_STR_LENGTH);
         characterName=getStringFromByteBuffer(byteBuf,34,GENERAL_STR_LENGTH);
         projectName=getStringFromByteBuffer(byteBuf,66,GENERAL_STR_LENGTH);
-        gameName=getStringFromByteBuffer(byteBuf,98,GENERAL_STR_LENGTH);
-        mapName=getStringFromByteBuffer(byteBuf,130,GENERAL_STR_LENGTH);
-        mapFileName=getStringFromByteBuffer(byteBuf,162,GENERAL_STR_LENGTH);
+        projectVersion=byteBuf.getFloat(98);
+        gameName=getStringFromByteBuffer(byteBuf,102,GENERAL_STR_LENGTH);
+        mapName=getStringFromByteBuffer(byteBuf,134,GENERAL_STR_LENGTH);
+        mapFileName=getStringFromByteBuffer(byteBuf,166,GENERAL_STR_LENGTH);
         
             // no error yet
             
         errorId=0;
         
-            // find project
+            // find project and check for error states
             
         project=app.getProjectList().get(projectName);
         if (project==null) {
             errorId=ERROR_UNKNOWN_PROJECT;
         }
+        else {
+            if (!project.isFirstClient()) {
+                if (project.getVersion()!=projectVersion) {
+                    errorId=ERROR_PROJECT_VERSION;
+                }
+                else {
+                    if (project.hasClient(userName)) {
+                        errorId=this.ERROR_DUPLICATE_USER_NAME;
+                    }
+                }
+            }
+        }
         
-        errorId=ERROR_PROJECT_VERSION;
-        
-            // TODO -- AUTHORIZATION and duplicate names
+            // TODO -- AUTHORIZATION?
+            
+            // if first client, than they get to set
+            // game, etc, otherwise they get whatever is
+            // currently running
+            
+        if (project!=null) {
+            if (project.isFirstClient()) {
+                project.setup(projectVersion,gameName,mapName,mapFileName);
+                app.updateUsers();
+                app.updateGame();
+            }
+            else {
+                gameName=project.getGameName();
+                mapName=project.getMapName();
+                mapFileName=project.getMapFileName();
+            }
+        }
         
             // reply user id, or a negative
-            // number if unable to log on
+            // number if unable to log on and
+            // passes back server information
          
-        byteBuf=ByteBuffer.allocate(4);
+        byteBuf=ByteBuffer.allocate(4+(GENERAL_STR_LENGTH*2));
         byteBuf.putShort(0,MESSAGE_TYPE_ENTITY_LOGON_REPLY);
         byteBuf.putShort(2,(errorId==0)?(short)id:(short)errorId);
+        putStringInByteBuffer(byteBuf,4,gameName,GENERAL_STR_LENGTH);
+        putStringInByteBuffer(byteBuf,36,mapName,GENERAL_STR_LENGTH);
         
         try {
             writeMessage(byteBuf.array());
@@ -393,27 +422,12 @@ public class WebSocketClient implements Runnable
     }
     
         //
-        // map syncing
-        //
-    
-    private void handleMapSync()
-    {
-        ByteBuffer      byteBuf;
-        
-        byteBuf=ByteBuffer.allocate(3);
-        byteBuf.putShort(0,MESSAGE_TYPE_MAP_SYNC_REPLY);
-        byteBuf.put((byte)0);         // true/false, set to false for no sync (keep current values)
-        sendMessage(byteBuf.array());
-    }
-    
-        //
         // messages
         //
         
     private boolean handleMessages()
     {
         byte[]          bytes;
-        ByteBuffer      byteBuf;
         
             // get any new message
             // if nothing available, then skip
@@ -428,15 +442,6 @@ public class WebSocketClient implements Runnable
             
             app.log("Unable to read message");
             return(false);
-        }
-        
-            // check for the special sync message
-            
-        byteBuf=ByteBuffer.wrap(bytes);
-        
-        if (byteBuf.getShort(0)!=MESSAGE_TYPE_MAP_SYNC_REQUEST) {
-            handleMapSync();
-            return(true);
         }
         
             // pass message to other clients

@@ -8,7 +8,7 @@ import java.net.*;
 public class WebSocketListener implements Runnable
 {
     private static final String IP="0.0.0.0";
-    private static final int PORT=52418;
+    private static final int PORT=52419;
     private static final int CONCURRENT_REQUEST=15;
     
     private final App                   app;

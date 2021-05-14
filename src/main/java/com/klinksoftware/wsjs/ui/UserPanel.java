@@ -3,7 +3,6 @@ package com.klinksoftware.wsjs.ui;
 import com.klinksoftware.wsjs.application.*;
 import com.klinksoftware.wsjs.websockets.*;
 
-import java.util.*;
 import javax.swing.*;
 
 public class UserPanel extends JList
@@ -24,21 +23,10 @@ public class UserPanel extends JList
     
     public void update(Project project)
     {
-        /*
-        ArrayList<WebSocketClient> clients
-
-        int         n;
-        
         listModel.removeAllElements();
         
-        for (WebSocketClient client:clients) {
-            if (client.isSynched()) {
-                listModel.addElement(client.getUserName());
-            }
-            else {
-                listModel.addElement(client.getUserName()+" (waiting)");
-            }
+        for (WebSocketClient client:project.getClientList()) {
+            listModel.addElement(client.getUserName());
         }
-*/
     }
 }

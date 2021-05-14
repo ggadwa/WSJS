@@ -542,7 +542,7 @@ export default class CoreClass
                 break;
                 
             case this.LOOP_GAME_LOAD:
-                this.game.setMapName(null);
+                this.game.gameSetup(null,null);
                 this.gameLoad.startLoop();
                 break;
                 

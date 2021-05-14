@@ -7,7 +7,9 @@ import java.nio.*;
 
 public class Project
 {
-    private String                      name,path;
+    private float                       version;
+    private String                      name,path,
+                                        gameName,mapName,mapFileName;
     private Storage                     storage;
     private ArrayList<WebSocketClient>  clients;
     private final App                   app;
@@ -18,6 +20,11 @@ public class Project
         
         this.name=name;
         this.path=path;
+        
+        version=0.0f;
+        gameName=null;
+        mapName=null;
+        mapFileName=null;
                 
             // the multiplayer clients
             
@@ -47,7 +54,7 @@ public class Project
     }
     
         //
-        // getters
+        // getters and setters
         //
     
     public String getName()
@@ -64,6 +71,34 @@ public class Project
     {
         return(clients);
     }
+    
+    public void setup(float version,String gameName,String mapName,String mapFileName)
+    {
+        this.version=version;
+        this.gameName=gameName;
+        this.mapName=mapName;
+        this.mapFileName=mapFileName;
+    }
+    
+    public float getVersion()
+    {
+        return(version);
+    }
+    
+    public String getGameName()
+    {
+        return(gameName);
+    }
+    
+    public String getMapName()
+    {
+        return(mapName);
+    }
+    
+    public String getMapFileName()
+    {
+        return(mapFileName);
+    }
 
         //
         // clients
@@ -76,6 +111,24 @@ public class Project
         }
         
         storage.addUser(client.getUserName());
+    }
+    
+    public boolean hasClient(String userName)
+    {
+        synchronized (clients) {
+            for (WebSocketClient client:clients) {
+                if (client.getUserName().equalsIgnoreCase(userName)) return(true);
+            }
+        }
+        
+        return(false);
+    }
+    
+    public boolean isFirstClient()
+    {
+        synchronized (clients) {
+            return(clients.isEmpty());
+        }
     }
     
     public void removeClient(WebSocketClient client)

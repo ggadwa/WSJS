@@ -263,8 +263,18 @@ export default class EntityClass
     }
     
         //
-        // map utilities
+        // game and map utilities
         //
+    
+    getGameName()
+    {
+        return(this.core.game.currentGameName);
+    }
+    
+    getMapName()
+    {
+        return(this.core.game.currentMapName);
+    }
     
     getMapGravityMinValue()
     {
