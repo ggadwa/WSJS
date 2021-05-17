@@ -211,7 +211,7 @@ export default class GameClass
     gameSetup(gameName,mapName)
     {
         if (this.multiplayerMode===this.MULTIPLAYER_MODE_NONE) {
-            this.gameName=null;
+            this.currentGameName=null;
             if (mapName!==null) {
                 this.currentMapName=mapName;
             }

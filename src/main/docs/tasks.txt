@@ -1,6 +1,5 @@
 SCRIPT REDO
 
-- add project versions
 - any this.core.
 
 [NEW KART MAP - get rid of ground and put flag ground segments, fix seams]
@@ -15,10 +14,6 @@ SCRIPT REDO
    - update game label when combo changes
    - check for dup names
    - check for project versions
-   - logon needs to have project name, pass back game & map name
-   - clients need to be in a paused state until final synch message
-   - don't enter other players until synch is OK
-   - call sync at very end (move stuff in stageNetworkConnectOK)
 
 INTERFACE
   - menu by keys

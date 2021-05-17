@@ -282,7 +282,7 @@ export default class EntityClass
     }
     
         //
-        // node and path utilities
+        // node, spots and path utilities
         //
         
     getRandomKeyNodeIndex()
@@ -461,6 +461,21 @@ export default class EntityClass
             if (idx===origIdx) return;      // ran out of spots, nothing we can do
         }
     }
+    
+    moveToRandomNode(addPnt,randomOffsetPnt)
+    {
+        let node;
+        let nodes=this.core.game.map.path.nodes;
+        
+        node=nodes[Math.trunc(nodes.length*Math.random())];
+        
+        this.position.setFromPoint(node.position);
+        this.position.addPoint(addPnt);
+        
+        this.position.x+=(((Math.random()*2.0)-1.0)*randomOffsetPnt.x);
+        this.position.y+=(((Math.random()*2.0)-1.0)*randomOffsetPnt.y);
+        this.position.z+=(((Math.random()*2.0)-1.0)*randomOffsetPnt.z);
+    }
         
     turnYTowardsNode(nodeIdx,turnSpeed)
     {
@@ -485,6 +500,11 @@ export default class EntityClass
     translatePathPerpendicularXZHitToOtherPerpendicularXZHit(hitNodeIdx,hitPnt,otherNodeIdx,otherHitPnt)
     {
         return(this.core.game.map.path.translatePerpendicularXZHitToOtherPerpendicularXZHit(hitNodeIdx,hitPnt,otherNodeIdx,otherHitPnt));
+    }
+    
+    getRandomUnusedSpotAndMark()
+    {
+        return(this.core.game.map.spotList.getRandomUnusedSpotAndMark());
     }
     
         //
