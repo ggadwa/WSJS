@@ -19,6 +19,7 @@ export default class DialogControlCheckboxClass extends DialogControlBaseClass
         this.indexBuffer=null;
         
         this.titleText=null;
+        this.checkText=null;
         
         Object.seal(this);
     }
@@ -68,6 +69,9 @@ export default class DialogControlCheckboxClass extends DialogControlBaseClass
         this.titleText=new TextClass(this.core,this.title,(this.x-this.TITLE_MARGIN),((this.y+this.CONTROL_HEIGHT)-this.FONT_MARGIN),fontSize,this.core.TEXT_ALIGN_RIGHT,new ColorClass(1,1,1,1),1);
         this.titleText.initialize();
         
+        this.checkText=new TextClass(this.core,this.title,(this.x+this.TITLE_MARGIN+Math.trunc(this.CONTROL_HEIGHT*0.5)),((this.y+this.CONTROL_HEIGHT)-this.FONT_MARGIN),fontSize,this.core.TEXT_ALIGN_CENTER,new ColorClass(1,1,1,1),1);
+        this.checkText.initialize();
+        
         return(this.CONTROL_HEIGHT);
     }
     
@@ -76,6 +80,7 @@ export default class DialogControlCheckboxClass extends DialogControlBaseClass
         let gl=this.core.gl;
         
         this.titleText.release();
+        this.checkText.release();
         
         gl.deleteBuffer(this.vertexBuffer);
         gl.deleteBuffer(this.colorBuffer);
@@ -84,7 +89,7 @@ export default class DialogControlCheckboxClass extends DialogControlBaseClass
     
     cursorInCheck()
     {
-        return((this.core.cursor.x>(this.x+this.TITLE_MARGIN)) && (this.core.cursor.x<=((this.x+this.TITLE_MARGIN)+(this.CONTROL_HEIGHT*2))) && (this.core.cursor.y>this.y) && (this.core.cursor.y<=(this.y+this.CONTROL_HEIGHT)));
+        return((this.core.cursor.x>(this.x+this.TITLE_MARGIN)) && (this.core.cursor.x<=((this.x+this.TITLE_MARGIN)+this.CONTROL_HEIGHT)) && (this.core.cursor.y>this.y) && (this.core.cursor.y<=(this.y+this.CONTROL_HEIGHT)));
     }
         
     clickUp()
@@ -106,7 +111,7 @@ export default class DialogControlCheckboxClass extends DialogControlBaseClass
         
         this.vertexArray[0]=this.vertexArray[6]=this.x+this.TITLE_MARGIN;
         this.vertexArray[1]=this.vertexArray[3]=this.y;
-        this.vertexArray[2]=this.vertexArray[4]=(this.x+this.TITLE_MARGIN)+(this.CONTROL_HEIGHT*2);
+        this.vertexArray[2]=this.vertexArray[4]=(this.x+this.TITLE_MARGIN)+this.CONTROL_HEIGHT;
         this.vertexArray[5]=this.vertexArray[7]=this.y+this.CONTROL_HEIGHT;
             
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
@@ -114,37 +119,6 @@ export default class DialogControlCheckboxClass extends DialogControlBaseClass
         gl.vertexAttribPointer(shader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
         
             // the control fill
-            
-        this.colorArray[0]=this.colorArray[4]=this.colorArray[8]=this.colorArray[12]=this.fillColor.r;
-        this.colorArray[1]=this.colorArray[5]=this.colorArray[9]=this.colorArray[13]=this.fillColor.g;
-        this.colorArray[2]=this.colorArray[6]=this.colorArray[10]=this.colorArray[14]=this.fillColor.b;
-        this.colorArray[3]=this.colorArray[7]=this.colorArray[11]=this.colorArray[15]=1;
-        
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.colorBuffer);
-        gl.bufferSubData(gl.ARRAY_BUFFER,0,this.colorArray);
-        gl.vertexAttribPointer(shader.vertexColorAttribute,4,gl.FLOAT,false,0,0);
-        
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
-            
-        gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_SHORT,0);
-        
-            // the check fill
-            
-        if (this.value) {
-            this.vertexArray[0]=this.vertexArray[6]=((this.x+this.TITLE_MARGIN)+this.CONTROL_HEIGHT)+1;
-            this.vertexArray[2]=this.vertexArray[4]=((this.x+this.TITLE_MARGIN)+(this.CONTROL_HEIGHT*2))-1;
-            
-        }
-        else {
-            this.vertexArray[0]=this.vertexArray[6]=(this.x+this.TITLE_MARGIN)+1;
-            this.vertexArray[2]=this.vertexArray[4]=((this.x+this.TITLE_MARGIN)+this.CONTROL_HEIGHT)-1;
-        }
-        
-        this.vertexArray[1]=this.vertexArray[3]=this.y+1;
-        this.vertexArray[5]=this.vertexArray[7]=(this.y+this.CONTROL_HEIGHT)-1;
-        
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
-        gl.bufferSubData(gl.ARRAY_BUFFER,0,this.vertexArray);
             
         if (this.value) {
             this.colorArray[0]=this.colorArray[4]=this.widgetTopColor.r;
@@ -166,26 +140,17 @@ export default class DialogControlCheckboxClass extends DialogControlBaseClass
         
         gl.bindBuffer(gl.ARRAY_BUFFER,this.colorBuffer);
         gl.bufferSubData(gl.ARRAY_BUFFER,0,this.colorArray);
+        gl.vertexAttribPointer(shader.vertexColorAttribute,4,gl.FLOAT,false,0,0);
         
-        gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_SHORT,0);
-        
-            // the check outline
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
             
-        this.colorArray[0]=this.colorArray[4]=this.colorArray[8]=this.colorArray[12]=this.outlineColor.r;
-        this.colorArray[1]=this.colorArray[5]=this.colorArray[9]=this.colorArray[13]=this.outlineColor.g;
-        this.colorArray[2]=this.colorArray[6]=this.colorArray[10]=this.colorArray[14]=this.outlineColor.b;
-        this.colorArray[3]=this.colorArray[7]=this.colorArray[11]=this.colorArray[15]=1;
-        
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.colorBuffer);
-        gl.bufferSubData(gl.ARRAY_BUFFER,0,this.colorArray);
-        
-        gl.drawArrays(gl.LINE_LOOP,0,4);
+        gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_SHORT,0);
         
             // the control outline
             
         this.vertexArray[0]=this.vertexArray[6]=this.x+this.TITLE_MARGIN;
         this.vertexArray[1]=this.vertexArray[3]=this.y;
-        this.vertexArray[2]=this.vertexArray[4]=(this.x+this.TITLE_MARGIN)+(this.CONTROL_HEIGHT*2);
+        this.vertexArray[2]=this.vertexArray[4]=(this.x+this.TITLE_MARGIN)+this.CONTROL_HEIGHT;
         this.vertexArray[5]=this.vertexArray[7]=this.y+this.CONTROL_HEIGHT;
             
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
@@ -211,9 +176,19 @@ export default class DialogControlCheckboxClass extends DialogControlBaseClass
         shader.drawEnd();
         
             // the title text
+        
+        if (this.value) {    
+            this.checkText.str='on';
+            this.checkText.color.setFromValues(1,1,0.5);
+        }
+        else {
+            this.checkText.str='off';
+            this.checkText.color.setFromValues(0.9,0.9,0.9);
+        }
             
         this.core.shaderList.textShader.drawStart();
         this.titleText.draw();
+        this.checkText.draw();
         this.core.shaderList.textShader.drawEnd();
     }
 

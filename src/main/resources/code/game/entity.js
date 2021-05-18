@@ -281,10 +281,35 @@ export default class EntityClass
         return(this.core.game.map.gravityMinValue);    
     }
     
+    getLiquidForIndex(liquidIdx)
+    {
+        return(this.core.game.map.liquidList.liquids[liquidIdx]);
+    }
+    
+    getLiquidForPoint(pnt)
+    {
+        return(this.core.game.map.liquidList.getLiquidForPoint(pnt));
+    }
+    
+    getLiquidForEyePoint(pnt,eyeOffset)
+    {
+        return(this.core.game.map.liquidList.getLiquidForEyePoint(pnt,eyeOffset));
+    }
+    
         //
         // node, spots and path utilities
         //
         
+    hasSpawnNodes()
+    {
+        return(this.core.game.map.path.spawnNodes.length!==0);
+    }
+    
+    hasKeyNodes()
+    {
+        return(this.core.game.map.path.keyNodes.length!==0);
+    }
+
     getRandomKeyNodeIndex()
     {
         return(this.core.game.map.path.getRandomKeyNodeIndex());
@@ -930,6 +955,11 @@ export default class EntityClass
     changeSoundRate(soundPlayIdx,rate)
     {
         this.core.audio.soundChangeRate(soundPlayIdx,rate);
+    }
+    
+    getSoundMillisecondDuration(sound)
+    {
+        return(this.core.game.map.soundList.getMillisecondDurationJson(sound));
     }
     
     musicSetRate(rate)
