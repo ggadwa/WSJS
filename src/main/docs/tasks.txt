@@ -1,3 +1,9 @@
+
+- use fill color on sliders
+- use double quad trick on input
+- need keyboard control for inputs on iPad
+- scale dialog font depending on screen width
+
 - rework multiplayer
    - first log in needs to pick game/map
       - needs to pass back game/map/etc

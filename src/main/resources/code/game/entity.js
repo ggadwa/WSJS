@@ -1192,7 +1192,7 @@ export default class EntityClass
         let buffer=new ArrayBuffer(59);
         let dataView=new DataView(buffer);
         
-        dataView.setInt16(0,mstType);
+        dataView.setInt16(0,msgType);
         dataView.setInt16(2,remoteId);
         dataView.setInt16(4,this.radius);
         dataView.setInt16(6,this.height);

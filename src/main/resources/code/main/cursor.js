@@ -158,6 +158,8 @@ export default class CursorClass
                 this.x=touch.x;
                 this.y=touch.y;
                 
+                console.info('had touch='+this.x+'>'+this.y);
+                
                 return(true);           // a click
             }
             

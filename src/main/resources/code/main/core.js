@@ -28,10 +28,6 @@ export default class CoreClass
 {
     constructor(project)
     {
-            // some testing flags
-            
-        this.debugForceTouch=false;
-
             // loop types
             
         this.LOOP_TITLE=0;

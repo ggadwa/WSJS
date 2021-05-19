@@ -6,6 +6,7 @@ import java.util.*;
 import java.io.*;
 import java.text.*;
 import java.net.*;
+import java.util.zip.*;
 
 public class HTTPClient implements Runnable
 {
@@ -232,9 +233,33 @@ public class HTTPClient implements Runnable
     
     private void writeFile(HTTPRequestData requestData) throws Exception
     {
+        byte[]                  bytes;
+        boolean                 zipped;
         StringBuilder           strBuild;
+        ByteArrayOutputStream   byteOut;
+        GZIPOutputStream        gzipOut;
         OutputStream            out;
         
+            // zip the file
+            // skip if png (already compressed)
+            
+        if (requestData.contentType.equals("image/png")) {
+            zipped=false;
+            bytes=requestData.contentBytes;
+        }
+        else {
+            zipped=true;
+            
+            byteOut=new ByteArrayOutputStream();
+            gzipOut=new GZIPOutputStream(byteOut);
+            gzipOut.write(requestData.contentBytes);
+            gzipOut.close();
+            bytes=byteOut.toByteArray();
+            byteOut.close();
+        }
+        
+            // write to socket
+            
         out=socket.getOutputStream();
         
             // the header
@@ -249,8 +274,9 @@ public class HTTPClient implements Runnable
         strBuild.append("Content-Type: ");
         strBuild.append(requestData.contentType);
         strBuild.append("\r\n");
+        if (zipped) strBuild.append("Content-Encoding: gzip\r\n");
         strBuild.append("Content-Length: ");
-        strBuild.append(requestData.contentBytes.length);
+        strBuild.append(bytes.length);
         strBuild.append("\r\n");
         strBuild.append("Last-Modified: ");
         strBuild.append(createGMTIfModified(requestData.lastModified));
@@ -264,13 +290,13 @@ public class HTTPClient implements Runnable
         
         out.write(strBuild.toString().getBytes());
         
-            // the data
+            // the gzipped data
             
-        out.write(requestData.contentBytes);
+        out.write(bytes);
         
             // stats
             
-        app.addStatusNetworkBytes(strBuild.length()+requestData.contentBytes.length);
+        app.addStatusNetworkBytes(strBuild.length()+bytes.length);
     }
     
     private void writeUpload() throws Exception
