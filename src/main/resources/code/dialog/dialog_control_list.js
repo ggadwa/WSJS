@@ -4,9 +4,9 @@ import DialogControlBaseClass from '../dialog/dialog_control_base.js';
 
 export default class DialogControlListClass extends DialogControlBaseClass
 {
-    constructor(core,dialog,tabId,x,y,title,list)
+    constructor(core,dialog,tabId,x,y,list)
     {
-        super(core,dialog,tabId,x,y,title);
+        super(core,dialog,tabId,x,y,null);
 
         this.list=list;
         
@@ -26,7 +26,6 @@ export default class DialogControlListClass extends DialogControlBaseClass
         this.colorBuffer=null;
         this.indexBuffer=null;
         
-        this.titleText=null;
         this.valueTexts=null;
         
         this.listScrollIndex=0;
@@ -72,16 +71,13 @@ export default class DialogControlListClass extends DialogControlBaseClass
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,indexArray,gl.STATIC_DRAW);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
         
-            // the title text
+            // the value text
             
         fontSize=Math.trunc(this.CONTROL_HEIGHT*0.6);
         
-        this.titleText=new TextClass(this.core,this.title,(this.x-this.TITLE_MARGIN),((this.y+this.CONTROL_HEIGHT)-this.FONT_MARGIN),fontSize,this.core.TEXT_ALIGN_RIGHT,new ColorClass(1,1,1,1),1);
-        this.titleText.initialize();
-        
         this.valueTexts=[];
         
-        x=(this.x+this.TITLE_MARGIN)+this.FONT_MARGIN;
+        x=this.x+this.FONT_MARGIN;
         y=(this.y+this.CONTROL_HEIGHT)-this.FONT_MARGIN;
         
         for (n=0;n!==this.LIST_INPUT_PER_VIEW_ITEM_COUNT;n++) {
@@ -100,8 +96,6 @@ export default class DialogControlListClass extends DialogControlBaseClass
         let n;
         let gl=this.core.gl;
         
-        this.titleText.release();
-        
         for (n=0;n!==this.LIST_INPUT_PER_VIEW_ITEM_COUNT;n++) {
             this.valueTexts[n].release();
         }
@@ -113,12 +107,12 @@ export default class DialogControlListClass extends DialogControlBaseClass
     
     cursorInList()
     {
-        return((this.core.cursor.x>=this.x) && (this.core.cursor.x<((this.x+(this.TITLE_MARGIN*2))+this.LIST_INPUT_WIDTH)) && (this.core.cursor.y>=this.y) && (this.core.cursor.y<(this.y+this.LIST_INPUT_HEIGHT)));
+        return((this.core.cursor.x>=this.x) && (this.core.cursor.x<(this.x+this.LIST_INPUT_WIDTH)) && (this.core.cursor.y>=this.y) && (this.core.cursor.y<(this.y+this.LIST_INPUT_HEIGHT)));
     }
     
     cursorInUpArrow()
     {
-        let rgt=((this.x+this.TITLE_MARGIN)+this.LIST_INPUT_WIDTH)-this.LIST_ARROW_MARGIN;
+        let rgt=(this.x+this.LIST_INPUT_WIDTH)-this.LIST_ARROW_MARGIN;
         let lft=rgt-this.LIST_ARROW_WIDTH;
         let top=this.y+this.LIST_ARROW_MARGIN;
         let bot=top+this.LIST_ARROW_WIDTH;
@@ -128,7 +122,7 @@ export default class DialogControlListClass extends DialogControlBaseClass
     
     cursorInDownArrow()
     {
-        let rgt=((this.x+this.TITLE_MARGIN)+this.LIST_INPUT_WIDTH)-this.LIST_ARROW_MARGIN;
+        let rgt=(this.x+this.LIST_INPUT_WIDTH)-this.LIST_ARROW_MARGIN;
         let lft=rgt-this.LIST_ARROW_WIDTH;
         let bot=(this.y+this.LIST_INPUT_HEIGHT)-this.LIST_ARROW_MARGIN;    
         let top=bot-this.LIST_ARROW_WIDTH;
@@ -175,16 +169,42 @@ export default class DialogControlListClass extends DialogControlBaseClass
         
         shader.drawStart();
         
-        this.vertexArray[0]=this.vertexArray[6]=this.x+this.TITLE_MARGIN;
+            // the outline
+            
+        highlight=this.cursorInList();
+            
+        this.vertexArray[0]=this.vertexArray[6]=this.x;
         this.vertexArray[1]=this.vertexArray[3]=this.y;
-        this.vertexArray[2]=this.vertexArray[4]=(this.x+this.TITLE_MARGIN)+this.LIST_INPUT_WIDTH;
+        this.vertexArray[2]=this.vertexArray[4]=this.x+this.LIST_INPUT_WIDTH;
         this.vertexArray[5]=this.vertexArray[7]=this.y+this.LIST_INPUT_HEIGHT;
             
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
         gl.bufferSubData(gl.ARRAY_BUFFER,0,this.vertexArray);
         gl.vertexAttribPointer(shader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
+            
+        this.colorArray[0]=this.colorArray[4]=this.colorArray[8]=this.colorArray[12]=highlight?this.highlightOutlineColor.r:this.outlineColor.r;
+        this.colorArray[1]=this.colorArray[5]=this.colorArray[9]=this.colorArray[13]=highlight?this.highlightOutlineColor.g:this.outlineColor.g;
+        this.colorArray[2]=this.colorArray[6]=this.colorArray[10]=this.colorArray[14]=highlight?this.highlightOutlineColor.b:this.outlineColor.b;
+        this.colorArray[3]=this.colorArray[7]=this.colorArray[11]=this.colorArray[15]=1;
         
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.colorBuffer);
+        gl.bufferSubData(gl.ARRAY_BUFFER,0,this.colorArray);
+        gl.vertexAttribPointer(shader.vertexColorAttribute,4,gl.FLOAT,false,0,0);
+        
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
+            
+        gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_SHORT,0);
+            
             // the fill
+        
+        this.vertexArray[0]=this.vertexArray[6]=this.x+1;
+        this.vertexArray[1]=this.vertexArray[3]=this.y+1;
+        this.vertexArray[2]=this.vertexArray[4]=(this.x+this.LIST_INPUT_WIDTH)-1;
+        this.vertexArray[5]=this.vertexArray[7]=(this.y+this.LIST_INPUT_HEIGHT)-1;
+            
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
+        gl.bufferSubData(gl.ARRAY_BUFFER,0,this.vertexArray);
+        gl.vertexAttribPointer(shader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
             
         this.colorArray[0]=this.colorArray[4]=this.colorArray[8]=this.colorArray[12]=this.fillColor.r;
         this.colorArray[1]=this.colorArray[5]=this.colorArray[9]=this.colorArray[13]=this.fillColor.g;
@@ -199,20 +219,6 @@ export default class DialogControlListClass extends DialogControlBaseClass
             
         gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_SHORT,0);
         
-            // the outline
-            
-        highlight=this.cursorInList();
-        
-        this.colorArray[0]=this.colorArray[4]=this.colorArray[8]=this.colorArray[12]=highlight?this.highlightOutlineColor.r:this.outlineColor.r;
-        this.colorArray[1]=this.colorArray[5]=this.colorArray[9]=this.colorArray[13]=highlight?this.highlightOutlineColor.g:this.outlineColor.g;
-        this.colorArray[2]=this.colorArray[6]=this.colorArray[10]=this.colorArray[14]=highlight?this.highlightOutlineColor.b:this.outlineColor.b;
-        this.colorArray[3]=this.colorArray[7]=this.colorArray[11]=this.colorArray[15]=1;
-        
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.colorBuffer);
-        gl.bufferSubData(gl.ARRAY_BUFFER,0,this.colorArray);
-        
-        gl.drawArrays(gl.LINE_LOOP,0,4);
-        
             // the highlight
             
         idx=this.listScrollIndex;
@@ -221,9 +227,9 @@ export default class DialogControlListClass extends DialogControlBaseClass
             if (idx<this.list.length) {
                 if (this.list[idx]===this.value) {
                     y=this.y+((n*this.CONTROL_HEIGHT)+1);
-                    this.vertexArray[0]=this.vertexArray[6]=this.x+this.TITLE_MARGIN;
+                    this.vertexArray[0]=this.vertexArray[6]=this.x+1;
                     this.vertexArray[1]=this.vertexArray[3]=y;
-                    this.vertexArray[2]=this.vertexArray[4]=((this.x+this.TITLE_MARGIN)+this.LIST_INPUT_WIDTH)-1;
+                    this.vertexArray[2]=this.vertexArray[4]=(this.x+this.LIST_INPUT_WIDTH)-1;
                     this.vertexArray[5]=this.vertexArray[7]=y+(this.CONTROL_HEIGHT-1);
 
                     gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
@@ -264,7 +270,6 @@ export default class DialogControlListClass extends DialogControlBaseClass
             
         this.core.shaderList.textShader.drawStart();
         
-        this.titleText.draw();
         for (n=0;n!==this.LIST_INPUT_PER_VIEW_ITEM_COUNT;n++) {
             this.valueTexts[n].str=(idx<this.list.length)?this.list[idx]:'';
             this.valueTexts[n].draw();
@@ -278,7 +283,7 @@ export default class DialogControlListClass extends DialogControlBaseClass
             
         shader.drawStart();
             
-        rgt=((this.x+this.TITLE_MARGIN)+this.LIST_INPUT_WIDTH)-this.LIST_ARROW_MARGIN;
+        rgt=(this.x+this.LIST_INPUT_WIDTH)-this.LIST_ARROW_MARGIN;
         lft=rgt-this.LIST_ARROW_WIDTH;
         mx=Math.trunc((lft+rgt)*0.5);
         

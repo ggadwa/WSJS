@@ -26,10 +26,18 @@ export default class DialogDeveloperClass extends DialogBaseClass
         
             // dialog buttons
             
-        this.addDialogButton('cancel',0.78,0.93,0.1,0.05,'Cancel',false);
-        this.addDialogButton('ok',0.89,0.93,0.1,0.05,'Ok',true);
-        this.addDialogButton('pathHints',0.01,0.93,0.2,0.05,'Save Path & Build Hints',false);
-        this.addDialogButton('shadowMaps',0.22,0.93,0.2,0.05,'Build Shadow Maps',false);
+        x=(this.core.canvas.width-this.DIALOG_CONTROL_RIGHT_MARGIN)-this.DIALOG_BUTTON_SMALL_WIDTH;
+        y=(this.core.canvas.height-this.DIALOG_CONTROL_BOTTOM_MARGIN)-this.DIALOG_BUTTON_HIGH;
+        this.addDialogButton('ok',x,y,this.DIALOG_BUTTON_SMALL_WIDTH,this.DIALOG_BUTTON_HIGH,'Ok',true);
+        
+        x-=(this.DIALOG_BUTTON_SMALL_WIDTH+this.DIALOG_BUTTON_MARGIN);
+        this.addDialogButton('cancel',x,y,this.DIALOG_BUTTON_SMALL_WIDTH,this.DIALOG_BUTTON_HIGH,'Cancel',false);
+        
+        x=this.DIALOG_CONTROL_LEFT_MARGIN;
+        this.addDialogButton('pathHints',x,y,this.DIALOG_BUTTON_LARGE_WIDTH,this.DIALOG_BUTTON_HIGH,'Save Path & Build Hints',false);
+        
+        x+=(this.DIALOG_BUTTON_LARGE_WIDTH+this.DIALOG_BUTTON_MARGIN);
+        this.addDialogButton('shadowMaps',x,y,this.DIALOG_BUTTON_LARGE_WIDTH,this.DIALOG_BUTTON_HIGH,'Build Shadow Maps',false);
         
             // developer controls
             

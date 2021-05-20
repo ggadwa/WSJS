@@ -28,9 +28,14 @@ export default class DialogSettingClass extends DialogBaseClass
         
             // dialog buttons
             
-        this.addDialogButton('cancel',0.78,0.93,0.1,0.05,'Cancel',false);
-        this.addDialogButton('ok',0.89,0.93,0.1,0.05,'Ok',true);
-        this.addDialogButton('quit',0.01,0.93,0.125,0.05,'Quit to Title',false);
+        x=(this.core.canvas.width-this.DIALOG_CONTROL_RIGHT_MARGIN)-this.DIALOG_BUTTON_SMALL_WIDTH;
+        y=(this.core.canvas.height-this.DIALOG_CONTROL_BOTTOM_MARGIN)-this.DIALOG_BUTTON_HIGH;
+        this.addDialogButton('ok',x,y,this.DIALOG_BUTTON_SMALL_WIDTH,this.DIALOG_BUTTON_HIGH,'Ok',true);
+        
+        x-=(this.DIALOG_BUTTON_SMALL_WIDTH+this.DIALOG_BUTTON_MARGIN);
+        this.addDialogButton('cancel',x,y,this.DIALOG_BUTTON_SMALL_WIDTH,this.DIALOG_BUTTON_HIGH,'Cancel',false);
+        
+        this.addDialogButton('quit',this.DIALOG_CONTROL_LEFT_MARGIN,y,this.DIALOG_BUTTON_LARGE_WIDTH,this.DIALOG_BUTTON_HIGH,'Quit to Title',false);
         
             // video
             

@@ -102,6 +102,8 @@ export default class DialogControlTextClass extends DialogControlBaseClass
         
         shader.drawStart();
         
+            // the outline
+        
         this.vertexArray[0]=this.vertexArray[6]=this.x+this.TITLE_MARGIN;
         this.vertexArray[1]=this.vertexArray[3]=this.y;
         this.vertexArray[2]=this.vertexArray[4]=(this.x+this.TITLE_MARGIN)+this.TEXT_INPUT_WIDTH;
@@ -111,7 +113,31 @@ export default class DialogControlTextClass extends DialogControlBaseClass
         gl.bufferSubData(gl.ARRAY_BUFFER,0,this.vertexArray);
         gl.vertexAttribPointer(shader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
         
+        highlight=this.cursorInText();
+        
+        this.colorArray[0]=this.colorArray[4]=this.colorArray[8]=this.colorArray[12]=highlight?this.highlightOutlineColor.r:this.outlineColor.r;
+        this.colorArray[1]=this.colorArray[5]=this.colorArray[9]=this.colorArray[13]=highlight?this.highlightOutlineColor.g:this.outlineColor.g;
+        this.colorArray[2]=this.colorArray[6]=this.colorArray[10]=this.colorArray[14]=highlight?this.highlightOutlineColor.b:this.outlineColor.b;
+        this.colorArray[3]=this.colorArray[7]=this.colorArray[11]=this.colorArray[15]=1;
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.colorBuffer);
+        gl.bufferSubData(gl.ARRAY_BUFFER,0,this.colorArray);
+        gl.vertexAttribPointer(shader.vertexColorAttribute,4,gl.FLOAT,false,0,0);
+        
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
+            
+        gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_SHORT,0);
+        
             // the fill
+            
+        this.vertexArray[0]=this.vertexArray[6]=(this.x+this.TITLE_MARGIN)+1;
+        this.vertexArray[1]=this.vertexArray[3]=this.y+1;
+        this.vertexArray[2]=this.vertexArray[4]=((this.x+this.TITLE_MARGIN)+this.TEXT_INPUT_WIDTH)-1;
+        this.vertexArray[5]=this.vertexArray[7]=(this.y+this.CONTROL_HEIGHT)-1;
+            
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
+        gl.bufferSubData(gl.ARRAY_BUFFER,0,this.vertexArray);
+        gl.vertexAttribPointer(shader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
             
         this.colorArray[0]=this.colorArray[4]=this.colorArray[8]=this.colorArray[12]=this.fillColor.r;
         this.colorArray[1]=this.colorArray[5]=this.colorArray[9]=this.colorArray[13]=this.fillColor.g;
@@ -125,20 +151,6 @@ export default class DialogControlTextClass extends DialogControlBaseClass
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
             
         gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_SHORT,0);
-        
-            // the outline
-            
-        highlight=this.cursorInText();
-        
-        this.colorArray[0]=this.colorArray[4]=this.colorArray[8]=this.colorArray[12]=highlight?this.highlightOutlineColor.r:this.outlineColor.r;
-        this.colorArray[1]=this.colorArray[5]=this.colorArray[9]=this.colorArray[13]=highlight?this.highlightOutlineColor.g:this.outlineColor.g;
-        this.colorArray[2]=this.colorArray[6]=this.colorArray[10]=this.colorArray[14]=highlight?this.highlightOutlineColor.b:this.outlineColor.b;
-        this.colorArray[3]=this.colorArray[7]=this.colorArray[11]=this.colorArray[15]=1;
-        
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.colorBuffer);
-        gl.bufferSubData(gl.ARRAY_BUFFER,0,this.colorArray);
-        
-        gl.drawArrays(gl.LINE_LOOP,0,4);
 
             // remove the buffers
 

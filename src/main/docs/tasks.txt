@@ -1,8 +1,9 @@
 
-- use fill color on sliders
-- use double quad trick on input
 - need keyboard control for inputs on iPad
-- scale dialog font depending on screen width
+- range drag needs to work even if out of click box
+- add urls, but pick url from picker
+- separate server & game (game-map)
+- retest sizing on iPad
 
 - rework multiplayer
    - first log in needs to pick game/map

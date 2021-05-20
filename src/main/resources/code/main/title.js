@@ -3,7 +3,6 @@ import TextClass from '../main/text.js';
 import MenuClass from '../main/menu.js';
 import SoundClass from '../sound/sound.js';
 import BitmapInterfaceClass from '../bitmap/bitmap_interface.js';
-import DialogButtonClass from '../dialog/dialog_button.js';
 
 export default class TitleClass
 {

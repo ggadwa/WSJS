@@ -8,10 +8,12 @@ export default class DialogButtonClass
         this.core=core;
         this.title=title;
         
-        this.lft=Math.trunc(this.core.canvas.width*x);
-        this.rgt=this.lft+Math.trunc(this.core.canvas.width*wid);
-        this.top=Math.trunc(this.core.canvas.height*y);
-        this.bot=this.top+Math.trunc(this.core.canvas.height*high);
+        this.lft=x;
+        this.rgt=x+wid;
+        this.top=y;
+        this.bot=y+high;
+        
+        this.DIALOG_BUTTON_TEXT_SIZE=20;
         
         this.colorArray=new Float32Array(4*4);
         
@@ -31,7 +33,7 @@ export default class DialogButtonClass
     
     initialize()
     {
-        let x,y,fontSize;
+        let x,y;
         let vertexArray,indexArray;
         let gl=this.core.gl;
         
@@ -73,10 +75,9 @@ export default class DialogButtonClass
             // the title text
             
         x=Math.trunc((this.lft+this.rgt)*0.5);
-        fontSize=Math.trunc((this.bot-this.top)*0.6);
-        y=(this.bot-Math.trunc(((this.bot-this.top)-fontSize)*0.5))+Math.trunc(fontSize*0.1);
+        y=(this.bot-Math.trunc(((this.bot-this.top)-this.DIALOG_BUTTON_TEXT_SIZE)*0.5))+Math.trunc(this.DIALOG_BUTTON_TEXT_SIZE*0.1);
         
-        this.text=new TextClass(this.core,this.title,x,y,fontSize,this.core.TEXT_ALIGN_CENTER,new ColorClass(1,1,1,1),1);
+        this.text=new TextClass(this.core,this.title,x,y,this.DIALOG_BUTTON_TEXT_SIZE,this.core.TEXT_ALIGN_CENTER,new ColorClass(1,1,1,1),1);
         this.text.initialize();
     }
     

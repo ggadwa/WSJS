@@ -15,7 +15,15 @@ export default class DialogBaseClass
         this.core=core;
         
         this.DIALOG_CONTROL_TOP_MARGIN=55;
+        this.DIALOG_CONTROL_BOTTOM_MARGIN=10;
+        this.DIALOG_CONTROL_LEFT_MARGIN=10;
+        this.DIALOG_CONTROL_RIGHT_MARGIN=10;
+        this.DIALOG_BUTTON_MARGIN=10;
+        
         this.DIALOG_CONTROL_MARGIN=5;
+        this.DIALOG_BUTTON_SMALL_WIDTH=150;
+        this.DIALOG_BUTTON_LARGE_WIDTH=250;
+        this.DIALOG_BUTTON_HIGH=40;
         
         this.PICKER_SIZE=128;           // needs to be outside so dialogs can calc some stuff
         
@@ -148,11 +156,11 @@ export default class DialogBaseClass
         return(high+this.DIALOG_CONTROL_MARGIN);
     }
     
-    addDialogControlList(dialog,tabId,id,x,y,title,list)
+    addDialogControlList(dialog,tabId,id,x,y,list)
     {
         let control,high;
         
-        control=new DialogControlListClass(this.core,dialog,tabId,x,y,title,list);
+        control=new DialogControlListClass(this.core,dialog,tabId,x,y,list);
         high=control.initialize();
         this.controls.set(id,control);
         

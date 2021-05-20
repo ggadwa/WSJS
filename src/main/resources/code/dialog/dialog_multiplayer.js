@@ -29,35 +29,45 @@ export default class DialogMultiplayerClass extends DialogBaseClass
         
             // dialog buttons
             
-        this.addDialogButton('cancel',0.755,0.93,0.1,0.05,'Cancel',false);
-        this.addDialogButton('localGame',0.01,0.93,0.125,0.05,'Local Game',false);
-        this.addDialogButton('joinGame',0.865,0.93,0.125,0.05,'Join Network Game',true);
+        x=(this.core.canvas.width-this.DIALOG_CONTROL_RIGHT_MARGIN)-this.DIALOG_BUTTON_LARGE_WIDTH;
+        y=(this.core.canvas.height-this.DIALOG_CONTROL_BOTTOM_MARGIN)-this.DIALOG_BUTTON_HIGH;
+        this.addDialogButton('joinGame',x,y,this.DIALOG_BUTTON_LARGE_WIDTH,this.DIALOG_BUTTON_HIGH,'Join Network Game',true);
+        
+        x-=(this.DIALOG_BUTTON_SMALL_WIDTH+this.DIALOG_BUTTON_MARGIN);
+        this.addDialogButton('cancel',x,y,this.DIALOG_BUTTON_SMALL_WIDTH,this.DIALOG_BUTTON_HIGH,'Cancel',false);
+        
+        this.addDialogButton('localGame',this.DIALOG_CONTROL_LEFT_MARGIN,y,this.DIALOG_BUTTON_LARGE_WIDTH,this.DIALOG_BUTTON_HIGH,'Local Game',false);
         
             // profile controls
             
-        x=Math.trunc(this.core.canvas.width*0.35);
+        x=Math.trunc(this.core.canvas.width*0.5)-200;
         y=this.DIALOG_CONTROL_TOP_MARGIN+50;
         this.addDialogControlText(this,'profile','name',x,y,'Name:');
 
-        x=Math.trunc(this.core.canvas.width*0.58);
+        x=Math.trunc(this.core.canvas.width*0.5)+150;
         y=this.DIALOG_CONTROL_TOP_MARGIN;
         y+=this.addDialogControlCharacterPicker(this,'profile','character',x,y);
         
-        x=Math.trunc(this.core.canvas.width*0.45);
+        x=Math.trunc(this.core.canvas.width*0.5);
         y+=this.addDialogControlRange(this,'profile','respawnTime',x,y,'Respawn Time:');        
         
             // server controls
           
-        x=Math.trunc(this.core.canvas.width*0.15);
+        x=this.DIALOG_CONTROL_LEFT_MARGIN;
         y=this.DIALOG_CONTROL_TOP_MARGIN;
-        y+=this.addDialogControlText(this,'server','serverURL',x,y,'Network Server:');
-        this.addDialogControlList(this,'server','serverList',x,y,'Recent Servers:',this.core.setup.multiplayerRecentServerURLs);
+        this.addDialogControlList(this,'server','serverList',x,y,this.core.setup.multiplayerRecentServerURLs);
         
-        x=Math.trunc(this.core.canvas.width*0.45);
-        this.addDialogControlList(this,'server','gameName',x,y,'Game:',Array.from(this.core.project.multiplayerGames.values()));
+        x=Math.trunc(this.core.canvas.width*0.5)-150;
+        y=this.DIALOG_CONTROL_TOP_MARGIN;
+        this.addDialogControlList(this,'server','gameName',x,y,Array.from(this.core.project.multiplayerGames.values()));
         
-        x=Math.trunc(this.core.canvas.width*0.75);
-        this.addDialogControlList(this,'server','mapName',x,y,'Map:',Array.from(this.core.project.multiplayerMaps.keys()));
+        x=(this.core.canvas.width-this.DIALOG_CONTROL_RIGHT_MARGIN)-300;
+        y=this.DIALOG_CONTROL_TOP_MARGIN;
+        y+=this.addDialogControlList(this,'server','mapName',x,y,Array.from(this.core.project.multiplayerMaps.keys()));
+        
+        x=Math.trunc(this.core.canvas.width*0.5)-170;
+        this.addDialogControlText(this,'server','serverURL',x,(y+5),'New Server:');
+        this.addDialogButton('serverAdd',(x+315),y,this.DIALOG_BUTTON_HIGH,this.DIALOG_BUTTON_HIGH,'+',false);
         
             // bot controls
 

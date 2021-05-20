@@ -89,7 +89,7 @@ export default class DialogControlCheckboxClass extends DialogControlBaseClass
     
     cursorInCheck()
     {
-        return((this.core.cursor.x>(this.x+this.TITLE_MARGIN)) && (this.core.cursor.x<=((this.x+this.TITLE_MARGIN)+this.CONTROL_HEIGHT)) && (this.core.cursor.y>this.y) && (this.core.cursor.y<=(this.y+this.CONTROL_HEIGHT)));
+        return((this.core.cursor.x>(this.x+this.TITLE_MARGIN)) && (this.core.cursor.x<=((this.x+this.TITLE_MARGIN)+(this.CONTROL_HEIGHT*2))) && (this.core.cursor.y>this.y) && (this.core.cursor.y<=(this.y+this.CONTROL_HEIGHT)));
     }
         
     clickUp()
@@ -218,12 +218,12 @@ export default class DialogControlCheckboxClass extends DialogControlBaseClass
         if (this.value) {    
             this.checkText.str='on';
             this.checkText.x=((this.x+this.TITLE_MARGIN)+this.CONTROL_HEIGHT)+Math.trunc(this.CONTROL_HEIGHT*0.5);
-            this.checkText.color.setFromValues(1,1,0.5);
+            this.checkText.color.setFromValues(0.5,1,0.5);
         }
         else {
             this.checkText.str='off';
             this.checkText.x=(this.x+this.TITLE_MARGIN)+Math.trunc(this.CONTROL_HEIGHT*0.5);
-            this.checkText.color.setFromValues(0.9,0.9,0.9);
+            this.checkText.color.setFromValues(1.0,0.5,0.5);
         }
             
         this.core.shaderList.textShader.drawStart();

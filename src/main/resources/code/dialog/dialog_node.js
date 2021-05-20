@@ -28,8 +28,12 @@ export default class DialogNodeClass extends DialogBaseClass
         
             // dialog buttons
             
-        this.addDialogButton('cancel',0.78,0.93,0.1,0.05,'Cancel',false);
-        this.addDialogButton('ok',0.89,0.93,0.1,0.05,'Ok',true);
+        x=(this.core.canvas.width-this.DIALOG_CONTROL_RIGHT_MARGIN)-this.DIALOG_BUTTON_SMALL_WIDTH;
+        y=(this.core.canvas.height-this.DIALOG_CONTROL_BOTTOM_MARGIN)-this.DIALOG_BUTTON_HIGH;
+        this.addDialogButton('ok',x,y,this.DIALOG_BUTTON_SMALL_WIDTH,this.DIALOG_BUTTON_HIGH,'Ok',true);
+        
+        x-=(this.DIALOG_BUTTON_SMALL_WIDTH+this.DIALOG_BUTTON_MARGIN);
+        this.addDialogButton('cancel',x,y,this.DIALOG_BUTTON_SMALL_WIDTH,this.DIALOG_BUTTON_HIGH,'Cancel',false);
         
             // node controls
             
