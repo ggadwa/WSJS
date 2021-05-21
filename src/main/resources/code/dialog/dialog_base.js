@@ -156,11 +156,11 @@ export default class DialogBaseClass
         return(high+this.DIALOG_CONTROL_MARGIN);
     }
     
-    addDialogControlList(dialog,tabId,id,x,y,list)
+    addDialogControlList(dialog,tabId,id,x,y,title,list)
     {
         let control,high;
         
-        control=new DialogControlListClass(this.core,dialog,tabId,x,y,list);
+        control=new DialogControlListClass(this.core,dialog,tabId,x,y,title,list);
         high=control.initialize();
         this.controls.set(id,control);
         

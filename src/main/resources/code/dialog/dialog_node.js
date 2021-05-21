@@ -37,7 +37,7 @@ export default class DialogNodeClass extends DialogBaseClass
         
             // node controls
             
-        x=Math.trunc(this.core.canvas.width*0.5);
+        x=Math.trunc(this.core.canvas.width*0.45);
         y=this.DIALOG_CONTROL_TOP_MARGIN;
         
         y+=this.addDialogControlText(this,'node','key',x,y,'Key (blank for none):');

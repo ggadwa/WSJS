@@ -1,8 +1,6 @@
 
 - need keyboard control for inputs on iPad
 - range drag needs to work even if out of click box
-- add urls, but pick url from picker
-- separate server & game (game-map)
 - retest sizing on iPad
 
 - rework multiplayer
