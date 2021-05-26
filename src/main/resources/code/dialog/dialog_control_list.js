@@ -111,7 +111,7 @@ export default class DialogControlListClass extends DialogControlBaseClass
         gl.deleteBuffer(this.indexBuffer);
     }
     
-    cursorInList()
+    cursorIn()
     {
         return((this.core.cursor.x>=this.x) && (this.core.cursor.x<((this.x+(this.TITLE_MARGIN*2))+this.LIST_INPUT_WIDTH)) && (this.core.cursor.y>=this.y) && (this.core.cursor.y<(this.y+this.LIST_INPUT_HEIGHT)));
     }
@@ -136,11 +136,9 @@ export default class DialogControlListClass extends DialogControlBaseClass
         return((this.core.cursor.x>=lft) && (this.core.cursor.x<rgt) && (this.core.cursor.y>=top) && (this.core.cursor.y<bot));
     }
         
-    clickUp()
+    clicked()
     {
         let idx,y;
-        
-        if (!this.cursorInList()) return(false);
         
              // up
              
@@ -167,17 +165,15 @@ export default class DialogControlListClass extends DialogControlBaseClass
         return(true);
     }
 
-    draw()
+    draw(highlight)
     {
-        let n,y,lft,rgt,top,bot,mx,idx,highlight;
+        let n,y,lft,rgt,top,bot,mx,idx;
         let shader=this.core.shaderList.colorShader;
         let gl=this.core.gl;
         
         shader.drawStart();
         
             // the outline
-            
-        highlight=this.cursorInList();
             
         this.vertexArray[0]=this.vertexArray[6]=this.x+this.TITLE_MARGIN;
         this.vertexArray[1]=this.vertexArray[3]=this.y;

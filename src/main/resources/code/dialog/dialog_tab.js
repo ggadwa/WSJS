@@ -117,7 +117,7 @@ export default class DialogTabClass
         // clicking
         //
         
-    cursorInTab()
+    cursorIn()
     {
         return((this.core.cursor.x>=this.lft) && (this.core.cursor.x<this.rgt) && (this.core.cursor.y>=this.top) && (this.core.cursor.y<this.bot));
     }
@@ -126,7 +126,7 @@ export default class DialogTabClass
         // drawing
         //
         
-    draw(selected)
+    draw(selected,highlight)
     {
         let shader=this.core.shaderList.colorShader;
         let gl=this.core.gl;
@@ -138,7 +138,7 @@ export default class DialogTabClass
         
             // button fill
         
-        if (!this.cursorInTab()) {
+        if (!highlight) {
             if (selected) {
                 this.colorArray[0]=this.colorArray[4]=0.7;
                 this.colorArray[1]=this.colorArray[5]=0.2;

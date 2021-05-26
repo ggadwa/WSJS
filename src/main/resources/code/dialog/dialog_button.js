@@ -95,7 +95,7 @@ export default class DialogButtonClass
         // clicking
         //
         
-    cursorInButton()
+    cursorIn()
     {
         return((this.core.cursor.x>=this.lft) && (this.core.cursor.x<this.rgt) && (this.core.cursor.y>=this.top) && (this.core.cursor.y<this.bot));
     }
@@ -104,7 +104,7 @@ export default class DialogButtonClass
         // drawing
         //
         
-    draw()
+    draw(highlight)
     {
         let shader=this.core.shaderList.colorShader;
         let gl=this.core.gl;
@@ -116,7 +116,7 @@ export default class DialogButtonClass
         
             // button fill
         
-        if (!this.cursorInButton()) {
+        if (!highlight) {
             this.colorArray[0]=this.colorArray[4]=0.7;
             this.colorArray[1]=this.colorArray[5]=0.2;
             this.colorArray[2]=this.colorArray[6]=1;

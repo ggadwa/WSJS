@@ -81,32 +81,25 @@ export default class DialogControlRangeClass extends DialogControlBaseClass
         gl.deleteBuffer(this.indexBuffer);
     }
     
-    cursorInRange()
+    cursorIn()
     {
         return((this.core.cursor.x>=this.x) && (this.core.cursor.x<((this.x+(this.TITLE_MARGIN*2))+this.TEXT_INPUT_WIDTH)) && (this.core.cursor.y>=this.y) && (this.core.cursor.y<(this.y+this.CONTROL_HEIGHT)));
     }
     
-    clickDown()
+    clickDrag()
     {
         let hx;
         
-        if (!this.cursorInRange()) return(false);
-        
-        hx=Math.trunc(((this.core.cursor.x-(this.x+this.TITLE_MARGIN))/this.TEXT_INPUT_WIDTH)*100); // we go a little over each edge so we can click to 0/100
+        hx=Math.trunc(((this.core.cursor.x-(this.x+this.TITLE_MARGIN))/this.TEXT_INPUT_WIDTH)*100);
         if (hx<0) hx=0;
         if (hx>100) hx=100;
         
         this.value=hx;
     }
-                
-    clickUp()
-    {
-        return(this.cursorInRange());
-    }
         
-    draw()
+    draw(highlight)
     {
-        let hx,my,hsz,highlight;
+        let hx,my,hsz;
         let shader=this.core.shaderList.colorShader;
         let gl=this.core.gl;
         
@@ -116,8 +109,6 @@ export default class DialogControlRangeClass extends DialogControlBaseClass
         
             // the track outline
             
-        highlight=this.cursorInRange();    
-       
         this.vertexArray[0]=this.vertexArray[6]=this.x+this.TITLE_MARGIN;
         this.vertexArray[1]=this.vertexArray[3]=my;
         this.vertexArray[2]=this.vertexArray[4]=(this.x+this.TITLE_MARGIN)+this.TEXT_INPUT_WIDTH;

@@ -1,7 +1,7 @@
 
 - need keyboard control for inputs on iPad
-- range drag needs to work even if out of click box
 - retest sizing on iPad
+- fix play controls on ipad
 
 - rework multiplayer
    - first log in needs to pick game/map

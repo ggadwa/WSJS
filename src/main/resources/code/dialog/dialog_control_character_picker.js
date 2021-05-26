@@ -90,19 +90,13 @@ export default class DialogControlCharacterPickerClass extends DialogControlBase
         gl.deleteBuffer(this.indexBuffer);
     }
     
-    cursorInPicker()
+    cursorIn()
     {
         return((this.core.cursor.x>=this.x) && (this.core.cursor.x<(this.x+this.dialog.PICKER_SIZE)) && (this.core.cursor.y>=this.y) && (this.core.cursor.y<(this.y+this.dialog.PICKER_SIZE)));
     }
-                
-    clickUp()
-    {
-        return(this.cursorInPicker());
-    }
         
-    draw()
+    draw(highlight)
     {
-        let highlight;
         let shader=this.core.shaderList.colorShader;
         let gl=this.core.gl;
         
@@ -162,8 +156,6 @@ export default class DialogControlCharacterPickerClass extends DialogControlBase
         
             // the outline
             
-        highlight=this.cursorInPicker();
-        
         shader=this.core.shaderList.colorShader;
             
         shader.drawStart();

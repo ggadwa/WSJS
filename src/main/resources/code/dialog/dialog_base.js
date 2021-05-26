@@ -49,6 +49,7 @@ export default class DialogBaseClass
         this.pickerControlAllowBlank=false;
         
         this.currentTextInputControl=null;      // current text input in dialog
+        this.currentClickingControlKey=null;    // current control being clicked
         
         // no seal, base class
     }
@@ -230,6 +231,8 @@ export default class DialogBaseClass
         
         this.currentMouseDown=false;
         
+        this.currentClickingControlKey=null;
+        
             // stop music/looping sounds
             
         this.core.audio.ambientStop();
@@ -309,12 +312,42 @@ export default class DialogBaseClass
                 mouseUp=true;
             }
         }
+        
+            // are we currently clicking in a control
+            
+        if (this.currentClickingControlKey!==null) {
+            
+            control=this.controls.get(this.currentClickingControlKey);
+            
+                // dragging
+                
+            if (mouseDown) {
+                control.clickDrag();
+                return(null);
+            }
+            
+                // mouse going up?
+                
+            if (mouseUp) {
+                key=this.currentClickingControlKey;
+                this.currentClickingControlKey=null;
+                
+                if (control.clicked()) {
+                   this.core.audio.soundStartUI(this.core.title.selectSound);
+                   this.currentTextInputControl=(control instanceof DialogControlTextClass)?control:null;
+                   this.core.input.keyClearLastRaw();
+                   return(key);
+                }
+                
+                return(null);
+            }
+        }
 
             // tabs
 
-        if ((!this.pickerMode) && (mouseUp)) {
+        if ((!this.pickerMode) && (this.currentClickingControlKey===null) && (mouseUp)) {
             for ([key,tab] of this.tabs) {
-                if (tab.cursorInTab()) {
+                if (tab.cursorIn()) {
                     this.core.audio.soundStartUI(this.core.title.clickSound);
                     this.selectedTabId=key;
                     this.currentTextInputControl=null;
@@ -326,37 +359,35 @@ export default class DialogBaseClass
         
             // controls
 
-        for ([key,control] of this.controls) {
-            if (!this.pickerMode) {
-                if (control.tabId===null) continue;
-                if (control.tabId!==this.selectedTabId) continue;
-            }
-            else {
-                if (control.tabId!==null) continue;
-            }
-            
-            if (mouseDown) {
-                control.clickDown();
-            }
-            else {
-                if (mouseUp) {
-                    if (control.clickUp()) {
-                        this.core.audio.soundStartUI(this.core.title.selectSound);
-                        this.currentTextInputControl=(control instanceof DialogControlTextClass)?control:null;
-                        this.core.input.keyClearLastRaw();
-                        return(key);
-                    }
+        if (mouseDown) {
+            for ([key,control] of this.controls) {
+
+                    // is this control in this tab?
+
+                if (!this.pickerMode) {
+                    if (control.tabId===null) continue;
+                    if (control.tabId!==this.selectedTabId) continue;
+                }
+                else {
+                    if (control.tabId!==null) continue;
+                }
+
+                    // are we in the control?
+
+                if (control.cursorIn()) {
+                    this.currentClickingControlKey=key;
+                    return(null);
                 }
             }
         }
-
+        
             // buttons
 
-        if ((!this.pickerMode) && (mouseUp)) {
+        if ((!this.pickerMode) && (this.currentClickingControlKey===null) && (mouseUp)) {
             for ([key,button] of this.buttons) {
                 if (!button.show) continue;
 
-                if (button.cursorInButton()) {
+                if (button.cursorIn()) {
                     this.core.audio.soundStartUI(this.core.title.clickSound);
                     this.currentTextInputControl=null;
                     this.core.input.keyClearLastRaw();
@@ -396,7 +427,7 @@ export default class DialogBaseClass
          
         if (!this.pickerMode) {
             for ([key,tab] of this.tabs) {
-                tab.draw(key===this.selectedTabId);
+                tab.draw((key===this.selectedTabId),(tab.cursorIn()&&(this.currentClickingControlKey===null)));
             }
         }
         
@@ -411,14 +442,19 @@ export default class DialogBaseClass
                 if (control.tabId!==null) continue;
             }
             
-            control.draw();
+            if (this.currentClickingControlKey!==null) {
+                control.draw(key===this.currentClickingControlKey);
+            }
+            else {
+                control.draw(control.cursorIn());
+            }
         }
        
             // buttons
             
         if (!this.pickerMode) {
             for ([key,button] of this.buttons) {
-                if (button.show) button.draw();
+                if (button.show) button.draw(button.cursorIn()&&(this.currentClickingControlKey===null));
             }
         }
         

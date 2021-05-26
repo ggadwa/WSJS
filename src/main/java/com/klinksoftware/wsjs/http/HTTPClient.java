@@ -241,9 +241,9 @@ public class HTTPClient implements Runnable
         OutputStream            out;
         
             // zip the file
-            // skip if png (already compressed)
+            // skip if png (already compressed) or wav (doesn't compress well or already compressed)
             
-        if (requestData.contentType.equals("image/png")) {
+        if ((requestData.contentType.equals("image/png")) || (requestData.contentType.equals("audio/wav"))) {
             zipped=false;
             bytes=requestData.contentBytes;
         }

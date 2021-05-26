@@ -87,23 +87,18 @@ export default class DialogControlCheckboxClass extends DialogControlBaseClass
         gl.deleteBuffer(this.indexBuffer);
     }
     
-    cursorInCheck()
+    cursorIn()
     {
         return((this.core.cursor.x>(this.x+this.TITLE_MARGIN)) && (this.core.cursor.x<=((this.x+this.TITLE_MARGIN)+(this.CONTROL_HEIGHT*2))) && (this.core.cursor.y>this.y) && (this.core.cursor.y<=(this.y+this.CONTROL_HEIGHT)));
     }
         
-    clickUp()
+    clicked()
     {
-        if (!this.cursorInCheck()) return(false);
-        
         this.value=!this.value;
-        
-        return(true);
     }
         
-    draw()
+    draw(highlight)
     {
-        let highlight;
         let shader=this.core.shaderList.colorShader;
         let gl=this.core.gl;
         
@@ -111,8 +106,6 @@ export default class DialogControlCheckboxClass extends DialogControlBaseClass
         
             // the outside line
             
-        highlight=this.cursorInCheck();
-        
         this.vertexArray[0]=this.vertexArray[6]=this.x+this.TITLE_MARGIN;
         this.vertexArray[1]=this.vertexArray[3]=this.y;
         this.vertexArray[2]=this.vertexArray[4]=(this.x+this.TITLE_MARGIN)+(this.CONTROL_HEIGHT*2);

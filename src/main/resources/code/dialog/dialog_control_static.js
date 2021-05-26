@@ -36,7 +36,7 @@ export default class DialogControlClass extends DialogControlBaseClass
         this.valueText.release();
     }
         
-    draw()
+    draw(highlight)
     {
         this.valueText.str=this.value;
         

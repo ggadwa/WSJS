@@ -48,20 +48,25 @@ export default class DialogControlBaseClass
         // clicking
         //
         
-    clickDown()
-    {
-    }
-    
-    clickUp()
+    cursorIn()
     {
         return(false);
+    }
+    
+    clicked()
+    {
+        return(true);
+    }
+    
+    clickDrag()
+    {
     }
     
         //
         // drawing
         //
         
-    draw()
+    draw(highlight)
     {
     }
 }
