@@ -1,7 +1,5 @@
 
 - need keyboard control for inputs on iPad
-- retest sizing on iPad
-- fix play controls on ipad
 
 - rework multiplayer
    - first log in needs to pick game/map

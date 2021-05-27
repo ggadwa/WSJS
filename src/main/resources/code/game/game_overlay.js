@@ -688,8 +688,6 @@ export default class GameOverlayClass
             touch=input.getNextTouchStart();
             if (touch===null) break;
             
-            this.debugText.str=touch.id+'>'+touch.x+','+touch.y+'>('+this.core.canvas.height+','+window.innerWidth+','+window.screen.width+window.innerHeight+','+window.screen.height+')';
-            
                 // check menu button
                 
             if (this.touchButtonMenu.isTouchInButton(touch.x,touch.y)) {

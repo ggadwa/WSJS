@@ -1032,22 +1032,22 @@ export default class EntityClass
     
     getTouchStickLeftX()
     {
-        return(this.core.game.overlay.getTouchSwipeLeftX());
+        return(this.core.game.overlay.getTouchStickLeftX());
     }
     
     getTouchStickLeftY()
     {
-        return(this.core.game.overlay.getTouchSwipeLeftY());
+        return(this.core.game.overlay.getTouchStickLeftY());
     }
     
     getTouchStickRightX()
     {
-        return(this.core.game.overlay.getTouchSwipeRightX());
+        return(this.core.game.overlay.getTouchStickRightX());
     }
     
     getTouchStickRightY()
     {
-        return(this.core.game.overlay.getTouchSwipeRightY());
+        return(this.core.game.overlay.getTouchStickRightY());
     }
     
     getTouchSwipeLeftX()
