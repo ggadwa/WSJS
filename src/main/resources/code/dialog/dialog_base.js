@@ -7,6 +7,7 @@ import DialogControlCheckboxClass from '../dialog/dialog_control_checkbox.js';
 import DialogControlRangeClass from '../dialog/dialog_control_range.js';
 import DialogControlListClass from '../dialog/dialog_control_list.js';
 import DialogControlCharacterPickerClass from '../dialog/dialog_control_character_picker.js';
+import DialogControlKeyboardClass from '../dialog/dialog_control_keyboard.js';
 
 export default class DialogBaseClass
 {
@@ -179,6 +180,17 @@ export default class DialogBaseClass
         return(high+this.DIALOG_CONTROL_MARGIN);
     }
     
+    addDialogControlKeyboard(dialog,tabId,id,x,y)
+    {
+        let control,high;
+        
+        control=new DialogControlKeyboardClass(this.core,dialog,tabId,x,y);
+        high=control.initialize();
+        this.controls.set(id,control);
+        
+        return(high+this.DIALOG_CONTROL_MARGIN);
+    }
+    
     setDialogControl(id,value)
     {
         this.controls.get(id).value=value;
@@ -254,6 +266,29 @@ export default class DialogBaseClass
         this.lastDrawTimestamp=this.timestamp;
         
         this.currentMouseDown=false;
+    }
+    
+        //
+        // special add for keyboard controls
+        //
+        
+    addCharacterToTextInputValue(id,key)
+    {
+        let control;
+        
+        control=this.controls.get(id);
+        
+            // < represents delete
+          
+        if (key==='<') {
+            if (control.value.length>0) control.value=control.value.substring(0,(control.value.length-1));
+            return;
+        }
+        
+            // everything else is a regular key
+            
+        control.value+=key;
+        if (control.value.length>this.MAX_TEXT_LENGTH) control.value=control.value.substring(0,this.MAX_TEXT_LENGTH);
     }
     
         //
@@ -361,6 +396,12 @@ export default class DialogBaseClass
 
         if (mouseDown) {
             for ([key,control] of this.controls) {
+                
+                    // if no touch, skip any keyboard controls
+                    
+                if (control instanceof DialogControlKeyboardClass) {
+                    if (!this.core.input.hasTouch) continue;
+                }
 
                     // is this control in this tab?
 
@@ -434,6 +475,13 @@ export default class DialogBaseClass
             // controls
    
         for ([key,control] of this.controls) {
+            
+                // if no touch, skip any keyboard controls
+
+            if (control instanceof DialogControlKeyboardClass) {
+                if (!this.core.input.hasTouch) continue;
+            }
+            
             if (!this.pickerMode) {
                 if (control.tabId===null) continue;
                 if (control.tabId!==this.selectedTabId) continue;

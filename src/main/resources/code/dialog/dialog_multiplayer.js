@@ -44,6 +44,8 @@ export default class DialogMultiplayerClass extends DialogBaseClass
         x=Math.trunc(this.core.canvas.width*0.4);
         y=this.DIALOG_CONTROL_TOP_MARGIN;
         y+=this.addDialogControlText(this,'profile','name',x,y,'Name:');
+        
+        this.addDialogControlKeyboard(this,'profile','nameKeyboard',(x+320),this.DIALOG_CONTROL_TOP_MARGIN);
 
         x=Math.trunc(this.core.canvas.width*0.4)+100;
         y+=this.addDialogControlCharacterPicker(this,'profile','character',x,y);
@@ -56,6 +58,8 @@ export default class DialogMultiplayerClass extends DialogBaseClass
         x=Math.trunc(this.core.canvas.width*0.4);
         y=this.DIALOG_CONTROL_TOP_MARGIN;
         y+=this.addDialogControlText(this,'server','serverURL',x,y,'Server URL:');
+        
+        this.addDialogControlKeyboard(this,'server','serverKeyboard',(x+320),this.DIALOG_CONTROL_TOP_MARGIN);
           
         x=Math.trunc(this.core.canvas.width*0.4);
         this.addDialogControlList(this,'server','serverList',x,y,'Recent URLs:',this.core.setup.multiplayerRecentServerURLs);        
@@ -218,6 +222,14 @@ export default class DialogMultiplayerClass extends DialogBaseClass
         if (id==='serverList') {
             this.setDialogControl('serverURL',this.getDialogControl('serverList'));
             return(true);
+        }
+        
+        if (id==='nameKeyboard') {
+            this.addCharacterToTextInputValue('name',this.getDialogControl(id));
+        }
+        
+        if (id==='serverKeyboard') {
+            this.addCharacterToTextInputValue('serverURL',this.getDialogControl(id));
         }
         
         if (id.startsWith('botPick')) {

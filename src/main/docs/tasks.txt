@@ -1,6 +1,4 @@
 
-- need keyboard control for inputs on iPad
-
 - rework multiplayer
    - first log in needs to pick game/map
       - needs to pass back game/map/etc
