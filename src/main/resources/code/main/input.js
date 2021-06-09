@@ -48,8 +48,10 @@ export default class InputClass
         this.touchMoveListener=this.touchMove.bind(this);
         
             // touches
+            // for now, we only do touch if we have touch and we do NOT have a mouse
+            // this is a fix for windows touch screen PCs
             
-        this.hasTouch=(navigator.maxTouchPoints>1);
+        this.hasTouch=(navigator.maxTouchPoints>1)&&(window.matchMedia("(any-hover: none)").matches);
         
         this.touchStartList=[];
         this.touchEndList=[];
