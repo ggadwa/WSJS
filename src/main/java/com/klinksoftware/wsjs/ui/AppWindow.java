@@ -1,9 +1,7 @@
 package com.klinksoftware.wsjs.ui;
 
 import com.klinksoftware.wsjs.application.*;
-import com.klinksoftware.wsjs.websockets.*;
 
-import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.net.*;
@@ -173,46 +171,19 @@ public class AppWindow implements WindowListener
 
         toolBar=new JToolBar();
         toolBar.setFloatable(false);
-        toolBar.setPreferredSize(new Dimension(Integer.MAX_VALUE,TOOLBAR_HEIGHT));
-        toolBar.setMinimumSize(new Dimension(Integer.MAX_VALUE,TOOLBAR_HEIGHT));
-        toolBar.setMaximumSize(new Dimension(Integer.MAX_VALUE,TOOLBAR_HEIGHT));
-        
         addToolProjectCombo();
         //addToolButton("tool_setup",0,"Settings");
-        
-        gbc=new GridBagConstraints();
-        gbc.fill=GridBagConstraints.BOTH;
-        gbc.gridx=0;
-        gbc.gridy=0;
-        gbc.gridwidth=2;
-        gbc.weightx=1.0;
-        gbc.weighty=0.0;
-        frame.add(toolBar,gbc);
+        frame.add(toolBar,new GridBagConstraints(0,0,2,1,1.0,0.0,GridBagConstraints.CENTER,GridBagConstraints.HORIZONTAL,new Insets(0,0,0,0),0,0));
 
             // game header
             
-        gameLabel=new GenericLabel("No game/map has been set yet",true,false);
-
-        gbc=new GridBagConstraints();
-        gbc.fill=GridBagConstraints.BOTH;
-        gbc.gridx=0;
-        gbc.gridy=1;
-        gbc.gridwidth=2;
-        gbc.weightx=1.0;
-        gbc.weighty=0.0;
-        frame.add(gameLabel,gbc);
+        gameLabel=new GradientLabel("No game/map has been set yet",new Color(255,196,255),new Color(255,128,255),false);
+        frame.add(gameLabel,new GridBagConstraints(0,1,2,1,1.0,0.0,GridBagConstraints.CENTER,GridBagConstraints.HORIZONTAL,new Insets(0,0,0,0),0,0));
         
             // user header
             
-        userLabel=new GenericLabel("Users",false,false);
-
-        gbc=new GridBagConstraints();
-        gbc.fill=GridBagConstraints.BOTH;
-        gbc.gridx=0;
-        gbc.gridy=2;
-        gbc.weightx=0.0;
-        gbc.weighty=0.0;
-        frame.add(userLabel,gbc);
+        userLabel=new GradientLabel("Users",new Color(196,196,255),new Color(128,128,255),false);
+        frame.add(userLabel,new GridBagConstraints(0,2,1,1,0.0,0.0,GridBagConstraints.CENTER,GridBagConstraints.HORIZONTAL,new Insets(0,0,0,0),0,0));
         
             // user List
             
@@ -222,29 +193,15 @@ public class AppWindow implements WindowListener
         userScrollPane.setBorder(BorderFactory.createMatteBorder(0,0,0,0,Color.black));
         userScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         userScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        userScrollPane.setPreferredSize(new Dimension(USER_WIDTH,100));
-        userScrollPane.setMinimumSize(new Dimension(USER_WIDTH,HEADER_HEIGHT));
+        userScrollPane.setPreferredSize(new Dimension(USER_WIDTH,Integer.MAX_VALUE));
+        userScrollPane.setMinimumSize(new Dimension(USER_WIDTH,Integer.MAX_VALUE));
         userScrollPane.setMaximumSize(new Dimension(USER_WIDTH,Integer.MAX_VALUE));
-        
-        gbc=new GridBagConstraints();
-        gbc.fill=GridBagConstraints.BOTH;
-        gbc.gridx=0;
-        gbc.gridy=3;
-        gbc.weightx=0.0;
-        gbc.weighty=1.0;
-        frame.add(userScrollPane,gbc);
+        frame.add(userScrollPane,new GridBagConstraints(0,3,1,1,0.0,1.0,GridBagConstraints.CENTER,GridBagConstraints.VERTICAL,new Insets(0,0,0,0),0,0));
         
             // status header
             
-        statusLabel=new GenericLabel("Status",false,false);
-
-        gbc=new GridBagConstraints();
-        gbc.fill=GridBagConstraints.BOTH;
-        gbc.gridx=0;
-        gbc.gridy=4;
-        gbc.weightx=0.0;
-        gbc.weighty=0.0;
-        frame.add(statusLabel,gbc);
+        statusLabel=new GradientLabel("Status",new Color(196,196,255),new Color(128,128,255),false);
+        frame.add(statusLabel,new GridBagConstraints(0,4,1,1,0.0,0.0,GridBagConstraints.CENTER,GridBagConstraints.HORIZONTAL,new Insets(0,0,0,0),0,0));
         
             // status
             
@@ -252,26 +209,12 @@ public class AppWindow implements WindowListener
         statusCanvas.setPreferredSize(new Dimension(USER_WIDTH,STATUS_CANVAS_HEIGHT));
         statusCanvas.setMinimumSize(new Dimension(USER_WIDTH,STATUS_CANVAS_HEIGHT));
         statusCanvas.setMaximumSize(new Dimension(USER_WIDTH,STATUS_CANVAS_HEIGHT));
-        
-        gbc=new GridBagConstraints();
-        gbc.fill=GridBagConstraints.BOTH;
-        gbc.gridx=0;
-        gbc.gridy=5;
-        gbc.weightx=0.0;
-        gbc.weighty=0.0;
-        frame.add(statusCanvas,gbc);
+        frame.add(statusCanvas,new GridBagConstraints(0,5,1,1,0.0,0.0,GridBagConstraints.CENTER,GridBagConstraints.VERTICAL,new Insets(0,0,0,0),0,0));
 
             // log header
 
-        logLabel=new GenericLabel("Log",false,true);
-        
-        gbc=new GridBagConstraints();
-        gbc.fill=GridBagConstraints.BOTH;
-        gbc.gridx=1;
-        gbc.gridy=2;
-        gbc.weightx=0.0;
-        gbc.weighty=0.0;
-        frame.add(logLabel,gbc);
+        logLabel=new GradientLabel("Log",new Color(196,196,255),new Color(128,128,255),true);
+        frame.add(logLabel,new GridBagConstraints(1,2,1,1,0.0,0.0,GridBagConstraints.CENTER,GridBagConstraints.HORIZONTAL,new Insets(0,0,0,0),0,0));
         
             // log text
             
@@ -284,15 +227,7 @@ public class AppWindow implements WindowListener
         logScrollPane.setPreferredSize(new Dimension(Integer.MAX_VALUE,LOG_HEIGHT));
         logScrollPane.setMinimumSize(new Dimension(Integer.MAX_VALUE,LOG_HEIGHT));
         logScrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
-        
-        gbc=new GridBagConstraints();
-        gbc.fill=GridBagConstraints.BOTH;
-        gbc.gridx=1;
-        gbc.gridy=3;
-        gbc.gridheight=3;
-        gbc.weightx=0.0;
-        gbc.weighty=1.0;
-        frame.add(logScrollPane,gbc);
+        frame.add(logScrollPane,new GridBagConstraints(1,3,1,3,0.0,1.0,GridBagConstraints.CENTER,GridBagConstraints.BOTH,new Insets(0,0,0,0),0,0));
 
             // all the event listeners
             
